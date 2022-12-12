@@ -156,10 +156,10 @@ Convert local files to a custom format
 `sticker_convert_cli --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
 ## Running python script directly
-*Note: Run scripts with `python ./sticker-convert/sticker_convert_cli.py`
+### Install python3
+Install python3 from https://www.python.org/
 
-First, install python3
-
+### Install python modules
 The following python modules are required:
 - `requests`
 - `ffmpeg-python`
@@ -170,6 +170,9 @@ The following python modules are required:
 - `python-telegram-bot`
 - `anyio`
 
+Install them with `pip install`
+
+### Executables / Binaries (Windows)
 For Windows, the following executables are required:
 - `ffmpeg.exe` and `ffprobe.exe`
     - Both can be found in https://ffmpeg.org/download.html
@@ -205,6 +208,7 @@ For Windows, the following executables are required:
 
 Create a directory named `bin` in the root of this repo and place the executables into it
 
+### Executables / Binaries (MacOS)
 For MacOS, the following binaries are required:
 - `ffmpeg` and `ffprobe`
     - Eaisest method is download from Homebrew `brew install ffmpeg`
@@ -227,6 +231,7 @@ For MacOS, the following binaries are required:
     - Easiest method is download from Homebrew `brew install apngasm`
     - Note that version 3 is required. Sourceforge only provides up to version 2.
 
+### Executables / Binaries (Linux)
 For Linux, the following binaries are required:
 - `ffmpeg` and `ffprobe`
 - `magick`
@@ -236,6 +241,11 @@ For Linux, the following binaries are required:
 - `apngdis`
 - `apngasm`
     - Note that version 3 is required. Sourceforge only provides up to version 2.
+
+### Running the script
+You have to run in the root directory of this repo with `python ./sticker_convert/sticker_convert_gui.py`
+
+Alternatively, use `run_gui_windows.bat` on Windows or `run_gui_macos_linux.sh` on MacOS or Linux.
 
 ## Compiling
 
