@@ -245,7 +245,14 @@ For Linux, the following binaries are required:
 ### Running the script
 You have to run in the root directory of this repo with `python ./sticker_convert/sticker_convert_gui.py`
 
-Alternatively, use `run_gui_windows.bat` on Windows or `run_gui_macos_linux.sh` on MacOS or Linux.
+## Docker
+```
+docker run -d -it --name sticker-convert \
+    -v /path/to/your/stickers_input:/app/stickers_input \
+    -v /path/to/your/stickers_output:/app/stickers_output \
+    sticker-convert:latest \
+    python3 /app/sticker_convert/sticker_convert_cli.py --help
+```
 
 ## Compiling
 

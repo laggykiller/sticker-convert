@@ -3,7 +3,6 @@ FROM alpine:latest
 WORKDIR /app
 
 COPY . /app/
-RUN cp /app/docker-run.sh /run.sh
 
 RUN apk add alpine-sdk python3 py3-pip ffmpeg imagemagick optipng pngquant zip unzip cmake libpng-dev boost-dev tar sed
 
@@ -32,4 +31,4 @@ RUN rm -rf /app/pngnq-s9-2.0.2 && \
 
 RUN pip3 install requests ffmpeg-python wand lottie argparse signalstickers_client python-telegram-bot anyio
 
-CMD ["run.sh", "--help"]
+CMD ["python3", "/app/sticker_convert/sticker_convert_cli.py", "--help"]
