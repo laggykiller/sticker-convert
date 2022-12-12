@@ -1,0 +1,16 @@
+stickers_input/**
+stickers_output/**
+*.exe
+*.dll
+bin/**
+dist/**
+build/**
+creds.json
+bzcmp
+bzdiff
+bzegrep
+bzfgrep
+gzgrep
+bzgrep
+bzless
+bzmore
