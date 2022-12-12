@@ -1,8 +1,6 @@
 import os
-import subprocess
 import sys
-import shutil
-import tempfile
+
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
     if sys.platform == 'win32':
         magick_home = os.path.abspath('./magick')
@@ -10,6 +8,8 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         os.environ["MAGICK_CODER_MODULE_PATH"] = magick_home + os.sep + "coders"
         os.environ["PATH"] += os.pathsep + magick_home + os.sep
     elif sys.platform == 'darwin':
+        script_path = os.path.join(os.path.split(__file__)[0], '../')
+        os.chdir(os.path.abspath(script_path))
         for i in os.listdir():
             if i.startswith('ImageMagick') and os.path.isdir(i):
                 magick_home = os.path.abspath(i)
@@ -21,6 +21,9 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
 
 from wand.image import Image
 import ffmpeg
+import subprocess
+import tempfile
+import shutil
 from utils.lottie_convert import lottie_convert
 from utils.format_verify import FormatVerify
 import traceback
@@ -319,6 +322,10 @@ class StickerConvert:
             subprocess.call([get_bin('apngasm'), '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
 def get_bin(bin):
+    if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        script_path = os.path.join(os.path.split(__file__)[0], '../')
+        os.chdir(os.path.abspath(script_path))
+
     which_result = shutil.which(bin)
     if which_result != None:
         return os.path.abspath(which_result)

@@ -30,7 +30,7 @@ Supports static and animated stickers, with transparency support
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 
 ## Pre-compiled releases
-Pre-compiled releases available for Windows and MacOS, for both GUI and CLI version.
+Pre-compiled releases available for Windows and MacOS, for both GUI and CLI version. Unzip the downloaded file and run sticker_convert_cli or sticker_convert_gui
 
 Docker image of the CLI version is available for Linux.
 
