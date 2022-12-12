@@ -79,10 +79,6 @@ def main():
 
     args = parser.parse_args()
 
-    if os.path.isdir(args.input_dir) == False:
-        print('Error: Cannot find the specified input directory')
-        return False
-
     signal_uuid = args.signal_uuid
     signal_password = args.signal_password
     telegram_token = args.telegram_token
@@ -111,8 +107,10 @@ def main():
         print('Saved credentials to creds.json')
     
     if os.path.isdir(args.input_dir) == False:
+        print('Warning: Cannot find the specified input directory. Creating for you...')
         os.makedirs(args.input_dir)
     if os.path.isdir(args.output_dir) == False:
+        print('Info: Cannot find the specified output directory. Creating for you...')
         os.makedirs(args.output_dir)
     
     processes = args.processes if args.processes else multiprocessing.cpu_count()

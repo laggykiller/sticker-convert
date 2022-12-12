@@ -4,10 +4,21 @@ import sys
 import shutil
 import tempfile
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-    magick_home = os.path.abspath('./magick')
-    os.environ["PATH"] += os.pathsep + magick_home + os.sep
-    os.environ['MAGICK_HOME'] = magick_home
-    os.environ["MAGICK_CODER_MODULE_PATH"] = magick_home + os.sep + "coders"
+    if sys.platform == 'win32':
+        magick_home = os.path.abspath('./magick')
+        os.environ['MAGICK_HOME'] = magick_home
+        os.environ["MAGICK_CODER_MODULE_PATH"] = magick_home + os.sep + "coders"
+        os.environ["PATH"] += os.pathsep + magick_home + os.sep
+    elif sys.platform == 'darwin':
+        for i in os.listdir():
+            if i.startswith('ImageMagick') and os.path.isdir(i):
+                magick_home = os.path.abspath(i)
+                break
+
+        os.environ['MAGICK_HOME'] = magick_home
+        os.environ["PATH"] += os.pathsep + magick_home + os.sep + "bin"
+        os.environ["DYLD_LIBRARY_PATH"] = magick_home + os.sep + "lib"
+
 from wand.image import Image
 import ffmpeg
 from utils.lottie_convert import lottie_convert
@@ -280,16 +291,16 @@ class StickerConvert:
 
             # apngdis convert to png strip
             tmp2_f = os.path.join(tempdir1, 'tmp1_strip.png')
-            subprocess.call([os.path.abspath(shutil.which('apngdis')), tmp1_f, '-s'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.call([get_bin('apngdis'), tmp1_f, '-S'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
             # pngnq-s9 optimization
             tmp3_f = os.path.join(tempdir1, 'tmp1_strip.1.png')
             number_of_colors = color # 1-256 number of colors
-            subprocess.call([os.path.abspath(shutil.which('pngnq-s9')), '-L', '-Qn', '-T15', '-n', str(number_of_colors), '-e', '.1.png', tmp2_f], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.call([get_bin('pngnq-s9'), '-L', '-Qn', '-T15', '-n', str(number_of_colors), '-e', '.1.png', tmp2_f], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
             # pngquant optimization
             tmp4_f = os.path.join(tempdir1, 'tmp1_strip.1.2.png')
-            subprocess.call([os.path.abspath(shutil.which(('pngquant'))), '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp3_f], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.call([get_bin('pngquant'), '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp3_f], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
             # magick convert single png strip to png files
             tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
@@ -305,5 +316,15 @@ class StickerConvert:
                 StickerConvert.convert_generic_image(j, j, res=res, quality=95)
             
             # apngasm create optimized apng
-            subprocess.call([os.path.abspath(shutil.which(('apngasm'))), '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            subprocess.call([get_bin('apngasm'), '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
+def get_bin(bin):
+    which_result = shutil.which(bin)
+    if which_result != None:
+        return os.path.abspath(which_result)
+    elif bin in os.listdir():
+        return os.path.abspath(f'./{bin}')
+    elif bin in os.listdir('./bin'):
+        return os.path.abspath(f'./bin/{bin}')
+    else:
+        print(f'Warning: Cannot find binary file {bin}')

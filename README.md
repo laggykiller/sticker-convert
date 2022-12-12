@@ -156,6 +156,8 @@ Convert local files to a custom format
 `sticker_convert_cli --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
 ## Running python script directly
+*Note: Run scripts with `python ./sticker-convert/sticker_convert_cli.py`
+
 First, install python3
 
 The following python modules are required:
@@ -197,21 +199,33 @@ For Windows, the following executables are required:
     - Download page: https://sourceforge.net/projects/apngdis/files/
     - Direct link: https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-win64.zip
 - `apngasm.exe`
-    - Note that version 3 is required and should not be portable version
+    - Note that version 3 is required. Sourceforge only provides up to version 2.
     - Download page: https://github.com/apngasm/apngasm/releases
     - Direct link: https://github.com/apngasm/apngasm/releases/download/3.1.1/apngasm_3.1-0_AMD64.exe
 
-Place the executables into root directory of this repo (i.e. Same directory as README.md)
+Create a directory named `bin` in the root of this repo and place the executables into it
 
 For MacOS, the following binaries are required:
 - `ffmpeg` and `ffprobe`
+    - Eaisest method is download from Homebrew `brew install ffmpeg`
 - `magick`
+    - Eaisest method is download from Homebrew `brew install imagemagick`
 - `optipng`
+    - Easiest method is download from Homebrew `brew install optipng`
 - `pngnq-s9`
+    - Compilation is required: https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9
+    - Compilation instructions are in https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/blob/master/INSTALL
+    - Note that you should add `#include <string.h>` to `src/rwpng.c` or else compilation fails
 - `pngquant`
+    - Easiest method is download from Homebrew `brew install pngquant`
 - `apngdis`
+    - Note that version 2.9 is required. Some homebrew-extra provides apngdis but it is version 2.8
+    - Download page: https://apngdis.sourceforge.net/
+    - Direct link: https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip
+    - Create a directory named `bin` in the root of this repo and place the executables into it
 - `apngasm`
-    - Note that version 3 is required
+    - Easiest method is download from Homebrew `brew install apngasm`
+    - Note that version 3 is required. Sourceforge only provides up to version 2.
 
 For Linux, the following binaries are required:
 - `ffmpeg` and `ffprobe`
@@ -221,13 +235,27 @@ For Linux, the following binaries are required:
 - `pngquant`
 - `apngdis`
 - `apngasm`
-    - Note that version 3 is required
+    - Note that version 3 is required. Sourceforge only provides up to version 2.
 
 ## Compiling
-1. Refer to the instructions in running python script directly for installing python modules and executables / binaries
-2. Create `bin` directory
-3. Copy all executables/binaries you have downloaded and placed in root directory of this repo into `bin` directory
-4. Run `pyinstaller sticker_convert_cli_windows.spec` or choose another .spec file
+
+### Windows
+1. Refer to the instructions in running python script directly for installing python modules and executables
+2. Run `pyinstaller sticker_convert_cli_windows.spec` or `pyinstaller sticker_convert_gui_windows.spec`
+3. Compilation result in `dist` directory
+
+### MacOS
+1. Refer to the instructions in running python script directly for installing python modules and binaries (Except imagemagick, ffmpeg and ffprobe)
+2. `ImageMagick` precompiled portable version is broken in newer releases of MacOS. You need to compile ImageMagick. Run `magick-compile-macos.sh` first
+    - Ref1: https://stackoverflow.com/questions/55754551/how-to-install-imagemagick-portably-on-macos-when-i-cant-set-dyld-library-path
+    - Ref2: https://github.com/ImageMagick/ImageMagick/issues/3129
+3. Get static build of `ffmpeg` and `ffprobe` from: https://evermeet.cx/ffmpeg/ (If down, then go to https://ffmpeg.org/download.html). 
+4. Create `bin` directory and place `ffmpeg`, `ffprobe` and `apngdis` into `bin` directory located in this repo
+5. Run `pyinstaller sticker_convert_cli_macos.spec` or `pyinstaller sticker_convert_gui_windows.spec`
+6. Compilation result in `dist` directory
+
+### Linux
+
 
 ## FAQ
 
