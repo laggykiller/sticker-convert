@@ -10,21 +10,23 @@ def get_bin(bin):
     if which_result != None:
         return os.path.abspath(which_result)
 
-binaries = [('./sticker_convert/bin/*', './bin')]
+if os.path.isdir('./sticker_convert/bin'):
+    binaries = [('./sticker_convert/bin/*', './bin')]
+else:
+    binaries = []
+
 datas = [('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon')]
 
 bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
 if sys.platform == 'win32':
     apngasm_dir = os.path.split(shutil.which("apngasm"))[0]
     magick_dir = os.path.split(shutil.which("magick"))[0]
-    datas += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.dll', './ImageMagick'), (f'{magick_dir}/modules/coders', './ImageMagick/coders'), (f'{apngasm_dir}/*', './')]
+    binaries += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.dll', './ImageMagick'), (f'{magick_dir}/modules/coders', './ImageMagick/coders'), (f'{apngasm_dir}/*', './')]
 elif sys.platform == 'darwin':
-    datas += [(f'ImageMagick/bin/*', f'./ImageMagick/bin'), (f'ImageMagick/lib/*', f'./ImageMagick/lib')]
-elif sys.platform == 'linux':
-    datas += [(f'ImageMagick/bin/*', f'./ImageMagick/bin'), (f'ImageMagick/lib/*', f'./ImageMagick/lib')]
+    binaries += [(f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'), (f'./sticker_convert/ImageMagick/lib/*', f'./ImageMagick/lib')]
 
-if (sys.platform == 'linux' or sys.platform == 'darwin') and os.path.isdir('ImageMagick') == False:
-    print('Warning: ImageMagick directory not found. You may run magick-compile.sh')
+if os.path.isdir('./sticker_convert/ImageMagick') == False and sys.platform == 'darwin':
+    print('Warning: ImageMagick directory not found. You may run magick-compile-macos.sh')
     sys.exit()
 
 for bin in bin_list:
@@ -32,12 +34,21 @@ for bin in bin_list:
     if bin_path:
         binaries.append((bin_path, './bin'))
 
+if sys.platform == 'win32':
+    suffix = 'windows'
+elif sys.platform == 'darwin':
+    suffix = 'macos'
+elif sys.platform == 'linux':
+    suffix = 'linux'
+else:
+    suffix = 'unknown'
+
 a = Analysis(
     ['sticker_convert/main.py'],
     pathex=[],
     binaries=binaries,
     datas=datas,
-    hiddenimports=[],
+    hiddenimports=['tkinter'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -75,5 +86,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name=f'sticker-convert-{sys.platform}',
+    name=f'sticker-convert-{suffix}',
 )

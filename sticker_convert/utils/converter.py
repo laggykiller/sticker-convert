@@ -1,31 +1,12 @@
 import os
-import sys
 import shutil
-
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('imagemagick') == None:
-    if sys.platform == 'win32':
-        magick_home = os.path.abspath('./ImageMagick')
-        os.environ['MAGICK_HOME'] = magick_home
-        os.environ["MAGICK_CODER_MODULE_PATH"] = magick_home + os.sep + "coders"
-        os.environ["PATH"] += os.pathsep + magick_home + os.sep
-    elif sys.platform == 'linux':
-        magick_home = os.path.abspath('./ImageMagick')
-        os.environ['MAGICK_HOME'] = magick_home
-        os.environ["PATH"] += os.pathsep + magick_home + os.sep + "bin"
-        os.environ["LD_LIBRARY_PATH"] = magick_home + os.sep + "lib"
-    elif sys.platform == 'darwin':
-        magick_home = os.path.abspath('./ImageMagick')
-        os.environ['MAGICK_HOME'] = magick_home
-        os.environ["PATH"] += os.pathsep + magick_home + os.sep + "bin"
-        os.environ["DYLD_LIBRARY_PATH"] = magick_home + os.sep + "lib"
-
-from wand.image import Image
+# import wand.image as Image
 import ffmpeg
-import subprocess
 import tempfile
 from utils.lottie_convert import lottie_convert
 from utils.format_verify import FormatVerify
 import traceback
+from utils.run_bin import RunBin
 
 lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
 lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4', '.webm')
@@ -182,26 +163,34 @@ class StickerConvert:
         # https://stackoverflow.com/a/28503615
         # out_f: tiles_{0}.jpg
 
-        with Image(filename=in_f) as img:
-            i = 0
-            for h in range(0, img.height, res):
-                for w in range(0, img.width, res):
-                    w_end = w + res
-                    h_end = h + res
-                    with img[w:w_end, h:h_end] as chunk:
-                        chunk.save(filename=out_f.format(str(i).zfill(3)))
-                    i += 1
+        # with Image(filename=in_f) as img:
+        #     i = 0
+        #     for h in range(0, img.height, res):
+        #         for w in range(0, img.width, res):
+        #             w_end = w + res
+        #             h_end = h + res
+        #             with img[w:w_end, h:h_end] as chunk:
+        #                 chunk.save(filename=out_f.format(str(i).zfill(3)))
+        #             i += 1
+
+        RunBin.run_cmd(['magick', in_f, '-crop', f'{res}x{res}', out_f])
 
     @staticmethod
     def convert_generic_image(in_f, out_f, res=512, quality=90, **kwargs):
-        with Image(filename=in_f) as img:
-            if res != None:
-                img.resize(width=res, height=res)
-                img.background_color = 'none'
-                img.gravity = 'center'
-                img.extent(width=res, height=res)
-            img.compression_quality = quality
-            img.save(filename=out_f)
+        # with Image(filename=in_f) as img:
+        #     if res != None:
+        #         img.resize(width=res, height=res)
+        #         img.background_color = 'none'
+        #         img.gravity = 'center'
+        #         img.extent(width=res, height=res)
+        #     img.compression_quality = quality
+        #     img.save(filename=out_f)
+
+        if res != None:
+            RunBin.run_cmd(['magick', in_f, '-resize', f'{res}x{res}', '-background', 'none', '-gravity', 'center', '-extent', f'{res}x{res}', '-quality', str(quality), out_f])
+        else:
+            RunBin.run_cmd(['magick', in_f, '-quality', str(quality), out_f])
+
 
     @staticmethod
     def convert_generic_anim(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
@@ -233,9 +222,7 @@ class StickerConvert:
             stream = ffmpeg.output(stream, out_f, pix_fmt='yuva420p', quality=quality, lossless=0)
         ffmpeg.run(stream, overwrite_output=True, quiet=True)
 
-        # os.system(f'ffmpeg -y -i {in_f} -r {fps} -vf "scale={res}:-1:flags=neighbor:sws_dither=none,pad={res}:{res}:(ow-iw)/2:(oh-ih)/2:color=black@0,setsar=1" -pix_fmt yuva420p -quality {quality} -lossless 0 -loop 0 {out_f}')
-
-        # subprocess.Popen([os.path.abspath(shutil.which('ffmpeg')), '-y', '-i', in_f, '-r', str(fps), '-vf', f'scale={res}:-1:flags=neighbor:sws_dither=none,pad={res}:{res}:(ow-iw)/2:(oh-ih)/2:color=black@0,setsar=1', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', str(out_f)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # RunBin.run_cmd(['ffmpeg', '-y', '-i', in_f, '-r', str(fps), '-vf', f'scale={res}:-1:flags=neighbor:sws_dither=none,pad={res}:{res}:(ow-iw)/2:(oh-ih)/2:color=black@0,setsar=1', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', str(out_f)])
 
     @staticmethod
     def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
@@ -246,8 +233,10 @@ class StickerConvert:
         with tempfile.TemporaryDirectory() as tempdir:
             tmp_f = os.path.join(tempdir, 'temp.mp4')
         
-            with Image(filename=in_f) as img:
-                img.save(filename=tmp_f)
+            # with Image(filename=in_f) as img:
+            #     img.save(filename=tmp_f)
+
+            RunBin.run_cmd(['magick', in_f, '-quality', str(quality), tmp_f])
             
             StickerConvert.convert_generic_anim(tmp_f, out_f, res=res, quality=quality, fps=fps)
 
@@ -293,38 +282,41 @@ class StickerConvert:
 
             # apngdis convert to png strip
             tmp2_f = os.path.join(tempdir1, 'tmp1_strip.png')
-            subprocess.call([get_bin('apngdis'), tmp1_f, '-S'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            RunBin.run_cmd(['apngdis', tmp1_f, '-S'])
 
             # pngnq-s9 optimization
             tmp3_f = os.path.join(tempdir1, 'tmp1_strip.1.png')
             number_of_colors = color # 1-256 number of colors
-            subprocess.call([get_bin('pngnq-s9'), '-L', '-Qn', '-T15', '-n', str(number_of_colors), '-e', '.1.png', tmp2_f], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(number_of_colors), '-e', '.1.png', tmp2_f])
 
             # pngquant optimization
             tmp4_f = os.path.join(tempdir1, 'tmp1_strip.1.2.png')
-            subprocess.call([get_bin('pngquant'), '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp3_f], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp3_f])
 
             # magick convert single png strip to png files
-            tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
+            # tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
+            tmp5_f = os.path.join(tempdir2, 'tmp2-%03d.png')
             StickerConvert.magick_crop(tmp4_f, tmp5_f, res)
             
             # optipng and magick convert optimize png files
             for i in os.listdir(tempdir2):
                 j = os.path.join(tempdir2, i)
-                subprocess.call([os.path.abspath(shutil.which(('optipng'))), '-o4', j], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+                RunBin.run_cmd(['optipng', '-o4', j], silence=True)
                 # https://www.imagemagick.org/script/command-line-options.php#quality
                 # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
                 # For png, filter_type = quality % 10
                 StickerConvert.convert_generic_image(j, j, res=res, quality=95)
             
             # apngasm create optimized apng
-            subprocess.call([get_bin('apngasm'), '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+            RunBin.run_cmd(['apngasm', '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'])
 
 def get_bin(bin):
     which_result = shutil.which(bin)
     if which_result != None:
         return os.path.abspath(which_result)
-    elif bin in os.listdir('./bin'):
+    elif os.path.isdir('./bin') and bin in os.listdir('./bin'):
         return os.path.abspath(f'./bin/{bin}')
+    elif os.path.isdir('./ImageMagick/bin') and bin in os.listdir('./ImageMagick/bin'):
+        return os.path.abspath(f'./ImageMagick/bin/{bin}')
     else:
         print(f'Warning: Cannot find binary file {bin}')

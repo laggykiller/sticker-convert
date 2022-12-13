@@ -3,7 +3,7 @@
 Install python3 from https://www.python.org/
 
 ## 2. Install python modules
-Install the required python modules with `pip3 install requests ffmpeg-python wand lottie argparse signalstickers_client python-telegram-bot anyio`
+Install the required python modules with `pip3 install requests ffmpeg-python lottie argparse signalstickers_client python-telegram-bot anyio`
 
 ## 3.1 Executables / Binaries (Windows)
 For Windows, the following executables are required:
@@ -68,6 +68,8 @@ For MacOS, the following binaries are required:
 Some packages are usually not available in repo. To compile them, install these packages:
 
 `sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config`
+
+You may also need to install `tkinter` with `sudo apt install python3-tk`
 
 For Linux, the following binaries are required:
 - `ffmpeg` and `ffprobe`
@@ -136,8 +138,3 @@ This repository uses `pyinstaller` for compiling. Install with `pip3 install pyi
 4. Place `ffmpeg`, `ffprobe` and `apngdis` inside `sticker_convert/bin`
 5. Run `pyinstaller sticker_convert.spec`
 6. Compilation result in `dist` directory
-
-## Compiling on Linux (Tested on Ubuntu 18.04)
-1. Refer to the instructions in running python script directly for installing python modules and binaries
-2. Run `pyinstaller sticker_convert.spec`
-3. Compilation result in `dist` directory

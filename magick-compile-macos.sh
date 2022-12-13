@@ -1,13 +1,19 @@
 #!/bin/sh
 # https://github.com/ImageMagick/ImageMagick/discussions/5215#discussioncomment-2949450
 
-if uname -s | grep -q "Linux" ; then
-    if cat /etc/issue | grep -q "Ubuntu"; then
-        apt update 
-        apt -y install curl zip gcc cmake make zlib1g-dev g++ 
-    fi
-fi
+# if uname -s | grep -q "Linux" ; then
+#     if cat /etc/issue | grep -q "Ubuntu"; then
+#         apt update 
+#         apt -y install curl zip gcc cmake make zlib1g-dev g++ 
+#     fi
+# fi
+
+cd ./sticker_convert
 export MAGICK_HOME=$(pwd)/ImageMagick
+cd ..
+
+rm -rf $MAGICK_HOME
+rm -rf magick-src
 
 mkdir magick-src
 cd magick-src
@@ -35,8 +41,9 @@ cd libpng-1.6.31
 cd ..
 
 rm config.status config.log
-./configure --prefix=$MAGICK_HOME --with-quantum-depth=32 --with-xml --disable-installed --enable-delegate-build --disable-shared --enable-static --with-modules=no \
-    --enable-hdri=no --with-heic=no --without-magick-plus-plus --with-quantum-depth=32 --without-frozenpaths --disable-silent-rules --disable-dependency-tracking \
+
+./configure --prefix=$MAGICK_HOME --with-quantum-depth=16 --with-xml --disable-installed --enable-delegate-build --disable-shared --enable-static --with-modules=no \
+    --enable-hdri=no --with-heic=no --without-magick-plus-plus --without-frozenpaths --disable-silent-rules --disable-dependency-tracking \
     --enable-zero-configuration --without-gslib --with-png=yes --with-jpeg=yes --without-jp2 --disable-osx-universal-binary --without-x --without-lcms \
     --without-freetype --without-pango --without-bzlib --with-webp --without-perl --without-gvc --without-zip --with-fontconfig=no
 

@@ -3,6 +3,8 @@ A python script for creating, downloading, converting+compressing and uploading 
 
 With GUI and CLI that runs on Windows, MacOS and Linux
 
+Pre-compiled releases available for Windows and MacOS. Docker image is also available for Linux version, which could be used for running CLI
+
 Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only)
 
 Supports static and animated stickers, with transparency support
@@ -30,9 +32,7 @@ Supports static and animated stickers, with transparency support
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 
 ## Pre-compiled releases
-Pre-compiled releases available for Windows and MacOS, for both GUI and CLI version. Unzip the downloaded file and run sticker_convert_cli or sticker_convert_gui
-
-Docker image of the CLI version is available for Linux.
+Pre-compiled releases available for Windows, MacOS. Unzip the downloaded file and run `sticker-convert`
 
 If you do not trust those, you may follow 'Running python script directly' section to run the python script directly. However, you will need to install multiple dependencies.
 
@@ -51,6 +51,8 @@ If you do not trust those, you may follow 'Running python script directly' secti
 8. Press 'Start'
 
 ## How to use (CLI)
+To run in CLI mode, pass on any arguments
+
 ```
 usage: sticker-convert.exe [-h] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR] [--download-signal DOWNLOAD_SIGNAL]
                            [--download-telegram DOWNLOAD_TELEGRAM] [--download-line DOWNLOAD_LINE]
