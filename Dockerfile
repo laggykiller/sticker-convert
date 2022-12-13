@@ -2,9 +2,9 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY . /app/
+COPY ./sticker_convert /app/
 
-RUN apk add alpine-sdk python3 py3-pip ffmpeg imagemagick optipng pngquant zip unzip cmake libpng-dev boost-dev tar sed
+RUN apk add alpine-sdk python3 py3-pip ffmpeg imagemagick optipng pngquant zip unzip cmake libpng-dev boost-dev tar sed python3-tkinter
 
 RUN mkdir /app/apngdis && \
     cd /app/apngdis && \
@@ -19,7 +19,7 @@ RUN curl -O -L https://github.com/apngasm/apngasm/archive/refs/tags/3.1.10.tar.g
 WORKDIR /app/apngasm-3.1.10
 RUN mkdir build && cd build && cmake ../ && make && make install
 WORKDIR /app
-RUN rm -rf ./apngasm-3.1.10 && rm 3.1.10.tar.gz
+RUN rm -rf /app/apngasm-3.1.10 && rm 3.1.10.tar.gz
 
 RUN curl -O -L https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz && \
     tar xvzf 2.0.2.tar.gz
@@ -29,6 +29,6 @@ WORKDIR /app
 RUN rm -rf /app/pngnq-s9-2.0.2 && \
     rm /app/2.0.2.tar.gz
 
-RUN pip3 install requests ffmpeg-python wand lottie argparse signalstickers_client python-telegram-bot anyio
+RUN pip3 install requests ffmpeg-python lottie argparse signalstickers_client python-telegram-bot anyio
 
-CMD ["python3", "/app/sticker_convert/sticker_convert_cli.py", "--help"]
+CMD ["python3", "/app/main.py", "--help"]

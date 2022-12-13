@@ -1,4 +1,12 @@
-creds.json
 build/**
 dist/**
-sticker_convert/bin/**
+magick-src/**
+**/__pycache__
+**/creds.json
+**/bin
+**/stickers_input
+**/stickers_output
+**/ImageMagick
+*.exe
+*.dll
+**/.DS_Store

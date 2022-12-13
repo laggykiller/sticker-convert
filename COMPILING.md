@@ -67,7 +67,7 @@ For MacOS, the following binaries are required:
 ## 3.3 Executables / Binaries (Linux) (Tested with Ubuntu 20.04)
 Some packages are usually not available in repo. To compile them, install these packages:
 
-`sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config`
+`sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config python3-tkinter`
 
 You may also need to install `tkinter` with `sudo apt install python3-tk`
 

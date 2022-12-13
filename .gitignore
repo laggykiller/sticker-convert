@@ -52,7 +52,6 @@ docs/_build/
 **/stickers_input
 **/stickers_output
 magick-src/**
-magick-portable/**
 **/ImageMagick
 *.exe
 *.dll
