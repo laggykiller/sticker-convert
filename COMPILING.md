@@ -39,7 +39,7 @@ For Windows, the following executables are required:
     - Download page: https://github.com/apngasm/apngasm/releases
     - Direct link: https://github.com/apngasm/apngasm/releases/download/3.1.1/apngasm_3.1-0_AMD64.exe
 
-Create a directory named `bin` in the root of this repo and place the executables into it
+Place executables inside `sticker_convert/bin`
 
 ## 3.2 Executables / Binaries (MacOS)
 For MacOS, the following binaries are required:
@@ -59,7 +59,7 @@ For MacOS, the following binaries are required:
     - Note that version 2.9 is required. Some homebrew-extra provides apngdis but it is version 2.8
     - Download page: https://apngdis.sourceforge.net/
     - Direct link: https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip
-    - Create a directory named `bin` in the root of this repo and place the executables into it
+    - Place the binary file inside `sticker_convert/bin`
 - `apngasm`
     - Easiest method is download from Homebrew `brew install apngasm`
     - Note that version 3 is required. Sourceforge only provides up to version 2.
@@ -117,14 +117,14 @@ For Linux, the following binaries are required:
 Note that Arch Linux have all of the required packages in official repository and AUR.
 
 ## 4 Running the script
-Change directory into `sticker_convert` directory and run `python ./sticker_convert_gui.py`
+Change directory into `sticker_convert` directory and run `python ./main.py`
 
 # Compiling
 This repository uses `pyinstaller` for compiling. Install with `pip3 install pyinstaller`
 
 ## Compiling on windows
 1. Refer to the instructions in running python script directly for installing python modules and executables
-2. Run `pyinstaller sticker_convert_cli_windows.spec` or `pyinstaller sticker_convert_gui_windows.spec`
+2. Run `pyinstaller sticker_convert.spec`
 3. Compilation result in `dist` directory
 
 ##  Compiling on MacOS
@@ -133,11 +133,11 @@ This repository uses `pyinstaller` for compiling. Install with `pip3 install pyi
     - Ref1: https://stackoverflow.com/questions/55754551/how-to-install-imagemagick-portably-on-macos-when-i-cant-set-dyld-library-path
     - Ref2: https://github.com/ImageMagick/ImageMagick/issues/3129
 3. Get static build of `ffmpeg` and `ffprobe` from: https://evermeet.cx/ffmpeg/ (If down, then go to https://ffmpeg.org/download.html). 
-4. Create `bin` directory and place `ffmpeg`, `ffprobe` and `apngdis` into `bin` directory located in this repo
-5. Run `pyinstaller sticker_convert_cli_macos.spec` or `pyinstaller sticker_convert_gui_windows.spec`
+4. Place `ffmpeg`, `ffprobe` and `apngdis` inside `sticker_convert/bin`
+5. Run `pyinstaller sticker_convert.spec`
 6. Compilation result in `dist` directory
 
 ## Compiling on Linux (Tested on Ubuntu 18.04)
 1. Refer to the instructions in running python script directly for installing python modules and binaries
-2. Run `pyinstaller sticker_convert_cli_linux.spec` or `pyinstaller sticker_convert_gui_linux.spec`
-6. Compilation result in `dist` directory
+2. Run `pyinstaller sticker_convert.spec`
+3. Compilation result in `dist` directory

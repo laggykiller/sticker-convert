@@ -52,18 +52,17 @@ If you do not trust those, you may follow 'Running python script directly' secti
 
 ## How to use (CLI)
 ```
-usage: sticker_convert_cli.exe [-h] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
-                               [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
-                               [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
-                               [--export-signal] [--export-telegram] [--no-compress]
-                               [--preset {signal,telegram,whatsapp,custom}] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                               [--res-min RES_MIN] [--res-max RES_MAX] [--quality-min QUALITY_MIN]
-                               [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                               [--steps STEPS] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                               [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--default-emoji DEFAULT_EMOJI]
-                               [--processes PROCESSES] [--author AUTHOR] [--title TITLE] [--signal-uuid SIGNAL_UUID]
-                               [--signal-password SIGNAL_PASSWORD] [--telegram-token TELEGRAM_TOKEN]
-                               [--telegram-userid TELEGRAM_USERID] [--save-cred]
+usage: sticker-convert.exe [-h] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR] [--download-signal DOWNLOAD_SIGNAL]
+                           [--download-telegram DOWNLOAD_TELEGRAM] [--download-line DOWNLOAD_LINE]
+                           [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers] [--export-signal]
+                           [--export-telegram] [--no-compress] [--preset {signal,telegram,whatsapp,custom}]
+                           [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
+                           [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN]
+                           [--color-max COLOR_MAX] [--steps STEPS] [--vid-size-max VID_SIZE_MAX]
+                           [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT]
+                           [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES] [--author AUTHOR] [--title TITLE]
+                           [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                           [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--save-cred]
 
 CLI for stickers-convert
 
@@ -127,33 +126,33 @@ options:
                         Set telegram user_id (From real account, not bot account). Required for uploading telegram
                         stickers
   --save-cred           Save signal and telegram credentials
-```
+  ```
 
-Note: If you are running python script directly, run with sticker_convert_cli.py
+Note: If you are running python script directly, run with main.py
 
 Examples:
 
 Only download from a source
 
-`sticker_convert_cli --download-signal <url> --no-compress`
+`sticker-convert --download-signal <url> --no-compress`
 
 Convert local files to signal compatible stickers
 
-`sticker_convert_cli --input-dir ./custom-input --output-dir ./custom-output --preset signal`
+`sticker-convert --input-dir ./custom-input --output-dir ./custom-output --preset signal`
 
-`sticker_convert_cli --preset signal`
+`sticker-convert --preset signal`
 
 Convert signal to telegram stickers
 
-`sticker_convert_cli --download-signal <url> --export-telegram`
+`sticker-convert --download-signal <url> --export-telegram`
 
 Convert local files to multiple formats and export
 
-`sticker_convert_cli --export-telegram --export-signal`
+`sticker-convert --export-telegram --export-signal`
 
 Convert local files to a custom format
 
-`sticker_convert_cli --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
+`sticker-convert --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
 ## Running python script directly & Compiling
 See [COMPILING.md](COMPILING.MD)
@@ -164,7 +163,7 @@ docker run -d -it --name sticker-convert \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
     sticker-convert:latest \
-    python3 /app/sticker_convert/sticker_convert_cli.py --help
+    python3 /app/sticker_convert/main.py --help
 ```
 
 ## FAQ

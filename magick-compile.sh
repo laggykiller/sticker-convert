@@ -1,27 +1,34 @@
 #!/bin/sh
 # https://github.com/ImageMagick/ImageMagick/discussions/5215#discussioncomment-2949450
 
+if uname -s | grep -q "Linux" ; then
+    if cat /etc/issue | grep -q "Ubuntu"; then
+        apt update 
+        apt -y install curl zip gcc cmake make zlib1g-dev g++ 
+    fi
+fi
 export MAGICK_HOME=$(pwd)/ImageMagick
 
 mkdir magick-src
 cd magick-src
 
-git clone https://github.com/ImageMagick/ImageMagick.git
-cd ImageMagick
+curl -O -L https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.0-54.tar.gz
+tar xvzf 7.1.0-54.tar.gz
+cd ImageMagick-7.1.0-54
 
-curl -O https://download.imagemagick.org/archive/delegates/jpegsrc.v9b.tar.gz
+curl -O -L https://download.imagemagick.org/archive/delegates/jpegsrc.v9b.tar.gz
 tar xvzf jpegsrc.v9b.tar.gz
 cd jpeg-9b
 ./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libjpeg
 cd ..
 
-curl -O https://download.imagemagick.org/archive/delegates/libwebp-0.6.0.tar.gz
+curl -O -L https://download.imagemagick.org/archive/delegates/libwebp-0.6.0.tar.gz
 tar xvzf libwebp-0.6.0.tar.gz
 cd libwebp-0.6.0
 ./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libwebp
 cd ..
 
-curl -O https://download.imagemagick.org/archive/delegates/libpng-1.6.31.tar.gz
+curl -O -L https://download.imagemagick.org/archive/delegates/libpng-1.6.31.tar.gz
 tar xvzf libpng-1.6.31.tar.gz
 cd libpng-1.6.31
 ./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libpng

@@ -2,7 +2,7 @@ import os
 import re
 from telegram import Bot
 from telegram.error import TelegramError
-from utils.sticker_convert import StickerConvert
+from utils.converter import StickerConvert
 from utils.metadata_handler import MetadataHandler
 from utils.format_verify import FormatVerify
 from utils.exceptions import NoTokenException

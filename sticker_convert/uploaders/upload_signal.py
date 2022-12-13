@@ -4,7 +4,7 @@ import anyio
 from signalstickers_client import StickersClient
 from signalstickers_client.models import LocalStickerPack, Sticker
 from utils.metadata_handler import MetadataHandler
-from utils.sticker_convert import StickerConvert
+from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from utils.exceptions import NoTokenException
 import tempfile

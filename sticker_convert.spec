@@ -1,6 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
 import shutil
+import sys
 
 block_cipher = None
 
@@ -8,27 +9,34 @@ def get_bin(bin):
     which_result = shutil.which(bin)
     if which_result != None:
         return os.path.abspath(which_result)
-    elif bin in os.listdir('./sticker_convert/bin'):
-        return os.path.abspath('./sticker_convert/bin/{bin}')
-
-bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe']
 
 binaries = [('./sticker_convert/bin/*', './bin')]
+datas = [('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon')]
+
+bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
+if sys.platform == 'win32':
+    apngasm_dir = os.path.split(shutil.which("apngasm"))[0]
+    magick_dir = os.path.split(shutil.which("magick"))[0]
+    datas += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.dll', './ImageMagick'), (f'{magick_dir}/modules/coders', './ImageMagick/coders'), (f'{apngasm_dir}/*', './')]
+elif sys.platform == 'darwin':
+    datas += [(f'ImageMagick/bin/*', f'./ImageMagick/bin'), (f'ImageMagick/lib/*', f'./ImageMagick/lib')]
+elif sys.platform == 'linux':
+    datas += [(f'ImageMagick/bin/*', f'./ImageMagick/bin'), (f'ImageMagick/lib/*', f'./ImageMagick/lib')]
+
+if (sys.platform == 'linux' or sys.platform == 'darwin') and os.path.isdir('ImageMagick') == False:
+    print('Warning: ImageMagick directory not found. You may run magick-compile.sh')
+    sys.exit()
+
 for bin in bin_list:
     bin_path = get_bin(bin)
     if bin_path:
         binaries.append((bin_path, './bin'))
 
-for i in os.listdir():
-    if i.startswith('ImageMagick') and os.path.isdir(i):
-        magick_dir = i
-        break
-
 a = Analysis(
-    ['sticker_convert/sticker_convert_cli.py'],
+    ['sticker_convert/main.py'],
     pathex=[],
     binaries=binaries,
-    datas=[('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon'), (f'{magick_dir}/bin/*', f'./{magick_dir}/bin'), (f'{magick_dir}/lib/*', f'./{magick_dir}/lib')],
+    datas=datas,
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -46,7 +54,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='sticker_convert_cli',
+    name='sticker-convert',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -67,5 +75,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='sticker_convert_cli',
+    name=f'sticker-convert-{sys.platform}',
 )

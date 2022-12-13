@@ -1,22 +1,20 @@
 import os
 import sys
+import shutil
 
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('imagemagick') == None:
     if sys.platform == 'win32':
-        magick_home = os.path.abspath('./magick')
+        magick_home = os.path.abspath('./ImageMagick')
         os.environ['MAGICK_HOME'] = magick_home
         os.environ["MAGICK_CODER_MODULE_PATH"] = magick_home + os.sep + "coders"
         os.environ["PATH"] += os.pathsep + magick_home + os.sep
     elif sys.platform == 'linux':
-        magick_home = os.path.abspath('./bin')
+        magick_home = os.path.abspath('./ImageMagick')
         os.environ['MAGICK_HOME'] = magick_home
-        os.environ["PATH"] += os.pathsep + magick_home + os.sep
+        os.environ["PATH"] += os.pathsep + magick_home + os.sep + "bin"
+        os.environ["LD_LIBRARY_PATH"] = magick_home + os.sep + "lib"
     elif sys.platform == 'darwin':
-        for i in os.listdir():
-            if i.startswith('ImageMagick') and os.path.isdir(i):
-                magick_home = os.path.abspath(i)
-                break
-
+        magick_home = os.path.abspath('./ImageMagick')
         os.environ['MAGICK_HOME'] = magick_home
         os.environ["PATH"] += os.pathsep + magick_home + os.sep + "bin"
         os.environ["DYLD_LIBRARY_PATH"] = magick_home + os.sep + "lib"
@@ -25,7 +23,6 @@ from wand.image import Image
 import ffmpeg
 import subprocess
 import tempfile
-import shutil
 from utils.lottie_convert import lottie_convert
 from utils.format_verify import FormatVerify
 import traceback

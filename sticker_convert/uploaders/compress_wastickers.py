@@ -2,7 +2,7 @@ import subprocess
 import shutil
 import os
 import tempfile
-from utils.sticker_convert import StickerConvert
+from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from utils.metadata_handler import MetadataHandler
 
