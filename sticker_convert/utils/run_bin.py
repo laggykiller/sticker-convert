@@ -1,10 +1,13 @@
 import subprocess
 import os
 import shutil
+import sys
 
 class RunBin:
     @staticmethod
     def get_bin(bin):
+        if sys.platform == 'win32':
+            bin = bin + '.exe'
         which_result = shutil.which(bin)
         if which_result != None:
             return os.path.abspath(which_result)

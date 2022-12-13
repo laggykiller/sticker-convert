@@ -1,1 +1,4 @@
 creds.json
+build/**
+dist/**
+sticker_convert/bin/**
