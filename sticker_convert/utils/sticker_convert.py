@@ -7,9 +7,11 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         os.environ['MAGICK_HOME'] = magick_home
         os.environ["MAGICK_CODER_MODULE_PATH"] = magick_home + os.sep + "coders"
         os.environ["PATH"] += os.pathsep + magick_home + os.sep
+    elif sys.platform == 'linux':
+        magick_home = os.path.abspath('./bin')
+        os.environ['MAGICK_HOME'] = magick_home
+        os.environ["PATH"] += os.pathsep + magick_home + os.sep
     elif sys.platform == 'darwin':
-        script_path = os.path.join(os.path.split(__file__)[0], '../')
-        os.chdir(os.path.abspath(script_path))
         for i in os.listdir():
             if i.startswith('ImageMagick') and os.path.isdir(i):
                 magick_home = os.path.abspath(i)
@@ -329,8 +331,6 @@ def get_bin(bin):
     which_result = shutil.which(bin)
     if which_result != None:
         return os.path.abspath(which_result)
-    elif bin in os.listdir():
-        return os.path.abspath(f'./{bin}')
     elif bin in os.listdir('./bin'):
         return os.path.abspath(f'./bin/{bin}')
     else:
