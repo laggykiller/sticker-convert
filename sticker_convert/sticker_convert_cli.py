@@ -1,4 +1,5 @@
 import os
+import sys
 from utils.sticker_convert import StickerConvert
 from utils.format_verify import FormatVerify
 from downloaders.download_line import DownloadLine
@@ -28,6 +29,12 @@ import multiprocessing
 
 # Convert local files to a custom format
 # sticker_convert_cli.py --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png
+
+if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    script_path = os.path.join(os.path.split(__file__)[0], '../')
+else:
+    script_path = os.path.split(__file__)[0]
+os.chdir(os.path.abspath(script_path))
 
 def main():
     preset_present = os.path.isfile('preset.json')

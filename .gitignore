@@ -49,8 +49,8 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
-stickers_input/**
-stickers_output/**
+**/stickers_input
+**/stickers_output
 magick-src/**
 ImageMagick/**
 *.exe

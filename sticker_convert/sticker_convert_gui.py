@@ -16,6 +16,12 @@ from uploaders.upload_signal import UploadSignal
 from uploaders.upload_telegram import UploadTelegram
 from uploaders.compress_wastickers import CompressWastickers
 
+if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+    script_path = os.path.join(os.path.split(__file__)[0], '../')
+else:
+    script_path = os.path.split(__file__)[0]
+os.chdir(os.path.abspath(script_path))
+
 class Window:
     default_input_mode = 'signal'
     default_output_mode = 'telegram'

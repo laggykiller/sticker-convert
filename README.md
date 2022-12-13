@@ -155,95 +155,8 @@ Convert local files to a custom format
 
 `sticker_convert_cli --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
-## Running python script directly
-### Install python3
-Install python3 from https://www.python.org/
-
-### Install python modules
-The following python modules are required:
-- `requests`
-- `ffmpeg-python`
-- `wand`
-- `lottie`
-- `argparse`
-- `signalstickers_client`
-- `python-telegram-bot`
-- `anyio`
-
-Install them with `pip install`
-
-### Executables / Binaries (Windows)
-For Windows, the following executables are required:
-- `ffmpeg.exe` and `ffprobe.exe`
-    - Both can be found in https://ffmpeg.org/download.html
-    - Direct link (May break): https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z
-- `magick.exe`
-    - Download page for ImageMagick: https://imagemagick.org/script/download.php#windows
-    - Note that you should choose one that ends with '-dll' and NOT portable version
-    - Direct link (May break): https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-54-Q16-HDRI-x64-dll.exe
-- `zip.exe`
-    - Download page: https://gnuwin32.sourceforge.net/packages/zip.htm
-    - Direct link: http://downloads.sourceforge.net/gnuwin32/zip-3.0-bin.zip
-    - All files in `bin` directory are needed
-- `bzip2.exe`
-    - Download page: https://gnuwin32.sourceforge.net/packages/bzip2.htm
-    - Direct link: https://sourceforge.net/projects/gnuwin32/files/bzip2/1.0.5/bzip2-1.0.5-bin.zip
-    - All files in `bin` directory are needed
-- `optipng.exe`
-    - Download page: https://sourceforge.net/projects/optipng/files/OptiPNG/
-    - Direct link: https://sourceforge.net/projects/optipng/files/OptiPNG/optipng-0.7.7/optipng-0.7.7-win32.zip
-- `pngnq-s9.exe`
-    - Download page: https://sourceforge.net/projects/pngnqs9/files/
-    - Direct link: https://sourceforge.net/projects/pngnqs9/files/pngnq-s9-2.0.1-win32.zip/download
-- `pngquant.exe`
-    - Download page: https://pngquant.org/
-    - Direct link: https://pngquant.org/pngquant-windows.zip
-- `apngdis.exe`
-    - Download page: https://sourceforge.net/projects/apngdis/files/
-    - Direct link: https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-win64.zip
-- `apngasm.exe`
-    - Note that version 3 is required. Sourceforge only provides up to version 2.
-    - Download page: https://github.com/apngasm/apngasm/releases
-    - Direct link: https://github.com/apngasm/apngasm/releases/download/3.1.1/apngasm_3.1-0_AMD64.exe
-
-Create a directory named `bin` in the root of this repo and place the executables into it
-
-### Executables / Binaries (MacOS)
-For MacOS, the following binaries are required:
-- `ffmpeg` and `ffprobe`
-    - Eaisest method is download from Homebrew `brew install ffmpeg`
-- `magick`
-    - Eaisest method is download from Homebrew `brew install imagemagick`
-- `optipng`
-    - Easiest method is download from Homebrew `brew install optipng`
-- `pngnq-s9`
-    - Compilation is required: https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9
-    - Compilation instructions are in https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/blob/master/INSTALL
-    - Note that you should add `#include <string.h>` to `src/rwpng.c` or else compilation fails
-- `pngquant`
-    - Easiest method is download from Homebrew `brew install pngquant`
-- `apngdis`
-    - Note that version 2.9 is required. Some homebrew-extra provides apngdis but it is version 2.8
-    - Download page: https://apngdis.sourceforge.net/
-    - Direct link: https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip
-    - Create a directory named `bin` in the root of this repo and place the executables into it
-- `apngasm`
-    - Easiest method is download from Homebrew `brew install apngasm`
-    - Note that version 3 is required. Sourceforge only provides up to version 2.
-
-### Executables / Binaries (Linux)
-For Linux, the following binaries are required:
-- `ffmpeg` and `ffprobe`
-- `magick`
-- `optipng`
-- `pngnq-s9`
-- `pngquant`
-- `apngdis`
-- `apngasm`
-    - Note that version 3 is required. Sourceforge only provides up to version 2.
-
-### Running the script
-You have to run in the root directory of this repo with `python ./sticker_convert/sticker_convert_gui.py`
+## Running python script directly & Compiling
+See [COMPILING.md](COMPILING.MD)
 
 ## Docker
 ```
@@ -253,26 +166,6 @@ docker run -d -it --name sticker-convert \
     sticker-convert:latest \
     python3 /app/sticker_convert/sticker_convert_cli.py --help
 ```
-
-## Compiling
-
-### Windows
-1. Refer to the instructions in running python script directly for installing python modules and executables
-2. Run `pyinstaller sticker_convert_cli_windows.spec` or `pyinstaller sticker_convert_gui_windows.spec`
-3. Compilation result in `dist` directory
-
-### MacOS
-1. Refer to the instructions in running python script directly for installing python modules and binaries (Except imagemagick, ffmpeg and ffprobe)
-2. `ImageMagick` precompiled portable version is broken in newer releases of MacOS. You need to compile ImageMagick. Run `magick-compile-macos.sh` first
-    - Ref1: https://stackoverflow.com/questions/55754551/how-to-install-imagemagick-portably-on-macos-when-i-cant-set-dyld-library-path
-    - Ref2: https://github.com/ImageMagick/ImageMagick/issues/3129
-3. Get static build of `ffmpeg` and `ffprobe` from: https://evermeet.cx/ffmpeg/ (If down, then go to https://ffmpeg.org/download.html). 
-4. Create `bin` directory and place `ffmpeg`, `ffprobe` and `apngdis` into `bin` directory located in this repo
-5. Run `pyinstaller sticker_convert_cli_macos.spec` or `pyinstaller sticker_convert_gui_windows.spec`
-6. Compilation result in `dist` directory
-
-### Linux
-
 
 ## FAQ
 

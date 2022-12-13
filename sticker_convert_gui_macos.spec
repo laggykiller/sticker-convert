@@ -4,13 +4,21 @@ import shutil
 
 block_cipher = None
 
-optipng_path = shutil.which("optipng")
-pngnqs9_path = shutil.which("pngnq-s9")
-pngquant_path = shutil.which("pngquant")
-# apngdis_path = shutil.which("apngdis")
-apngasm_path = shutil.which("apngasm")
-# ffmpeg_path = shutil.which("ffmpeg")
-# ffprobe_path = shutil.which("ffprobe")
+def get_bin(bin):
+    which_result = shutil.which(bin)
+    if which_result != None:
+        return os.path.abspath(which_result)
+    elif bin in os.listdir('./sticker_convert/bin'):
+        return os.path.abspath('./sticker_convert/bin/{bin}')
+
+bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe']
+
+binaries = [('./sticker_convert/bin/*', './bin')]
+for bin in bin_list:
+    bin_path = get_bin(bin)
+    if bin_path:
+        binaries.append((bin_path, './bin'))
+
 for i in os.listdir():
     if i.startswith('ImageMagick') and os.path.isdir(i):
         magick_dir = i
@@ -19,8 +27,8 @@ for i in os.listdir():
 a = Analysis(
     ['sticker_convert/sticker_convert_gui.py'],
     pathex=[],
-    binaries=[('./bin/*', './bin'), (optipng_path, './bin'), (pngnqs9_path, './bin'), (pngquant_path, './bin'), (apngasm_path, './bin')],
-    datas=[('preset.json', './'), (f'{magick_dir}/bin/*', f'./{magick_dir}/bin'), (f'{magick_dir}/lib/*', f'./{magick_dir}/lib'), ('icon/*', './icon')],
+    binaries=binaries,
+    datas=[('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon'), (f'{magick_dir}/bin/*', f'./{magick_dir}/bin'), (f'{magick_dir}/lib/*', f'./{magick_dir}/lib')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -49,7 +57,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='icon/appicon.ico'
+    icon='./sticker_convert/icon/appicon.ico'
 )
 coll = COLLECT(
     exe,

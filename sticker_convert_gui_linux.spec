@@ -11,7 +11,7 @@ def get_bin(bin):
     elif bin in os.listdir('./sticker_convert/bin'):
         return os.path.abspath('./sticker_convert/bin/{bin}')
 
-bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe']
+bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip', 'magick']
 
 binaries = [('./sticker_convert/bin/*', './bin')]
 for bin in bin_list:
@@ -19,16 +19,11 @@ for bin in bin_list:
     if bin_path:
         binaries.append((bin_path, './bin'))
 
-for i in os.listdir():
-    if i.startswith('ImageMagick') and os.path.isdir(i):
-        magick_dir = i
-        break
-
 a = Analysis(
-    ['sticker_convert/sticker_convert_cli.py'],
+    ['sticker_convert/sticker_convert_gui.py'],
     pathex=[],
     binaries=binaries,
-    datas=[('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon'), (f'{magick_dir}/bin/*', f'./{magick_dir}/bin'), (f'{magick_dir}/lib/*', f'./{magick_dir}/lib')],
+    datas=[('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
@@ -46,7 +41,7 @@ exe = EXE(
     a.scripts,
     [],
     exclude_binaries=True,
-    name='sticker_convert_cli',
+    name='sticker_convert_gui',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -67,5 +62,5 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='sticker_convert_cli',
+    name='sticker_convert_gui',
 )
