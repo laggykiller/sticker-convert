@@ -324,10 +324,6 @@ class StickerConvert:
             subprocess.call([get_bin('apngasm'), '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'], stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
 
 def get_bin(bin):
-    if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        script_path = os.path.join(os.path.split(__file__)[0], '../')
-        os.chdir(os.path.abspath(script_path))
-
     which_result = shutil.which(bin)
     if which_result != None:
         return os.path.abspath(which_result)
