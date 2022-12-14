@@ -11,18 +11,14 @@ def get_bin(bin):
     if which_result != None:
         return os.path.abspath(which_result)
 
-if os.path.isdir('./sticker_convert/bin'):
-    binaries = [('./sticker_convert/bin/*', './bin')]
-else:
-    binaries = []
-
+binaries = []
 datas = [('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon')]
 
 bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
 if sys.platform == 'win32':
     apngasm_dir = os.path.split(shutil.which("apngasm"))[0]
     magick_dir = os.path.split(shutil.which("magick"))[0]
-    binaries += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.dll', './ImageMagick'), (f'{magick_dir}/modules/coders', './ImageMagick/coders'), (f'{apngasm_dir}/*', './')]
+    binaries += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.dll', './ImageMagick'), (f'{magick_dir}/*.xml', './ImageMagick'), (f'{magick_dir}/modules/coders', './ImageMagick/coders'), (f'{apngasm_dir}/*', './')]
 elif sys.platform == 'darwin':
     binaries += [(f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'), (f'./sticker_convert/ImageMagick/lib/*', f'./ImageMagick/lib')]
 
@@ -34,6 +30,10 @@ for bin in bin_list:
     bin_path = get_bin(bin)
     if bin_path:
         binaries.append((bin_path, './bin'))
+
+# Add local binaries at last so they are not overwritten by those found in system
+if os.path.isdir('./sticker_convert/bin'):
+    binaries += [('./sticker_convert/bin/*', './bin')]
 
 # signalstickers_client needs a custom cacert.pem
 # https://stackoverflow.com/a/48068640
