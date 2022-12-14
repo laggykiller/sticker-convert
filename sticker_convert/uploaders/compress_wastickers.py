@@ -51,7 +51,8 @@ class CompressWastickers:
                 StickerConvert.convert_and_compress_to_size(os.path.join(in_dir, 'cover.png'), cover_path, img_size_max=50000, vid_size_max=50000, res_min=96, res_max=96)
         else:
             # First image in the directory, extracting first frame
-            StickerConvert.compress_to_size(StickerConvert.convert_generic_image, os.path.join(in_dir, f'{os.listdir(in_dir)[0]}[0]'), cover_path, img_size_max=50000, vid_size_max=50000, res_min=96, res_max=96)
+            first_image = [i for i in os.listdir(in_dir) if not i.endswith('.txt')][0]
+            StickerConvert.compress_to_size(StickerConvert.convert_generic_image, os.path.join(in_dir, f'{first_image}[0]'), cover_path, img_size_max=50000, vid_size_max=50000, res_min=96, res_max=96)
         
         MetadataHandler.set_metadata(tmp_dir, author=author)
     
