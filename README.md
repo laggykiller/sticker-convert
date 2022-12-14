@@ -144,9 +144,9 @@ Convert local files to signal compatible stickers
 
 `sticker-convert --preset signal`
 
-Convert signal to telegram stickers
+Convert signal to telegram stickers and upload to telegram
 
-`sticker-convert --download-signal <url> --export-telegram`
+`sticker-convert --download-signal <url> --export-telegram --telegram-token <your_bot_token_here> --telegram-userid <your_userid_here> --save-cred`
 
 Convert local files to multiple formats and export
 
