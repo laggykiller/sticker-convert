@@ -213,9 +213,17 @@ class StickerConvert:
         if fps:
             stream = ffmpeg.filter(stream, 'fps', fps=fps, round='up')
         if res:
+            probe_info = ffmpeg.probe(in_f)
+            width = probe_info['streams'][0]['width']
+            height = probe_info['streams'][0]['height']
+
             # Resolution must be even number, or else error occur
-            res = res + res % 2
-            stream = ffmpeg.filter(stream, 'scale', res, -1, flags='neighbor', sws_dither='none')
+            # res = res + res % 2
+            # https://trac.ffmpeg.org/wiki/Scaling says can use -2 instead
+            if width > height:
+                stream = ffmpeg.filter(stream, 'scale', res, -2, flags='neighbor', sws_dither='none')
+            else:
+                stream = ffmpeg.filter(stream, 'scale', -2, res, flags='neighbor', sws_dither='none')
             stream = ffmpeg.filter(stream, 'pad', res, res, '(ow-iw)/2', '(ow-ih)/2', color='black@0')
             stream = ffmpeg.filter(stream, 'setsar', 1)
         if out_f_ext == '.apng' or out_f_ext == '.png':
