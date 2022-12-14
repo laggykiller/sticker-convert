@@ -29,6 +29,6 @@ WORKDIR /app
 RUN rm -rf /app/pngnq-s9-2.0.2 && \
     rm /app/2.0.2.tar.gz
 
-RUN pip3 install requests ffmpeg-python lottie argparse signalstickers_client python-telegram-bot anyio
+RUN pip3 install requests ffmpeg-python lottie argparse signalstickers_client python-telegram-bot anyio wand
 
 CMD ["python3", "/app/main.py", "--help"]
