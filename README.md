@@ -39,7 +39,7 @@ If you do not trust those, you may follow 'Running python script directly' secti
 ## How to use (GUI)
 ![imgs/screenshot](imgs/screenshot.png)
 
-1. Run sticker_convert_gui.exe
+1. Run `sticker-convert.exe`, `sticker-convert` or `python3 main.py`
 2. Choose input source.
     - If you are downloading, enter URL address if you want to download from (If applicable)
     - If you are using local files, choose input directory. Defaults to a folder named 'stickers_input' in the same directory as the program. Put files you want to convert into that directory
@@ -144,9 +144,9 @@ Convert local files to signal compatible stickers
 
 `sticker-convert --preset signal`
 
-Convert signal to telegram stickers
+Convert signal to telegram stickers and upload to telegram
 
-`sticker-convert --download-signal <url> --export-telegram`
+`sticker-convert --download-signal <url> --export-telegram --telegram-token <your_bot_token_here> --telegram-userid <your_userid_here> --save-cred`
 
 Convert local files to multiple formats and export
 
@@ -157,13 +157,13 @@ Convert local files to a custom format
 `sticker-convert --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
 ## Running python script directly & Compiling
-See [COMPILING.md](COMPILING.MD)
+See [COMPILING.md](COMPILING.md)
 
 ## Docker
 
 Running
 ```
-docker push laggykiller/sticker-convert:latest
+docker pull laggykiller/sticker-convert:latest
 docker run -d -it --name sticker-convert \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
