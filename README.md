@@ -37,7 +37,7 @@ Pre-compiled releases available for Windows, MacOS. Unzip the downloaded file an
 If you do not trust those, you may follow 'Running python script directly' section to run the python script directly. However, you will need to install multiple dependencies.
 
 ## How to use (GUI)
-![screenshot](screenshot.png)
+![imgs/screenshot](imgs/screenshot.png)
 
 1. Run sticker_convert_gui.exe
 2. Choose input source.
@@ -179,10 +179,13 @@ docker run -d -it --name sticker-convert \
 ### Getting signal uuid and password
 `uuid` and `password` are needed for uploading Signal stickers.
 
-1. Open Signal Desktop in the commandline with `signal-desktop --enable-dev-tools`
-2. Goto Menu
-3. Toggle Developers tools
-4. Open console
+![imgs/signal-uuid-password.png](imgs/signal-uuid-password.png)
+
+1. Install Signal Desktop from https://signal.org/en/download/
+2. Link Signal Desktop with your phone
+3. Open Signal Desktop in the commandline with `Signal.exe --enable-dev-tools` (Windows) or `signal-desktop --enable-dev-tools` (MacOS / Windows)
+4. Go to `View -> Toggle Developers tools`
+5. Open console
     - `uuid` is the output of running: `window.reduxStore.getState().items.uuid_id`
     - `password` is the output of running: `window.reduxStore.getState().items.password`
 
@@ -193,6 +196,8 @@ Reference: https://github.com/teynav/signalApngSticker
 ### Getting telegram bot token
 `token` needed for uploading and downloading Telegram stickers
 
+![imgs/telegram-bot.png](imgs/telegram-bot.png)
+
 1. Contact botfather on telegram: https://t.me/botfather
 2. Follow instructions here to create a bot and get token: https://core.telegram.org/bots/features#creating-a-new-bot
 3. The token looks like this: `110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`
@@ -202,6 +207,8 @@ Reference: https://github.com/teynav/signalApngSticker
 `user_id` needed for uploading Telegram stickers. Note that the user_id should be from a real account, not from the bot account.
 
 Follow instruction from this post: https://stackoverflow.com/a/52667196
+
+![imgs/telegram-userid.png](imgs/telegram-userid.png)
 
 ### Importing .wastickers into WhatsApp
 1. Download Sticker maker on your phone [[iOS version](https://apps.apple.com/us/app/sticker-maker-studio/id1443326857) | [Android version](https://play.google.com/store/apps/details?id=com.marsvard.stickermakerforwhatsapp)]
