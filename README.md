@@ -163,7 +163,7 @@ See [COMPILING.md](COMPILING.MD)
 
 Running
 ```
-docker push laggykiller/sticker-convert:latest
+docker pull laggykiller/sticker-convert:latest
 docker run -d -it --name sticker-convert \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
