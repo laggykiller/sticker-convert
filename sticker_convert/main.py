@@ -8,6 +8,9 @@ script_path = os.path.split(__file__)[0]
 os.chdir(os.path.abspath(script_path))
 
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('magick') == None:
+    os.environ["PATH"] += os.pathsep + os.path.abspath(os.path.join(script_path, './bin')) + os.sep
+
+if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('magick') == None:
     if sys.platform == 'win32':
         magick_home = os.path.abspath('./ImageMagick')
         os.environ['MAGICK_HOME'] = magick_home
