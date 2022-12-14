@@ -157,7 +157,7 @@ Convert local files to a custom format
 `sticker-convert --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
 ## Running python script directly & Compiling
-See [COMPILING.md](COMPILING.MD)
+See [COMPILING.md](COMPILING.md)
 
 ## Docker
 
