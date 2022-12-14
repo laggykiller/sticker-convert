@@ -6,10 +6,7 @@ import shutil
 from gui import GUI
 from cli import CLI
 
-if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-    script_path = os.path.join(os.path.split(__file__)[0], '../')
-else:
-    script_path = os.path.split(__file__)[0]
+script_path = os.path.split(__file__)[0]
 os.chdir(os.path.abspath(script_path))
 
 if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('magick') == None:
