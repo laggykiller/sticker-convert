@@ -160,18 +160,20 @@ Convert local files to a custom format
 See [COMPILING.md](COMPILING.MD)
 
 ## Docker
-Building
-```
-docker build . -t sticker-convert:1.0
-```
 
 Running
 ```
+docker push laggykiller/sticker-convert:latest
 docker run -d -it --name sticker-convert \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
     sticker-convert:latest \
     python3 /app/main.py --help
+```
+
+Building
+```
+docker build . -t sticker-convert
 ```
 
 ## FAQ
