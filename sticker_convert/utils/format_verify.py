@@ -51,8 +51,8 @@ class FormatVerify:
                     return False
         else:
             dimension = RunBin.run_cmd(['magick', 'identify', '-ping', 'format', '%wx%h', file], silence=False)
-            width = dimension.split('x')[0]
-            height = dimension.split('x')[1]
+            width = int(dimension.split('x')[0])
+            height = int(dimension.split('x')[1])
 
             if res_min != None and (height < res_min or width < res_min):
                 return False
