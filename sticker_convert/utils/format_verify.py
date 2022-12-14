@@ -1,10 +1,9 @@
 import os
-import ffmpeg
 from utils.run_bin import RunBin
 # On Linux, old ImageMagick do not have magick command. In such case, use wand library
-if RunBin.get_bin('magick') == None:
-    USE_WAND = True
+if RunBin.get_bin('magick', silent=True) == None:
     from wand.image import Image
+import ffmpeg
 import mimetypes
 from lottie.exporters.tgs_validator import TgsValidator, Severity
 
@@ -42,7 +41,7 @@ class FormatVerify:
     @staticmethod
     def check_file_res(file, res_min=None, res_max=None, square=None):
         file = str(file) + '[0]'
-        if USE_WAND:
+        if RunBin.get_bin('magick', silent=True) == None:
             with Image(filename=file) as img:
                 if res_min != None and (img.height < res_min or img.width < res_min):
                     return False
@@ -121,7 +120,7 @@ class FormatVerify:
                 except ffmpeg.Error:
                     pass
                 
-                if USE_WAND == True:
+                if RunBin.get_bin('magick', silent=True) == None:
                     with Image(filename=file) as img:
                         frames = img.iterator_length()
                 else:

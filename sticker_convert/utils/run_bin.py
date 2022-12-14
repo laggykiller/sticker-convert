@@ -5,7 +5,7 @@ import sys
 
 class RunBin:
     @staticmethod
-    def get_bin(bin):
+    def get_bin(bin, silent=False):
         if sys.platform == 'win32':
             bin = bin + '.exe'
         which_result = shutil.which(bin)
@@ -16,7 +16,8 @@ class RunBin:
         elif os.path.isdir('./ImageMagick/bin') and bin in os.listdir('./ImageMagick/bin'):
             return os.path.abspath(f'./ImageMagick/bin/{bin}')
         else:
-            print(f'Warning: Cannot find binary file {bin}')
+            if silent == False:
+                print(f'Warning: Cannot find binary file {bin}')
     
     @staticmethod
     def run_cmd(cmd_list, silence=False):
