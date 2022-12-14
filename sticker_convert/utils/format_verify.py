@@ -4,7 +4,7 @@ from utils.run_bin import RunBin
 # On Linux, old ImageMagick do not have magick command. In such case, use wand library
 if RunBin.get_bin('magick') == None:
     USE_WAND = True
-    import wand.image as Image
+    from wand.image import Image
 import mimetypes
 from lottie.exporters.tgs_validator import TgsValidator, Severity
 
