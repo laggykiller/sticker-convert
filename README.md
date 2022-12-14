@@ -220,6 +220,10 @@ Follow instruction from this post: https://stackoverflow.com/a/52667196
 3. Share the file to Sticker Maker app
 4. Inside Sticker Maker app, you can then import the stickers into WhatsApp
 
+### I want to upload stickers that are in stickers_output that have not been uploaded yet
+CLI: Run with `--no-compress --export-xxxxx`
+GUI: Select `From local directory` for Input source, tick `No compression` box and select `Upload to xxxxx` for Output options
+
 ## Credits
 - Information about Signal and Telegram stickers: https://github.com/teynav/signalApngSticker
 - Information about Line and Kakao stickers: https://github.com/star-39/moe-sticker-bot
