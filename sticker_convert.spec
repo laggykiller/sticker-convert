@@ -2,6 +2,7 @@
 import os
 import shutil
 import sys
+import importlib
 
 block_cipher = None
 
@@ -33,6 +34,11 @@ for bin in bin_list:
     bin_path = get_bin(bin)
     if bin_path:
         binaries.append((bin_path, './bin'))
+
+# signalstickers_client needs a custom cacert.pem
+# https://stackoverflow.com/a/48068640
+proot = os.path.dirname(importlib.import_module('signalstickers_client').__file__)
+datas.append((os.path.join(proot, 'utils/ca/cacert.pem'), 'signalstickers_client/utils/ca/'))
 
 if sys.platform == 'win32':
     suffix = 'windows'
