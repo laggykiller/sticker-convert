@@ -5,6 +5,8 @@ With GUI and CLI that runs on Windows, MacOS and Linux
 
 Pre-compiled releases available for Windows and MacOS. Docker image is also available for Linux version, which could be used for running CLI
 
+You may [try this repo out in Google Colab](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which you can run the code on cloud (without downloading) and get the result from Google Drive.
+
 Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only)
 
 Supports static and animated stickers, with transparency support
