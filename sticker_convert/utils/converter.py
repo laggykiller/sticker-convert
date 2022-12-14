@@ -1,12 +1,15 @@
 import os
 import shutil
-# import wand.image as Image
+from utils.run_bin import RunBin
+# On Linux, old ImageMagick do not have magick command. In such case, use wand library
+if RunBin.get_bin('magick') == None:
+    USE_WAND = True
+    import wand.image as Image
 import ffmpeg
 import tempfile
 from utils.lottie_convert import lottie_convert
 from utils.format_verify import FormatVerify
 import traceback
-from utils.run_bin import RunBin
 
 lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
 lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4', '.webm')
@@ -163,33 +166,35 @@ class StickerConvert:
         # https://stackoverflow.com/a/28503615
         # out_f: tiles_{0}.jpg
 
-        # with Image(filename=in_f) as img:
-        #     i = 0
-        #     for h in range(0, img.height, res):
-        #         for w in range(0, img.width, res):
-        #             w_end = w + res
-        #             h_end = h + res
-        #             with img[w:w_end, h:h_end] as chunk:
-        #                 chunk.save(filename=out_f.format(str(i).zfill(3)))
-        #             i += 1
-
-        RunBin.run_cmd(['magick', in_f, '-crop', f'{res}x{res}', out_f])
+        if USE_WAND:
+            with Image(filename=in_f) as img:
+                i = 0
+                for h in range(0, img.height, res):
+                    for w in range(0, img.width, res):
+                        w_end = w + res
+                        h_end = h + res
+                        with img[w:w_end, h:h_end] as chunk:
+                            chunk.save(filename=out_f.format(str(i).zfill(3)))
+                        i += 1
+        else:
+            RunBin.run_cmd(['magick', in_f, '-crop', f'{res}x{res}', out_f])
 
     @staticmethod
     def convert_generic_image(in_f, out_f, res=512, quality=90, **kwargs):
-        # with Image(filename=in_f) as img:
-        #     if res != None:
-        #         img.resize(width=res, height=res)
-        #         img.background_color = 'none'
-        #         img.gravity = 'center'
-        #         img.extent(width=res, height=res)
-        #     img.compression_quality = quality
-        #     img.save(filename=out_f)
-
-        if res != None:
-            RunBin.run_cmd(['magick', in_f, '-resize', f'{res}x{res}', '-background', 'none', '-gravity', 'center', '-extent', f'{res}x{res}', '-quality', str(quality), out_f])
+        if USE_WAND:
+            with Image(filename=in_f) as img:
+                if res != None:
+                    img.resize(width=res, height=res)
+                    img.background_color = 'none'
+                    img.gravity = 'center'
+                    img.extent(width=res, height=res)
+                img.compression_quality = quality
+                img.save(filename=out_f)
         else:
-            RunBin.run_cmd(['magick', in_f, '-quality', str(quality), out_f])
+            if res != None:
+                RunBin.run_cmd(['magick', in_f, '-resize', f'{res}x{res}', '-background', 'none', '-gravity', 'center', '-extent', f'{res}x{res}', '-quality', str(quality), out_f])
+            else:
+                RunBin.run_cmd(['magick', in_f, '-quality', str(quality), out_f])
 
 
     @staticmethod
@@ -232,11 +237,12 @@ class StickerConvert:
 
         with tempfile.TemporaryDirectory() as tempdir:
             tmp_f = os.path.join(tempdir, 'temp.mp4')
-        
-            # with Image(filename=in_f) as img:
-            #     img.save(filename=tmp_f)
 
-            RunBin.run_cmd(['magick', in_f, '-quality', str(quality), tmp_f])
+            if USE_WAND:
+                with Image(filename=in_f) as img:
+                    img.save(filename=tmp_f)
+            else:
+                RunBin.run_cmd(['magick', in_f, '-quality', str(quality), tmp_f])
             
             StickerConvert.convert_generic_anim(tmp_f, out_f, res=res, quality=quality, fps=fps)
 

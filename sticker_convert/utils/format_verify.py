@@ -1,9 +1,12 @@
 import os
 import ffmpeg
-# from wand.image import Image
+from utils.run_bin import RunBin
+# On Linux, old ImageMagick do not have magick command. In such case, use wand library
+if RunBin.get_bin('magick') == None:
+    USE_WAND = True
+    import wand.image as Image
 import mimetypes
 from lottie.exporters.tgs_validator import TgsValidator, Severity
-from utils.run_bin import RunBin
 
 class FormatVerify:
     def __init__(self):
@@ -39,24 +42,25 @@ class FormatVerify:
     @staticmethod
     def check_file_res(file, res_min=None, res_max=None, square=None):
         file = str(file) + '[0]'
-        # with Image(filename=file) as img:
-        #     if res_min != None and (img.height < res_min or img.width < res_min):
-        #         return False
-        #     if res_max != None and (img.height > res_max or img.width > res_max):
-        #         return False
-        #     if square != None and img.height != img.width:
-        #         return False
+        if USE_WAND:
+            with Image(filename=file) as img:
+                if res_min != None and (img.height < res_min or img.width < res_min):
+                    return False
+                if res_max != None and (img.height > res_max or img.width > res_max):
+                    return False
+                if square != None and img.height != img.width:
+                    return False
+        else:
+            dimension = RunBin.run_cmd(['magick', 'identify', '-ping', 'format', '%wx%h', file], silence=False)
+            width = dimension.split('x')[0]
+            height = dimension.split('x')[1]
 
-        dimension = RunBin.run_cmd(['magick', 'identify', '-ping', 'format', '%wx%h', file], silence=False)
-        width = dimension.split('x')[0]
-        height = dimension.split('x')[1]
-
-        if res_min != None and (height < res_min or width < res_min):
-            return False
-        if res_max != None and (height > res_max or width > res_max):
-            return False
-        if square != None and height != width:
-            return False
+            if res_min != None and (height < res_min or width < res_min):
+                return False
+            if res_max != None and (height > res_max or width > res_max):
+                return False
+            if square != None and height != width:
+                return False
 
         return True
 
@@ -116,11 +120,12 @@ class FormatVerify:
                         return True
                 except ffmpeg.Error:
                     pass
-
-                # with Image(filename=file) as img:
-                #     frames = img.iterator_length()
-
-                frames = RunBin.run_cmd(['magick', 'identify', file], silence=False).count('\n')
+                
+                if USE_WAND == True:
+                    with Image(filename=file) as img:
+                        frames = img.iterator_length()
+                else:
+                    frames = RunBin.run_cmd(['magick', 'identify', file], silence=False).count('\n')
                 
                 if frames > 1:
                     return True
