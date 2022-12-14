@@ -2,8 +2,7 @@ import os
 import shutil
 from utils.run_bin import RunBin
 # On Linux, old ImageMagick do not have magick command. In such case, use wand library
-if RunBin.get_bin('magick') == None:
-    USE_WAND = True
+if RunBin.get_bin('magick', silent=True) == None:
     from wand.image import Image
 import ffmpeg
 import tempfile
@@ -166,7 +165,7 @@ class StickerConvert:
         # https://stackoverflow.com/a/28503615
         # out_f: tiles_{0}.jpg
 
-        if USE_WAND:
+        if RunBin.get_bin('magick', silent=True) == None:
             with Image(filename=in_f) as img:
                 i = 0
                 for h in range(0, img.height, res):
@@ -181,7 +180,7 @@ class StickerConvert:
 
     @staticmethod
     def convert_generic_image(in_f, out_f, res=512, quality=90, **kwargs):
-        if USE_WAND:
+        if RunBin.get_bin('magick', silent=True) == None:
             with Image(filename=in_f) as img:
                 if res != None:
                     img.resize(width=res, height=res)
@@ -238,7 +237,7 @@ class StickerConvert:
         with tempfile.TemporaryDirectory() as tempdir:
             tmp_f = os.path.join(tempdir, 'temp.mp4')
 
-            if USE_WAND:
+            if RunBin.get_bin('magick', silent=True) == None:
                 with Image(filename=in_f) as img:
                     img.save(filename=tmp_f)
             else:
