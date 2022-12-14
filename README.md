@@ -39,7 +39,7 @@ If you do not trust those, you may follow 'Running python script directly' secti
 ## How to use (GUI)
 ![imgs/screenshot](imgs/screenshot.png)
 
-1. Run sticker_convert_gui.exe
+1. Run `sticker-convert.exe`, `sticker-convert` or `python3 main.py`
 2. Choose input source.
     - If you are downloading, enter URL address if you want to download from (If applicable)
     - If you are using local files, choose input directory. Defaults to a folder named 'stickers_input' in the same directory as the program. Put files you want to convert into that directory
