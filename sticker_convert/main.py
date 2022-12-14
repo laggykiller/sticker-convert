@@ -3,8 +3,6 @@ import multiprocessing
 import sys
 import os
 import shutil
-from gui import GUI
-from cli import CLI
 
 script_path = os.path.split(__file__)[0]
 os.chdir(os.path.abspath(script_path))
@@ -20,6 +18,9 @@ if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('m
         os.environ['MAGICK_HOME'] = magick_home
         os.environ["PATH"] += os.pathsep + magick_home + os.sep + "bin"
         os.environ["DYLD_LIBRARY_PATH"] = magick_home + os.sep + "lib"
+
+from gui import GUI
+from cli import CLI
 
 def main():
     if len(sys.argv) == 1:
