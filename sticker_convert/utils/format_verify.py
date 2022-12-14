@@ -50,7 +50,7 @@ class FormatVerify:
                 if square != None and img.height != img.width:
                     return False
         else:
-            dimension = RunBin.run_cmd(['magick', 'identify', '-ping', 'format', '%wx%h', file], silence=False)
+            dimension = RunBin.run_cmd(['magick', 'identify', '-ping', '-format', '%wx%h', file], silence=False)
             width = int(dimension.split('x')[0])
             height = int(dimension.split('x')[1])
 
