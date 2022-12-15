@@ -51,7 +51,7 @@ jobs:
                 ./get-deps-windows.bat &&
                 pyinstaller sticker_convert.spec &&
                 cd dist &&
-                tar -cvzf sticker-convert-windows.zip sticker-convert-windows
+                ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert-windows
             OUT_FILE_NAME: sticker-convert-windows.zip
             ASSET_MIME: application/zip
     steps:
