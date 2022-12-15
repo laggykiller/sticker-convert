@@ -48,7 +48,7 @@ jobs:
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: >
-                ./get-deps-windows.bat &&
+                start ./get-deps-windows.bat &&
                 pyinstaller sticker_convert.spec &&
                 cd dist &&
                 tar -cvzf sticker-convert-windows.zip sticker-convert-windows
