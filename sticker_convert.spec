@@ -17,21 +17,47 @@ def get_bin(bin):
     if which_result != None:
         return os.path.abspath(which_result)
 
+def get_magick_dir():
+    # Prioritize local binaries
+    if os.path.isdir('./sticker_convert/ImageMagick'):
+        return os.path.abspath(f'./sticker_convert/ImageMagick')
+    else:
+        magick_path = shutil.which("magick")
+        if magick_path:
+            return os.path.split(magick_path)[0]
+        else:
+            print('Error: ImageMagick directory not found.')
+            sys.exit()
+
 binaries = []
 datas = [('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon')]
 
-bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
 if sys.platform == 'win32':
-    apngasm_dir = os.path.split(shutil.which("apngasm"))[0]
-    magick_dir = os.path.split(shutil.which("magick"))[0]
-    binaries += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.dll', './ImageMagick'), (f'{magick_dir}/*.xml', './ImageMagick'), (f'{magick_dir}/modules/coders', './ImageMagick/coders'), (f'{apngasm_dir}/*', './')]
+    apngasm_path = shutil.which("apngasm")
+    if apngasm_path:
+        apngasm_dir = os.path.split(apngasm_path)[0]
+        binaries += [(f'{apngasm_dir}/*', './bin')]
+    
+    magick_dir = get_magick_dir()
+    binaries += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.xml', './ImageMagick')]
+
+    # Portable version does not have coders directory
+    if os.path.isdir(f'{magick_dir}/modules/coders'):
+        binaries += [(f'{magick_dir}/modules/coders', './ImageMagick/coders')]
+    
+    # Portable version does not have dll
+    if [i for i in os.listdir(magick_dir) if os.path.splitext(i)[-1].lower() == '.dll'] != []:
+        binaries += [(f'{magick_dir}/*.dll', './ImageMagick')]
+
+    
 elif sys.platform == 'darwin':
+    if os.path.isdir('./sticker_convert/ImageMagick') == False:
+        print('Error: ImageMagick directory not found. You may run magick-compile-macos.sh')
+        sys.exit()
+    
     binaries += [(f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'), (f'./sticker_convert/ImageMagick/lib/*', f'./ImageMagick/lib')]
 
-if os.path.isdir('./sticker_convert/ImageMagick') == False and sys.platform == 'darwin':
-    print('Warning: ImageMagick directory not found. You may run magick-compile-macos.sh')
-    sys.exit()
-
+bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
 for bin in bin_list:
     bin_path = get_bin(bin)
     if bin_path:

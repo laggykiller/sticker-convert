@@ -41,6 +41,7 @@ class FormatVerify:
     @staticmethod
     def check_file_res(file, res_min=None, res_max=None, square=None):
         file = str(file) + '[0]'
+        
         if RunBin.get_bin('magick', silent=True) == None:
             with Image(filename=file) as img:
                 if res_min != None and (img.height < res_min or img.width < res_min):
