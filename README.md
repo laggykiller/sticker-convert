@@ -226,6 +226,7 @@ Follow instruction from this post: https://stackoverflow.com/a/52667196
 
 ### I want to upload stickers that are in stickers_output that have not been uploaded yet
 CLI: Run with `--no-compress --export-xxxxx`
+
 GUI: Select `From local directory` for Input source, tick `No compression` box and select `Upload to xxxxx` for Output options
 
 ## Credits
