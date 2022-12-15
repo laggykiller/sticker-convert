@@ -7,6 +7,12 @@ import importlib
 block_cipher = None
 
 def get_bin(bin):
+    # Prioritize local binaries
+    if sys.platform == 'win32' and os.path.isfile(f'./sticker_convert/bin/{bin}.exe'):
+        return os.path.abspath(f'./sticker_convert/bin/{bin}.exe')
+    elif os.path.isfile(f'./sticker_convert/bin/{bin}'):
+        return os.path.abspath(f'./sticker_convert/bin/{bin}')
+
     which_result = shutil.which(bin)
     if which_result != None:
         return os.path.abspath(which_result)
