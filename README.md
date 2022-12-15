@@ -23,7 +23,9 @@ Supports static and animated stickers, with transparency support
     - Download: Supported, but require bot token
     - Upload: Supported, but require bot token and user_id. Alternatively, you may manually upload and create sticker pack with the output of this program.
 - Whatsapp
-    - Download: You have to manually find sticker packs / extract from your phone
+    - Download: You have to manually find sticker packs / extract from your phone or from WhatsApp Web
+        - Android Phone: Inside "/storage/emulated/0/Whatsapp/media/Whatsapp Stickers" OR "/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Stickers"
+        - Any: Go to WhatsApp Web, right click on sticker and click "Save image as..."
     - Upload: The program can create .wastickers file, which could then be imported into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information
 - Line
     - Download: Supported (e.g. https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
