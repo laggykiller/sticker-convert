@@ -3,7 +3,9 @@ A python script for creating, downloading, converting+compressing and uploading 
 
 With GUI and CLI that runs on Windows, MacOS and Linux
 
-Pre-compiled releases available for Windows and MacOS. Docker image is also available for Linux version, which could be used for running CLI
+[Pre-compiled releases available](https://github.com/laggykiller/sticker-convert/releases) for Windows and MacOS.
+
+[Docker image is available](https://hub.docker.com/r/laggykiller/sticker-convert) for Linux version, which could be used for running CLI
 
 You may [try this repo out in Google Colab](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which you can run the code on cloud (without downloading) and get the result from Google Drive. However, it maybe slower than running on your computer.
 
