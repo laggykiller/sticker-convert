@@ -6,6 +6,8 @@ Install python3 from https://www.python.org/
 Install the required python modules with `pip3 install requests ffmpeg-python lottie signalstickers_client python-telegram-bot anyio wand`
 
 ## 3.1 Executables / Binaries (Windows)
+NOTE: You may run `get-deps-windows.bat` to get them automatically
+
 For Windows, the following executables are required:
 - `ffmpeg.exe` and `ffprobe.exe`
     - Both can be found in https://ffmpeg.org/download.html
@@ -43,6 +45,8 @@ For Windows, the following executables are required:
 Place executables inside `sticker_convert/bin`
 
 ## 3.2 Executables / Binaries (MacOS)
+NOTE: You may run `get-deps-macos.bat` to get them automatically
+
 For MacOS, the following binaries are required:
 - `ffmpeg` and `ffprobe`
     - Eaisest method is download from Homebrew `brew install ffmpeg`
@@ -126,11 +130,15 @@ Change directory into `sticker_convert` directory and run `python ./main.py`
 This repository uses `pyinstaller` for compiling. Install with `pip3 install pyinstaller`
 
 ## Compiling on windows
+(NOTE: You may run `get-deps-windows.bat` to get dependencies automatically)
+
 1. Refer to the instructions in running python script directly for installing python modules and executables
 2. Run `pyinstaller sticker_convert.spec`
 3. Compilation result in `dist` directory
 
 ##  Compiling on MacOS
+(NOTE: You may run `get-deps-macos.bat` to get dependencies automatically)
+
 1. Refer to the instructions in running python script directly for installing python modules and binaries (Except imagemagick, ffmpeg and ffprobe)
 2. `ImageMagick` precompiled portable version is broken in newer releases of MacOS. You need to compile ImageMagick. Run `magick-compile-macos.sh` first
     - Ref1: https://stackoverflow.com/questions/55754551/how-to-install-imagemagick-portably-on-macos-when-i-cant-set-dyld-library-path

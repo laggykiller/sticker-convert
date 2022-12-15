@@ -27,6 +27,10 @@ def get_magick_dir():
             return os.path.split(magick_path)[0]
         else:
             print('Error: ImageMagick directory not found.')
+            if sys.platform == 'win32':
+                print('You may run get-deps-windows.bat to get ImageMagick automagically')
+            elif sys.platform == 'darwin':
+                print('You may run get-deps-macos.bat to get ImageMagick automagically')
             sys.exit()
 
 binaries = []
@@ -51,10 +55,6 @@ if sys.platform == 'win32':
 
     
 elif sys.platform == 'darwin':
-    if os.path.isdir('./sticker_convert/ImageMagick') == False:
-        print('Error: ImageMagick directory not found. You may run magick-compile-macos.sh')
-        sys.exit()
-    
     binaries += [(f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'), (f'./sticker_convert/ImageMagick/lib/*', f'./ImageMagick/lib')]
 
 bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
