@@ -3,7 +3,7 @@
 Install python3 from https://www.python.org/
 
 ## 2. Install python modules
-Install the required python modules with `pip3 install requests ffmpeg-python lottie signalstickers_client python-telegram-bot anyio wand`
+Install the required python modules with `pip3 install requirements.txt`
 
 ## 3.1 Executables / Binaries (Windows)
 NOTE: You may run `get-deps-windows.bat` to get them automatically
@@ -45,7 +45,7 @@ For Windows, the following executables are required:
 Place executables inside `sticker_convert/bin`
 
 ## 3.2 Executables / Binaries (MacOS)
-NOTE: You may run `get-deps-macos.bat` to get them automatically
+NOTE: You may run `get-deps-macos.sh` to get them automatically
 
 For MacOS, the following binaries are required:
 - `ffmpeg` and `ffprobe`
