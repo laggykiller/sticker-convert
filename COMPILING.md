@@ -12,8 +12,9 @@ For Windows, the following executables are required:
     - Direct link (May break): https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-essentials.7z
 - `magick.exe`
     - Download page for ImageMagick: https://imagemagick.org/script/download.php#windows
-    - Note that you should choose one that ends with '-dll' and NOT portable version
+    - Installed version is recommended. Note that you should choose one that ends with '-dll'
     - Direct link (May break): https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-54-Q16-HDRI-x64-dll.exe
+    - For portable version, decompress, rename directory and place into `sticker_covnert/ImageMagick`
 - `zip.exe`
     - Download page: https://gnuwin32.sourceforge.net/packages/zip.htm
     - Direct link: http://downloads.sourceforge.net/gnuwin32/zip-3.0-bin.zip
@@ -37,7 +38,7 @@ For Windows, the following executables are required:
 - `apngasm.exe`
     - Note that version 3 is required. Sourceforge only provides up to version 2.
     - Download page: https://github.com/apngasm/apngasm/releases
-    - Direct link: https://github.com/apngasm/apngasm/releases/download/3.1.1/apngasm_3.1-0_AMD64.exe
+    - Direct link: https://github.com/apngasm/apngasm/releases/download/3.1.3/apngasm_3.1-3_AMD64.exe
 
 Place executables inside `sticker_convert/bin`
 

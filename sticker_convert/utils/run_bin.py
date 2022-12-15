@@ -8,16 +8,20 @@ class RunBin:
     def get_bin(bin, silent=False):
         if sys.platform == 'win32':
             bin = bin + '.exe'
+
+        # Prioritize local binaries
+        if os.path.isdir('./bin') and bin in os.listdir('./bin'):
+            return os.path.abspath(f'./bin/{bin}')
+        elif os.path.isdir('./ImageMagick') and bin in os.listdir('./ImageMagick'):
+            return os.path.abspath(f'./ImageMagick/{bin}')
+        elif os.path.isdir('./ImageMagick/bin') and bin in os.listdir('./ImageMagick/bin'):
+            return os.path.abspath(f'./ImageMagick/bin/{bin}')
+
         which_result = shutil.which(bin)
         if which_result != None:
             return os.path.abspath(which_result)
-        elif os.path.isdir('./bin') and bin in os.listdir('./bin'):
-            return os.path.abspath(f'./bin/{bin}')
-        elif os.path.isdir('./ImageMagick/bin') and bin in os.listdir('./ImageMagick/bin'):
-            return os.path.abspath(f'./ImageMagick/bin/{bin}')
-        else:
-            if silent == False:
-                print(f'Warning: Cannot find binary file {bin}')
+        elif silent == False:
+            print(f'Warning: Cannot find binary file {bin}')
     
     @staticmethod
     def run_cmd(cmd_list, silence=False):

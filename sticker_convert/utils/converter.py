@@ -164,7 +164,6 @@ class StickerConvert:
     def magick_crop(in_f, out_f, res):
         # https://stackoverflow.com/a/28503615
         # out_f: tiles_{0}.jpg
-
         if RunBin.get_bin('magick', silent=True) == None:
             with Image(filename=in_f) as img:
                 i = 0
@@ -176,10 +175,17 @@ class StickerConvert:
                             chunk.save(filename=out_f.format(str(i).zfill(3)))
                         i += 1
         else:
+            out_f = out_f.replace('{0}', '%03d')
             RunBin.run_cmd(['magick', in_f, '-crop', f'{res}x{res}', out_f])
 
     @staticmethod
     def convert_generic_image(in_f, out_f, res=512, quality=90, **kwargs):
+        # https://www.imagemagick.org/script/command-line-options.php#quality
+        # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
+        # For png, filter_type = quality % 10
+        if os.path.splitext(out_f)[-1] == '.png':
+            quality = 95
+
         if RunBin.get_bin('magick', silent=True) == None:
             with Image(filename=in_f) as img:
                 if res != None:
@@ -194,7 +200,6 @@ class StickerConvert:
                 RunBin.run_cmd(['magick', in_f, '-resize', f'{res}x{res}', '-background', 'none', '-gravity', 'center', '-extent', f'{res}x{res}', '-quality', str(quality), out_f])
             else:
                 RunBin.run_cmd(['magick', in_f, '-quality', str(quality), out_f])
-
 
     @staticmethod
     def convert_generic_anim(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
@@ -240,10 +245,11 @@ class StickerConvert:
     def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
         # ffmpeg do not support webp decoding (yet)
         # Converting animated .webp to image of the frames or .webp directly can result in broken frames
-        # Converting to .mp4 first is safe way of handling .webp
+        # .mp4 does not like odd number of width / height
+        # Converting to .webm first is safe way of handling .webp
 
         with tempfile.TemporaryDirectory() as tempdir:
-            tmp_f = os.path.join(tempdir, 'temp.mp4')
+            tmp_f = os.path.join(tempdir, 'temp.webm')
 
             if RunBin.get_bin('magick', silent=True) == None:
                 with Image(filename=in_f) as img:
@@ -308,7 +314,7 @@ class StickerConvert:
 
             # magick convert single png strip to png files
             # tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
-            tmp5_f = os.path.join(tempdir2, 'tmp2-%03d.png')
+            tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
             StickerConvert.magick_crop(tmp4_f, tmp5_f, res)
             
             # optipng and magick convert optimize png files
@@ -322,14 +328,3 @@ class StickerConvert:
             
             # apngasm create optimized apng
             RunBin.run_cmd(['apngasm', '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'])
-
-def get_bin(bin):
-    which_result = shutil.which(bin)
-    if which_result != None:
-        return os.path.abspath(which_result)
-    elif os.path.isdir('./bin') and bin in os.listdir('./bin'):
-        return os.path.abspath(f'./bin/{bin}')
-    elif os.path.isdir('./ImageMagick/bin') and bin in os.listdir('./ImageMagick/bin'):
-        return os.path.abspath(f'./ImageMagick/bin/{bin}')
-    else:
-        print(f'Warning: Cannot find binary file {bin}')
