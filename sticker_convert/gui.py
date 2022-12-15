@@ -296,7 +296,7 @@ class GUI:
             messagebox.showerror(title='sticker-convert', message='Warning: preset.json cannot be found')
             sys.exit()
         else:
-            with open('preset.json') as f:
+            with open('preset.json', encoding='utf-8') as f:
                 self.presets_dict = json.load(f)
     
     def load_creds(self):
@@ -307,7 +307,7 @@ class GUI:
             self.telegram_userid = ''
             return
 
-        with open('creds.json') as f:
+        with open('creds.json', encoding='utf-8') as f:
             creds = json.load(f)
 
         self.signal_uuid_var.set(creds['signal_uuid'])
@@ -322,7 +322,7 @@ class GUI:
             'telegram_token': self.telegram_token_var.get(),
             'telegram_userid': self.telegram_userid_var.get()
         }
-        with open('creds.json', 'w+') as f:
+        with open('creds.json', 'w+', encoding='utf-8') as f:
             json.dump(creds, f, indent=4)
 
     def callback_set_indir(self, *args):

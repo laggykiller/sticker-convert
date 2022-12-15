@@ -36,7 +36,7 @@ class CLI:
             print('Warning: preset.json cannot be found')
             return
         else:
-            with open('preset.json') as f:
+            with open('preset.json', encoding='utf-8') as f:
                 presets_dict = json.load(f)
 
         parser = argparse.ArgumentParser(description='CLI for stickers-convert')
@@ -86,7 +86,7 @@ class CLI:
         telegram_userid = args.telegram_userid
 
         if os.path.isfile('creds.json'):
-            with open('creds.json') as f:
+            with open('creds.json', encoding='utf-8') as f:
                 creds = json.load(f)
 
             signal_uuid = creds['signal_uuid'] if signal_uuid == None else signal_uuid
@@ -103,7 +103,7 @@ class CLI:
                 'telegram_token': telegram_token,
                 'telegram_userid': telegram_userid
             }
-            with open('creds.json', 'w+') as f:
+            with open('creds.json', 'w+', encoding='utf-8') as f:
                 json.dump(creds, f, indent=4)
             print('Saved credentials to creds.json')
         
