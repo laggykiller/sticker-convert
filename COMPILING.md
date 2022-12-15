@@ -3,7 +3,7 @@
 Install python3 from https://www.python.org/
 
 ## 2. Install python modules
-Install the required python modules with `pip3 install requests ffmpeg-python lottie argparse signalstickers_client python-telegram-bot anyio wand`
+Install the required python modules with `pip3 install requests ffmpeg-python lottie signalstickers_client python-telegram-bot anyio wand`
 
 ## 3.1 Executables / Binaries (Windows)
 For Windows, the following executables are required:
