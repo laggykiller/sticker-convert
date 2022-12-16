@@ -40,37 +40,43 @@ del optipng-0.7.7-win32.zip
 rmdir -r optipng-0.7.7-win32
 
 :: Get pngquant
+mkdir pngquant-dl
+cd pngquant-dl
 curl -O -L "https://pngquant.org/pngquant-windows.zip"
 tar -xf pngquant-windows.zip
-move pngquant\pngquant.exe .
-del pngquant-windows.zip
-rmdir -r pngquant
+cd ..
+move pngquant-dl\pngquant\pngquant.exe .
+del pngquant-dl\pngquant-windows.zip
+rmdir -r pngquant-dl
 
 :: Get ffmpeg
+mkdir ffmpeg-dl
+cd ffmpeg-dl
 curl -O -L "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip"
 tar -xf ffmpeg-master-latest-win64-gpl.zip
-move ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe .
-move ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe .
-del ffmpeg-master-latest-win64-gpl.zip
-rmdir -r ffmpeg-master-latest-win64-gpl
+cd ..
+move ffmpeg-dl\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe .
+move ffmpeg-dl\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe .
+del ffmpeg-dl\ffmpeg-master-latest-win64-gpl.zip
+rmdir -r ffmpeg-dl
 
 :: Get bzip2
-mkdir bzip2
-cd .\bzip2
+mkdir bzip2-dl
+cd bzip2-dl
 curl -O -L "https://sourceforge.net/projects/gnuwin32/files/bzip2/1.0.5/bzip2-1.0.5-bin.zip"
 tar -xf bzip2-1.0.5-bin.zip
 cd ..
-move bzip2\bin\* .
-rmdir -r bzip2
+move bzip2-dl\bin\* .
+rmdir -r bzip2-dl
 
 :: Get zip
-mkdir zip
-cd zip
+mkdir zip-dl
+cd zip-dl
 curl -O -L "http://downloads.sourceforge.net/gnuwin32/zip-3.0-bin.zip"
 tar -xf zip-3.0-bin.zip
 cd ..
-move zip\bin\* .
-rmdir -r zip
+move zip-dl\bin\* .
+rmdir -r zip-dl
 
 :: Go back to repo root
 cd ..\..\
