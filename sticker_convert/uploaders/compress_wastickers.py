@@ -5,7 +5,6 @@ import tempfile
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from utils.metadata_handler import MetadataHandler
-import time
 
 def clean_dir(dir):
     for i in os.listdir(dir):
