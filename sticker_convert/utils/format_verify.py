@@ -113,7 +113,14 @@ class FormatVerify:
 
         else:
             if os.path.isfile(file):
-                if file_ext not in  ('.webp', '.webm', '.png', '.apng'):
+                if file_ext in ('.apng', '.png'):
+                    file_f_ffprobe = ffmpeg.probe(file)
+                    video_info = next(s for s in file_f_ffprobe['streams'] if s['codec_type'] == 'video')
+                    if video_info['codec_name'] == 'apng':
+                        return True
+                    else:
+                        return False
+                if file_ext not in  ('.webp', '.webm'):
                     try:
                         file_f_ffprobe = ffmpeg.probe(file)
                         codec_type = file_f_ffprobe['streams'][0]['codec_type']
