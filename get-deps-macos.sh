@@ -12,23 +12,23 @@ rm -rf magick-src
 mkdir magick-src
 cd magick-src
 
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.0-54.tar.gz
+curl --retry 5 -O -L https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.0-54.tar.gz
 tar xvzf 7.1.0-54.tar.gz
 cd ImageMagick-7.1.0-54
 
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://download.imagemagick.org/archive/delegates/jpegsrc.v9b.tar.gz
+curl --retry 5 -O -L https://download.imagemagick.org/archive/delegates/jpegsrc.v9b.tar.gz
 tar xvzf jpegsrc.v9b.tar.gz
 cd jpeg-9b
 ./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libjpeg
 cd ..
 
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://download.imagemagick.org/archive/delegates/libwebp-0.6.0.tar.gz
+curl --retry 5 -O -L https://download.imagemagick.org/archive/delegates/libwebp-0.6.0.tar.gz
 tar xvzf libwebp-0.6.0.tar.gz
 cd libwebp-0.6.0
 ./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libwebp
 cd ..
 
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://download.imagemagick.org/archive/delegates/libpng-1.6.31.tar.gz
+curl --retry 5 -O -L https://download.imagemagick.org/archive/delegates/libpng-1.6.31.tar.gz
 tar xvzf libpng-1.6.31.tar.gz
 cd libpng-1.6.31
 ./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libpng
@@ -56,7 +56,7 @@ cd ./sticker_convert/bin
 # Compiling pngnq-s9
 mkdir ./pngnqs9
 cd ./pngnqs9
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz
+curl --retry 5 -O -L https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz
 tar xvzf 2.0.2.tar.gz
 cd ./pngnq-s9-2.0.2
 # Fix bug that causes compilation to fail
@@ -74,7 +74,7 @@ rm -rf ./pngnqs9
 # Get pngquant
 mkdir pngquant-dl
 cd pngquant-dl
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L "https://pngquant.org/pngquant.tar.bz2"
+curl --retry 5 -O -L "https://pngquant.org/pngquant.tar.bz2"
 tar xvzf pngquant.tar.bz2
 cd ../
 cp ./pngquant-dl/pngquant ./
@@ -93,24 +93,24 @@ rm -rf ./optipng-dl
 rm optipng.tar.gz
 
 # Get apngasm
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://sourceforge.net/projects/apngasm/files/2.91/apngasm-2.91-bin-macos.zip
+curl --retry 5 -O -L https://sourceforge.net/projects/apngasm/files/2.91/apngasm-2.91-bin-macos.zip
 unzip apngasm-2.91-bin-macos.zip
 rm readme.txt
 rm apngasm-2.91-bin-macos.zip
 
 # Get apngdis
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip
+curl --retry 5 -O -L https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip
 unzip apngdis-2.9-bin-macos.zip
 rm readme.txt
 rm apngdis-2.9-bin-macos.zip
 
 # Get ffmpeg
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://evermeet.cx/ffmpeg/ffmpeg-5.1.2.zip
+curl --retry 5 -O -L https://evermeet.cx/ffmpeg/ffmpeg-5.1.2.zip
 unzip ffmpeg-5.1.2.zip
 rm ffmpeg-5.1.2.zip
 
 # Get ffprobe
-curl --max-time 10 --retry 5 --retry-delay 0 --retry-max-time 40 -O -L https://evermeet.cx/ffmpeg/ffprobe-5.1.2.zip
+curl --retry 5 -O -L https://evermeet.cx/ffmpeg/ffprobe-5.1.2.zip
 unzip ffprobe-5.1.2.zip
 rm ffprobe-5.1.2.zip
 
