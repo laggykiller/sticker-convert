@@ -3,8 +3,8 @@
 cd sticker_convert
 
 :: Preparing bin and ImageMagick directory
-rmdir -r sticker_convert\bin >nul 2>&1
-rmdir -r sticker_convert\ImageMagick >nul 2>&1
+rd /s /q sticker_convert\bin >nul 2>&1
+rd /s /q sticker_convert\ImageMagick >nul 2>&1
 
 :: Get ImageMagick
 mkdir ImageMagick
@@ -30,14 +30,14 @@ curl -O -L "https://sourceforge.net/projects/pngnqs9/files/pngnq-s9-2.0.2.zip"
 tar -xf pngnq-s9-2.0.2.zip
 move pngnq-s9-2.0.2\pngnq-s9.exe .
 del pngnq-s9-2.0.2.zip
-rmdir -r pngnq-s9-2.0.2
+rd /s /q pngnq-s9-2.0.2
 
 :: Get optipng
 curl -O -L "https://sourceforge.net/projects/optipng/files/OptiPNG/optipng-0.7.7/optipng-0.7.7-win32.zip"
 tar -xf optipng-0.7.7-win32.zip
 move optipng-0.7.7-win32\optipng.exe .
 del optipng-0.7.7-win32.zip
-rmdir -r optipng-0.7.7-win32
+rd /s /q optipng-0.7.7-win32
 
 :: Get pngquant
 mkdir pngquant-dl
@@ -46,7 +46,7 @@ curl -O -L "https://pngquant.org/pngquant-windows.zip"
 tar -xf pngquant-windows.zip
 cd ..
 move pngquant-dl\pngquant\pngquant.exe .
-rmdir -r pngquant-dl
+rd /s /q pngquant-dl
 
 :: Get ffmpeg
 mkdir ffmpeg-dl
@@ -56,7 +56,7 @@ tar -xf ffmpeg-master-latest-win64-gpl.zip
 cd ..
 move ffmpeg-dl\ffmpeg-master-latest-win64-gpl\bin\ffmpeg.exe .
 move ffmpeg-dl\ffmpeg-master-latest-win64-gpl\bin\ffprobe.exe .
-rmdir -r ffmpeg-dl
+rd /s /q ffmpeg-dl
 
 :: Get bzip2
 mkdir bzip2-dl
@@ -65,7 +65,7 @@ curl -O -L "https://sourceforge.net/projects/gnuwin32/files/bzip2/1.0.5/bzip2-1.
 tar -xf bzip2-1.0.5-bin.zip
 cd ..
 move bzip2-dl\bin\* .
-rmdir -r bzip2-dl
+rd /s /q bzip2-dl
 
 :: Get zip
 mkdir zip-dl
@@ -74,7 +74,7 @@ curl -O -L "http://downloads.sourceforge.net/gnuwin32/zip-3.0-bin.zip"
 tar -xf zip-3.0-bin.zip
 cd ..
 move zip-dl\bin\* .
-rmdir -r zip-dl
+rd /s /q zip-dl
 
 :: Go back to repo root
 cd ..\..\
