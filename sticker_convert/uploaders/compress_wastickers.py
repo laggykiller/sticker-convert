@@ -14,7 +14,8 @@ class CompressWastickers:
     @staticmethod
     def compress_wastickers(in_dir, out_dir, author='Me', title='My sticker pack', quality_max=90, quality_min=0, fps_max=30, fps_min=3, steps=20, **kwargs):
         title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=title, author=author)
-        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=30, separate_image_anim=True)
+        # packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=30, separate_image_anim=True)
+        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=30, separate_image_anim=False)
 
         for pack_title, stickers in packs.items():
             num = 0 # Originally the Sticker Maker application name the files with int(time.time())
