@@ -31,4 +31,6 @@ RUN rm -rf /app/pngnq-s9-2.0.2 && \
 
 RUN pip3 install requests ffmpeg-python lottie argparse signalstickers_client python-telegram-bot anyio wand
 
+Volume ["/app/stickers_input", "/app/stickers_output"]
+
 CMD ["python3", "/app/main.py", "--help"]
