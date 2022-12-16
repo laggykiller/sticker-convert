@@ -35,7 +35,7 @@
         "vid_size_max": 500000,
         "img_size_max": 100000,
         "vid_format": ".webp",
-        "img_format": ".png",
+        "img_format": ".webp",
         "fps_min": 1,
         "fps_max": 30,
         "res_min": 512,

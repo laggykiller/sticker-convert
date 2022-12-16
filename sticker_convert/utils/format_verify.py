@@ -113,13 +113,14 @@ class FormatVerify:
 
         else:
             if os.path.isfile(file):
-                try:
-                    file_f_ffprobe = ffmpeg.probe(file)
-                    codec_type = file_f_ffprobe['streams'][0]['codec_type']
-                    if codec_type == 'video':
-                        return True
-                except ffmpeg.Error:
-                    pass
+                if file_ext not in  ('.webp', '.webm', '.png', '.apng'):
+                    try:
+                        file_f_ffprobe = ffmpeg.probe(file)
+                        codec_type = file_f_ffprobe['streams'][0]['codec_type']
+                        if codec_type == 'video':
+                            return True
+                    except ffmpeg.Error:
+                        pass
                 
                 if RunBin.get_bin('magick', silent=True) == None:
                     with Image(filename=file) as img:
