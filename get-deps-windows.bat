@@ -21,9 +21,10 @@ del apngasm_3.1-3_AMD64.zip
 
 :: Get apngdis
 cd bin
-curl -O -L "https://sourceforge.net/projects/apngdis/files/2.8/apngdis-2.8-bin-win32.zip"
-tar -xf apngdis-2.8-bin-win32.zip
-del apngdis-2.8-bin-win32.zip
+curl -O -L "https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-win64.zip"
+tar -xf apngdis-2.9-bin-win64.zip
+del apngdis-2.9-bin-win64.zip
+del readme.txt
 
 :: Get pngnq-s9
 curl -O -L "https://sourceforge.net/projects/pngnqs9/files/pngnq-s9-2.0.2.zip"
