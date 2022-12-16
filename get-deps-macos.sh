@@ -71,6 +71,26 @@ cd ../../
 cp ./pngnqs9/pngnq-s9-2.0.2/src/pngnq-s9 ./
 rm -rf ./pngnqs9
 
+# Get pngquant
+mkdir pngquant-dl
+cd pngquant-dl
+curl -O -L "https://pngquant.org/pngquant.tar.bz2"
+tar xvzf pngquant.tar.bz2
+cd ../
+cp ./pngquant-dl/pngquant ./
+rm -rf ./pngquant-dl
+
+# Get optipng
+# https://stackoverflow.com/a/69858397
+mkdir optipng-dl
+cd optipng-dl
+curl -L -H "Authorization: Bearer QQ==" -o optipng.tar.gz https://ghcr.io/v2/homebrew/core/optipng/blobs/sha256:3d423dfa59e07122f70e2a15026289dfc6884798ac76898065dbe587256c6e35
+tar xvzf optipng.tar.gz
+cd ../
+cp ./optipng-dl/optipng/0.7.7/bin/optipng ./
+rm -rf ./optipng-dl
+
+
 # Get apngasm
 curl -O -L https://sourceforge.net/projects/apngasm/files/2.91/apngasm-2.91-bin-macos.zip
 unzip apngasm-2.91-bin-macos.zip
