@@ -30,7 +30,7 @@ For Windows, the following executables are required:
     - Direct link: https://sourceforge.net/projects/optipng/files/OptiPNG/optipng-0.7.7/optipng-0.7.7-win32.zip
 - `pngnq-s9.exe`
     - Download page: https://sourceforge.net/projects/pngnqs9/files/
-    - Direct link: https://sourceforge.net/projects/pngnqs9/files/pngnq-s9-2.0.1-win32.zip/download
+    - Direct link: https://sourceforge.net/projects/pngnqs9/files/pngnq-s9-2.0.2.zip
 - `pngquant.exe`
     - Download page: https://pngquant.org/
     - Direct link: https://pngquant.org/pngquant-windows.zip
