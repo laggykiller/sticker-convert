@@ -29,6 +29,7 @@ del apngdis-2.8-bin-win32.zip
 curl -O -L "https://sourceforge.net/projects/pngnqs9/files/pngnq-s9-2.0.2.zip"
 tar -xf pngnq-s9-2.0.2.zip
 move pngnq-s9-2.0.2\pngnq-s9.exe .
+del pngnq-s9-2.0.2.zip
 rmdir -r pngnq-s9-2.0.2
 
 :: Get optipng
