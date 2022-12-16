@@ -1,17 +1,28 @@
 # sticker-convert
-A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
+![sticker_convert/icon/appicon.png](sticker_convert/icon/appicon.png)
+- A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
+- With GUI and CLI that runs on Windows, MacOS and Linux
+- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only)
+- Supports static and animated stickers, with transparency support
 
-With GUI and CLI that runs on Windows, MacOS and Linux
+## Downloads
+- [Pre-compiled releases](https://github.com/laggykiller/sticker-convert/releases) for Windows and MacOS. (Unzip the downloaded file and run `sticker-convert`)
+- [Docker image](https://hub.docker.com/r/laggykiller/sticker-convert) for Linux version, which could be used for running CLI.
+- [Try in Google Colab without downloading](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which runs the code on Google server and get the result from Google Drive. However, it maybe slower than running on your computer.
 
-[Pre-compiled releases available](https://github.com/laggykiller/sticker-convert/releases) for Windows and MacOS.
-
-[Docker image is available](https://hub.docker.com/r/laggykiller/sticker-convert) for Linux version, which could be used for running CLI
-
-You may [try this repo out in Google Colab](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which you can run the code on cloud (without downloading) and get the result from Google Drive. However, it maybe slower than running on your computer.
-
-Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only)
-
-Supports static and animated stickers, with transparency support
+## Table of contents
+- [Compatibility](#compatibility)
+- [How to use (GUI)](#how-to-use-gui)
+- [How to use (CLI)](#how-to-use-cli)
+- [How to use (Docker)](#how-to-use-docker)
+- [Running python script directly & Compiling](#running-python-script-directly--compiling)
+- [FAQ](#faq)
+    - [Getting signal uuid and password](#getting-signal-uuid-and-password)
+    - [Getting telegram bot token](#getting-telegram-bot-token)
+    - [Importing .wastickers into WhatsApp](#importing-wastickers-into-whatsapp)
+    - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
+- [Credits](#credits)
+- [DISCLAIMER](#disclaimer)
 
 ## Compatibility
 - Signal
@@ -36,11 +47,6 @@ Supports static and animated stickers, with transparency support
 - Kakao
     - Download: Supported (e.g. https://e.kakao.com/t/xxxxx)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
-
-## Pre-compiled releases
-Pre-compiled releases available for Windows, MacOS. Unzip the downloaded file and run `sticker-convert`
-
-If you do not trust those, you may follow 'Running python script directly' section to run the python script directly. However, you will need to install multiple dependencies.
 
 ## How to use (GUI)
 ![imgs/screenshot](imgs/screenshot.png)
@@ -162,10 +168,7 @@ Convert local files to a custom format
 
 `sticker-convert --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
-## Running python script directly & Compiling
-See [COMPILING.md](COMPILING.md)
-
-## Docker
+## How to use (Docker)
 
 Running
 ```
@@ -181,6 +184,9 @@ Building
 ```
 docker build . -t sticker-convert
 ```
+
+## Running python script directly & Compiling
+See [COMPILING.md](COMPILING.md)
 
 ## FAQ
 

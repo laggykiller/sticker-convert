@@ -6,6 +6,7 @@ import sys
 import shutil
 import multiprocessing
 from threading import Thread
+import webbrowser
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from downloaders.download_line import DownloadLine
@@ -250,6 +251,8 @@ class GUI:
         self.telegram_userid_var = StringVar(self.root)
         self.telegram_userid_entry = Entry(self.frame_cred, textvariable=self.telegram_userid_var, width=60)
 
+        self.cred_help = Button(self.frame_cred, text='Get help', command=self.callback_cred_help)
+
         self.signal_uuid_lbl.grid(column=0, row=0, sticky='w')
         self.signal_uuid_entry.grid(column=1, row=0, columnspan=2, sticky='w')
         self.signal_password_lbl.grid(column=0, row=1, sticky='w')
@@ -258,6 +261,7 @@ class GUI:
         self.telegram_token_entry.grid(column=1, row=2, columnspan=2, sticky='w')
         self.telegram_userid_lbl.grid(column=0, row=3, sticky='w')
         self.telegram_userid_entry.grid(column=1, row=3, columnspan=2, sticky='w')
+        self.cred_help.grid(column=0, row=4, columnspan=2, sticky='w')
 
         # Progress frame
         self.progress_box = scrolledtext.ScrolledText(self.frame_progress, width=60, height=10, wrap='word')
@@ -378,6 +382,9 @@ class GUI:
         
     def callback_update_progress_bar(self, *args):
         self.progress_bar['value'] += 100 / self.items
+    
+    def callback_cred_help(self, *args):
+        webbrowser.open('https://github.com/laggykiller/sticker-convert#faq')
 
     def update_progress_box(self, message):
         self.progress_box.config(state='normal')
