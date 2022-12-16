@@ -42,10 +42,11 @@ class StickerConvert:
             return StickerConvert.convert_tgs
 
         else:
+            if in_f_ext == '.webp':
+                return StickerConvert.convert_from_webp_anim
+
             if FormatVerify.is_anim(in_f):
-                if in_f_ext == '.webp':
-                    return StickerConvert.convert_from_webp_anim
-                elif out_f_ext == '.png' or out_f_ext == '.apng':
+                if out_f_ext == '.png' or out_f_ext == '.apng':
                     return StickerConvert.convert_to_apng_anim
                 else:
                     return StickerConvert.convert_generic_anim
@@ -83,7 +84,7 @@ class StickerConvert:
                         return True
                     
                     size = os.path.getsize(tmp_f)
-                    if FormatVerify.is_anim(tmp_f):
+                    if FormatVerify.is_anim(in_f):
                         size_max = vid_size_max
                     else:
                         size_max = img_size_max
@@ -232,7 +233,7 @@ class StickerConvert:
             stream = ffmpeg.filter(stream, 'pad', res, res, '(ow-iw)/2', '(ow-ih)/2', color='black@0')
             stream = ffmpeg.filter(stream, 'setsar', 1)
         if out_f_ext == '.apng' or out_f_ext == '.png':
-            stream = ffmpeg.output(stream, out_f, vcodec='apng', pix_fmt='rgba', quality=quality, plays=0)
+            stream = ffmpeg.output(stream, out_f, vcodec='apng', pix_fmt='rgba', quality=95, plays=0)
         elif out_f_ext == '.webp':
             stream = ffmpeg.output(stream, out_f, vcodec='webp', pix_fmt='yuva420p', quality=quality, lossless=0, loop=0)
         else:
@@ -242,22 +243,32 @@ class StickerConvert:
         # RunBin.run_cmd(['ffmpeg', '-y', '-i', in_f, '-r', str(fps), '-vf', f'scale={res}:-1:flags=neighbor:sws_dither=none,pad={res}:{res}:(ow-iw)/2:(oh-ih)/2:color=black@0,setsar=1', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', str(out_f)])
 
     @staticmethod
-    def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
-        # ffmpeg do not support webp decoding (yet)
-        # Converting animated .webp to image of the frames or .webp directly can result in broken frames
-        # .mp4 does not like odd number of width / height
-        # Converting to .webm first is safe way of handling .webp
-
+    def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, color=90, **kwargs):
         with tempfile.TemporaryDirectory() as tempdir:
-            tmp_f = os.path.join(tempdir, 'temp.webm')
+            if FormatVerify.is_anim(in_f):
+                # ffmpeg do not support webp decoding (yet)
+                # Converting animated .webp to image of the frames or .webp directly can result in broken frames
+                # .mp4 does not like odd number of width / height
+                # Converting to .webm first is safe way of handling .webp
 
-            if RunBin.get_bin('magick', silent=True) == None:
-                with Image(filename=in_f) as img:
-                    img.save(filename=tmp_f)
+                tmp_f = os.path.join(tempdir, 'tmp.webm')
+                StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality)
+                StickerConvert.convert_generic_anim(tmp_f, out_f, res=res, quality=quality, fps=fps)
             else:
-                RunBin.run_cmd(['magick', in_f, '-quality', str(quality), tmp_f])
-            
-            StickerConvert.convert_generic_anim(tmp_f, out_f, res=res, quality=quality, fps=fps)
+                extension = os.path.splitext(out_f)[-1].lower()
+                tmp_f = os.path.join(tempdir, f'tmp{extension}')
+                StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality)
+                # Need more compression for .png
+                if os.path.splitext(out_f)[-1] == '.png':
+                    tmp1_f = os.path.join(tempdir, 'tmp.1.png')
+                    RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp_f])
+
+                    tmp2_f = os.path.join(tempdir, 'tmp.1.2.png')
+                    RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp1_f])
+                    
+                    shutil.move(tmp2_f, out_f)
+                else:
+                    shutil.move(tmp_f, out_f)
 
     @staticmethod
     def convert_tgs(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
@@ -305,8 +316,7 @@ class StickerConvert:
 
             # pngnq-s9 optimization
             tmp3_f = os.path.join(tempdir1, 'tmp1_strip.1.png')
-            number_of_colors = color # 1-256 number of colors
-            RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(number_of_colors), '-e', '.1.png', tmp2_f])
+            RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp2_f])
 
             # pngquant optimization
             tmp4_f = os.path.join(tempdir1, 'tmp1_strip.1.2.png')
