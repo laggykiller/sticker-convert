@@ -79,6 +79,7 @@ tar xvzf pngquant.tar.bz2
 cd ../
 cp ./pngquant-dl/pngquant ./
 rm -rf ./pngquant-dl
+rm pngquant.tar.bz2
 
 # Get optipng
 # https://stackoverflow.com/a/69858397
@@ -89,7 +90,7 @@ tar xvzf optipng.tar.gz
 cd ../
 cp ./optipng-dl/optipng/0.7.7/bin/optipng ./
 rm -rf ./optipng-dl
-
+rm optipng.tar.gz
 
 # Get apngasm
 curl -O -L https://sourceforge.net/projects/apngasm/files/2.91/apngasm-2.91-bin-macos.zip
