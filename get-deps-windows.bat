@@ -43,7 +43,7 @@ rd /s /q optipng-0.7.7-win32
 :: Get pngquant
 mkdir pngquant-dl
 cd pngquant-dl
-curl --retry 5 -O -L "https://pngquant.org/pngquant-windows.zip"
+curl --retry 5 -O -L "https://github.com/laggykiller/pngquant/releases/download/2.17.0/pngquant-windows.zip"
 tar -xf pngquant-windows.zip
 cd ..
 move pngquant-dl\pngquant\pngquant.exe .
