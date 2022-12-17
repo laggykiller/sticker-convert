@@ -16,12 +16,12 @@ class MetadataHandler:
     def get_metadata(dir, title=None, author=None, emoji_dict=None):
         title_path = os.path.join(dir, 'title.txt')
         if title == None and os.path.isfile(title_path):
-            with open(title_path) as f:
+            with open(title_path, encoding='utf-8') as f:
                 title = f.read().replace('\n', '')
 
         author_path = os.path.join(dir, 'author.txt')
         if author == None and os.path.isfile(author_path):
-            with open(author_path) as f:
+            with open(author_path, encoding='utf-8') as f:
                 author = f.read().replace('\n', '')
         
         emoji_path = os.path.join(dir, 'emoji.txt')
@@ -35,12 +35,12 @@ class MetadataHandler:
     def set_metadata(dir, title=None, author=None, emoji_dict=None):
         title_path = os.path.join(dir, 'title.txt')
         if title != None:
-            with open(title_path, 'w+') as f:
+            with open(title_path, 'w+', encoding='utf-8') as f:
                 f.write(title)
         
         author_path = os.path.join(dir, 'author.txt')
         if author != None:
-            with open(author_path, 'w+') as f:
+            with open(author_path, 'w+', encoding='utf-8') as f:
                 f.write(author)
         
         emoji_path = os.path.join(dir, 'emoji.txt')
