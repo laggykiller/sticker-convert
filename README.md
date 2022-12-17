@@ -199,8 +199,11 @@ See [COMPILING.md](COMPILING.md)
 
 1. Install Signal Desktop from https://signal.org/en/download/
 2. Link Signal Desktop with your phone
-3. Open Signal Desktop in the commandline with `Signal.exe --enable-dev-tools` (Windows) or `signal-desktop --enable-dev-tools` (MacOS / Windows)
-4. Go to `View -> Toggle Developers tools`
+3. Open Signal Desktop in the commandline
+    - Windows: Open search, type cmd, type `%localappdata%\Programs\signal-desktop\Signal.exe --enable-dev-tools` and press enter
+    - MacOS: Open terminal, type `/Applications/Signal.app/Contents/MacOS/Signal --enable-dev-tools`
+    - Linux: Open terminal, type `signal-desktop --enable-dev-tools`
+4. On the top bar, go to `View -> Toggle Developers tools`
 5. Open console
     - `uuid` is the output of running: `window.reduxStore.getState().items.uuid_id`
     - `password` is the output of running: `window.reduxStore.getState().items.password`
