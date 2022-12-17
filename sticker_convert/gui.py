@@ -444,17 +444,17 @@ class GUI:
             return
         
         if (input_option == self.input_options['telegram'] or output_option == self.output_options['telegram']) and telegram_token == '':
-            self.update_progress_box('Downloading from and uploading to telegram requires user_id (From real account, not bot account)')
+            self.update_progress_box('Downloading from and uploading to telegram requires bot token. If you want to upload the results by yourself, select "Save to local directory only" for output')
             self.stop()
             return
         
         if output_option == self.output_options['telegram'] and telegram_userid == '':
-            self.update_progress_box('Uploading to telegram requires bot token')
+            self.update_progress_box('Uploading to telegram requires user_id (From real account, not bot account). If you want to upload the results by yourself, select "Save to local directory only" for output')
             self.stop()
             return
         
         if output_option == self.output_options['signal'] and (signal_uuid == '' or signal_password == ''):
-            self.update_progress_box('Uploading to signal requires uuid and password')
+            self.update_progress_box('Uploading to signal requires uuid and password. If you want to upload the results by yourself, select "Save to local directory only" for output')
             self.stop()
             return
         

@@ -204,6 +204,16 @@ class StickerConvert:
 
     @staticmethod
     def convert_generic_anim(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
+        if shutil.which('ffmpeg'):
+            # Faster
+            StickerConvert.convert_generic_anim_pymodule(in_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
+        else:
+            # Slower (a bit) but at least it works
+            # e.g. MacOS compiled version in system without ffmpeg
+            StickerConvert.convert_generic_anim_subprocess(in_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
+
+    @staticmethod
+    def convert_generic_anim_pymodule(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
         in_f_ext = os.path.splitext(in_f)[-1].lower()
         out_f_ext = os.path.splitext(out_f)[-1].lower()
 
@@ -240,7 +250,50 @@ class StickerConvert:
             stream = ffmpeg.output(stream, out_f, pix_fmt='yuva420p', quality=quality, lossless=0)
         ffmpeg.run(stream, overwrite_output=True, quiet=True)
 
-        # RunBin.run_cmd(['ffmpeg', '-y', '-i', in_f, '-r', str(fps), '-vf', f'scale={res}:-1:flags=neighbor:sws_dither=none,pad={res}:{res}:(ow-iw)/2:(oh-ih)/2:color=black@0,setsar=1', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', str(out_f)])
+    @staticmethod
+    def convert_generic_anim_subprocess(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
+        in_f_ext = os.path.splitext(in_f)[-1].lower()
+        out_f_ext = os.path.splitext(out_f)[-1].lower()
+
+        # cmd_list = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error']
+        cmd_list = ['ffmpeg', '-y', '-hide_banner']
+
+        if fps_in:
+            # For converting multiple images into animation
+            # fps_in is fps of the input sequence of images
+            # Example in_f: path/to/dir/image-%03d.png
+            cmd_list += ['-r', str(fps_in)]
+        elif in_f_ext == '.webm':
+            cmd_list += ['-vcodec', 'libvpx-vp9']
+        
+        cmd_list += ['-i', in_f]
+
+        if fps:
+            cmd_list += ['-r', str(fps)]
+        if res:
+            dimension = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', in_f]).replace('\n', '')
+            width = int(dimension.split('x')[0])
+            height = int(dimension.split('x')[1])
+
+            # Resolution must be even number, or else error occur
+            # res = res + res % 2
+            # https://trac.ffmpeg.org/wiki/Scaling says can use -2 instead
+            if width > height:
+                cmd_list += ['-vf', f'scale={res}:-2:flags=neighbor:sws_dither=none']
+            else:
+                cmd_list += ['-vf', f'scale=-2:{res}:flags=neighbor:sws_dither=none']
+
+            cmd_list += ['-vf', f'pad={res}:{res}:(ow-iw)/2:(oh-ih)/2:color=black@0']
+            cmd_list += ['-vf', f'setsar=1']
+
+        if out_f_ext == '.apng' or out_f_ext == '.png':
+            cmd_list += ['-vcodec', 'apng', '-pix_fmt', 'rgba', '-quality', '95', '-plays', '0', out_f]
+        elif out_f_ext == '.webp':
+            cmd_list += ['-vcodec', 'webp', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', '-loop', '0', out_f]
+        else:
+            cmd_list += ['-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', out_f]
+        # RunBin.run_cmd(cmd_list)
+        RunBin.run_cmd(cmd_list, silence=False)
 
     @staticmethod
     def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, color=90, **kwargs):

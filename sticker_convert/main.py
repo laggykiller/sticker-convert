@@ -7,20 +7,24 @@ import shutil
 script_path = os.path.split(__file__)[0]
 os.chdir(os.path.abspath(script_path))
 
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('magick') == None:
-    os.environ["PATH"] += os.pathsep + os.path.abspath(os.path.join(script_path, './bin')) + os.sep
+if sys.platform == 'win32' and shutil.which('magick') == None:
+    os.environ['MAGICK_HOME'] = os.path.abspath('./ImageMagick')
+    os.environ["MAGICK_CODER_MODULE_PATH"] = os.path.abspath('./ImageMagick/coders')
+    os.environ["PATH"] += os.pathsep + os.path.abspath('./ImageMagick')
+elif sys.platform == 'darwin':
+    if "DYLD_LIBRARY_PATH" in os.environ:
+        os.environ["DYLD_LIBRARY_PATH"] += os.pathsep + os.path.abspath("./lib")
+    else:
+        os.environ["DYLD_LIBRARY_PATH"] = os.path.abspath("./lib")
 
-if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS') or shutil.which('magick') == None:
-    if sys.platform == 'win32':
-        magick_home = os.path.abspath('./ImageMagick')
-        os.environ['MAGICK_HOME'] = magick_home
-        os.environ["MAGICK_CODER_MODULE_PATH"] = magick_home + os.sep + "coders"
-        os.environ["PATH"] += os.pathsep + magick_home + os.sep
-    elif sys.platform == 'darwin':
-        magick_home = os.path.abspath('./ImageMagick')
-        os.environ['MAGICK_HOME'] = magick_home
-        os.environ["PATH"] += os.pathsep + magick_home + os.sep + "bin"
-        os.environ["DYLD_LIBRARY_PATH"] = magick_home + os.sep + "lib"
+    if shutil.which('magick') == None:
+        os.environ['MAGICK_HOME'] = os.path.abspath('./ImageMagick')
+        os.environ["PATH"] += os.pathsep + os.path.abspath("./ImageMagick/bin")
+        os.environ["MAGICK_CODER_MODULE_PATH"] = os.path.abspath('./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders')
+        os.environ["MAGICK_CONFIGURE_PATH"] = os.path.abspath('./ImageMagick/etc/ImageMagick-7')
+        os.environ["DYLD_LIBRARY_PATH"] += os.pathsep + os.path.abspath("./ImageMagick/lib")
+
+os.environ["PATH"] += os.pathsep + os.path.abspath('./bin') + os.sep
 
 from gui import GUI
 from cli import CLI

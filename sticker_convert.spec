@@ -30,7 +30,7 @@ def get_magick_dir():
             if sys.platform == 'win32':
                 print('You may run get-deps-windows.bat to get ImageMagick automagically')
             elif sys.platform == 'darwin':
-                print('You may run get-deps-macos.bat to get ImageMagick automagically')
+                print('You may run get-deps-macos.sh to get ImageMagick automagically')
             sys.exit()
 
 binaries = []
@@ -55,7 +55,12 @@ if sys.platform == 'win32':
 
     
 elif sys.platform == 'darwin':
-    binaries += [(f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'), (f'./sticker_convert/ImageMagick/lib/*', f'./ImageMagick/lib')]
+    binaries += [(f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin')]
+    binaries += [(f'./sticker_convert/ImageMagick/lib/*.dylib', f'./ImageMagick/lib')]
+    binaries += [(f'./sticker_convert/ImageMagick/lib/*.a', f'./ImageMagick/lib')]
+    binaries += [(f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.la', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders')]
+    binaries += [(f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.so', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders')]
+    binaries += [(f'./sticker_convert/ImageMagick/etc/ImageMagick-7/*.xml', f'./ImageMagick/etc/ImageMagick-7')]
 
 bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
 for bin in bin_list:
@@ -66,6 +71,9 @@ for bin in bin_list:
 # Add local binaries at last so they are not overwritten by those found in system
 if os.path.isdir('./sticker_convert/bin'):
     binaries += [('./sticker_convert/bin/*', './bin')]
+
+if os.path.isdir('./sticker_convert/lib'):
+    binaries += [('./sticker_convert/lib/*', './lib')]
 
 # signalstickers_client needs a custom cacert.pem
 # https://stackoverflow.com/a/48068640
