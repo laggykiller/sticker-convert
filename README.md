@@ -1,5 +1,5 @@
 # sticker-convert
-<img src="https://socialify.git.ci/laggykiller/sticker-convert/image?description=1&descriptionEditable=Create%2C%20download%2C%20convert%2C%20compress%2C%20upload%20sticker.%20Support%20Signal%2C%20Telegram%2C%20WhatsApp%2C%20Line%2C%20Kako&font=Jost&forks=1&issues=1&logo=https%3A%2F%2Fgithub.com%2Flaggykiller%2Fsticker-convert%2Fraw%2Fmaster%2Fsticker_convert%2Ficon%2Fappicon.png&name=1&owner=1&pattern=Plus&pulls=1&stargazers=1&theme=Dark" alt="sticker-convert" width="640" height="320" />
+![imgs/banner.png](imgs/banner.png)
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
 - With GUI and CLI that runs on Windows, MacOS and Linux
