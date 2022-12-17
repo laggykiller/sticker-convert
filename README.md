@@ -193,6 +193,7 @@ See [COMPILING.md](COMPILING.md)
 
 ### Getting signal uuid and password
 `uuid` and `password` are needed for uploading Signal stickers.
+(Note: If you don't want to do this, you can still upload stickers manually by Signal Desktop)
 
 ![imgs/signal-uuid-password.png](imgs/signal-uuid-password.png)
 
@@ -204,12 +205,11 @@ See [COMPILING.md](COMPILING.md)
     - `uuid` is the output of running: `window.reduxStore.getState().items.uuid_id`
     - `password` is the output of running: `window.reduxStore.getState().items.password`
 
-(Note: If you don't want to do this, you can still upload stickers manually by Signal Desktop)
-
 Reference: https://github.com/teynav/signalApngSticker
 
 ### Getting telegram bot token
 `token` needed for uploading and downloading Telegram stickers
+(Note: If you don't want to do this, you can still upload stickers manually by using this: https://t.me/stickers)
 
 ![imgs/telegram-bot.png](imgs/telegram-bot.png)
 
@@ -220,6 +220,7 @@ Reference: https://github.com/teynav/signalApngSticker
 
 ### Getting telegram user_id
 `user_id` needed for uploading Telegram stickers. Note that the user_id should be from a real account, not from the bot account.
+(Note: If you don't want to do this, you can still upload stickers manually by using this: https://t.me/stickers)
 
 Follow instruction from this post: https://stackoverflow.com/a/52667196
 

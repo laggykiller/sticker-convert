@@ -130,20 +130,11 @@ Change directory into `sticker_convert` directory and run `python ./main.py`
 This repository uses `pyinstaller` for compiling. Install with `pip3 install pyinstaller`
 
 ## Compiling on windows
-(NOTE: You may run `get-deps-windows.bat` to get dependencies automatically)
-
-1. Refer to the instructions in running python script directly for installing python modules and executables
+1. Run `get-deps-windows.bat` to get dependencies automatically
 2. Run `pyinstaller sticker_convert.spec`
 3. Compilation result in `dist` directory
 
 ##  Compiling on MacOS
-(NOTE: You may run `get-deps-macos.bat` to get dependencies automatically)
-
-1. Refer to the instructions in running python script directly for installing python modules and binaries (Except imagemagick, ffmpeg and ffprobe)
-2. `ImageMagick` precompiled portable version is broken in newer releases of MacOS. You need to compile ImageMagick. Run `magick-compile-macos.sh` first
-    - Ref1: https://stackoverflow.com/questions/55754551/how-to-install-imagemagick-portably-on-macos-when-i-cant-set-dyld-library-path
-    - Ref2: https://github.com/ImageMagick/ImageMagick/issues/3129
-3. Get static build of `ffmpeg` and `ffprobe` from: https://evermeet.cx/ffmpeg/ (If down, then go to https://ffmpeg.org/download.html). 
-4. Place `ffmpeg`, `ffprobe` and `apngdis` inside `sticker_convert/bin`
-5. Run `pyinstaller sticker_convert.spec`
-6. Compilation result in `dist` directory
+1. Run `get-deps-macos.sh` to get dependencies automatically
+2. Run `pyinstaller sticker_convert.spec`
+3. Compilation result in `dist` directory

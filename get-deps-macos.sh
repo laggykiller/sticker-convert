@@ -1,61 +1,39 @@
 #!/bin/sh
-# https://github.com/ImageMagick/ImageMagick/discussions/5215#discussioncomment-2949450
+# To remove all homebrew packages for testing portability: brew remove --force $(brew list --formula)
 
-# Compile ImageMagick
+NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
 cd ./sticker_convert
-export MAGICK_HOME=$(pwd)/ImageMagick
-cd ..
-
-rm -rf $MAGICK_HOME
-rm -rf magick-src
-
-mkdir magick-src
-cd magick-src
-
-curl --retry 5 -O -L https://github.com/ImageMagick/ImageMagick/archive/refs/tags/7.1.0-54.tar.gz
-tar xvzf 7.1.0-54.tar.gz
-cd ImageMagick-7.1.0-54
-
-curl --retry 5 -O -L https://download.imagemagick.org/archive/delegates/jpegsrc.v9b.tar.gz
-tar xvzf jpegsrc.v9b.tar.gz
-cd jpeg-9b
-./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libjpeg
-cd ..
-
-curl --retry 5 -O -L https://download.imagemagick.org/archive/delegates/libwebp-0.6.0.tar.gz
-tar xvzf libwebp-0.6.0.tar.gz
-cd libwebp-0.6.0
-./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libwebp
-cd ..
-
-curl --retry 5 -O -L https://download.imagemagick.org/archive/delegates/libpng-1.6.31.tar.gz
-tar xvzf libpng-1.6.31.tar.gz
-cd libpng-1.6.31
-./configure --enable-static --disable-shared --prefix=$MAGICK_HOME/lib/libpng
-cd ..
-
-rm config.status config.log
-
-./configure --prefix=$MAGICK_HOME --with-quantum-depth=16 --with-xml --disable-installed --enable-delegate-build --disable-shared --enable-static --with-modules=no \
-    --enable-hdri=no --with-heic=no --without-magick-plus-plus --without-frozenpaths --disable-silent-rules --disable-dependency-tracking \
-    --enable-zero-configuration --without-gslib --with-png=yes --with-jpeg=yes --without-jp2 --disable-osx-universal-binary --without-x --without-lcms \
-    --without-freetype --without-pango --without-bzlib --with-webp --without-perl --without-gvc --without-zip --with-fontconfig=no
-
-make clean
-make
-make install
-
-cd ../../
-rm -rf ./magick-src
 
 # Preparing bin directory
-rm -rf ./sticker_convert/bin
-mkdir ./sticker_convert/bin
-cd ./sticker_convert/bin
+rm -rf ./bin
+mkdir ./bin
+cd ./bin
+
+# Get pkg-config (For compiling pngnq-s9)
+brew install pkg-config
+
+# Get apngasm (Also gets libpng)
+brew install apngasm
+cp /usr/local/bin/apngasm ./
+
+# Get apngdis
+curl --retry 5 -O -L https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip
+unzip apngdis-2.9-bin-macos.zip
+rm readme.txt
+rm apngdis-2.9-bin-macos.zip
+
+# Get ImageMagick
+brew install imagemagick
+rm -rf ../ImageMagick
+mkdir ../ImageMagick
+cp -r /usr/local/opt/imagemagick/bin ../ImageMagick
+cp -r /usr/local/opt/imagemagick/lib ../ImageMagick
+cp -r /usr/local/opt/imagemagick/etc ../ImageMagick
 
 # Compiling pngnq-s9
-mkdir ./pngnqs9
-cd ./pngnqs9
+mkdir ./pngnq-s9-dl
+cd ./pngnq-s9-dl
 curl --retry 5 -O -L https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz
 tar xvzf 2.0.2.tar.gz
 cd ./pngnq-s9-2.0.2
@@ -68,41 +46,16 @@ make
 # make install
 chmod +x src/pngnq-s9
 cd ../../
-cp ./pngnqs9/pngnq-s9-2.0.2/src/pngnq-s9 ./
-rm -rf ./pngnqs9
+cp ./pngnq-s9-dl/pngnq-s9-2.0.2/src/pngnq-s9 ./
+rm -rf ./pngnq-s9-dl
 
 # Get pngquant
-mkdir pngquant-dl
-cd pngquant-dl
-curl --retry 5 -O -L "https://pngquant.org/pngquant.tar.bz2"
-tar xvzf pngquant.tar.bz2
-cd ../
-cp ./pngquant-dl/pngquant ./
-rm -rf ./pngquant-dl
-rm pngquant.tar.bz2
+brew install pngquant
+cp /usr/local/bin/pngquant ./
 
 # Get optipng
-# https://stackoverflow.com/a/69858397
-mkdir optipng-dl
-cd optipng-dl
-curl -L -H "Authorization: Bearer QQ==" -o optipng.tar.gz https://ghcr.io/v2/homebrew/core/optipng/blobs/sha256:3d423dfa59e07122f70e2a15026289dfc6884798ac76898065dbe587256c6e35
-tar xvzf optipng.tar.gz
-cd ../
-cp ./optipng-dl/optipng/0.7.7/bin/optipng ./
-rm -rf ./optipng-dl
-rm optipng.tar.gz
-
-# Get apngasm
-curl --retry 5 -O -L https://sourceforge.net/projects/apngasm/files/2.91/apngasm-2.91-bin-macos.zip
-unzip apngasm-2.91-bin-macos.zip
-rm readme.txt
-rm apngasm-2.91-bin-macos.zip
-
-# Get apngdis
-curl --retry 5 -O -L https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip
-unzip apngdis-2.9-bin-macos.zip
-rm readme.txt
-rm apngdis-2.9-bin-macos.zip
+brew install optipng
+cp /usr/local/opt/optipng/bin/* ./
 
 # Get ffmpeg
 curl --retry 5 -O -L https://evermeet.cx/ffmpeg/ffmpeg-5.1.2.zip
@@ -113,6 +66,58 @@ rm ffmpeg-5.1.2.zip
 curl --retry 5 -O -L https://evermeet.cx/ffmpeg/ffprobe-5.1.2.zip
 unzip ffprobe-5.1.2.zip
 rm ffprobe-5.1.2.zip
+
+# Get libwebm
+brew install libwebm
+
+# Copy library
+mkdir ../lib
+cp /usr/local/opt/aom/lib/* ../lib
+cp /usr/local/opt/apngasm/lib/* ../lib
+cp /usr/local/opt/boost/lib/* ../lib
+cp /usr/local/opt/brotli/lib/* ../lib
+# cp /usr/local/opt/docbook-xsl/lib/* ../lib
+# cp /usr/local/opt/docbook/lib/* ../lib
+cp /usr/local/opt/fontconfig/lib/* ../lib
+cp /usr/local/opt/freetype/lib/* ../lib
+cp /usr/local/opt/gettext/lib/* ../lib
+cp /usr/local/opt/ghostscript/lib/* ../lib
+cp /usr/local/opt/giflib/lib/* ../lib
+cp /usr/local/opt/glib/lib/* ../lib
+# cp /usr/local/opt/gnu-getopt/lib/* ../lib
+cp /usr/local/opt/highway/lib/* ../lib
+cp /usr/local/opt/icu4c/lib/* ../lib
+# cp /usr/local/opt/imagemagick/lib/* ../lib
+cp /usr/local/opt/imath/lib/* ../lib
+cp /usr/local/opt/jasper/lib/* ../lib
+cp /usr/local/opt/jbig2dec/lib/* ../lib
+cp /usr/local/opt/jpeg-turbo/lib/* ../lib
+cp /usr/local/opt/jpeg-xl/lib/* ../lib
+cp /usr/local/opt/libde265/lib/* ../lib
+cp /usr/local/opt/libheif/lib/* ../lib
+cp /usr/local/opt/libidn/lib/* ../lib
+cp /usr/local/opt/liblqr/lib/* ../lib
+cp /usr/local/opt/libomp/lib/* ../lib
+cp /usr/local/opt/libpng/lib/* ../lib
+cp /usr/local/opt/libraw/lib/* ../lib
+cp /usr/local/opt/libtiff/lib/* ../lib
+cp /usr/local/opt/libtool/lib/* ../lib
+cp /usr/local/opt/libvmaf/lib/* ../lib
+cp /usr/local/opt/libwebm/lib/* ../lib
+cp /usr/local/opt/little-cms/lib/* ../lib
+cp /usr/local/opt/little-cms2/lib/* ../lib
+cp /usr/local/opt/lz4/lib/* ../lib
+# cp /usr/local/opt/lzlib/lib/* ../lib
+# cp /usr/local/opt/m4/lib/* ../lib
+cp /usr/local/opt/openexr/lib/* ../lib
+cp /usr/local/opt/openjpeg/lib/* ../lib
+cp /usr/local/opt/pcre2/lib/* ../lib
+# cp /usr/local/opt/shared-mime-info/lib/* ../lib
+cp /usr/local/opt/webp/lib/* ../lib
+cp /usr/local/opt/x265/lib/* ../lib
+# cp /usr/local/opt/xmlto/lib/* ../lib
+cp /usr/local/opt/xz/lib/* ../lib
+cp /usr/local/opt/zstd/lib/* ../lib
 
 # Go back to root of repo
 cd ../../
