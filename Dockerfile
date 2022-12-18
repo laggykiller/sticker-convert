@@ -29,7 +29,7 @@ WORKDIR /app
 RUN rm -rf /app/pngnq-s9-2.0.2 && \
     rm /app/2.0.2.tar.gz
 
-RUN pip3 install requests ffmpeg-python lottie argparse signalstickers_client python-telegram-bot anyio wand
+RUN pip3 install -r requirements.txt
 
 Volume ["/app/stickers_input", "/app/stickers_output"]
 
