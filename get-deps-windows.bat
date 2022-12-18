@@ -9,9 +9,9 @@ rd /s /q sticker_convert\ImageMagick >nul 2>&1
 :: Get ImageMagick
 mkdir ImageMagick
 cd .\ImageMagick
-curl --retry 5 -O -L "https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-54-portable-Q16-x64.zip"
-tar -xf ImageMagick-7.1.0-54-portable-Q16-x64.zip
-del ImageMagick-7.1.0-54-portable-Q16-x64.zip
+curl --retry 5 -O -L "https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-55-portable-Q16-x64.zip"
+tar -xf ImageMagick-7.1.0-55-portable-Q16-x64.zip
+del ImageMagick-7.1.0-55-portable-Q16-x64.zip
 cd ..
 
 :: Get apngasm
