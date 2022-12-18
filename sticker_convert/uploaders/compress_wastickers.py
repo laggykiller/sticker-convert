@@ -44,7 +44,7 @@ class CompressWastickers:
                     else:
                         StickerConvert.convert_and_compress_to_size(src, dst, vid_size_max=500000, img_size_max=100000, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, steps=steps)
 
-                out_f = os.path.join(out_dir, pack_title + '.wastickers')
+                out_f = os.path.join(out_dir, FormatVerify.sanitize_filename(pack_title + '.wastickers'))
 
                 CompressWastickers.add_metadata(in_dir, tempdir, author, title)
                 CompressWastickers.compress(out_f, tempdir)
