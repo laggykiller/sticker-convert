@@ -220,7 +220,7 @@ Reference: https://github.com/teynav/signalApngSticker
 1. Contact botfather on telegram: https://t.me/botfather
 2. Follow instructions here to create a bot and get token: https://core.telegram.org/bots/features#creating-a-new-bot
 3. The token looks like this: `110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`
-4. You need to send `/start` to your newly created bot
+4. **You need to send `/start` to your newly created bot**
 
 ### Getting telegram user_id
 `user_id` needed for uploading Telegram stickers. Note that the user_id should be from a real account, not from the bot account.
