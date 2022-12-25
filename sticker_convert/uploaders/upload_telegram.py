@@ -74,19 +74,23 @@ class UploadTelegram:
                         print(f'Warning: Cannot find emoji for file {src_full_name}, skip uploading this file...')
                         continue
                     
-                    if pack_exists == False:
-                        bot.create_new_sticker_set(
-                            user_id, name, pack_title, emoji,
-                            png_sticker=open(png_sticker, 'rb') if png_sticker else None,
-                            tgs_sticker=open(tgs_sticker, 'rb') if tgs_sticker else None,
-                            webm_sticker=open(webm_sticker, 'rb') if webm_sticker else None)
-                        pack_exists = True
-                    else:
-                        bot.add_sticker_to_set(
-                            user_id, name, emoji,
-                            png_sticker=open(png_sticker, 'rb') if png_sticker else None,
-                            tgs_sticker=open(tgs_sticker, 'rb') if tgs_sticker else None,
-                            webm_sticker=open(webm_sticker, 'rb') if webm_sticker else None)
+                    try:
+                        if pack_exists == False:
+                            bot.create_new_sticker_set(
+                                user_id, name, pack_title, emoji,
+                                png_sticker=open(png_sticker, 'rb') if png_sticker else None,
+                                tgs_sticker=open(tgs_sticker, 'rb') if tgs_sticker else None,
+                                webm_sticker=open(webm_sticker, 'rb') if webm_sticker else None)
+                            pack_exists = True
+                        else:
+                            bot.add_sticker_to_set(
+                                user_id, name, emoji,
+                                png_sticker=open(png_sticker, 'rb') if png_sticker else None,
+                                tgs_sticker=open(tgs_sticker, 'rb') if tgs_sticker else None,
+                                webm_sticker=open(webm_sticker, 'rb') if webm_sticker else None)
+                    except TelegramError as e:
+                        print(f'Cannot upload {name} due to {e}')
+
                     print('Uploaded', src)
 
             print(f'https://t.me/addstickers/{name}')
