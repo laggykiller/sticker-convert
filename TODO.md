@@ -1,5 +1,6 @@
 ### Todo
 
+- [ ] Improve debugging
 - [ ] Add dialog that ask if `stickers_input` files should be deleted if not empty
 - [ ] Handle apng compression without depending on external programs +/- improve compression speed
 - [ ] No longer depend on ImageMagick
