@@ -29,6 +29,7 @@ WORKDIR /app
 RUN rm -rf /app/pngnq-s9-2.0.2 && \
     rm /app/2.0.2.tar.gz
 
+COPY ./requirements.txt /app/
 RUN pip3 install -r requirements.txt
 
 Volume ["/app/stickers_input", "/app/stickers_output"]
