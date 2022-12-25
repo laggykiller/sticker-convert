@@ -63,10 +63,10 @@ class UploadTelegram:
                     else:
                         if FormatVerify.is_anim(src):
                             webm_sticker = os.path.join(tempdir, src_name + '.webm')
-                            StickerConvert.convert_and_compress_to_size(src, webm_sticker, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=30, fps_min=0, steps=steps)
+                            StickerConvert.convert_and_compress_to_size(src, webm_sticker, vid_size_max=256000, img_size_max=512000, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=30, fps_min=0, steps=steps)
                         else:
                             png_sticker = os.path.join(tempdir, src_name + '.png')
-                            StickerConvert.convert_and_compress_to_size(src, png_sticker, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, steps=steps)
+                            StickerConvert.convert_and_compress_to_size(src, png_sticker, vid_size_max=256000, img_size_max=512000, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, steps=steps)
                     
                     try:
                         emoji = emoji_dict[src_name]
