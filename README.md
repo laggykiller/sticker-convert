@@ -47,7 +47,7 @@
         - For more information: https://github.com/doubleplusc/Line-sticker-downloader
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Kakao
-    - Download: Supported (e.g. https://e.kakao.com/t/xxxxx)
+    - Download: Supported (e.g. https://e.kakao.com/t/xxxxx). Can only download static stickers. Learn more about the problems encountered [kakao_anim_note.md](kakao_anim_note.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 
 ## How to use (GUI)
