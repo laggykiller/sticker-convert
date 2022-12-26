@@ -13,14 +13,15 @@ jobs:
     steps:
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: "marvinpinto/action-automatic-releases@latest"
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        repo_token: "${{ secrets.GITHUB_TOKEN }}"
         draft: false
         prerelease: false
+        automatic_release_tag: ${{ github.ref }}
+        title: Release ${{ github.ref }}
+        files: null
+
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
     - name: Save Release URL File for publish
