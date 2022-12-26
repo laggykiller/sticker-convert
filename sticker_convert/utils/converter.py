@@ -11,7 +11,7 @@ from utils.format_verify import FormatVerify
 import traceback
 
 lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
-lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4', '.webm')
+lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4')
 
 class StickerConvert:
     @staticmethod
@@ -223,7 +223,12 @@ class StickerConvert:
             # Example in_f: path/to/dir/image-%03d.png
             stream = ffmpeg.input(in_f, framerate=fps_in)
         elif in_f_ext == '.webm':
-            stream = ffmpeg.input(in_f, vcodec='libvpx-vp9')
+            probe_info = ffmpeg.probe(in_f)
+            codec = probe_info['streams'][0]['codec_name']
+            if codec == 'vp8':
+                stream = ffmpeg.input(in_f, vcodec='vp8')
+            else:
+                stream = ffmpeg.input(in_f, vcodec='libvpx-vp9')
         else:
             stream = ffmpeg.input(in_f)
         if fps:
@@ -264,7 +269,11 @@ class StickerConvert:
             # Example in_f: path/to/dir/image-%03d.png
             cmd_list += ['-r', str(fps_in)]
         elif in_f_ext == '.webm':
-            cmd_list += ['-vcodec', 'libvpx-vp9']
+            codec = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', in_f]).replace('\n', '')
+            if codec == 'vp8':
+                cmd_list += ['-vcodec', 'vp8']
+            else:
+                cmd_list += ['-vcodec', 'libvpx-vp9']
         
         cmd_list += ['-i', in_f]
 
@@ -336,7 +345,7 @@ class StickerConvert:
                 tmp1_f = in_f
 
             if out_f_ext not in lottie_out_ext_support:
-                tmp2_f = os.path.join(tempdir, 'tmp2.mp4')
+                tmp2_f = os.path.join(tempdir, 'tmp2.webm')
                 lottie_convert(tmp1_f, tmp2_f)
                 StickerConvert.convert(tmp2_f, out_f, res=res, quality=quality, fps=fps)
             else:
