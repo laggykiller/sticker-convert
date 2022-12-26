@@ -2,7 +2,7 @@ FROM alpine:latest
 
 WORKDIR /app
 
-RUN apk add alpine-sdk python3 py3-pip ffmpeg imagemagick optipng pngquant zip unzip cmake libpng-dev boost-dev tar sed python3-tkinter
+RUN apk add alpine-sdk python3 py3-pip ffmpeg imagemagick optipng pngquant zip unzip cmake libpng-dev boost-dev tar sed python3-tkinter py3-opencv
 
 RUN mkdir /app/apngdis && \
     cd /app/apngdis && \
