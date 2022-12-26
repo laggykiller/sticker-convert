@@ -19,6 +19,7 @@ jobs:
         draft: false
         prerelease: false
         title: Release ${{ github.ref }}
+        automatic_release_tag: 'latest'
 
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
