@@ -18,7 +18,7 @@ jobs:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
         draft: false
         prerelease: false
-        automatic_release_tag: ${{ github.ref }}
+        title: Release ${{ github.ref }}
 
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
