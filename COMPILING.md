@@ -3,7 +3,7 @@
 Install python3 from https://www.python.org/
 
 ## 2. Install python modules
-Install the required python modules with `pip3 install requirements.txt`
+Install the required python modules with `pip3 install -r requirements.txt`
 
 ## 3.1 Executables / Binaries (Windows)
 NOTE: You may run `get-deps-windows.bat` to get them automatically
@@ -72,9 +72,7 @@ For MacOS, the following binaries are required:
 ## 3.3 Executables / Binaries (Linux) (Tested with Ubuntu 20.04)
 Some packages are usually not available in repo. To compile them, install these packages:
 
-`sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config python3-tkinter`
-
-You may also need to install `tkinter` with `sudo apt install python3-tk`
+`sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config python3-tkinter python3-opencv`
 
 For Linux, the following binaries are required:
 - `ffmpeg` and `ffprobe`
