@@ -29,7 +29,7 @@ def print_dep_message(loader):
         sys.stderr.write("For %s install %s\n" % (failed, dep))
 
 def lottie_convert(infile, outfile, input_format=None, output_format=None, sanitize=False, optimize=1, fps=None, width=None, height=None, i_options={}, o_options={}):
-    ns = parser.parse_args()
+    ns, unknown = parser.parse_known_args()
 
     importer = None
     suf = os.path.splitext(infile)[1][1:]
