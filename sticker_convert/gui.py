@@ -490,25 +490,23 @@ class GUI:
         # Check if input and ouput directories have files and prompt for deletion
         # It is possible to help the user to delete files but this is dangerous
         if input_option != self.input_options['local'] and os.listdir(input_dir) != []:
-            title = 'sticker-convert'
             message = 'Input directory is not empty (e.g. Files from previous run?)\n'
             message += f'Input directory is set to {input_dir}\n'
             message += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
 
-            result = messagebox.askyesno(title, message)
+            result = messagebox.askyesno('sticker-convert', message)
 
             if result == False:
                 self.stop()
                 return
 
         if output_option != self.output_options['local'] and no_compress == False and os.listdir(output_dir) != []:
-            title = 'sticker-convert'
             message = 'Output directory is not empty (e.g. Files from previous run?)\n'
             message += f'Output directory is set to {output_dir}\n'
             message += 'Hint: If you just want to upload files that you had compressed before, please choose "No" and tick the "No compression" box\n'
             message += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
 
-            result = messagebox.askyesno(title, message)
+            result = messagebox.askyesno('sticker-convert', message)
 
             if result == False:
                 self.stop()
