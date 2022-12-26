@@ -489,7 +489,7 @@ class GUI:
 
         # Check if input and ouput directories have files and prompt for deletion
         # It is possible to help the user to delete files but this is dangerous
-        if output_option != self.input_options['local'] and os.listdir(input_dir) != []:
+        if input_option != self.input_options['local'] and os.listdir(input_dir) != []:
             title = 'sticker-convert'
             message = 'Input directory is not empty (e.g. Files from previous run?)\n'
             message += f'Input directory is set to {input_dir}\n'

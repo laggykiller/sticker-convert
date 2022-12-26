@@ -117,7 +117,7 @@ class CLI:
         
         # Check if input and ouput directories have files and prompt for deletion
         # It is possible to help the user to delete files but this is dangerous
-        if (args.download_signal or args.download_line or args.download_telegram or args.download_kakao) and os.listdir(args.input_dir) != []:
+        if (args.download_signal or args.download_line or args.download_telegram or args.download_kakao) and args.no_compress == False and os.listdir(args.input_dir) != []:
             print('Input directory is not empty (e.g. Files from previous run?)')
             print(f'Input directory is set to {args.input_dir}')
             print('You may continue at risk of contaminating the resulting sticker pack')
