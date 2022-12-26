@@ -2,8 +2,6 @@ FROM alpine:latest
 
 WORKDIR /app
 
-COPY ./sticker_convert /app/
-
 RUN apk add alpine-sdk python3 py3-pip ffmpeg imagemagick optipng pngquant zip unzip cmake libpng-dev boost-dev tar sed python3-tkinter
 
 RUN mkdir /app/apngdis && \
@@ -29,6 +27,7 @@ WORKDIR /app
 RUN rm -rf /app/pngnq-s9-2.0.2 && \
     rm /app/2.0.2.tar.gz
 
+COPY ./sticker_convert /app/
 COPY ./requirements.txt /app/
 RUN pip3 install -r requirements.txt
 
