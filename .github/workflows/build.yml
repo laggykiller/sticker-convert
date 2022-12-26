@@ -55,10 +55,6 @@ jobs:
         pip install -r requirements.txt
     - name: Build with pyinstaller for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
-    - name: Load Release URL File from release job
-      uses: actions/download-artifact@v1
-      with:
-        name: release_url
     - name: Get release
       id: get_release
       uses: bruceadams/get-release@v1.3.2
