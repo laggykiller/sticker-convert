@@ -40,6 +40,7 @@ class CLI:
                 presets_dict = json.load(f)
 
         parser = argparse.ArgumentParser(description='CLI for stickers-convert')
+        parser.add_argument('--no-confirm', dest='no_confirm', action='store_true', help='Do not ask any questions')
         parser.add_argument('--input-dir', dest='input_dir', default='./stickers_input', help='Specify input directory')
         parser.add_argument('--output-dir', dest='output_dir', default='./stickers_output', help='Specify output directory')
         parser.add_argument('--download-signal', dest='download_signal', help='Download signal stickers from a URL as input (e.g. https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)')
@@ -113,6 +114,41 @@ class CLI:
         if os.path.isdir(args.output_dir) == False:
             print('Info: Cannot find the specified output directory. Creating for you...')
             os.makedirs(args.output_dir)
+        
+        # Check if input and ouput directories have files and prompt for deletion
+        # It is possible to help the user to delete files but this is dangerous
+        if (args.download_signal or args.download_line or args.download_telegram or args.download_kakao) and os.listdir(args.input_dir) != []:
+            print('Input directory is not empty (e.g. Files from previous run?)')
+            print(f'Input directory is set to {args.input_dir}')
+            print('You may continue at risk of contaminating the resulting sticker pack')
+            print()
+
+            if args.no_confirm:
+                print('"--no-confirm" flag is set. Continue with this run without asking questions')
+            else:
+                print('If you do not want to get asked by this question, add "--no-confirm" flag')
+                print()
+                result = input('Continue? [y/N] > ')
+                if result.lower() != 'y':
+                    print('Cancelled this run')
+                    return
+
+        if (args.export_wastickers or args.export_signal or args.export_telegram) and args.no_compress == False and os.listdir(args.output_dir) != []:
+            print('Output directory is not empty (e.g. Files from previous run?)')
+            print(f'Output directory is set to {args.output_dir}')
+            print('Hint: If you just want to upload files that you had compressed before, please choose "n" and add "--no-compress" flag')
+            print('You may continue at risk of contaminating the resulting sticker pack')
+            print()
+
+            if args.no_confirm:
+                print('"--no-confirm" flag is set. Continue with this run without asking questions')
+            else:
+                print('If you do not want to get asked by this question, add "--no-confirm" flag')
+                print()
+                result = input('Continue? [y/N] > ')
+                if result.lower() != 'y':
+                    print('Cancelled this run')
+                    return
         
         processes = args.processes if args.processes else multiprocessing.cpu_count()
         

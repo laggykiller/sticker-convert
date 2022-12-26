@@ -93,7 +93,7 @@ class GUI:
 
         self.input_setdir_lbl = Label(self.frame_input, text='Input directory', width=15, justify='left', anchor='w')
         self.input_setdir_var = StringVar(self.root)
-        self.input_setdir_var.set('./stickers_input')
+        self.input_setdir_var.set(os.path.abspath('./stickers_input'))
         self.input_setdir_entry = Entry(self.frame_input, textvariable=self.input_setdir_var, width=40)
         self.input_setdir_btn = Button(self.frame_input, text='Choose directory...', command=self.callback_set_indir)
 
@@ -212,7 +212,7 @@ class GUI:
 
         self.output_setdir_lbl = Label(self.frame_output, text='Output directory', width=15, justify='left', anchor='w')
         self.output_setdir_var = StringVar(self.root)
-        self.output_setdir_var.set('./stickers_output')
+        self.output_setdir_var.set(os.path.abspath('./stickers_output'))
         self.output_setdir_entry = Entry(self.frame_output, textvariable=self.output_setdir_var, width=40)
         self.output_setdir_btn = Button(self.frame_output, text='Choose directory...', command=self.callback_set_outdir)
 
@@ -330,12 +330,20 @@ class GUI:
             json.dump(creds, f, indent=4)
 
     def callback_set_indir(self, *args):
-        input_dir = filedialog.askdirectory()
-        self.input_setdir_var.set(input_dir)
+        orig_input_dir = self.output_setdir_var.get()
+        if not os.path.isdir(orig_input_dir):
+            orig_input_dir = os.getwcd()
+        input_dir = filedialog.askdirectory(initialdir=orig_input_dir)
+        if input_dir != '':
+            self.input_setdir_var.set(input_dir)
     
     def callback_set_outdir(self, *args):
-        output_dir = filedialog.askdirectory()
-        self.output_setdir_var.set(output_dir)
+        orig_output_dir = self.output_setdir_var.get()
+        if not os.path.isdir(orig_output_dir):
+            orig_output_dir = os.getwcd()
+        output_dir = filedialog.askdirectory(initialdir=orig_output_dir)
+        if output_dir != '':
+            self.output_setdir_var.set(output_dir)
     
     def callback_input_option(self, *args):
         if self.input_option_var.get() == self.input_options['local']:
@@ -478,7 +486,34 @@ class GUI:
         
         if os.path.isdir(output_dir) == False:
             os.makedirs(output_dir)
-        
+
+        # Check if input and ouput directories have files and prompt for deletion
+        # It is possible to help the user to delete files but this is dangerous
+        if output_option != self.input_options['local'] and os.listdir(input_dir) != []:
+            title = 'sticker-convert'
+            message = 'Input directory is not empty (e.g. Files from previous run?)\n'
+            message += f'Input directory is set to {input_dir}\n'
+            message += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
+
+            result = messagebox.askyesno(title, message)
+
+            if result == False:
+                self.stop()
+                return
+
+        if output_option != self.output_options['local'] and no_compress == False and os.listdir(output_dir) != []:
+            title = 'sticker-convert'
+            message = 'Output directory is not empty (e.g. Files from previous run?)\n'
+            message += f'Output directory is set to {output_dir}\n'
+            message += 'Hint: If you just want to upload files that you had compressed before, please choose "No" and tick the "No compression" box\n'
+            message += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
+
+            result = messagebox.askyesno(title, message)
+
+            if result == False:
+                self.stop()
+                return
+
         # Download
         self.update_progress_box('Downloading...')
         self.progress_bar.config(mode='indeterminate')

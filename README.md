@@ -68,22 +68,22 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.exe [-h] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR] [--download-signal DOWNLOAD_SIGNAL]
-                           [--download-telegram DOWNLOAD_TELEGRAM] [--download-line DOWNLOAD_LINE]
-                           [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers] [--export-signal]
-                           [--export-telegram] [--no-compress] [--preset {signal,telegram,whatsapp,custom}]
+usage: sticker-convert.exe [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
+                           [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
+                           [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
+                           [--export-signal] [--export-telegram] [--no-compress] [--preset {signal,telegram,whatsapp,custom}]
                            [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
-                           [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN]
-                           [--color-max COLOR_MAX] [--steps STEPS] [--vid-size-max VID_SIZE_MAX]
-                           [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT]
-                           [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES] [--author AUTHOR] [--title TITLE]
-                           [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                           [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
+                           [--steps STEPS] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
+                           [--img-format IMG_FORMAT] [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES] [--author AUTHOR]
+                           [--title TITLE] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
                            [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--save-cred]
 
 CLI for stickers-convert
 
 options:
   -h, --help            show this help message and exit
+  --no-confirm          Do not ask any questions
   --input-dir INPUT_DIR
                         Specify input directory
   --output-dir OUTPUT_DIR
@@ -142,7 +142,7 @@ options:
                         Set telegram user_id (From real account, not bot account). Required for uploading telegram
                         stickers
   --save-cred           Save signal and telegram credentials
-  ```
+```
 
 Note: If you are running python script directly, run with main.py
 
