@@ -9,4 +9,3 @@ pyinstaller==5.7.0
 CairoSVG==2.5.2
 Pillow==9.3.0
 opencv-python==4.6.0.66
-numpy==1.23.0
