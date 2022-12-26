@@ -180,7 +180,7 @@ class StickerConvert:
             RunBin.run_cmd(['magick', in_f, '-crop', f'{res}x{res}', out_f])
 
     @staticmethod
-    def convert_generic_image(in_f, out_f, res=512, quality=90, **kwargs):
+    def convert_generic_image(in_f, out_f, res=None, quality=90, **kwargs):
         # https://www.imagemagick.org/script/command-line-options.php#quality
         # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
         # For png, filter_type = quality % 10
@@ -306,6 +306,9 @@ class StickerConvert:
 
     @staticmethod
     def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, color=90, **kwargs):
+        in_f_ext = os.path.splitext(in_f)[-1].lower()
+        out_f_ext = os.path.splitext(out_f)[-1].lower()
+
         with tempfile.TemporaryDirectory() as tempdir:
             if FormatVerify.is_anim(in_f):
                 # ffmpeg do not support webp decoding (yet)
@@ -315,11 +318,10 @@ class StickerConvert:
 
                 tmp_f = os.path.join(tempdir, 'tmp.webm')
                 StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality)
-                StickerConvert.convert_generic_anim(tmp_f, out_f, res=res, quality=quality, fps=fps)
+                StickerConvert.convert(tmp_f, out_f, res=res, quality=quality, fps=fps)
             else:
-                extension = os.path.splitext(out_f)[-1].lower()
-                tmp_f = os.path.join(tempdir, f'tmp{extension}')
-                StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality)
+                tmp_f = os.path.join(tempdir, f'tmp{out_f_ext}')
+                StickerConvert.convert_generic_image(in_f, tmp_f, res=res, quality=quality)
                 # Need more compression for .png
                 if os.path.splitext(out_f)[-1] == '.png':
                     tmp1_f = os.path.join(tempdir, 'tmp.1.png')
@@ -345,9 +347,9 @@ class StickerConvert:
                 tmp1_f = in_f
 
             if out_f_ext not in lottie_out_ext_support:
-                tmp2_f = os.path.join(tempdir, 'tmp2.webm')
+                tmp2_f = os.path.join(tempdir, 'tmp2.webp')
                 lottie_convert(tmp1_f, tmp2_f)
-                StickerConvert.convert(tmp2_f, out_f, res=res, quality=quality, fps=fps)
+                StickerConvert.convert_from_webp_anim(tmp2_f, out_f, res=res, quality=quality, fps=fps)
             else:
                 lottie_convert(tmp1_f, out_f)
     
