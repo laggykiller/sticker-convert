@@ -11,15 +11,12 @@ jobs:
     name: Create Release
     runs-on: [ubuntu-latest]
     steps:
+    - uses: actions/checkout@v2
     - name: Create Release
-      id: create_release
-      uses: "marvinpinto/action-automatic-releases@latest"
+      uses: ncipollo/release-action@v1
       with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        draft: false
-        prerelease: false
-        title: Release ${{ github.ref }}
-        automatic_release_tag: 'latest'
+        token: "${{ secrets.GITHUB_TOKEN }}"
+        name: Release ${{ github.ref }}
 
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
