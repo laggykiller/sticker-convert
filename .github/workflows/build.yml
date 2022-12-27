@@ -37,9 +37,8 @@ jobs:
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: |
-                $env:Path += ";C:\Program Files\UniConvertor-2.0rc5\dlls"
-                cmd.exe /c "echo %path:;=&echo.%"
                 ./get-deps-windows.bat
+                $env:Path += ";C:\Program Files\UniConvertor-2.0rc5\dlls"
                 pyinstaller sticker_convert.spec
                 cd dist
                 ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert-windows
