@@ -45,6 +45,7 @@ For Windows, the following executables are required:
     - The easiest way to get is to install UniConvertor
     - Download page: https://sk1project.net/uc2/download/
     - Direct link (May break): https://downloads.sk1project.net/uc2/MS_Windows/uniconvertor-2.0rc5-win64_headless.msi
+    - After that, add `C:\Program Files\UniConvertor-2.0rc5\dlls` to PATH environmental variable (One way to do it is to execute the command `powershell -command "[Environment]::SetEnvironmentVariable('Path', $env:Path + ';C:\Program Files\UniConvertor-2.0rc5\dlls', 'Machine')"`)
 
 Place executables inside `sticker_convert/bin`
 
