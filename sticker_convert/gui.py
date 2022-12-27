@@ -527,7 +527,7 @@ class GUI:
             DownloadKakao.download_stickers_kakao(url, out_dir=input_dir)
 
         # Compress
-        if vid_format == '.apng':
+        if vid_format == '.png' or vid_format == '.apng':
             self.update_progress_box('Compressing...\nTips: Compressing .apng takes long time. Consider using another format or lowering "--steps"')
         else:
             self.update_progress_box('Compressing...')

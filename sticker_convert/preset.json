@@ -2,7 +2,7 @@
     "signal": {
         "vid_size_max": 300000,
         "img_size_max": 300000,
-        "vid_format": ".apng",
+        "vid_format": ".png",
         "img_format": ".png",
         "fps_min": 1,
         "fps_max": 30,

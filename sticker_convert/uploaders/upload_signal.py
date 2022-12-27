@@ -39,16 +39,11 @@ class UploadSignal:
                     src_full_name = os.path.split(src)[-1]
                     src_name = os.path.splitext(src_full_name)[0]
                     
-                    if not (FormatVerify.check_file(src, square=True, size_max=300000, animated=True, format='.apng') or
-                            FormatVerify.check_file(src, square=True, size_max=300000, animated=False, format='.png') or
+                    if not (FormatVerify.check_file(src, square=True, size_max=300000, format='.apng') or
+                            FormatVerify.check_file(src, square=True, size_max=300000, format='.png') or
                             FormatVerify.check_file(src, square=True, size_max=300000, animated=False, format='.webp')):
-
-                        if FormatVerify.is_anim(src):
-                            extension = '.apng'
-                        else:
-                            extension = '.png'
                             
-                        sticker_path = os.path.join(tempdir, src_name + extension)
+                        sticker_path = os.path.join(tempdir, src_name + '.png')
                         StickerConvert.convert_and_compress_to_size(src, sticker_path, vid_size_max=300000, img_size_max=300000, res_min=res_min, res_max=res_max, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, steps=steps)
                     else:
                         sticker_path = src
