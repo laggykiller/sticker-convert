@@ -38,9 +38,9 @@ jobs:
             TARGET: windows
             CMD_BUILD: |
                 ./get-deps-windows.bat
-                echo %PATH%
+                set
                 refreshenv
-                echo %PATH%
+                set
                 pyinstaller sticker_convert.spec
                 cd dist
                 ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert-windows
