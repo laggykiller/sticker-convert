@@ -41,6 +41,10 @@ For Windows, the following executables are required:
     - Note that version 3 is required. Sourceforge only provides up to version 2.
     - Download page: https://github.com/apngasm/apngasm/releases
     - Direct link: https://github.com/apngasm/apngasm/releases/download/3.1.3/apngasm_3.1-3_AMD64.exe
+- `libcairo`
+    - The easiest way to get is to install UniConvertor
+    - Download page: https://sk1project.net/uc2/download/
+    - Direct link (May break): https://downloads.sk1project.net/uc2/MS_Windows/uniconvertor-2.0rc5-win64_headless.msi
 
 Place executables inside `sticker_convert/bin`
 
