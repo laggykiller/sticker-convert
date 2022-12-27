@@ -27,19 +27,19 @@ jobs:
         include:
           - os: macos-latest
             TARGET: macos
-            CMD_BUILD: >
-                sh ./get-deps-macos.sh &&
-                pyinstaller sticker_convert.spec &&
-                cd dist/ &&
+            CMD_RESOLVE_DEPS: sh ./get-deps-macos.sh
+            CMD_BUILD: |
+                pyinstaller sticker_convert.spec
+                cd dist/
                 zip -r9 sticker-convert-macos.zip sticker-convert-macos/
             OUT_FILE_NAME: sticker-convert-macos.zip
             ASSET_MIME: application/zip
           - os: windows-latest
             TARGET: windows
-            CMD_BUILD: >
-                ./get-deps-windows.bat &&
-                pyinstaller sticker_convert.spec &&
-                cd dist &&
+            CMD_RESOLVE_DEPS: ./get-deps-windows.bat
+            CMD_BUILD: |
+                pyinstaller sticker_convert.spec
+                cd dist
                 ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert-windows
             OUT_FILE_NAME: sticker-convert-windows.zip
             ASSET_MIME: application/zip
