@@ -27,8 +27,9 @@ jobs:
         include:
           - os: macos-latest
             TARGET: macos
-            CMD_BUILD: |
+            DEP_BUILD: |
                 sh ./get-deps-macos.sh
+            CMD_BUILD: |
                 pyinstaller sticker_convert.spec
                 cd dist/
                 zip -r9 sticker-convert-macos.zip sticker-convert-macos/
@@ -36,8 +37,9 @@ jobs:
             ASSET_MIME: application/zip
           - os: windows-latest
             TARGET: windows
+            DEP_BUILD: |
+                Add-Content $env:GITHUB_PATH "C:\Program Files\UniConvertor-2.0rc5\dlls"
             CMD_BUILD: |
-                echo "C:\Program Files\UniConvertor-2.0rc5\dlls" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
                 cmd.exe /c "echo %path:;=&echo.%"
                 ./get-deps-windows.bat
                 pyinstaller sticker_convert.spec
