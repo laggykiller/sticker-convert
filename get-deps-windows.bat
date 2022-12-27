@@ -6,6 +6,10 @@ cd sticker_convert
 rd /s /q sticker_convert\bin >nul 2>&1
 rd /s /q sticker_convert\ImageMagick >nul 2>&1
 
+:: Install UniConvertor for getting cairo library
+curl --retry 5 -O -L "https://downloads.sk1project.net/uc2/MS_Windows/uniconvertor-2.0rc5-win64_headless.msi"
+msiexec.exe /qn /i uniconvertor-2.0rc5-win64_headless.msi  /L*vx!
+
 :: Get apngasm
 curl --retry 5 -O -L "https://github.com/laggykiller/apngasm/releases/download/3.1.3/apngasm_3.1-3_AMD64.zip"
 tar -xf apngasm_3.1-3_AMD64.zip
@@ -76,10 +80,6 @@ curl --retry 5 -O -L "https://imagemagick.org/archive/binaries/ImageMagick-7.1.0
 tar -xf ImageMagick-7.1.0-55-portable-Q16-x64.zip
 del ImageMagick-7.1.0-55-portable-Q16-x64.zip
 cd ..
-
-:: Install UniConvertor for getting cairo library
-curl --retry 5 -O -L "https://downloads.sk1project.net/uc2/MS_Windows/uniconvertor-2.0rc5-win64_headless.msi"
-start /wait msiexec.exe /i uniconvertor-2.0rc5-win64_headless.msi
 
 :: Go back to repo root
 cd ..\..\
