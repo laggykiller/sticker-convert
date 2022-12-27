@@ -11,9 +11,6 @@ curl --retry 5 -O -L "https://downloads.sk1project.net/uc2/MS_Windows/uniconvert
 start /wait msiexec /qn /i uniconvertor-2.0rc5-win64_headless.msi
 del uniconvertor-2.0rc5-win64_headless.msi
 powershell -command "[Environment]::SetEnvironmentVariable('Path', $env:Path + ';C:\Program Files\UniConvertor-2.0rc5\dlls', 'Machine')"
-refreshenv
-dir "C:\Program Files\UniConvertor-2.0rc5\dlls"
-echo %path:;=&echo.%
 
 :: Get apngasm
 curl --retry 5 -O -L "https://github.com/laggykiller/apngasm/releases/download/3.1.3/apngasm_3.1-3_AMD64.zip"
