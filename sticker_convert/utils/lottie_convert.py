@@ -6,18 +6,10 @@ Adapted from https://gitlab.com/mattbas/python-lottie/-/raw/master/bin/lottie_co
 
 import sys
 import os
-import argparse
 from lottie.exporters import exporters
 from lottie.importers import importers
 from lottie.utils.stripper import float_strip, heavy_strip
 from lottie import __version__
-
-parser = argparse.ArgumentParser(
-    formatter_class=argparse.RawTextHelpFormatter,
-    conflict_handler='resolve'
-)
-
-group = importers.set_options(parser)
 
 def print_dep_message(loader):
     if not loader.failed_modules:
@@ -29,10 +21,19 @@ def print_dep_message(loader):
         sys.stderr.write("For %s install %s\n" % (failed, dep))
 
 def lottie_convert(infile, outfile, input_format=None, output_format=None, sanitize=False, optimize=1, fps=None, width=None, height=None, i_options={}, o_options={}):
-    ns, unknown = parser.parse_known_args()
-
     importer = None
     suf = os.path.splitext(infile)[1][1:]
+    extra_arg = {'n_colors': 1, 
+                'palette': [],
+                'mode': 'embed',
+                'frame_delay': 4,
+                'framerate': 60,
+                'frame_files': [],
+                'color_mode': 'nearest',
+                'embed_format': None,
+                'stroke': 1
+                }
+
     for p in importers:
         if suf in p.extensions:
             importer = p
@@ -59,7 +60,8 @@ def lottie_convert(infile, outfile, input_format=None, output_format=None, sanit
         return False
 
     for opt in importer.extra_options:
-        i_options[opt.name] = getattr(ns, opt.nsvar(importer.slug))
+        i_options[opt.name] = extra_arg[opt.name]
+
     an = importer.process(infile, **i_options)
 
     if fps:
