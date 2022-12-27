@@ -187,7 +187,7 @@ class CLI:
             DownloadKakao.download_stickers_kakao(args.download_kakao, out_dir=args.input_dir)
 
         if args.no_compress == False:
-            if vid_format == '.apng':
+            if vid_format == '.png' or vid_format == '.apng':
                 print('Tips: Compressing .apng takes long time. Consider using another format or lowering "--steps"')
 
             pool = multiprocessing.Pool(processes=processes)

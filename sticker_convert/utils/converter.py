@@ -45,7 +45,9 @@ class StickerConvert:
             if in_f_ext == '.webp':
                 return StickerConvert.convert_from_webp_anim
 
-            if FormatVerify.is_anim(in_f):
+            # webm should be handled by ffmpeg using vp9 codec
+            # ImageMagick will remove transparency
+            if FormatVerify.is_anim(in_f) or in_f_ext == '.webm':
                 if out_f_ext == '.png' or out_f_ext == '.apng':
                     return StickerConvert.convert_to_apng_anim
                 else:
@@ -361,18 +363,12 @@ class StickerConvert:
         # magick: Will output single frame png
 
         with tempfile.TemporaryDirectory() as tempdir1, tempfile.TemporaryDirectory() as tempdir2:
-            if os.path.splitext(in_f)[-1] == '.webp':
-                tmp0_f = os.path.join(tempdir1, 'tmp0.mp4')
-                StickerConvert.convert_from_webp_anim(in_f, tmp0_f, res=res, quality=quality, fps=fps)
-            else:
-                tmp0_f = in_f
-
             delay = round(1000 / fps)
 
             # Convert to uncompressed apng
             # https://stackoverflow.com/a/29378555
             tmp1_f = os.path.join(tempdir1, 'tmp1.apng')
-            StickerConvert.convert_generic_anim(tmp0_f, tmp1_f, res=res, quality=100, fps=fps)
+            StickerConvert.convert_generic_anim(in_f, tmp1_f, res=res, quality=100, fps=fps)
 
             # apngdis convert to png strip
             tmp2_f = os.path.join(tempdir1, 'tmp1_strip.png')
