@@ -79,7 +79,7 @@ cd ..
 
 :: Install UniConvertor for getting cairo library
 curl --retry 5 -O -L "https://downloads.sk1project.net/uc2/MS_Windows/uniconvertor-2.0rc5-win64_headless.msi"
-msiexec /i uniconvertor-2.0rc5-win64_headless.msi
+start /wait msiexec.exe /i uniconvertor-2.0rc5-win64_headless.msi
 
 :: Go back to repo root
 cd ..\..\
