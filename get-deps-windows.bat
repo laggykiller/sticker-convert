@@ -11,6 +11,7 @@ curl --retry 5 -O -L "https://downloads.sk1project.net/uc2/MS_Windows/uniconvert
 start /wait msiexec /qn /i uniconvertor-2.0rc5-win64_headless.msi
 del uniconvertor-2.0rc5-win64_headless.msi
 powershell -command "[Environment]::SetEnvironmentVariable('Path', $env:Path + ';C:\Program Files\UniConvertor-2.0rc5\dlls', 'Machine')"
+refreshenv
 dir "C:\Program Files\UniConvertor-2.0rc5\dlls"
 echo %path:;=&echo.%
 
