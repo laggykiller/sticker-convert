@@ -40,8 +40,10 @@ class StickerConvert:
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
-        if in_f_ext == '.tgs' or out_f_ext == '.tgs':
-            return StickerConvert.convert_tgs
+        if in_f_ext == '.tgs' or in_f_ext == '.lottie':
+            return StickerConvert.convert_from_tgs
+        elif out_f_ext == '.tgs' or in_f_ext == '.lottie':
+            return StickerConvert.convert_to_tgs
 
         else:
             if in_f_ext == '.webp':
@@ -335,9 +337,28 @@ class StickerConvert:
                     shutil.move(tmp_f, out_f)
 
     @staticmethod
-    def convert_tgs(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
+    def convert_from_tgs(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
+        with tempfile.TemporaryDirectory() as tempdir:
+            with gzip.open(in_f) as f:
+                file_json = json.loads(f.read().decode(encoding='utf-8'))
+            fps_in = file_json['fr']
+            frames_start = file_json['ip']
+            frames_end = file_json['op']
+
+            j = 1
+            for i in range(frames_start, frames_end):
+                # https://stackoverflow.com/questions/41190107/using-ffmpeg-with-python3-subprocess-to-convert-multiple-pngs-to-a-video
+                tmp2_f_frame = os.path.join(tempdir, f'tmp-{str(j).zfill(3)}.png')
+                lottie_convert(in_f, tmp2_f_frame, o_options={'frame': i})
+                j += 1
+            
+            tmp2_f = os.path.join(tempdir, 'tmp-{0}.png')
+
+            StickerConvert.convert_generic_anim(tmp2_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
+    
+    @staticmethod
+    def convert_to_tgs(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
         in_f_ext = CodecInfo.get_file_ext(in_f)
-        out_f_ext = CodecInfo.get_file_ext(out_f)
 
         with tempfile.TemporaryDirectory() as tempdir1, tempfile.TemporaryDirectory() as tempdir2:
             if in_f_ext not in lottie_in_ext_support:
@@ -346,28 +367,7 @@ class StickerConvert:
             else:
                 tmp1_f = in_f
 
-            # webm encoding with vp8 by lottie_convert not working, cause loss of transparency (tested on Windows)
-            # webp fps is incorrect
-            # Safest way is to convert to png files
-            if out_f_ext not in lottie_out_ext_support:
-                with gzip.open(in_f) as f:
-                    file_json = json.loads(f.read().decode(encoding='utf-8'))
-                fps_in = file_json['fr']
-                frames_start = file_json['ip']
-                frames_end = file_json['op']
-
-                j = 1
-                for i in range(frames_start, frames_end):
-                    # https://stackoverflow.com/questions/41190107/using-ffmpeg-with-python3-subprocess-to-convert-multiple-pngs-to-a-video
-                    tmp2_f_frame = os.path.join(tempdir2, f'tmp2-{str(j).zfill(3)}.png')
-                    lottie_convert(tmp1_f, tmp2_f_frame, o_options={'frame': i})
-                    j += 1
-                
-                tmp2_f = os.path.join(tempdir2, 'tmp2-{0}.png')
-
-                StickerConvert.convert_generic_anim(tmp2_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
-            else:
-                lottie_convert(tmp1_f, out_f, fps=fps)
+            lottie_convert(tmp1_f, out_f, fps=fps)
     
     @staticmethod
     def convert_to_apng_anim(in_f, out_f, res=512, quality=90, fps=30, color=90):
