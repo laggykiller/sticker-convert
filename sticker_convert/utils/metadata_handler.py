@@ -1,6 +1,6 @@
 import os
 import json
-from utils.format_verify import FormatVerify
+from utils.codec_info import CodecInfo
 
 class MetadataHandler:
     @staticmethod
@@ -58,7 +58,7 @@ class MetadataHandler:
 
         emoji_dict_new = {}
         for file in os.listdir(dir):
-            if os.path.splitext(file)[-1] == '.txt':
+            if CodecInfo.get_file_ext(file) == '.txt':
                 continue
             file_name = os.path.splitext(file)[0]
             if emoji_dict and file_name in emoji_dict:
@@ -96,7 +96,7 @@ class MetadataHandler:
             for file in stickers_present:
                 file_path = os.path.join(dir, file)
 
-                if FormatVerify.is_anim(file_path):
+                if CodecInfo.is_anim(file_path):
                     anim_stickers.append(file_path)
                 else:
                     image_stickers.append(file_path)

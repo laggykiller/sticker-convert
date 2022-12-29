@@ -5,6 +5,7 @@ from telegram.error import TelegramError
 from utils.converter import StickerConvert
 from utils.metadata_handler import MetadataHandler
 from utils.format_verify import FormatVerify
+from utils.codec_info import CodecInfo
 from utils.exceptions import NoTokenException
 import tempfile
 
@@ -61,7 +62,7 @@ class UploadTelegram:
                     elif FormatVerify.check_file(src, res_min=512, res_max=512, fps_max=30, square=True, size_max=256000, animated=True, format='.webm'):
                         webm_sticker = src
                     else:
-                        if FormatVerify.is_anim(src):
+                        if CodecInfo.is_anim(src):
                             webm_sticker = os.path.join(tempdir, src_name + '.webm')
                             StickerConvert.convert_and_compress_to_size(src, webm_sticker, vid_size_max=256000, img_size_max=512000, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=30, fps_min=0, steps=steps)
                         else:

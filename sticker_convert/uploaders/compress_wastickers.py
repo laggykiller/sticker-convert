@@ -27,7 +27,7 @@ class CompressWastickers:
                     src_name = os.path.splitext(src_full_name)[0]
 
                     # WhatsApp does not care about a static image in webp anyway
-                    # if FormatVerify.is_anim(src):
+                    # if CodecInfo.is_anim(src):
                     #     extension = '.webp'
                     # else:
                     #     extension = '.png'

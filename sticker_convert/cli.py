@@ -1,6 +1,6 @@
 import os
 from utils.converter import StickerConvert
-from utils.format_verify import FormatVerify
+from utils.codec_info import CodecInfo
 from downloaders.download_line import DownloadLine
 from downloaders.download_signal import DownloadSignal
 from downloaders.download_telegram import DownloadTelegram
@@ -194,11 +194,11 @@ class CLI:
             for i in os.listdir(args.input_dir):
                 in_f = os.path.join(args.input_dir, i)
 
-                if os.path.splitext(i)[1] == '.txt':
+                if CodecInfo.get_file_ext(i) == '.txt':
                     shutil.copy(in_f, os.path.join(args.output_dir, i))
                     continue
 
-                if FormatVerify.is_anim(in_f):
+                if CodecInfo.is_anim(in_f):
                     format = vid_format
                 else:
                     format = img_format
