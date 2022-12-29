@@ -7,8 +7,10 @@ if RunBin.get_bin('magick', silent=True) == None:
 import ffmpeg
 import tempfile
 from utils.lottie_convert import lottie_convert
-from utils.format_verify import FormatVerify
+from utils.codec_info import CodecInfo
 import traceback
+import gzip
+import json
 
 lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
 lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4')
@@ -35,8 +37,8 @@ class StickerConvert:
 
     @staticmethod
     def get_convert_method(in_f, out_f):
-        in_f_ext = os.path.splitext(in_f)[-1].lower()
-        out_f_ext = os.path.splitext(out_f)[-1].lower()
+        in_f_ext = CodecInfo.get_file_ext(in_f)
+        out_f_ext = CodecInfo.get_file_ext(out_f)
 
         if in_f_ext == '.tgs' or out_f_ext == '.tgs':
             return StickerConvert.convert_tgs
@@ -47,7 +49,7 @@ class StickerConvert:
 
             # webm should be handled by ffmpeg using vp9 codec
             # ImageMagick will remove transparency
-            if FormatVerify.is_anim(in_f) or in_f_ext == '.webm':
+            if CodecInfo.is_anim(in_f) or in_f_ext == '.webm':
                 if out_f_ext == '.png' or out_f_ext == '.apng':
                     return StickerConvert.convert_to_apng_anim
                 else:
@@ -77,7 +79,7 @@ class StickerConvert:
                 while True:
                     param = steps_list[step_current]
 
-                    tmp_f = os.path.join(tempdir, str(step_current) + os.path.splitext(out_f)[-1])
+                    tmp_f = os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f))
                     print(f'Compressing {in_f} -> {out_f} res={param[0]}, quality={param[1]}, fps={param[2]}, color={param[3]}')
                     convert_method(in_f, tmp_f, res=param[0], quality=param[1], fps=param[2], color=param[3])
 
@@ -86,7 +88,7 @@ class StickerConvert:
                         return True
                     
                     size = os.path.getsize(tmp_f)
-                    if FormatVerify.is_anim(in_f):
+                    if CodecInfo.is_anim(in_f):
                         size_max = vid_size_max
                     else:
                         size_max = img_size_max
@@ -97,7 +99,7 @@ class StickerConvert:
                             step_current = int((step_lower + step_upper) / 2)
                             print(f'Compressed {in_f} -> {out_f} but size {size} is smaller than limit {size_max}, recompressing with higher quality (step {step_lower}-{step_current}-{step_upper})')
                         else:
-                            shutil.move(os.path.join(tempdir, str(step_current) + os.path.splitext(out_f)[-1]), out_f)
+                            shutil.move(os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f)), out_f)
                             print(f'Compressed {in_f} -> {out_f} successfully (step {step_current})')
                             return True
                     else:
@@ -107,7 +109,7 @@ class StickerConvert:
                             print(f'Compressed {in_f} -> {out_f} but size {size} is larger than limit {size_max}, recompressing with lower quality (step {step_lower}-{step_current}-{step_upper})')
                         else:
                             if step_current < steps:
-                                shutil.move(os.path.join(tempdir, str(step_current + 1) + os.path.splitext(out_f)[-1]), out_f)
+                                shutil.move(os.path.join(tempdir, str(step_current + 1) + CodecInfo.get_file_ext(out_f)), out_f)
                                 print(f'Compressed {in_f} -> {out_f} successfully (step {step_current})')
                                 return True
                             else:
@@ -135,7 +137,7 @@ class StickerConvert:
             
     #         for param in steps_list:
     #             with tempfile.TemporaryDirectory() as tempdir:
-    #                 tmp_f = os.path.join(tempdir, 'temp' + os.path.splitext(out_f)[-1])
+    #                 tmp_f = os.path.join(tempdir, 'temp' + CodecInfo.get_file_ext(out_f))
     #                 print(f'Compressing {in_f} -> {out_f} res={param[0]}, quality={param[1]}, fps={param[2]}, color={param[3]}')
     #                 convert_method(in_f, tmp_f, res=param[0], quality=param[1], fps=param[2], color=param[3])
 
@@ -143,7 +145,7 @@ class StickerConvert:
     #                     return True
                     
     #                 size = os.path.getsize(tmp_f)
-    #                 if FormatVerify.is_anim(tmp_f):
+    #                 if CodecInfo.is_anim(tmp_f):
     #                     size_max = vid_size_max
     #                 else:
     #                     size_max = img_size_max
@@ -186,7 +188,7 @@ class StickerConvert:
         # https://www.imagemagick.org/script/command-line-options.php#quality
         # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
         # For png, filter_type = quality % 10
-        if os.path.splitext(out_f)[-1] == '.png':
+        if CodecInfo.get_file_ext(out_f) == '.png':
             quality = 95
 
         if RunBin.get_bin('magick', silent=True) == None:
@@ -216,17 +218,16 @@ class StickerConvert:
 
     @staticmethod
     def convert_generic_anim_pymodule(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
-        in_f_ext = os.path.splitext(in_f)[-1].lower()
-        out_f_ext = os.path.splitext(out_f)[-1].lower()
+        in_f_ext = CodecInfo.get_file_ext(in_f)
+        out_f_ext = CodecInfo.get_file_ext(out_f)
 
         if fps_in:
             # For converting multiple images into animation
             # fps_in is fps of the input sequence of images
             # Example in_f: path/to/dir/image-%03d.png
-            stream = ffmpeg.input(in_f, framerate=fps_in)
+            stream = ffmpeg.input(in_f.replace('{0}', '%03d'), framerate=fps_in)
         elif in_f_ext == '.webm':
-            probe_info = ffmpeg.probe(in_f)
-            codec = probe_info['streams'][0]['codec_name']
+            codec = CodecInfo.get_file_codec(in_f)
             if codec == 'vp8':
                 stream = ffmpeg.input(in_f, vcodec='vp8')
             else:
@@ -236,9 +237,7 @@ class StickerConvert:
         if fps:
             stream = ffmpeg.filter(stream, 'fps', fps=fps, round='up')
         if res:
-            probe_info = ffmpeg.probe(in_f)
-            width = probe_info['streams'][0]['width']
-            height = probe_info['streams'][0]['height']
+            width, height = CodecInfo.get_file_res(in_f)
 
             # Resolution must be even number, or else error occur
             # res = res + res % 2
@@ -259,8 +258,8 @@ class StickerConvert:
 
     @staticmethod
     def convert_generic_anim_subprocess(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
-        in_f_ext = os.path.splitext(in_f)[-1].lower()
-        out_f_ext = os.path.splitext(out_f)[-1].lower()
+        in_f_ext = CodecInfo.get_file_ext(in_f)
+        out_f_ext = CodecInfo.get_file_ext(out_f)
 
         # cmd_list = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error']
         cmd_list = ['ffmpeg', '-y', '-hide_banner']
@@ -270,8 +269,9 @@ class StickerConvert:
             # fps_in is fps of the input sequence of images
             # Example in_f: path/to/dir/image-%03d.png
             cmd_list += ['-r', str(fps_in)]
+            in_f = in_f.replace('{0}', '%03d')
         elif in_f_ext == '.webm':
-            codec = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', in_f]).replace('\n', '')
+            codec = CodecInfo.get_file_codec(in_f)
             if codec == 'vp8':
                 cmd_list += ['-vcodec', 'vp8']
             else:
@@ -282,9 +282,7 @@ class StickerConvert:
         if fps:
             cmd_list += ['-r', str(fps)]
         if res:
-            dimension = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', in_f]).replace('\n', '')
-            width = int(dimension.split('x')[0])
-            height = int(dimension.split('x')[1])
+            width, height = CodecInfo.get_file_res(in_f)
 
             # Resolution must be even number, or else error occur
             # res = res + res % 2
@@ -308,11 +306,11 @@ class StickerConvert:
 
     @staticmethod
     def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, color=90, **kwargs):
-        in_f_ext = os.path.splitext(in_f)[-1].lower()
-        out_f_ext = os.path.splitext(out_f)[-1].lower()
+        in_f_ext = CodecInfo.get_file_ext(in_f)
+        out_f_ext = CodecInfo.get_file_ext(out_f)
 
         with tempfile.TemporaryDirectory() as tempdir:
-            if FormatVerify.is_anim(in_f):
+            if CodecInfo.is_anim(in_f):
                 # ffmpeg do not support webp decoding (yet)
                 # Converting animated .webp to image of the frames or .webp directly can result in broken frames
                 # .mp4 does not like odd number of width / height
@@ -325,7 +323,7 @@ class StickerConvert:
                 tmp_f = os.path.join(tempdir, f'tmp{out_f_ext}')
                 StickerConvert.convert_generic_image(in_f, tmp_f, res=res, quality=quality)
                 # Need more compression for .png
-                if os.path.splitext(out_f)[-1] == '.png':
+                if CodecInfo.get_file_ext(out_f) == '.png':
                     tmp1_f = os.path.join(tempdir, 'tmp.1.png')
                     RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp_f])
 
@@ -338,22 +336,38 @@ class StickerConvert:
 
     @staticmethod
     def convert_tgs(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
-        in_f_ext = os.path.splitext(in_f)[-1].lower()
-        out_f_ext = os.path.splitext(out_f)[-1].lower()
+        in_f_ext = CodecInfo.get_file_ext(in_f)
+        out_f_ext = CodecInfo.get_file_ext(out_f)
 
-        with tempfile.TemporaryDirectory() as tempdir:
+        with tempfile.TemporaryDirectory() as tempdir1, tempfile.TemporaryDirectory() as tempdir2:
             if in_f_ext not in lottie_in_ext_support:
-                tmp1_f = os.path.join(tempdir, 'tmp1.webp')
+                tmp1_f = os.path.join(tempdir1, 'tmp1.webp')
                 StickerConvert.convert_generic_anim(in_f, tmp1_f, res=res, quality=quality, fps=fps)
             else:
                 tmp1_f = in_f
 
+            # webm encoding with vp8 by lottie_convert not working, cause loss of transparency (tested on Windows)
+            # webp fps is incorrect
+            # Safest way is to convert to png files
             if out_f_ext not in lottie_out_ext_support:
-                tmp2_f = os.path.join(tempdir, 'tmp2.webp')
-                lottie_convert(tmp1_f, tmp2_f)
-                StickerConvert.convert_from_webp_anim(tmp2_f, out_f, res=res, quality=quality, fps=fps)
+                with gzip.open(in_f) as f:
+                    file_json = json.loads(f.read().decode(encoding='utf-8'))
+                fps_in = file_json['fr']
+                frames_start = file_json['ip']
+                frames_end = file_json['op']
+
+                j = 1
+                for i in range(frames_start, frames_end):
+                    # https://stackoverflow.com/questions/41190107/using-ffmpeg-with-python3-subprocess-to-convert-multiple-pngs-to-a-video
+                    tmp2_f_frame = os.path.join(tempdir2, f'tmp2-{str(j).zfill(3)}.png')
+                    lottie_convert(tmp1_f, tmp2_f_frame, o_options={'frame': i})
+                    j += 1
+                
+                tmp2_f = os.path.join(tempdir2, 'tmp2-{0}.png')
+
+                StickerConvert.convert_generic_anim(tmp2_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
             else:
-                lottie_convert(tmp1_f, out_f)
+                lottie_convert(tmp1_f, out_f, fps=fps)
     
     @staticmethod
     def convert_to_apng_anim(in_f, out_f, res=512, quality=90, fps=30, color=90):

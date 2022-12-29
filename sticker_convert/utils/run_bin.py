@@ -36,6 +36,6 @@ class RunBin:
         error_str = error.decode()
 
         if silence == False and error_str != '':
-            print(error_str)
+            print(f"Error while executing {' '.join(cmd_list)} : {error_str}")
 
         return output_str
