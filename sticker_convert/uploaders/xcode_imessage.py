@@ -187,7 +187,7 @@ class XcodeImessage:
             icons_lst.append(i)
         
         # packname/Info.plist
-        plist_path = os.path.join(pack_path, 'Info.plist')
+        plist_path = os.path.join(pack_path, 'stickers/Info.plist')
         with open(plist_path, 'rb') as f:
             plist_dict = plistlib.load(f)
         plist_dict['CFBundleDisplayName'] = title
