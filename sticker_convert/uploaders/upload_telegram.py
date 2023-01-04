@@ -11,22 +11,23 @@ import tempfile
 
 class UploadTelegram:
     @staticmethod
-    def upload_stickers_telegram(token, user_id, in_dir, title=None, emoji_dict=None, quality_max=90, quality_min=0, steps=20, default_emoji='😀', **kwargs):
+    def upload_stickers_telegram(token, user_id, in_dir, title=None, emoji_dict=None, quality_max=90, quality_min=0, color_min=0, color_max=90, fake_vid=True, steps=20, default_emoji='😀', **kwargs):
         if token == None:
             raise NoTokenException('Token required for uploading to telegram')
 
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=title, emoji_dict=emoji_dict)
-        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_anim_pack=50, file_per_image_pack=120, separate_image_anim=True)
+        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_anim_pack=50, file_per_image_pack=120, separate_image_anim=not fake_vid)
 
         if title == None:
             raise TypeError('title cannot be', title)
         if emoji_dict == None:
             print('emoji.txt is required for uploading telegram stickers')
             print(f'emoji.txt generated for you in {in_dir}')
-            print(f'Default emoji is set to {default_emoji}. If you just want to use this emoji on all stickers in this pack, run script again')
+            print(f'Default emoji is set to {default_emoji}.')
+            print(f'If you just want to use this emoji on all stickers in this pack, run script again with --no-compress or tick the "No compression" box.')
             MetadataHandler.generate_emoji_file(dir=in_dir, default_emoji=default_emoji)
-            return ['emoji.txt is required for uploading telegram stickers', f'emoji.txt generated for you in {in_dir}', f'Default emoji is set to {default_emoji}. If you just want to use this emoji on all stickers in this pack, run script again']
+            return ['emoji.txt is required for uploading telegram stickers', f'emoji.txt generated for you in {in_dir}', f'Default emoji is set to {default_emoji}.', 'If you just want to use this emoji on all stickers in this pack, run script again with --no-compress or tick the "No compression" box.']
 
         bot= Bot(token)
 
@@ -55,19 +56,19 @@ class UploadTelegram:
                     tgs_sticker = None
                     webm_sticker = None
 
-                    if FormatVerify.check_file(src, res_min=512, res_max=512, square=True, size_max=512000, animated=False, format='.png'):
+                    if FormatVerify.check_file(src, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, square=True, size_max=512000, animated=False if not fake_vid else None, format='.png'):
                         png_sticker = src
                     elif FormatVerify.check_file(src, size_max=64000, format='.tgs'):
                         tgs_sticker = src
-                    elif FormatVerify.check_file(src, res_min=512, res_max=512, fps_max=30, square=True, size_max=256000, animated=True, format='.webm'):
+                    elif FormatVerify.check_file(src, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, fps_max=30, square=True, size_max=256000, animated=True if not fake_vid else None, duration_max=3000, format='.webm'):
                         webm_sticker = src
                     else:
-                        if CodecInfo.is_anim(src):
+                        if fake_vid or CodecInfo.is_anim(src):
                             webm_sticker = os.path.join(tempdir, src_name + '.webm')
-                            StickerConvert.convert_and_compress_to_size(src, webm_sticker, vid_size_max=256000, img_size_max=512000, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=30, fps_min=0, steps=steps)
+                            StickerConvert.convert_and_compress_to_size(src, webm_sticker, vid_size_max=256000, img_size_max=512000, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=30, fps_min=0, color_min=color_min, color_max=color_max, duration_max=3000, steps=steps)
                         else:
                             png_sticker = os.path.join(tempdir, src_name + '.png')
-                            StickerConvert.convert_and_compress_to_size(src, png_sticker, vid_size_max=256000, img_size_max=512000, res_min=512, res_max=512, quality_max=quality_max, quality_min=quality_min, steps=steps)
+                            StickerConvert.convert_and_compress_to_size(src, png_sticker, vid_size_max=256000, img_size_max=512000, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=quality_max, quality_min=quality_min, color_min=color_min, color_max=color_max, steps=steps)
                     
                     try:
                         emoji = emoji_dict[src_name]

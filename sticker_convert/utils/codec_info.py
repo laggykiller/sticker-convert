@@ -35,7 +35,7 @@ class CodecInfo:
             fps_denom = int(fps_str.split('/')[1])
             fps = fps_nom / fps_denom
         else:
-            RunBin.run_cmd(['ffprobe', '-v', '0', '-of', 'csv=p=0', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', file]).replace('\n', '')
+            int(RunBin.run_cmd(['ffprobe', '-v', '0', '-of', 'csv=p=0', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', file]).replace('\n', ''))
 
         return fps
     
@@ -109,6 +109,11 @@ class CodecInfo:
             frames_magick = RunBin.run_cmd(['magick', 'identify', file], silence=False).count('\n')
         
         return max(frames_ffprobe, frames_magick)
+    
+    @staticmethod
+    def get_file_duration(file):
+        # Return duration in miliseconds
+        return CodecInfo.get_file_frames(file) / CodecInfo.get_file_fps(file) * 1000
     
     @staticmethod
     def get_file_ext(file):

@@ -7,7 +7,7 @@ import re
 
 class FormatVerify:
     @staticmethod
-    def check_file(file, res_min=None, res_max=None, square=None, fps_min=None, fps_max=None, size_min=None, size_max=None, animated=None, format=None):
+    def check_file(file, res_w_min=None, res_w_max=None, res_h_min=None, res_h_max=None, square=None, fps_min=None, fps_max=None, size_min=None, size_max=None, animated=None, format=None, duration_min=None, duration_max=None):
         if CodecInfo.get_file_ext(file) == '.tgs':
             validator = TgsValidator(Severity.Error)
             validator.check_file(file)
@@ -15,11 +15,12 @@ class FormatVerify:
         else:
             return (
                 FormatVerify.check_presence(file) and
-                FormatVerify.check_file_res(file, res_min=res_min, res_max=res_max, square=square) and 
+                FormatVerify.check_file_res(file, res_w_min=res_w_min, res_w_max=res_w_max, res_h_min=res_h_min, res_h_max=res_h_max, square=square) and 
                 FormatVerify.check_file_fps(file, fps_min=fps_min, fps_max=fps_max) and
                 FormatVerify.check_file_size(file, size_min=size_min, size_max=size_max) and
                 FormatVerify.check_animated(file, animated=animated) and
-                FormatVerify.check_format(file, format=format)
+                FormatVerify.check_format(file, format=format) and 
+                FormatVerify.check_duration(file, duration_min=duration_min, duration_max=duration_max)
                 )
 
     @staticmethod
@@ -27,12 +28,12 @@ class FormatVerify:
         return os.path.isfile(file)
 
     @staticmethod
-    def check_file_res(file, res_min=None, res_max=None, square=None):
+    def check_file_res(file, res_w_min=None, res_w_max=None, res_h_min=None, res_h_max=None, square=None):
         width, height = CodecInfo.get_file_res(file)
 
-        if res_min != None and (height < res_min or width < res_min):
+        if (res_w_min and res_w_max) and (width < res_w_min or width > res_w_max):
             return False
-        if res_max != None and (height > res_max or width > res_max):
+        if (res_h_min and res_h_max) and (height < res_h_min or height > res_h_max):
             return False
         if square != None and height != width:
             return False
@@ -71,6 +72,16 @@ class FormatVerify:
     @staticmethod
     def check_format(file, format=None):
         if format != None and CodecInfo.get_file_ext(file) != format:
+            return False
+        
+        return True
+    
+    @staticmethod
+    def check_duration(file, duration_min=None, duration_max=None):
+        duration = CodecInfo.get_file_duration(file)
+        if duration_min != None and duration < duration_min:
+            return False
+        if duration_max != None and duration > duration_max:
             return False
         
         return True

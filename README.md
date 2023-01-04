@@ -23,6 +23,7 @@
     - [Importing .wastickers into WhatsApp](#importing-wastickers-into-whatsapp)
     - [Getting stickers from WhatsApp](#getting-stickers-from-whatsapp)
     - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
+    - [Why the telegram sticker link ends with _by_xxxbot?](#why-the-telegram-sticker-link-ends-with-_by_xxxbot)
 - [Credits](#credits)
 - [DISCLAIMER](#disclaimer)
 
@@ -49,6 +50,10 @@
 - Kakao
     - Download: Supported (e.g. https://e.kakao.com/t/xxxxx). Can only download static stickers. Learn more about the problems encountered [kakao_anim_note.md](kakao_anim_note.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
+- iMessage
+    - Download: Not supported.
+    - Compression: Supported (Not tested).
+    - Upload: Not supported.
 
 ## How to use (GUI)
 ![imgs/screenshot](imgs/screenshot.png)
@@ -71,13 +76,16 @@ To run in CLI mode, pass on any arguments
 usage: sticker-convert.exe [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
                            [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
                            [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
-                           [--export-signal] [--export-telegram] [--no-compress] [--preset {signal,telegram,whatsapp,custom}]
-                           [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
-                           [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                           [--steps STEPS] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                           [--img-format IMG_FORMAT] [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES] [--author AUTHOR]
-                           [--title TITLE] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
-                           [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--save-cred]
+                           [--export-signal] [--export-telegram] [--no-compress]
+                           [--preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
+                           [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                           [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
+                           [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--duration-min DURATION]
+                           [--duration-max DURATION] [--steps STEPS] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                           [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--default-emoji DEFAULT_EMOJI]
+                           [--processes PROCESSES] [--author AUTHOR] [--title TITLE] [--signal-uuid SIGNAL_UUID]
+                           [--signal-password SIGNAL_PASSWORD] [--telegram-token TELEGRAM_TOKEN]
+                           [--telegram-userid TELEGRAM_USERID] [--save-cred]
 
 CLI for stickers-convert
 
@@ -102,20 +110,34 @@ options:
   --export-signal       Upload to signal
   --export-telegram     Upload to telegram
   --no-compress         Do not compress files. Useful for only downloading stickers
-  --preset {signal,telegram,whatsapp,custom}
-                        Use preset
+  --preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
+                        Apply preset for compression
   --fps-min FPS_MIN     Set minimum output fps
   --fps-max FPS_MAX     Set maximum output fps
-  --res-min RES_MIN     Set minimum output resolution
-  --res-max RES_MAX     Set maximum output resolution
+  --res-min RES_MIN     Set minimum output resolution (width and height)
+  --res-max RES_MAX     Set maximum output resolution (width and height)
+  --res-w-min RES_W_MIN
+                        Set minimum output resolution (width)
+  --res-w-max RES_W_MAX
+                        Set maximum output resolution (width)
+  --res-h-min RES_H_MIN
+                        Set minimum output resolution (height)
+  --res-h-max RES_H_MAX
+                        Set maximum output resolution (height)
   --quality-min QUALITY_MIN
                         Set minimum quality
   --quality-max QUALITY_MAX
                         Set maximum quality
   --color-min COLOR_MIN
-                        Set minimum number of colors (For converting to apng)
+                        Set minimum number of colors (For converting to apng). >256 will disable it.
   --color-max COLOR_MAX
-                        Set maximum number of colors (For converting to apng)
+                        Set maximum number of colors (For converting to apng). >256 will disable it.
+  --duration-min DURATION
+                        Set minimum output duration in miliseconds. Will change play speed if source is longer than
+                        duration. 0 will disable limit.
+  --duration-max DURATION
+                        Set maximum output duration in miliseconds. Will change play speed if source is longer than
+                        duration. 0 will disable limit.
   --steps STEPS         Set number of divisions between min and max settings. Higher value is slower but yields file
                         more closer to the specified file size limit
   --vid-size-max VID_SIZE_MAX
@@ -126,10 +148,12 @@ options:
                         Set file format if input is a animated
   --img-format IMG_FORMAT
                         Set file format if input is a static image
+  --fake-vid            Convert (faking) image to video. Useful if (1) Size limit for video is larger than image; (2)
+                        Mix image and video into same pack
   --default-emoji DEFAULT_EMOJI
                         Set the default emoji for uploading signal and telegram sticker packs
   --processes PROCESSES
-                        Set number of processes. Default to cpus in system
+                        Set number of processes. Default to number of logical processors in system
   --author AUTHOR       Set author of created sticker pack
   --title TITLE         Set name of created sticker pack
   --signal-uuid SIGNAL_UUID
@@ -144,7 +168,7 @@ options:
   --save-cred           Save signal and telegram credentials
 ```
 
-Note: If you are running python script directly, run with main.py
+Note: If you are running python script directly, run with `main.py`
 
 Examples:
 
@@ -244,6 +268,11 @@ Follow instruction from this post: https://stackoverflow.com/a/52667196
 CLI: Run with `--no-compress --export-xxxxx`
 
 GUI: Select `From local directory` for Input source, tick `No compression` box and select `Upload to xxxxx` for Output options
+
+### Why the telegram sticker link ends with _by_xxxbot?
+Sticker pack created by bot should end with this suffix as enforced by Telegram.
+
+To avoid this, upload telegram stickers manually using https://t.me/stickers
 
 ## Credits
 - Information about Signal and Telegram stickers: https://github.com/teynav/signalApngSticker

@@ -3,6 +3,8 @@ import os
 from contextlib import contextmanager
 from utils.metadata_handler import MetadataHandler
 from utils.exceptions import NoTokenException
+import shutil
+import tempfile
 
 @contextmanager
 def cwd(path):
@@ -30,11 +32,18 @@ class DownloadTelegram:
         sticker_set = bot.getStickerSet(title)
 
         emoji_dict = {}
-        for i in sticker_set.stickers:
-            with cwd(out_dir):
-                f_name = i.get_file().download()
-            emoji_dict[os.path.splitext(f_name)[0]] = i.emoji
-            print('Downloaded', f_name)
+        num = 0
+        with tempfile.TemporaryDirectory() as tempdir:
+            for i in sticker_set.stickers:
+                with cwd(tempdir):
+                    f_name_orig = i.get_file().download()
+                f_path_orig = os.path.join(tempdir, f_name_orig)
+                f_name = str(num).zfill(3) + os.path.splitext(f_name_orig)[-1]
+                f_path = os.path.join(out_dir, f_name)
+                shutil.move(f_path_orig, f_path)
+                emoji_dict[os.path.splitext(f_name)[0]] = i.emoji
+                print('Downloaded', f_name)
+                num += 1
         
         MetadataHandler.set_metadata(out_dir, title=title, emoji_dict=emoji_dict)
 

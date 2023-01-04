@@ -59,8 +59,11 @@ class GUI:
         self.initialized = False
 
         self.root = Tk()
-        self.root.eval('tk::PlaceWindow . center')
-        self.root.iconbitmap('icon/appicon.ico')
+        # self.root.eval('tk::PlaceWindow . center')
+        if sys.platform == 'darwin':
+            self.root.iconbitmap('icon/appicon.icns')
+        else:
+            self.root.iconbitmap('icon/appicon.ico')
         self.root.title('sticker-convert')
 
         # Create frames
@@ -107,107 +110,207 @@ class GUI:
         self.input_address_tip.grid(column=0, row=3, columnspan=3, sticky='w')
 
         # Compression options frame
+        self.no_compress_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Do not compress files. Useful for only downloading stickers'))
+        self.no_compress_var = BooleanVar()
+        self.no_compress_cbox = Checkbutton(self.frame_comp, text="No compression", variable=self.no_compress_var, command=self.callback_nocompress)
+
+        self.comp_preset_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Apply preset for compression'))
         self.comp_preset_lbl = Label(self.frame_comp, text='Preset')
         self.comp_preset_var = StringVar(self.root)
         self.comp_preset_var.set(list(self.presets_dict.keys())[0])
         self.comp_preset_opt = OptionMenu(self.frame_comp, self.comp_preset_var, *self.presets_dict.keys(), command=self.callback_comp_apply_preset)
-        self.comp_preset_opt.config(width=10)
+        self.comp_preset_opt.config(width=20)
 
-        self.no_compress_var = BooleanVar()
-        self.no_compress_cbox = Checkbutton(self.frame_comp, text="No compression", variable=self.no_compress_var, command=self.callback_nocompress)
-
-        self.fps_min_lbl = Label(self.frame_comp, text='Output FPS (Minimum)')
+        self.fps_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('FPS Higher = Smoother but larger size'))
+        self.fps_lbl = Label(self.frame_comp, text='Output FPS')
+        self.fps_min_lbl = Label(self.frame_comp, text='Min:')
         self.fps_min_var = IntVar(self.root)
         self.fps_min_entry = Entry(self.frame_comp, textvariable=self.fps_min_var, width=8)
-        self.fps_max_lbl = Label(self.frame_comp, text='Output FPS (Maximum)')
+        self.fps_max_lbl = Label(self.frame_comp, text='Max:')
         self.fps_max_var = IntVar(self.root)
         self.fps_max_entry = Entry(self.frame_comp, textvariable=self.fps_max_var, width=8)
+        self.fps_disable_var = BooleanVar()
+        self.fps_disable_cbox = Checkbutton(self.frame_comp, text="X", variable=self.fps_disable_var, command=self.callback_disable_fps)
 
-        self.res_min_lbl = Label(self.frame_comp, text='Output resolution (Minimum)')
-        self.res_min_var = IntVar(self.root)
-        self.res_min_entry = Entry(self.frame_comp, textvariable=self.res_min_var, width=8)
-        self.res_max_lbl = Label(self.frame_comp, text='Output resolution (Maximum)')
-        self.res_max_var = IntVar(self.root)
-        self.res_max_entry = Entry(self.frame_comp, textvariable=self.res_max_var, width=8)
+        self.res_w_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Set width.\nResolution higher = Clearer but larger size'))
+        self.res_w_lbl = Label(self.frame_comp, text='Output resolution (Width)')
+        self.res_w_min_lbl = Label(self.frame_comp, text='Min:')
+        self.res_w_min_var = IntVar(self.root)
+        self.res_w_min_entry = Entry(self.frame_comp, textvariable=self.res_w_min_var, width=8)
+        self.res_w_max_lbl = Label(self.frame_comp, text='Max:')
+        self.res_w_max_var = IntVar(self.root)
+        self.res_w_max_entry = Entry(self.frame_comp, textvariable=self.res_w_max_var, width=8)
+        self.res_w_disable_var = BooleanVar()
+        self.res_w_disable_cbox = Checkbutton(self.frame_comp, text="X", variable=self.res_w_disable_var, command=self.callback_disable_res_w)
+        
+        self.res_h_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Set height.\nResolution higher = Clearer but larger size'))
+        self.res_h_lbl = Label(self.frame_comp, text='Output resolution (Height)')
+        self.res_h_min_lbl = Label(self.frame_comp, text='Min:')
+        self.res_h_min_var = IntVar(self.root)
+        self.res_h_min_entry = Entry(self.frame_comp, textvariable=self.res_h_min_var, width=8)
+        self.res_h_max_lbl = Label(self.frame_comp, text='Max:')
+        self.res_h_max_var = IntVar(self.root)
+        self.res_h_max_entry = Entry(self.frame_comp, textvariable=self.res_h_max_var, width=8)
+        self.res_h_disable_var = BooleanVar()
+        self.res_h_disable_cbox = Checkbutton(self.frame_comp, text="X", variable=self.res_h_disable_var, command=self.callback_disable_res_h)
 
-        self.quality_min_lbl = Label(self.frame_comp, text='Output quality (Minimum)')
+        self.quality_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Quality higher = Clearer but larger size'))
+        self.quality_lbl = Label(self.frame_comp, text='Output quality (0-100)')
+        self.quality_min_lbl = Label(self.frame_comp, text='Min:')
         self.quality_min_var = IntVar(self.root)
         self.quality_min_entry = Entry(self.frame_comp, textvariable=self.quality_min_var, width=8)
-        self.quality_max_lbl = Label(self.frame_comp, text='Output quality (Maximum)')
+        self.quality_max_lbl = Label(self.frame_comp, text='Max:')
         self.quality_max_var = IntVar(self.root)
         self.quality_max_entry = Entry(self.frame_comp, textvariable=self.quality_max_var, width=8)
+        self.quality_disable_var = BooleanVar()
+        self.quality_disable_cbox = Checkbutton(self.frame_comp, text="X", variable=self.quality_disable_var, command=self.callback_disable_quality)
 
-        self.color_min_lbl = Label(self.frame_comp, text='Colors [apng only] (Minimum)')
+        self.color_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Reduce size by limiting number of colors.\nMakes image "blocky". >256 will disable this.\nApplies to png and apng only.\nColor higher = More colors but larger size'))
+        self.color_lbl = Label(self.frame_comp, text='Colors (0-256)')
+        self.color_min_lbl = Label(self.frame_comp, text='Min:')
         self.color_min_var = IntVar(self.root)
         self.color_min_entry = Entry(self.frame_comp, textvariable=self.color_min_var, width=8)
-        self.color_max_lbl = Label(self.frame_comp, text='Colors [apng only] (Maximum)')
+        self.color_max_lbl = Label(self.frame_comp, text='Max:')
         self.color_max_var = IntVar(self.root)
         self.color_max_entry = Entry(self.frame_comp, textvariable=self.color_max_var, width=8)
+        self.color_disable_var = BooleanVar()
+        self.color_disable_cbox = Checkbutton(self.frame_comp, text="X", variable=self.color_disable_var, command=self.callback_disable_color)
 
-        self.img_size_max_lbl = Label(self.frame_comp, text='Maximum file size (Static)')
+        self.duration_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.'))
+        self.duration_lbl = Label(self.frame_comp, text='Duration (Miliseconds)')
+        self.duration_min_lbl = Label(self.frame_comp, text='Min:')
+        self.duration_min_var = IntVar(self.root)
+        self.duration_min_entry = Entry(self.frame_comp, textvariable=self.duration_min_var, width=8)
+        self.duration_max_lbl = Label(self.frame_comp, text='Max:')
+        self.duration_max_var = IntVar(self.root)
+        self.duration_max_entry = Entry(self.frame_comp, textvariable=self.duration_max_var, width=8)
+        self.duration_disable_var = BooleanVar()
+        self.duration_disable_cbox = Checkbutton(self.frame_comp, text="X", variable=self.duration_disable_var, command=self.callback_disable_duration)
+
+        self.size_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Set maximum file size in bytes for video and image'))
+        self.size_lbl = Label(self.frame_comp, text='Maximum file size (bytes)')
+        self.img_size_max_lbl = Label(self.frame_comp, text='Img:')
         self.img_size_max_var = IntVar(self.root)
         self.img_size_max_entry = Entry(self.frame_comp, textvariable=self.img_size_max_var, width=8)
-        self.vid_size_max_lbl = Label(self.frame_comp, text='Maximum file size (Animated)')
+        self.vid_size_max_lbl = Label(self.frame_comp, text='Vid:')
         self.vid_size_max_var = IntVar(self.root)
         self.vid_size_max_entry = Entry(self.frame_comp, textvariable=self.vid_size_max_var, width=8)
+        self.size_disable_var = BooleanVar()
+        self.size_disable_cbox = Checkbutton(self.frame_comp, text="X", variable=self.size_disable_var, command=self.callback_disable_size)
 
-        self.img_format_lbl = Label(self.frame_comp, text='File format (Static)')
+        self.format_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Set file format for video and image'))
+        self.format_lbl = Label(self.frame_comp, text='File format')
+        self.img_format_lbl = Label(self.frame_comp, text='Img:')
         self.img_format_var = StringVar(self.root)
         self.img_format_entry = Entry(self.frame_comp, textvariable=self.img_format_var, width=8)
-        self.vid_format_lbl = Label(self.frame_comp, text='File format (Animated)')
+        self.vid_format_lbl = Label(self.frame_comp, text='Vid:')
         self.vid_format_var = StringVar(self.root)
         self.vid_format_entry = Entry(self.frame_comp, textvariable=self.vid_format_var, width=8)
 
+        self.fake_vid_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Convert image to video. Useful if:\n(1) Size limit for video is larger than image\n(2) Mix image and video into same pack'))
+        self.fake_vid_var = BooleanVar()
+        self.fake_vid_cbox = Checkbutton(self.frame_comp, text="Convert (faking) image to video", variable=self.fake_vid_var)
+
+        self.default_emoji_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Set the default emoji for uploading signal and telegram sticker packs'))
         self.default_emoji_lbl = Label(self.frame_comp, text='Default emoji')
         self.default_emoji_var = StringVar(self.root)
         self.default_emoji_entry = Entry(self.frame_comp, textvariable=self.default_emoji_var, width=8)
 
+        self.steps_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit'))
         self.steps_lbl = Label(self.frame_comp, text='Number of steps')
         self.steps_var = IntVar(self.root)        
         self.steps_entry = Entry(self.frame_comp, textvariable=self.steps_var, width=8)
-        self.steps_tip = Label(self.frame_comp, text='(Steps higher = Slower but closer to target size)')
 
+        self.processes_help_btn = Button(self.frame_comp, text='?', command=lambda: self.callback_compress_help('Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources'))
         self.processes_lbl = Label(self.frame_comp, text='Number of processes')
         self.processes_var = IntVar(self.root)
         self.processes_var.set(multiprocessing.cpu_count())
-        self.processes_entry = Entry(self.frame_comp, textvariable=self.processes_var, width=8)        
-        self.processes_tip = Label(self.frame_comp, text='(Processes higher = Compress faster but consume more resources)')
+        self.processes_entry = Entry(self.frame_comp, textvariable=self.processes_var, width=8)
 
-        self.no_compress_cbox.grid(column=0, row=0, sticky='w')
-        self.comp_preset_lbl.grid(column=0, row=1, sticky='w')
-        self.comp_preset_opt.grid(column=1, row=1, sticky='nes')
-        self.fps_min_lbl.grid(column=0, row=2, sticky='w')
-        self.fps_min_entry.grid(column=1, row=2, sticky='nes')
-        self.fps_max_lbl.grid(column=0, row=3, sticky='w')
-        self.fps_max_entry.grid(column=1, row=3, sticky='nes')
-        self.res_min_lbl.grid(column=0, row=4, sticky='w')
-        self.res_min_entry.grid(column=1, row=4, sticky='nes')
-        self.res_max_lbl.grid(column=0, row=5, sticky='w')
-        self.res_max_entry.grid(column=1, row=5, sticky='nes')
-        self.quality_min_lbl.grid(column=0, row=6, sticky='w')
-        self.quality_min_entry.grid(column=1, row=6, sticky='nes')
-        self.quality_max_lbl.grid(column=0, row=7, sticky='w')
-        self.quality_max_entry.grid(column=1, row=7, sticky='nes')
-        self.color_min_lbl.grid(column=0, row=8, sticky='w')
-        self.color_min_entry.grid(column=1, row=8, sticky='nes')
-        self.color_max_lbl.grid(column=0, row=9, sticky='w')
-        self.color_max_entry.grid(column=1, row=9, sticky='nes')
-        self.img_size_max_lbl.grid(column=0, row=10, sticky='w')
-        self.img_size_max_entry.grid(column=1, row=10, sticky='nes')
-        self.vid_size_max_lbl.grid(column=0, row=11, sticky='w')
-        self.vid_size_max_entry.grid(column=1, row=11, sticky='nes')
-        self.img_format_lbl.grid(column=0, row=12, sticky='w')
-        self.img_format_entry.grid(column=1, row=12, sticky='nes')
-        self.vid_format_lbl.grid(column=0, row=13, sticky='w')
-        self.vid_format_entry.grid(column=1, row=13, sticky='nes')
-        self.default_emoji_lbl.grid(column=0, row=14, sticky='w')
-        self.default_emoji_entry.grid(column=1, row=14, sticky='nes')
-        self.steps_lbl.grid(column=0, row=15, sticky='w')
-        self.steps_entry.grid(column=1, row=15, sticky='nes')
-        self.steps_tip.grid(column=0, row=16, columnspan=2, sticky='w')
-        self.processes_lbl.grid(column=0, row=17, sticky='w')
-        self.processes_entry.grid(column=1, row=17, sticky='nes')
-        self.processes_tip.grid(column=0, row=18, columnspan=2, sticky='w')
+        self.no_compress_help_btn.grid(column=0, row=0, sticky='w')
+        self.no_compress_cbox.grid(column=1, row=0, columnspan=6, sticky='w')
+
+        self.comp_preset_help_btn.grid(column=0, row=1, sticky='w')
+        self.comp_preset_lbl.grid(column=1, row=1, sticky='w')
+        self.comp_preset_opt.grid(column=2, row=1, columnspan=6, sticky='nes')
+
+        self.fps_help_btn.grid(column=0, row=2, sticky='w')
+        self.fps_lbl.grid(column=1, row=2, sticky='w')
+        self.fps_min_lbl.grid(column=2, row=2, sticky='w')
+        self.fps_min_entry.grid(column=3, row=2, sticky='nes')
+        self.fps_max_lbl.grid(column=4, row=2, sticky='w')
+        self.fps_max_entry.grid(column=5, row=2, sticky='nes')
+        self.fps_disable_cbox.grid(column=6, row=2, sticky='nes')
+
+        self.res_w_help_btn.grid(column=0, row=3, sticky='w')
+        self.res_w_lbl.grid(column=1, row=3, sticky='w')
+        self.res_w_min_lbl.grid(column=2, row=3, sticky='w')
+        self.res_w_min_entry.grid(column=3, row=3, sticky='nes')
+        self.res_w_max_lbl.grid(column=4, row=3, sticky='w')
+        self.res_w_max_entry.grid(column=5, row=3, sticky='nes')
+        self.res_w_disable_cbox.grid(column=6, row=3, sticky='nes')
+
+        self.res_h_help_btn.grid(column=0, row=4, sticky='w')
+        self.res_h_lbl.grid(column=1, row=4, sticky='w')
+        self.res_h_min_lbl.grid(column=2, row=4, sticky='w')
+        self.res_h_min_entry.grid(column=3, row=4, sticky='nes')
+        self.res_h_max_lbl.grid(column=4, row=4, sticky='w')
+        self.res_h_max_entry.grid(column=5, row=4, sticky='nes')
+        self.res_h_disable_cbox.grid(column=6, row=4, sticky='nes')
+
+        self.quality_help_btn.grid(column=0, row=5, sticky='w')
+        self.quality_lbl.grid(column=1, row=5, sticky='w')
+        self.quality_min_lbl.grid(column=2, row=5, sticky='w')
+        self.quality_min_entry.grid(column=3, row=5, sticky='nes')
+        self.quality_max_lbl.grid(column=4, row=5, sticky='w')
+        self.quality_max_entry.grid(column=5, row=5, sticky='nes')
+        self.quality_disable_cbox.grid(column=6, row=5, sticky='nes')
+
+        self.color_help_btn.grid(column=0, row=6, sticky='w')
+        self.color_lbl.grid(column=1, row=6, sticky='w')
+        self.color_min_lbl.grid(column=2, row=6, sticky='w')
+        self.color_min_entry.grid(column=3, row=6, sticky='nes')
+        self.color_max_lbl.grid(column=4, row=6, sticky='w')
+        self.color_max_entry.grid(column=5, row=6, sticky='nes')
+        self.color_disable_cbox.grid(column=6, row=6, sticky='nes')
+
+        self.duration_help_btn.grid(column=0, row=7, sticky='w')
+        self.duration_lbl.grid(column=1, row=7, sticky='w')
+        self.duration_min_lbl.grid(column=2, row=7, sticky='w')
+        self.duration_min_entry.grid(column=3, row=7, sticky='nes')
+        self.duration_max_lbl.grid(column=4, row=7, sticky='w')
+        self.duration_max_entry.grid(column=5, row=7, sticky='nes')
+        self.duration_disable_cbox.grid(column=6, row=7, sticky='nes')
+
+        self.size_help_btn.grid(column=0, row=8, sticky='w')
+        self.size_lbl.grid(column=1, row=8, sticky='w')
+        self.img_size_max_lbl.grid(column=2, row=8, sticky='w')
+        self.img_size_max_entry.grid(column=3, row=8, sticky='nes')
+        self.vid_size_max_lbl.grid(column=4, row=8, sticky='w')
+        self.vid_size_max_entry.grid(column=5, row=8, sticky='nes')
+        self.size_disable_cbox.grid(column=6, row=8, sticky='nes')
+
+        self.format_help_btn.grid(column=0, row=9, sticky='w')
+        self.format_lbl.grid(column=1, row=9, sticky='w')
+        self.img_format_lbl.grid(column=2, row=9, sticky='w')
+        self.img_format_entry.grid(column=3, row=9, sticky='nes')
+        self.vid_format_lbl.grid(column=4, row=9, sticky='w')
+        self.vid_format_entry.grid(column=5, row=9, sticky='nes')
+
+        self.fake_vid_help_btn.grid(column=0, row=10, sticky='w')
+        self.fake_vid_cbox.grid(column=1, row=10, columnspan=6, sticky='w')
+
+        self.default_emoji_help_btn.grid(column=0, row=11, sticky='w')
+        self.default_emoji_lbl.grid(column=1, row=11, sticky='w')
+        self.default_emoji_entry.grid(column=2, row=11, columnspan=5, sticky='nes')
+
+        self.steps_help_btn.grid(column=0, row=12, sticky='w')
+        self.steps_lbl.grid(column=1, row=12, sticky='w')
+        self.steps_entry.grid(column=2, row=12, columnspan=5, sticky='nes')
+
+        self.processes_help_btn.grid(column=0, row=13, sticky='w')
+        self.processes_lbl.grid(column=1, row=13, sticky='w')
+        self.processes_entry.grid(column=2, row=13, columnspan=5, sticky='nes')
 
         # Output frame
         self.output_options_lbl = Label(self.frame_output, text='Output options', width=15, justify='left', anchor='w')
@@ -375,24 +478,95 @@ class GUI:
         selection = self.comp_preset_var.get()
         self.fps_min_var.set(self.presets_dict[selection]['fps_min'])
         self.fps_max_var.set(self.presets_dict[selection]['fps_max'])
-        self.res_min_var.set(self.presets_dict[selection]['res_min'])
-        self.res_max_var.set(self.presets_dict[selection]['res_max'])
+        self.res_w_min_var.set(self.presets_dict[selection]['res_w_min'])
+        self.res_w_max_var.set(self.presets_dict[selection]['res_w_max'])
+        self.res_h_min_var.set(self.presets_dict[selection]['res_h_min'])
+        self.res_h_max_var.set(self.presets_dict[selection]['res_h_max'])
         self.quality_min_var.set(self.presets_dict[selection]['quality_min'])
         self.quality_max_var.set(self.presets_dict[selection]['quality_max'])
         self.color_min_var.set(self.presets_dict[selection]['color_min'])
         self.color_max_var.set(self.presets_dict[selection]['color_max'])
+        self.duration_min_var.set(self.presets_dict[selection]['duration_min'])
+        self.duration_max_var.set(self.presets_dict[selection]['duration_max'])
         self.img_size_max_var.set(self.presets_dict[selection]['img_size_max'])
         self.vid_size_max_var.set(self.presets_dict[selection]['vid_size_max'])
         self.img_format_var.set(self.presets_dict[selection]['img_format'])
         self.vid_format_var.set(self.presets_dict[selection]['vid_format'])
+        self.fake_vid_var.set(self.presets_dict[selection]['fake_vid'])
         self.default_emoji_var.set(self.presets_dict[selection]['default_emoji'])
         self.steps_var.set(self.presets_dict[selection]['steps'])
     
     def callback_nocompress(self, *args):
         if self.no_compress_var.get() == True:
-            self.disable_inputs_comp()
+            self.set_inputs_comp(False)
         else:
-            self.enable_inputs_comp()
+            self.set_inputs_comp(True)
+    
+    def callback_disable_fps(self, *args):
+        if self.fps_disable_var.get() == True:
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.fps_min_entry.config(state=state)
+        self.fps_max_entry.config(state=state)
+
+    def callback_disable_res_w(self, *args):
+        if self.res_w_disable_var.get() == True:
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.res_w_min_entry.config(state=state)
+        self.res_w_max_entry.config(state=state)
+
+    def callback_disable_res_h(self, *args):
+        if self.res_h_disable_var.get() == True:
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.res_h_min_entry.config(state=state)
+        self.res_h_max_entry.config(state=state)
+
+    def callback_disable_quality(self, *args):
+        if self.quality_disable_var.get() == True:
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.quality_min_entry.config(state=state)
+        self.quality_max_entry.config(state=state)
+
+    def callback_disable_color(self, *args):
+        if self.color_disable_var.get() == True:
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.color_min_entry.config(state=state)
+        self.color_max_entry.config(state=state)
+
+    def callback_disable_duration(self, *args):
+        if self.duration_disable_var.get() == True:
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.duration_min_entry.config(state=state)
+        self.duration_max_entry.config(state=state)
+
+    def callback_disable_size(self, *args):
+        if self.size_disable_var.get() == True:
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.img_size_max_entry.config(state=state)
+        self.vid_size_max_entry.config(state=state)
+
+    def callback_compress_help(self, message='', *args):
+        messagebox.showinfo(title='sticker-convert', message=message)
         
     def callback_update_progress_bar(self, *args):
         self.progress_bar['value'] += 100 / self.items
@@ -411,7 +585,7 @@ class GUI:
 
     def start_process(self):
         self.save_creds()
-        self.disable_inputs()
+        self.set_inputs(False)
         # self.stop_btn.config(state='normal')
         self.start_btn.config(state='disabled')
 
@@ -425,23 +599,45 @@ class GUI:
             output_dir = self.output_setdir_var.get()
 
             no_compress = self.no_compress_var.get()
-            vid_size_max = self.vid_size_max_var.get()
-            img_size_max = self.img_size_max_var.get()
+
+            size_disable = self.size_disable_var.get()
+            vid_size_max = int(self.vid_size_max_var.get()) if not size_disable else None
+            img_size_max = int(self.img_size_max_var.get()) if not size_disable else None
+
             vid_format = self.vid_format_var.get()
             img_format = self.img_format_var.get()
-            fps_min = self.fps_min_var.get()
-            fps_max = self.fps_max_var.get()
-            res_min = self.res_min_var.get()
-            res_max = self.res_max_var.get()
-            quality_max = self.quality_max_var.get()
-            quality_min = self.quality_min_var.get()
-            color_min = self.color_min_var.get()
-            color_max = self.color_max_var.get()
-            steps = self.steps_var.get()
+
+            fake_vid = self.fake_vid_var.get()
+
+            fps_disable = self.fps_disable_var.get()
+            fps_min = int(self.fps_min_var.get()) if not fps_disable else None
+            fps_max = int(self.fps_max_var.get()) if not fps_disable else None
+
+            res_w_disable = self.res_w_disable_var.get()
+            res_w_min = int(self.res_w_min_var.get()) if not res_w_disable else None
+            res_w_max = int(self.res_w_max_var.get()) if not res_w_disable else None
+
+            res_h_disable = self.res_h_disable_var.get()
+            res_h_min = int(self.res_h_min_var.get()) if not res_h_disable else None
+            res_h_max = int(self.res_h_max_var.get()) if not res_h_disable else None
+
+            quality_disable = self.quality_disable_var.get()
+            quality_max = int(self.quality_max_var.get()) if not quality_disable else None
+            quality_min = int(self.quality_min_var.get()) if not quality_disable else None
+
+            color_disable = self.color_disable_var.get()
+            color_min = int(self.color_min_var.get()) if not color_disable else None
+            color_max = int(self.color_max_var.get()) if not color_disable else None
+
+            duration_disable = self.duration_disable_var.get()
+            duration_min = self.duration_min_var.get() if not duration_disable else None
+            duration_max = self.duration_max_var.get() if not duration_disable else None
+
+            steps = int(self.steps_var.get())
             default_emoji = self.default_emoji_var.get()
             title = self.title_var.get()
             author = self.author_var.get()
-            processes = self.processes_var.get()
+            processes = int(self.processes_var.get())
 
             signal_uuid = self.signal_uuid_var.get()
             signal_password = self.signal_password_var.get()
@@ -531,6 +727,9 @@ class GUI:
             DownloadTelegram.download_stickers_telegram(url, out_dir=input_dir, token=telegram_token)
         elif input_option == self.input_options['kakao']:
             DownloadKakao.download_stickers_kakao(url, out_dir=input_dir)
+        
+        if fake_vid:
+            img_format = vid_format
 
         # Compress
         if vid_format == '.png' or vid_format == '.apng':
@@ -558,7 +757,7 @@ class GUI:
 
                 out_f = os.path.join(output_dir, os.path.splitext(i)[0] + format)
                 
-                pool.apply_async(StickerConvert.convert_and_compress_to_size, kwds={'in_f': in_f, 'out_f': out_f, 'vid_size_max': vid_size_max, 'img_size_max': img_size_max, 'res_max': res_max, 'res_min': res_min, 'quality_max': quality_max, 'quality_min': quality_min, 'fps_max': fps_max, 'fps_min': fps_min, 'color_min': color_min, 'color_max': color_max, 'steps': steps}, callback=self.callback_update_progress_bar)
+                pool.apply_async(StickerConvert.convert_and_compress_to_size, kwds={'in_f': in_f, 'out_f': out_f, 'vid_size_max': vid_size_max, 'img_size_max': img_size_max, 'res_w_min': res_w_min, 'res_w_max': res_w_max, 'res_h_min': res_h_min, 'res_h_max': res_h_max, 'quality_max': quality_max, 'quality_min': quality_min, 'fps_max': fps_max, 'fps_min': fps_min, 'color_min': color_min, 'color_max': color_max, 'duration_min': duration_min, 'duration_max': duration_max, 'fake_vid': fake_vid, 'steps': steps}, callback=self.callback_update_progress_bar)
 
             pool.close()
             pool.join()
@@ -570,11 +769,11 @@ class GUI:
         self.progress_bar.start(50)
         urls = []
         if output_option == self.output_options['whatsapp']:
-            CompressWastickers.compress_wastickers(in_dir=output_dir, out_dir=output_dir, author=author, title=title, res_max=res_max, res_min=res_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, steps=steps, default_emoji=default_emoji)
+            CompressWastickers.compress_wastickers(in_dir=output_dir, out_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         elif output_option == self.output_options['signal']:
-            urls += UploadSignal.upload_stickers_signal(uuid=signal_uuid, password=signal_password, in_dir=output_dir, author=author, title=title, res_max=res_max, res_min=res_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, steps=steps, default_emoji=default_emoji)
+            urls += UploadSignal.upload_stickers_signal(uuid=signal_uuid, password=signal_password, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         elif output_option == self.output_options['telegram']:
-            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=output_dir, author=author, title=title, res_max=res_max, res_min=res_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, steps=steps, default_emoji=default_emoji)
+            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         
         if urls != []:
             urls_str = 'All done. Stickers uploaded to:\n' + '\n'.join(urls)
@@ -586,79 +785,74 @@ class GUI:
     
     def stop(self):
         self.progress_bar.stop()
-        self.enable_inputs()
+        self.set_inputs(True)
         # self.stop_btn.config(state='disabled')
         self.start_btn.config(state='normal')
     
-    def disable_inputs_comp(self):
-        self.comp_preset_opt.config(state='disabled')
-        self.fps_min_entry.config(state='disabled')
-        self.fps_max_entry.config(state='disabled')
-        self.res_min_entry.config(state='disabled')
-        self.res_max_entry.config(state='disabled')
-        self.quality_min_entry.config(state='disabled')
-        self.quality_max_entry.config(state='disabled')
-        self.color_min_entry.config(state='disabled')
-        self.color_max_entry.config(state='disabled')
-        self.img_size_max_entry.config(state='disabled')
-        self.vid_size_max_entry.config(state='disabled')
-        self.img_format_entry.config(state='disabled')
-        self.vid_format_entry.config(state='disabled')
-        self.default_emoji_entry.config(state='disabled')
-        self.steps_entry.config(state='disabled')
-        self.processes_entry.config(state='disabled')
+    def set_inputs_comp(self, state_bool: bool):
+        if state_bool:
+            state = 'normal'
+            self.callback_disable_fps()
+            self.callback_disable_res_w()
+            self.callback_disable_res_h()
+            self.callback_disable_quality()
+            self.callback_disable_color()
+            self.callback_disable_duration()
+            self.callback_disable_size()
+        else:
+            state = 'disabled'
+            self.fps_min_entry.config(state=state)
+            self.fps_max_entry.config(state=state)
+            self.res_w_min_entry.config(state=state)
+            self.res_w_max_entry.config(state=state)
+            self.res_h_min_entry.config(state=state)
+            self.res_h_max_entry.config(state=state)
+            self.color_min_entry.config(state=state)
+            self.color_max_entry.config(state=state)
+            self.quality_min_entry.config(state=state)
+            self.quality_max_entry.config(state=state)
+            self.duration_min_entry.config(state=state)
+            self.duration_max_entry.config(state=state)
+            self.img_size_max_entry.config(state=state)
+            self.vid_size_max_entry.config(state=state)
 
-    def disable_inputs(self):
-        self.input_option_opt.config(state='disabled')
-        self.input_address_entry.config(state='disabled')
-        self.input_setdir_entry.config(state='disabled')
-        self.input_setdir_btn.config(state='disabled')
-        self.no_compress_cbox.config(state='disabled')
-        self.disable_inputs_comp()
-        self.title_entry.config(state='disabled')
-        self.author_entry.config(state='disabled')
-        self.output_options_opt.config(state='disabled')
-        self.output_setdir_entry.config(state='disabled')
-        self.output_setdir_btn.config(state='disabled')
-        self.signal_uuid_entry.config(state='disabled')
-        self.signal_password_entry.config(state='disabled')
-        self.telegram_token_entry.config(state='disabled')
-        self.telegram_userid_entry.config(state='disabled')
+        self.comp_preset_opt.config(state=state)
+        self.fps_disable_cbox.config(state=state)
+        self.res_w_disable_cbox.config(state=state)
+        self.res_h_disable_cbox.config(state=state)
+        self.quality_disable_cbox.config(state=state)
+        self.color_disable_cbox.config(state=state)
+        self.duration_disable_cbox.config(state=state)
+        self.size_disable_cbox.config(state=state)
+        self.img_format_entry.config(state=state)
+        self.vid_format_entry.config(state=state)
+        self.fake_vid_cbox.config(state=state)
+        self.default_emoji_entry.config(state=state)
+        self.steps_entry.config(state=state)
+        self.processes_entry.config(state=state)
 
-    def enable_inputs_comp(self):
-        self.comp_preset_opt.config(state='normal')
-        self.fps_min_entry.config(state='normal')
-        self.fps_max_entry.config(state='normal')
-        self.res_min_entry.config(state='normal')
-        self.res_max_entry.config(state='normal')
-        self.quality_min_entry.config(state='normal')
-        self.quality_max_entry.config(state='normal')
-        self.color_min_entry.config(state='normal')
-        self.color_max_entry.config(state='normal')
-        self.img_size_max_entry.config(state='normal')
-        self.vid_size_max_entry.config(state='normal')
-        self.img_format_entry.config(state='normal')
-        self.vid_format_entry.config(state='normal')
-        self.default_emoji_entry.config(state='normal')
-        self.steps_entry.config(state='normal')
-        self.processes_entry.config(state='normal')
+    def set_inputs(self, state_bool: bool):
+        if state_bool:
+            state = 'normal'
+        else:
+            state = 'disabled'
 
-    def enable_inputs(self):
-        self.input_option_opt.config(state='normal')
-        self.input_address_entry.config(state='normal')
-        self.input_setdir_entry.config(state='normal')
-        self.input_setdir_btn.config(state='normal')
-        self.no_compress_cbox.config(state='normal')
-        self.enable_inputs_comp()
-        self.title_entry.config(state='normal')
-        self.author_entry.config(state='normal')
-        self.output_options_opt.config(state='normal')
-        self.output_setdir_entry.config(state='normal')
-        self.output_setdir_btn.config(state='normal')
-        self.signal_uuid_entry.config(state='normal')
-        self.signal_password_entry.config(state='normal')
-        self.telegram_token_entry.config(state='normal')
-        self.telegram_userid_entry.config(state='normal')
+        self.input_option_opt.config(state=state)
+        self.input_address_entry.config(state=state)
+        self.input_setdir_entry.config(state=state)
+        self.input_setdir_btn.config(state=state)
+        self.no_compress_cbox.config(state=state)
+        self.set_inputs_comp(state_bool)
+        self.title_entry.config(state=state)
+        self.author_entry.config(state=state)
+        self.output_options_opt.config(state=state)
+        self.output_setdir_entry.config(state=state)
+        self.output_setdir_btn.config(state=state)
+        self.signal_uuid_entry.config(state=state)
+        self.signal_password_entry.config(state=state)
+        self.telegram_token_entry.config(state=state)
+        self.telegram_userid_entry.config(state=state)
 
-        self.callback_input_option()
-        self.callback_nocompress()
+        if state_bool:
+            self.callback_input_option()
+            self.callback_nocompress()

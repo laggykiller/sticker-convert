@@ -53,22 +53,29 @@ class CLI:
         parser.add_argument('--export-telegram', dest='export_telegram', action='store_true', help='Upload to telegram')
 
         parser.add_argument('--no-compress', dest='no_compress', action='store_true', help='Do not compress files. Useful for only downloading stickers')
-        parser.add_argument('--preset', dest='preset', default='custom', choices=presets_dict.keys(), help='Use preset')
+        parser.add_argument('--preset', dest='preset', default='custom', choices=presets_dict.keys(), help='Apply preset for compression')
         parser.add_argument('--fps-min', dest='fps_min', type=int, default=None, help='Set minimum output fps')
         parser.add_argument('--fps-max', dest='fps_max', type=int, default=None, help='Set maximum output fps')
-        parser.add_argument('--res-min', dest='res_min', type=int, default=None, help='Set minimum output resolution')
-        parser.add_argument('--res-max', dest='res_max', type=int, default=None, help='Set maximum output resolution')
+        parser.add_argument('--res-min', dest='res_min', type=int, default=None, help='Set minimum output resolution (width and height)')
+        parser.add_argument('--res-max', dest='res_max', type=int, default=None, help='Set maximum output resolution (width and height)')
+        parser.add_argument('--res-w-min', dest='res_w_min', type=int, default=None, help='Set minimum output resolution (width)')
+        parser.add_argument('--res-w-max', dest='res_w_max', type=int, default=None, help='Set maximum output resolution (width)')
+        parser.add_argument('--res-h-min', dest='res_h_min', type=int, default=None, help='Set minimum output resolution (height)')
+        parser.add_argument('--res-h-max', dest='res_h_max', type=int, default=None, help='Set maximum output resolution (height)')
         parser.add_argument('--quality-min', dest='quality_min', type=int, default=None, help='Set minimum quality')
         parser.add_argument('--quality-max', dest='quality_max', type=int, default=None, help='Set maximum quality')
-        parser.add_argument('--color-min', dest='color_min', type=int, default=None, help='Set minimum number of colors (For converting to apng)')
-        parser.add_argument('--color-max', dest='color_max', type=int, default=None, help='Set maximum number of colors (For converting to apng)')
+        parser.add_argument('--color-min', dest='color_min', type=int, default=None, help='Set minimum number of colors (For converting to apng). >256 will disable it.')
+        parser.add_argument('--color-max', dest='color_max', type=int, default=None, help='Set maximum number of colors (For converting to apng). >256 will disable it.')
+        parser.add_argument('--duration-min', dest='duration', type=int, default=None, help='Set minimum output duration in miliseconds. Will change play speed if source is longer than duration. 0 will disable limit.')
+        parser.add_argument('--duration-max', dest='duration', type=int, default=None, help='Set maximum output duration in miliseconds. Will change play speed if source is longer than duration. 0 will disable limit.')
         parser.add_argument('--steps', dest='steps', type=int, default=None, help='Set number of divisions between min and max settings. Higher value is slower but yields file more closer to the specified file size limit')
         parser.add_argument('--vid-size-max', dest='vid_size_max', type=int, default=None, help='Set maximum file size limit for animated stickers')
         parser.add_argument('--img-size-max', dest='img_size_max', type=int, default=None, help='Set maximum file size limit for static stickers')
         parser.add_argument('--vid-format', dest='vid_format', default=None, help='Set file format if input is a animated')
         parser.add_argument('--img-format', dest='img_format', default=None, help='Set file format if input is a static image')
+        parser.add_argument('--fake-vid', dest='fake_vid', action='store_true', help='Convert (faking) image to video. Useful if (1) Size limit for video is larger than image; (2) Mix image and video into same pack')
         parser.add_argument('--default-emoji', dest='default_emoji', default=presets_dict['custom']['default_emoji'], help='Set the default emoji for uploading signal and telegram sticker packs')
-        parser.add_argument('--processes', dest='processes', type=int, help='Set number of processes. Default to cpus in system')
+        parser.add_argument('--processes', dest='processes', type=int, help='Set number of processes. Default to number of logical processors in system')
 
         parser.add_argument('--author', dest='author', default='Me', help='Set author of created sticker pack')
         parser.add_argument('--title', dest='title', default='My sticker pack', help='Set name of created sticker pack')
@@ -108,22 +115,39 @@ class CLI:
                 json.dump(creds, f, indent=4)
             print('Saved credentials to creds.json')
         
-        if os.path.isdir(args.input_dir) == False:
+        input_dir = args.input_dir
+        if os.path.isdir(input_dir) == False:
             print('Warning: Cannot find the specified input directory. Creating for you...')
-            os.makedirs(args.input_dir)
-        if os.path.isdir(args.output_dir) == False:
+            os.makedirs(input_dir)
+
+        output_dir = args.output_dir
+        if os.path.isdir(output_dir) == False:
             print('Info: Cannot find the specified output directory. Creating for you...')
-            os.makedirs(args.output_dir)
+            os.makedirs(output_dir)
+        
+        download_signal = args.download_signal
+        download_line = args.download_line
+        download_telegram = args.download_telegram
+        download_kakao = args.download_kakao
+
+        export_wastickers = args.export_wastickers
+        export_signal = args.export_signal
+        export_telegram = args.export_telegram
+
+        no_compress = args.no_compress
+        no_confirm = args.no_confirm
         
         # Check if input and ouput directories have files and prompt for deletion
         # It is possible to help the user to delete files but this is dangerous
-        if (args.download_signal or args.download_line or args.download_telegram or args.download_kakao) and args.no_compress == False and os.listdir(args.input_dir) != []:
+        
+
+        if (download_signal or download_line or download_telegram or download_kakao) and no_compress == False and os.listdir(input_dir) != []:
             print('Input directory is not empty (e.g. Files from previous run?)')
-            print(f'Input directory is set to {args.input_dir}')
+            print(f'Input directory is set to {input_dir}')
             print('You may continue at risk of contaminating the resulting sticker pack')
             print()
 
-            if args.no_confirm:
+            if no_confirm:
                 print('"--no-confirm" flag is set. Continue with this run without asking questions')
             else:
                 print('If you do not want to get asked by this question, add "--no-confirm" flag')
@@ -133,14 +157,14 @@ class CLI:
                     print('Cancelled this run')
                     return
 
-        if (args.export_wastickers or args.export_signal or args.export_telegram) and args.no_compress == False and os.listdir(args.output_dir) != []:
+        if (export_wastickers or export_signal or export_telegram) and no_compress == False and os.listdir(output_dir) != []:
             print('Output directory is not empty (e.g. Files from previous run?)')
-            print(f'Output directory is set to {args.output_dir}')
+            print(f'Output directory is set to {output_dir}')
             print('Hint: If you just want to upload files that you had compressed before, please choose "n" and add "--no-compress" flag')
             print('You may continue at risk of contaminating the resulting sticker pack')
             print()
 
-            if args.no_confirm:
+            if no_confirm:
                 print('"--no-confirm" flag is set. Continue with this run without asking questions')
             else:
                 print('If you do not want to get asked by this question, add "--no-confirm" flag')
@@ -152,50 +176,72 @@ class CLI:
         
         processes = args.processes if args.processes else multiprocessing.cpu_count()
         
-        if args.preset == 'custom':
-            if sum((args.export_wastickers, args.export_signal, args.export_telegram)) > 1:
+        preset = args.preset
+        if preset == 'custom':
+            if sum((export_wastickers, export_signal, export_telegram)) > 1:
                 # Let the verify functions in export do the compression
-                args.no_compress = True
-            elif args.export_wastickers:
-                args.preset = 'whatsapp'
-            elif args.export_signal:
-                args.preset = 'signal'
-            elif args.export_telegram:
-                args.preset = 'telegram'
+                no_compress = True
+            elif export_wastickers:
+                preset = 'whatsapp'
+            elif export_signal:
+                preset = 'signal'
+            elif export_telegram:
+                preset = 'telegram'
 
-        vid_size_max = presets_dict[args.preset]['vid_size_max'] if args.vid_size_max == None else args.vid_size_max
-        img_size_max = presets_dict[args.preset]['img_size_max'] if args.img_size_max == None else args.img_size_max
-        vid_format = presets_dict[args.preset]['vid_format'] if args.vid_format == None else args.vid_format
-        img_format = presets_dict[args.preset]['img_format'] if args.img_format == None else args.img_format
-        fps_min = presets_dict[args.preset]['fps_min'] if args.fps_min == None else args.fps_min
-        fps_max = presets_dict[args.preset]['fps_max'] if args.fps_max == None else args.fps_max
-        res_min = presets_dict[args.preset]['res_min'] if args.res_min == None else args.res_min
-        res_max = presets_dict[args.preset]['res_max'] if args.res_max == None else args.res_max
-        quality_max = presets_dict[args.preset]['quality_max'] if args.quality_max == None else args.quality_max
-        quality_min = presets_dict[args.preset]['quality_min'] if args.quality_min == None else args.quality_min
-        color_min = presets_dict[args.preset]['color_min'] if args.color_min == None else args.color_min
-        color_max = presets_dict[args.preset]['color_max'] if args.color_max == None else args.color_max
-        steps = presets_dict[args.preset]['steps'] if args.steps == None else args.steps
+        vid_size_max = presets_dict[preset]['vid_size_max'] if args.vid_size_max == None else args.vid_size_max
+        img_size_max = presets_dict[preset]['img_size_max'] if args.img_size_max == None else args.img_size_max
+        vid_format = presets_dict[preset]['vid_format'] if args.vid_format == None else args.vid_format
+        img_format = presets_dict[preset]['img_format'] if args.img_format == None else args.img_format
+        fake_vid = presets_dict[preset]['fake_vid'] if args.fake_vid == None else args.fake_vid
+        fps_min = presets_dict[preset]['fps_min'] if args.fps_min == None else args.fps_min
+        fps_max = presets_dict[preset]['fps_max'] if args.fps_max == None else args.fps_max
+        if args.res_min:
+            res_w_min = args.res_min
+            res_h_min = args.res_min
+        else:
+            res_w_min = presets_dict[preset]['res_w_min'] if args.res_w_min == None else args.res_w_min
+            res_h_min = presets_dict[preset]['res_h_min'] if args.res_h_min == None else args.res_h_min
+
+        if args.res_max:
+            res_w_max = args.res_max
+            res_h_max = args.res_max
+        else:
+            res_w_max = presets_dict[preset]['res_w_max'] if args.res_w_max == None else args.res_w_max    
+            res_h_max = presets_dict[preset]['res_h_max'] if args.res_h_max == None else args.res_h_max
+        quality_max = presets_dict[preset]['quality_max'] if args.quality_max == None else args.quality_max
+        quality_min = presets_dict[preset]['quality_min'] if args.quality_min == None else args.quality_min
+        color_min = presets_dict[preset]['color_min'] if args.color_min == None else args.color_min
+        color_max = presets_dict[preset]['color_max'] if args.color_max == None else args.color_max
+        duration_min = presets_dict[preset]['duration_min'] if args.duration_min == None else args.duration_min
+        duration_max = presets_dict[preset]['duration_max'] if args.duration_max == None else args.duration_max
+        steps = presets_dict[preset]['steps'] if args.steps == None else args.steps
+
+        title = args.title
+        author = args.author
+        default_emoji = args.default_emoji
         
-        if args.download_signal:
-            DownloadSignal.download_stickers_signal(args.download_signal, out_dir=args.input_dir)
-        if args.download_line:
-            DownloadLine.download_stickers_line(args.download_line, out_dir=args.input_dir)
-        if args.download_telegram:
-            DownloadTelegram.download_stickers_telegram(args.download_telegram, out_dir=args.input_dir, token=telegram_token)
-        if args.download_kakao:
-            DownloadKakao.download_stickers_kakao(args.download_kakao, out_dir=args.input_dir)
+        if download_signal:
+            DownloadSignal.download_stickers_signal(download_signal, out_dir=input_dir)
+        if download_line:
+            DownloadLine.download_stickers_line(download_line, out_dir=input_dir)
+        if download_telegram:
+            DownloadTelegram.download_stickers_telegram(download_telegram, out_dir=input_dir, token=telegram_token)
+        if download_kakao:
+            DownloadKakao.download_stickers_kakao(download_kakao, out_dir=input_dir)
+        
+        if fake_vid:
+            img_format = vid_format
 
-        if args.no_compress == False:
+        if no_compress == False:
             if vid_format == '.png' or vid_format == '.apng':
                 print('Tips: Compressing .apng takes long time. Consider using another format or lowering "--steps"')
 
             pool = multiprocessing.Pool(processes=processes)
-            for i in os.listdir(args.input_dir):
-                in_f = os.path.join(args.input_dir, i)
+            for i in os.listdir(input_dir):
+                in_f = os.path.join(input_dir, i)
 
                 if CodecInfo.get_file_ext(i) == '.txt':
-                    shutil.copy(in_f, os.path.join(args.output_dir, i))
+                    shutil.copy(in_f, os.path.join(output_dir, i))
                     continue
 
                 if CodecInfo.is_anim(in_f):
@@ -203,20 +249,20 @@ class CLI:
                 else:
                     format = img_format
 
-                out_f = os.path.join(args.output_dir, os.path.splitext(i)[0] + format)
+                out_f = os.path.join(output_dir, os.path.splitext(i)[0] + format)
                 
-                pool.apply_async(StickerConvert.convert_and_compress_to_size, kwds={'in_f': in_f, 'out_f': out_f, 'vid_size_max': vid_size_max, 'img_size_max': img_size_max, 'res_max': res_max, 'res_min': res_min, 'quality_max': quality_max, 'quality_min': quality_min, 'fps_max': fps_max, 'fps_min': fps_min, 'color_min': color_min, 'color_max': color_max, 'steps': steps})
+                pool.apply_async(StickerConvert.convert_and_compress_to_size, kwds={'in_f': in_f, 'out_f': out_f, 'vid_size_max': vid_size_max, 'img_size_max': img_size_max, 'res_w_min': res_w_min, 'res_w_max': res_w_max, 'res_h_min': res_h_min, 'res_h_max': res_h_max, 'quality_max': quality_max, 'quality_min': quality_min, 'fps_max': fps_max, 'fps_min': fps_min, 'color_min': color_min, 'color_max': color_max, 'duration_min': duration_min, 'duration_max': duration_max, 'fake_vid': fake_vid, 'steps': steps})
 
             pool.close()
             pool.join()
 
         urls = []
-        if args.export_wastickers:
-            CompressWastickers.compress_wastickers(in_dir=args.output_dir, out_dir=args.output_dir, author=args.author, title=args.title, res_max=res_max, res_min=res_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, steps=steps, default_emoji=args.default_emoji)
-        if args.export_signal:
-            urls += UploadSignal.upload_stickers_signal(uuid=signal_uuid, password=signal_password, in_dir=args.output_dir, author=args.author, title=args.title, res_max=res_max, res_min=res_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, steps=steps, default_emoji=args.default_emoji)
-        if args.export_telegram:
-            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=args.output_dir, author=args.author, title=args.title, res_max=res_max, res_min=res_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, steps=steps, default_emoji=args.default_emoji)
+        if export_wastickers:
+            CompressWastickers.compress_wastickers(in_dir=output_dir, out_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
+        if export_signal:
+            urls += UploadSignal.upload_stickers_signal(uuid=signal_uuid, password=signal_password, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
+        if export_telegram:
+            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         
         if urls != []:
             print(urls)

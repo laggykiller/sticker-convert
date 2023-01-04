@@ -11,32 +11,37 @@ from utils.codec_info import CodecInfo
 import traceback
 import gzip
 import json
+import math
 
-lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
-lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4')
+# lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
+# lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4')
 
 class StickerConvert:
     @staticmethod
-    def convert(in_f, out_f, res=512, quality=90, fps=30, color=90):
+    def convert(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, color=90, duration_min=None, duration_max=None, fake_vid=False):
         '''
         Convert format with given res, quality, fps
         '''
-        convert_method = StickerConvert.get_convert_method(in_f, out_f)
+        convert_method = StickerConvert.get_convert_method(in_f, out_f, fake_vid=fake_vid)
 
-        convert_method(in_f, out_f, res=res, quality=quality, fps=fps, color=color)
+        convert_method(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, color=color, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
 
     @staticmethod
-    def convert_and_compress_to_size(in_f, out_f, vid_size_max=None, img_size_max=None, res_min=512, res_max=512, quality_max=90, quality_min=0, fps_max=30, fps_min=3, color_min=60, color_max=90, steps=20):
+    def convert_and_compress_to_size(in_f, out_f, vid_size_max=None, img_size_max=None, 
+        res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=90, quality_min=0, fps_max=30, fps_min=3, color_min=60, color_max=90, 
+        duration_min=None, duration_max=None, fake_vid=False, steps=20):
         '''
         Convert format with given res, quality, fps
         Try to reduce file size to below thresholds (vid_size_max and img_size_max) by adjusting res, quality, fps
         '''
-        convert_method = StickerConvert.get_convert_method(in_f, out_f)
+        convert_method = StickerConvert.get_convert_method(in_f, out_f, fake_vid=fake_vid)
         
-        return StickerConvert.compress_to_size(convert_method, in_f, out_f, vid_size_max=vid_size_max, img_size_max=img_size_max, res_min=res_min, res_max=res_max, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, steps=steps)
+        return StickerConvert.compress_to_size(convert_method, in_f, out_f, vid_size_max=vid_size_max, img_size_max=img_size_max, 
+            res_w_min=res_w_min, res_w_max=res_w_max, res_h_min=res_h_min, res_h_max=res_h_max, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, 
+            color_min=color_min, color_max=color_max, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid, steps=steps)
 
     @staticmethod
-    def get_convert_method(in_f, out_f):
+    def get_convert_method(in_f, out_f, fake_vid=False):
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
@@ -51,7 +56,7 @@ class StickerConvert:
 
             # webm should be handled by ffmpeg using vp9 codec
             # ImageMagick will remove transparency
-            if CodecInfo.is_anim(in_f) or in_f_ext == '.webm':
+            if fake_vid or CodecInfo.is_anim(in_f) or in_f_ext == '.webm':
                 if out_f_ext == '.png' or out_f_ext == '.apng':
                     return StickerConvert.convert_to_apng_anim
                 else:
@@ -60,7 +65,10 @@ class StickerConvert:
                 return StickerConvert.convert_generic_image
     
     @staticmethod
-    def compress_to_size(convert_method, in_f, out_f, vid_size_max=None, img_size_max=None, res_max=512, res_min=512, quality_max=90, quality_min=0, fps_max=30, fps_min=3, color_min=60, color_max=90, steps=20):
+    def compress_to_size(convert_method, in_f, out_f, vid_size_max=None, img_size_max=None, 
+        res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=90, quality_min=0, 
+        fps_max=30, fps_min=3, color_min=60, color_max=90, duration_min=None, duration_max=None, fake_vid=False, steps=20):
+        
         def get_step_value(max, min, step, steps):
             return round((max - min) * step / steps + min)
 
@@ -68,7 +76,8 @@ class StickerConvert:
             steps_list = []
             for step in range(steps, -1, -1):
                 steps_list.append((
-                    get_step_value(res_max, res_min, step, steps),
+                    get_step_value(res_w_max, res_w_min, step, steps),
+                    get_step_value(res_h_max, res_h_min, step, steps),
                     get_step_value(quality_max, quality_min, step, steps),
                     get_step_value(fps_max, fps_min, step, steps),
                     get_step_value(color_max, color_min, step, steps)
@@ -77,23 +86,29 @@ class StickerConvert:
             with tempfile.TemporaryDirectory() as tempdir:
                 step_lower = 0
                 step_upper = steps
-                step_current = round((step_lower + step_upper) / 2)
+
+                if vid_size_max == None and img_size_max == None:
+                    # No limit to size, create the best quality result
+                    step_current = 0
+                else:
+                    step_current = round((step_lower + step_upper) / 2)
+
                 while True:
                     param = steps_list[step_current]
 
                     tmp_f = os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f))
-                    print(f'Compressing {in_f} -> {out_f} res={param[0]}, quality={param[1]}, fps={param[2]}, color={param[3]}')
-                    convert_method(in_f, tmp_f, res=param[0], quality=param[1], fps=param[2], color=param[3])
-
-                    if vid_size_max == None and img_size_max == None:
-                        print('vid_size_max and/or img_size_max should be specified')
-                        return True
+                    print(f'Compressing {in_f} -> {out_f} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]}')
+                    convert_method(in_f, tmp_f, res_w=param[0], res_h=param[1], quality=param[2], fps=param[3], color=param[4], duration_min=duration_min, duraiton_max=duration_max, fake_vid=fake_vid)
                     
                     size = os.path.getsize(tmp_f)
                     if CodecInfo.is_anim(in_f):
                         size_max = vid_size_max
                     else:
                         size_max = img_size_max
+                    
+                    if size == None:
+                        shutil.move(os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f)), out_f)
+                        print(f'Compressed {in_f} -> {out_f} successfully (step {step_current})')
 
                     if size < size_max:
                         if step_upper - step_lower > 1:
@@ -123,7 +138,10 @@ class StickerConvert:
             print(e, tb)
 
     # @staticmethod
-    # def compress_to_size(convert_method, in_f, out_f, vid_size_max=None, img_size_max=None, res_max=512, res_min=512, quality_max=90, quality_min=0, fps_max=30, fps_min=3, color_min=60, color_max=90, steps=20):
+    # def compress_to_size(convert_method, in_f, out_f, vid_size_max=None, img_size_max=None, 
+    #     res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=90, quality_min=0, 
+    #     fps_max=30, fps_min=3, color_min=60, color_max=90, duration_min=None, duration_max=None, fake_vid=False, steps=20):
+
     #     def get_step_value(max, min, step, steps):
     #         return round((max - min) * step / steps + min)
 
@@ -131,7 +149,8 @@ class StickerConvert:
     #         steps_list = []
     #         for step in range(steps, -1, -1):
     #             steps_list.append((
-    #                 get_step_value(res_max, res_min, step, steps),
+    #                 get_step_value(res_w_max, res_w_min, step, steps),
+    #                 get_step_value(res_h_max, res_h_min, step, steps),
     #                 get_step_value(quality_max, quality_min, step, steps),
     #                 get_step_value(fps_max, fps_min, step, steps),
     #                 get_step_value(color_max, color_min, step, steps)
@@ -140,8 +159,8 @@ class StickerConvert:
     #         for param in steps_list:
     #             with tempfile.TemporaryDirectory() as tempdir:
     #                 tmp_f = os.path.join(tempdir, 'temp' + CodecInfo.get_file_ext(out_f))
-    #                 print(f'Compressing {in_f} -> {out_f} res={param[0]}, quality={param[1]}, fps={param[2]}, color={param[3]}')
-    #                 convert_method(in_f, tmp_f, res=param[0], quality=param[1], fps=param[2], color=param[3])
+    #                 print(f'Compressing {in_f} -> {out_f} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]}')
+    #                 convert_method(in_f, tmp_f, res_w=param[0], res_h=param[1], quality=param[2], fps=param[3], color=param[4], duration_min=duration_min, duraiton_max=duration_max, fake_vid=fake_vid)
 
     #                 if vid_size_max == None and img_size_max == None:
     #                     return True
@@ -154,7 +173,7 @@ class StickerConvert:
 
     #                 if size < size_max:
     #                     shutil.move(tmp_f, out_f)
-    #                     print(f'Compressed {in_f} -> {out_f} successfully with size {size} res={param[0]}, quality={param[1]}, fps={param[2]}, color={param[3]}')
+    #                     print(f'Compressed {in_f} -> {out_f} successfully with size {size} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]}')
     #                     return True
     #                 else:
     #                     print(f'Compressed {in_f} -> {out_f} but size {size} is larger than limit {size_max}, recompressing with lower quality')
@@ -168,58 +187,94 @@ class StickerConvert:
     #         print(e, tb)
 
     @staticmethod
-    def magick_crop(in_f, out_f, res):
+    def magick_crop(in_f, out_f, res_w, res_h):
         # https://stackoverflow.com/a/28503615
         # out_f: tiles_{0}.jpg
         if RunBin.get_bin('magick', silent=True) == None:
             with Image(filename=in_f) as img:
                 i = 0
-                for h in range(0, img.height, res):
-                    for w in range(0, img.width, res):
-                        w_end = w + res
-                        h_end = h + res
+                for h in range(0, img.height, res_h):
+                    for w in range(0, img.width, res_w):
+                        w_end = w + res_w
+                        h_end = h + res_h
                         with img[w:w_end, h:h_end] as chunk:
                             chunk.save(filename=out_f.format(str(i).zfill(3)))
                         i += 1
         else:
             out_f = out_f.replace('{0}', '%03d')
-            RunBin.run_cmd(['magick', in_f, '-crop', f'{res}x{res}', out_f])
+            RunBin.run_cmd(['magick', in_f, '-crop', f'{res_w}x{res_h}', out_f])
 
     @staticmethod
-    def convert_generic_image(in_f, out_f, res=None, quality=90, **kwargs):
+    def convert_generic_image(in_f, out_f, res_w=None, res_h=None, quality=90, color=None, **kwargs):
+        if RunBin.get_bin('magick', silent=True) == None:
+            StickerConvert.convert_generic_image_pymodule(in_f, out_f, res_w=res_w, res_h=res_h, quality=90)
+        else:
+            StickerConvert.convert_generic_image_subprocess(in_f, out_f, res_w=res_w, res_h=res_h, quality=90)
+        
+        if CodecInfo.get_file_ext(out_f) == '.png':
+            StickerConvert.png_optimize(out_f, out_f, quality=quality, color=color)
+    
+    @staticmethod
+    def convert_generic_image_pymodule(in_f, out_f, res_w=None, res_h=None, quality=90, **kwargs):
         # https://www.imagemagick.org/script/command-line-options.php#quality
         # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
         # For png, filter_type = quality % 10
         if CodecInfo.get_file_ext(out_f) == '.png':
             quality = 95
-
-        if RunBin.get_bin('magick', silent=True) == None:
-            with Image(filename=in_f) as img:
-                if res != None:
-                    img.resize(width=res, height=res)
-                    img.background_color = 'none'
-                    img.gravity = 'center'
-                    img.extent(width=res, height=res)
-                img.compression_quality = quality
-                img.save(filename=out_f)
+        
+        with Image(filename=in_f) as img:
+            if res_w and res_h:
+                img.resize(width=res_w, height=res_h)
+                img.background_color = 'none'
+                img.gravity = 'center'
+                img.extent(width=res_w, height=res_h)
+            img.compression_quality = quality
+            img.save(filename=out_f)
+    
+    @staticmethod
+    def convert_generic_image_subprocess(in_f, out_f, res_w=None, res_h=None, quality=90, **kwargs):
+        # https://www.imagemagick.org/script/command-line-options.php#quality
+        # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
+        # For png, filter_type = quality % 10
+        if CodecInfo.get_file_ext(out_f) == '.png':
+            quality = 95
+        
+        if res_w and res_h:
+            RunBin.run_cmd(['magick', in_f, '-resize', f'{res_w}x{res_h}', '-background', 'none', '-gravity', 'center', '-extent', f'{res_w}x{res_h}', '-quality', str(quality), out_f])
         else:
-            if res != None:
-                RunBin.run_cmd(['magick', in_f, '-resize', f'{res}x{res}', '-background', 'none', '-gravity', 'center', '-extent', f'{res}x{res}', '-quality', str(quality), out_f])
-            else:
-                RunBin.run_cmd(['magick', in_f, '-quality', str(quality), out_f])
+            RunBin.run_cmd(['magick', in_f, '-quality', str(quality), out_f])
 
     @staticmethod
-    def convert_generic_anim(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
+    def png_optimize(in_f, out_f, quality=90, color=None, **kwargs):
+        with tempfile.TemporaryDirectory() as tempdir:
+            tmp0_f = os.path.join(tempdir, 'tmp.png')
+            shutil.copy(in_f, tmp0_f)
+
+            tmp1_f = os.path.join(tempdir, 'tmp.1.png')
+            if color and color <= 256:
+                RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp0_f])
+            else:
+                shutil.move(tmp0_f, tmp1_f)
+
+            tmp2_f = os.path.join(tempdir, 'tmp.1.2.png')
+            RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp1_f])
+
+            RunBin.run_cmd(['optipng', '-o4', tmp2_f], silence=True)
+
+            shutil.move(tmp2_f, out_f)
+
+    @staticmethod
+    def convert_generic_anim(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, duration_min=None, duration_max=None, **kwargs):
         if shutil.which('ffmpeg'):
             # Faster
-            StickerConvert.convert_generic_anim_pymodule(in_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
+            StickerConvert.convert_generic_anim_pymodule(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in, duration_min=duration_min, duration_max=duration_max)
         else:
             # Slower (a bit) but at least it works
             # e.g. MacOS compiled version in system without ffmpeg
-            StickerConvert.convert_generic_anim_subprocess(in_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
+            StickerConvert.convert_generic_anim_subprocess(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in, duration_min=duration_min, duration_max=duration_max)
 
     @staticmethod
-    def convert_generic_anim_pymodule(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
+    def convert_generic_anim_pymodule(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, duration_min=None, duration_max=None, **kwargs):
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
@@ -238,18 +293,26 @@ class StickerConvert:
             stream = ffmpeg.input(in_f)
         if fps:
             stream = ffmpeg.filter(stream, 'fps', fps=fps, round='up')
-        if res:
+        if res_w and res_h:
             width, height = CodecInfo.get_file_res(in_f)
 
             # Resolution must be even number, or else error occur
-            # res = res + res % 2
-            # https://trac.ffmpeg.org/wiki/Scaling says can use -2 instead
+            res_w = res_w + res_w % 2
+            res_h = res_h + res_h % 2
+
             if width > height:
-                stream = ffmpeg.filter(stream, 'scale', res, -2, flags='neighbor', sws_dither='none')
+                stream = ffmpeg.filter(stream, 'scale', res_w, -1, flags='neighbor', sws_dither='none')
             else:
-                stream = ffmpeg.filter(stream, 'scale', -2, res, flags='neighbor', sws_dither='none')
-            stream = ffmpeg.filter(stream, 'pad', res, res, '(ow-iw)/2', '(ow-ih)/2', color='black@0')
+                stream = ffmpeg.filter(stream, 'scale', -1, res_h, flags='neighbor', sws_dither='none')
+            stream = ffmpeg.filter(stream, 'pad', res_w, res_h, '(ow-iw)/2', '(ow-ih)/2', color='black@0')
             stream = ffmpeg.filter(stream, 'setsar', 1)
+        if duration_min or duration_max:
+            duration_orig = CodecInfo.get_file_duration(in_f)
+            if duration_min > 0 and duration_orig < duration_min:
+                factor = math.floor(duration_min / duration_orig * 10) / 10 # Round to 1 decimal place
+            elif duration_max > 0 and duration_orig > duration_max:
+                factor = math.floor(duration_max / duration_orig * 10) / 10 # Round to 1 decimal place
+            stream = ffmpeg.filter(stream, 'setpts', f'{factor}*PTS')
         if out_f_ext == '.apng' or out_f_ext == '.png':
             stream = ffmpeg.output(stream, out_f, vcodec='apng', pix_fmt='rgba', quality=95, plays=0)
         elif out_f_ext == '.webp':
@@ -259,7 +322,7 @@ class StickerConvert:
         ffmpeg.run(stream, overwrite_output=True, quiet=True)
 
     @staticmethod
-    def convert_generic_anim_subprocess(in_f, out_f, res=512, quality=90, fps=30, fps_in=None, **kwargs):
+    def convert_generic_anim_subprocess(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, duration_min=None, duration_max=None, **kwargs):
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
@@ -283,19 +346,27 @@ class StickerConvert:
 
         if fps:
             cmd_list += ['-r', str(fps)]
-        if res:
+        if res_w and res_h:
             width, height = CodecInfo.get_file_res(in_f)
 
             # Resolution must be even number, or else error occur
-            # res = res + res % 2
-            # https://trac.ffmpeg.org/wiki/Scaling says can use -2 instead
-            if width > height:
-                cmd_list += ['-vf', f'scale={res}:-2:flags=neighbor:sws_dither=none']
-            else:
-                cmd_list += ['-vf', f'scale=-2:{res}:flags=neighbor:sws_dither=none']
+            res_w = res_w + res_w % 2
+            res_h = res_h + res_h % 2
 
-            cmd_list += ['-vf', f'pad={res}:{res}:(ow-iw)/2:(oh-ih)/2:color=black@0']
+            if width > height:
+                cmd_list += ['-vf', f'scale={res_w}:-1:flags=neighbor:sws_dither=none']
+            else:
+                cmd_list += ['-vf', f'scale=-1:{res_h}:flags=neighbor:sws_dither=none']
+
+            cmd_list += ['-vf', f'pad={res_w}:{res_h}:(ow-iw)/2:(oh-ih)/2:color=black@0']
             cmd_list += ['-vf', f'setsar=1']
+        if duration_min or duration_max:
+            duration_orig = CodecInfo.get_file_duration(in_f)
+            if duration_min and duration_orig < duration_min:
+                factor = math.floor(duration_min / duration_orig * 10) / 10 # Round to 1 decimal place
+            elif duration_min and duration_orig > duration_max:
+                factor = math.floor(duration_max / duration_orig * 10) / 10 # Round to 1 decimal place
+            cmd_list += ['-vf', f'setpts={factor}*PTS']
 
         if out_f_ext == '.apng' or out_f_ext == '.png':
             cmd_list += ['-vcodec', 'apng', '-pix_fmt', 'rgba', '-quality', '95', '-plays', '0', out_f]
@@ -303,41 +374,27 @@ class StickerConvert:
             cmd_list += ['-vcodec', 'webp', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', '-loop', '0', out_f]
         else:
             cmd_list += ['-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', out_f]
+
         # RunBin.run_cmd(cmd_list)
         RunBin.run_cmd(cmd_list, silence=False)
 
     @staticmethod
-    def convert_from_webp_anim(in_f, out_f, res=512, quality=90, fps=30, color=90, **kwargs):
+    def convert_from_webp_anim(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, color=90, duration_min=None, duration_max=None, fake_vid=False, **kwargs):
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
         with tempfile.TemporaryDirectory() as tempdir:
-            if CodecInfo.is_anim(in_f):
-                # ffmpeg do not support webp decoding (yet)
-                # Converting animated .webp to image of the frames or .webp directly can result in broken frames
-                # .mp4 does not like odd number of width / height
-                # Converting to .webm first is safe way of handling .webp
+            # ffmpeg do not support webp decoding (yet)
+            # Converting animated .webp to image of the frames or .webp directly can result in broken frames
+            # .mp4 does not like odd number of width / height
+            # Converting to .webm first is safe way of handling .webp
 
-                tmp_f = os.path.join(tempdir, 'tmp.webm')
-                StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality)
-                StickerConvert.convert(tmp_f, out_f, res=res, quality=quality, fps=fps)
-            else:
-                tmp_f = os.path.join(tempdir, f'tmp{out_f_ext}')
-                StickerConvert.convert_generic_image(in_f, tmp_f, res=res, quality=quality)
-                # Need more compression for .png
-                if CodecInfo.get_file_ext(out_f) == '.png':
-                    tmp1_f = os.path.join(tempdir, 'tmp.1.png')
-                    RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp_f])
-
-                    tmp2_f = os.path.join(tempdir, 'tmp.1.2.png')
-                    RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp1_f])
-                    
-                    shutil.move(tmp2_f, out_f)
-                else:
-                    shutil.move(tmp_f, out_f)
+            tmp_f = os.path.join(tempdir, 'tmp.webm')
+            StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality)
+            StickerConvert.convert(tmp_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, color=color, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
 
     @staticmethod
-    def convert_from_tgs(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
+    def convert_from_tgs(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, duration_min=None, duration_max=None, **kwargs):
         with tempfile.TemporaryDirectory() as tempdir:
             with gzip.open(in_f) as f:
                 file_json = json.loads(f.read().decode(encoding='utf-8'))
@@ -354,23 +411,20 @@ class StickerConvert:
             
             tmp2_f = os.path.join(tempdir, 'tmp-{0}.png')
 
-            StickerConvert.convert_generic_anim(tmp2_f, out_f, res=res, quality=quality, fps=fps, fps_in=fps_in)
+            StickerConvert.convert_generic_anim(tmp2_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in, duration_min=duration_min, duration_max=duration_max)
     
     @staticmethod
-    def convert_to_tgs(in_f, out_f, res=512, quality=90, fps=30, **kwargs):
+    def convert_to_tgs(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, duration_min=None, duration_max=None, **kwargs):
         in_f_ext = CodecInfo.get_file_ext(in_f)
 
         with tempfile.TemporaryDirectory() as tempdir1, tempfile.TemporaryDirectory() as tempdir2:
-            if in_f_ext not in lottie_in_ext_support:
-                tmp1_f = os.path.join(tempdir1, 'tmp1.webp')
-                StickerConvert.convert_generic_anim(in_f, tmp1_f, res=res, quality=quality, fps=fps)
-            else:
-                tmp1_f = in_f
+            tmp1_f = os.path.join(tempdir1, 'tmp1.webp')
+            StickerConvert.convert_generic_anim(in_f, tmp1_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, duration_min=duration_min, duration_max=duration_max)
 
             lottie_convert(tmp1_f, out_f, fps=fps)
     
     @staticmethod
-    def convert_to_apng_anim(in_f, out_f, res=512, quality=90, fps=30, color=90):
+    def convert_to_apng_anim(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, color=90, duration_min=None, duration_max=None, **kwargs):
         # Heavily based on https://github.com/teynav/signalApngSticker/blob/main/scripts_linux/script_v3/core-hybrid
 
         # ffmpeg: Changing apng quality does not affect final size
@@ -382,7 +436,7 @@ class StickerConvert:
             # Convert to uncompressed apng
             # https://stackoverflow.com/a/29378555
             tmp1_f = os.path.join(tempdir1, 'tmp1.apng')
-            StickerConvert.convert_generic_anim(in_f, tmp1_f, res=res, quality=100, fps=fps)
+            StickerConvert.convert_generic_anim(in_f, tmp1_f, res_w=res_w, res_h=res_h, quality=100, fps=fps, duration_min=duration_min, duration_max=duration_max)
 
             # apngdis convert to png strip
             tmp2_f = os.path.join(tempdir1, 'tmp1_strip.png')
@@ -399,7 +453,7 @@ class StickerConvert:
             # magick convert single png strip to png files
             # tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
             tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
-            StickerConvert.magick_crop(tmp4_f, tmp5_f, res)
+            StickerConvert.magick_crop(tmp4_f, tmp5_f, res_w, res_h)
             
             # optipng and magick convert optimize png files
             for i in os.listdir(tempdir2):
@@ -408,7 +462,7 @@ class StickerConvert:
                 # https://www.imagemagick.org/script/command-line-options.php#quality
                 # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
                 # For png, filter_type = quality % 10
-                StickerConvert.convert_generic_image(j, j, res=res, quality=95)
+                StickerConvert.convert_generic_image(j, j, res_w=res_w, res_h=res_h, quality=95)
             
             # apngasm create optimized apng
             RunBin.run_cmd(['apngasm', '-F', '-d', str(delay), '-o', out_f, f'{tempdir2}/*'])

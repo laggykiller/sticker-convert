@@ -29,7 +29,7 @@ class DownloadKakao:
 
         for url in pack_meta['result']['thumbnailUrls']:
             sticker_id = url.split('/')[-1]
-            out_path = os.path.join(out_dir, str(sticker_id) + '.png')
+            out_path = os.path.join(out_dir, str(sticker_id).zfill(3) + '.png')
             
             for i in range(3):
                 try:
