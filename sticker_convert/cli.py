@@ -8,6 +8,7 @@ from downloaders.download_kakao import DownloadKakao
 from uploaders.upload_signal import UploadSignal
 from uploaders.upload_telegram import UploadTelegram
 from uploaders.compress_wastickers import CompressWastickers
+from uploaders.xcode_imessage import XcodeImessage
 import json
 import shutil
 import multiprocessing
@@ -48,9 +49,10 @@ class CLI:
         parser.add_argument('--download-line', dest='download_line', help='Download line stickers from a URL / ID as input (e.g. https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)')
         parser.add_argument('--download-kakao', dest='download_kakao', help='Download kakao stickers from a URL / ID as input (e.g. https://e.kakao.com/t/xxxxx)')
 
-        parser.add_argument('--export-wastickers', dest='export_wastickers', action='store_true', help='Create a .wastickers file for uploading to whatsapp')
-        parser.add_argument('--export-signal', dest='export_signal', action='store_true', help='Upload to signal')
-        parser.add_argument('--export-telegram', dest='export_telegram', action='store_true', help='Upload to telegram')
+        parser.add_argument('--export-wastickers', dest='export_wastickers', action='store_true', help='Create a .wastickers file for uploading to WhatsApp')
+        parser.add_argument('--export-signal', dest='export_signal', action='store_true', help='Upload to Signal')
+        parser.add_argument('--export-telegram', dest='export_telegram', action='store_true', help='Upload to Telegram')
+        parser.add_argument('--export-imessage', dest='export_imessage', action='store_true', help='Create Xcode project for importing to iMessage')
 
         parser.add_argument('--no-compress', dest='no_compress', action='store_true', help='Do not compress files. Useful for only downloading stickers')
         parser.add_argument('--preset', dest='preset', default='custom', choices=presets_dict.keys(), help='Apply preset for compression')
@@ -133,6 +135,7 @@ class CLI:
         export_wastickers = args.export_wastickers
         export_signal = args.export_signal
         export_telegram = args.export_telegram
+        export_imessage = args.export_imessage
 
         no_compress = args.no_compress
         no_confirm = args.no_confirm
@@ -157,7 +160,7 @@ class CLI:
                     print('Cancelled this run')
                     return
 
-        if (export_wastickers or export_signal or export_telegram) and no_compress == False and os.listdir(output_dir) != []:
+        if (export_wastickers or export_signal or export_telegram or export_imessage) and no_compress == False and os.listdir(output_dir) != []:
             print('Output directory is not empty (e.g. Files from previous run?)')
             print(f'Output directory is set to {output_dir}')
             print('Hint: If you just want to upload files that you had compressed before, please choose "n" and add "--no-compress" flag')
@@ -178,7 +181,7 @@ class CLI:
         
         preset = args.preset
         if preset == 'custom':
-            if sum((export_wastickers, export_signal, export_telegram)) > 1:
+            if sum((export_wastickers, export_signal, export_telegram, export_imessage)) > 1:
                 # Let the verify functions in export do the compression
                 no_compress = True
             elif export_wastickers:
@@ -187,6 +190,8 @@ class CLI:
                 preset = 'signal'
             elif export_telegram:
                 preset = 'telegram'
+            elif export_imessage:
+                preset = 'imessage_small'
 
         vid_size_max = presets_dict[preset]['vid_size_max'] if args.vid_size_max == None else args.vid_size_max
         img_size_max = presets_dict[preset]['img_size_max'] if args.img_size_max == None else args.img_size_max
@@ -258,11 +263,13 @@ class CLI:
 
         urls = []
         if export_wastickers:
-            CompressWastickers.compress_wastickers(in_dir=output_dir, out_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
+            urls += CompressWastickers.compress_wastickers(in_dir=output_dir, out_dir=output_dir, author=author, title=title, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         if export_signal:
             urls += UploadSignal.upload_stickers_signal(uuid=signal_uuid, password=signal_password, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         if export_telegram:
-            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
+            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=output_dir, author=author, title=title, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
+        if export_imessage:
+            urls += XcodeImessage.create_imessage_xcode(in_dir=output_dir, out_dir=output_dir, author=author, title=title, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, steps=steps, default_emoji=default_emoji)
         
         if urls != []:
             print(urls)

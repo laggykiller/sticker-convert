@@ -14,6 +14,8 @@ def clean_dir(dir):
 class CompressWastickers:
     @staticmethod
     def compress_wastickers(in_dir, out_dir, author='Me', title='My sticker pack', quality_max=90, quality_min=0, fps_max=30, fps_min=3, color_min=0, color_max=90, fake_vid=True, steps=20, **kwargs):
+        urls = []
+        
         title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=title, author=author)
         # packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=30, separate_image_anim=True)
         packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=30, separate_image_anim=not fake_vid)
@@ -46,6 +48,11 @@ class CompressWastickers:
 
                 CompressWastickers.add_metadata(in_dir, tempdir, author, title)
                 CompressWastickers.compress(out_f, tempdir)
+
+            print(out_f)
+            urls.append(out_f)
+        
+        return urls
 
     @staticmethod
     def add_metadata(in_dir, tmp_dir, author, title):

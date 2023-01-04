@@ -3,7 +3,7 @@
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
 - With GUI and CLI that runs on Windows, MacOS and Linux
-- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only)
+- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), iMessage (Create Xcode sticker pack project)
 - Supports static and animated stickers, with transparency support
 
 ## Downloads
@@ -52,8 +52,7 @@
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - iMessage
     - Download: Not supported.
-    - Compression: Supported (Not tested).
-    - Upload: Not supported.
+    - Upload: The program can create Xcode project for iMessage sticker pack, which could then be compiled and sideloaded using Xcode.
 
 ## How to use (GUI)
 ![imgs/screenshot](imgs/screenshot.png)
@@ -76,7 +75,7 @@ To run in CLI mode, pass on any arguments
 usage: sticker-convert.exe [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
                            [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
                            [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
-                           [--export-signal] [--export-telegram] [--no-compress]
+                           [--export-signal] [--export-telegram] [--export-imessage] [--no-compress]
                            [--preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
                            [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
                            [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
@@ -106,9 +105,10 @@ options:
                         https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
   --download-kakao DOWNLOAD_KAKAO
                         Download kakao stickers from a URL / ID as input (e.g. https://e.kakao.com/t/xxxxx)
-  --export-wastickers   Create a .wastickers file for uploading to whatsapp
-  --export-signal       Upload to signal
-  --export-telegram     Upload to telegram
+  --export-wastickers   Create a .wastickers file for uploading to WhatsApp
+  --export-signal       Upload to Signal
+  --export-telegram     Upload to Telegram
+  --export-imessage     Create Xcode project for importing to iMessage
   --no-compress         Do not compress files. Useful for only downloading stickers
   --preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
                         Apply preset for compression

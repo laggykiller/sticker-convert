@@ -5,9 +5,18 @@ from utils.codec_info import CodecInfo
 class MetadataHandler:
     @staticmethod
     def get_stickers_present(dir):
+        from uploaders.xcode_imessage import XcodeImessage
+
         stickers_present = os.listdir(dir)
         if 'cover.png' in stickers_present:
             stickers_present.remove('cover.png')
+        for icon in XcodeImessage().iconset:
+            if icon in stickers_present:
+                stickers_present.remove(icon)
+        if '.DS_Store' in stickers_present:
+            stickers_present.remove('.DS_Store')
+        if '._.DS_Store' in stickers_present:
+            stickers_present.remove('._.DS_Store')
         stickers_present = [i for i in stickers_present if not i.endswith('.txt')]
 
         return stickers_present

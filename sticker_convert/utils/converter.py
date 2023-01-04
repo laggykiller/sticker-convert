@@ -257,7 +257,10 @@ class StickerConvert:
                 shutil.move(tmp0_f, tmp1_f)
 
             tmp2_f = os.path.join(tempdir, 'tmp.1.2.png')
-            RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp1_f])
+            if quality and quality < 100:
+                RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp1_f])
+            else:
+                shutil.move(tmp1_f, tmp2_f)
 
             RunBin.run_cmd(['optipng', '-o4', tmp2_f], silence=True)
 
@@ -456,11 +459,17 @@ class StickerConvert:
 
             # pngnq-s9 optimization
             tmp3_f = os.path.join(tempdir1, 'tmp1_strip.1.png')
-            RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp2_f])
+            if color and color <= 256:
+                RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp2_f])
+            else:
+                shutil.move(tmp2_f, tmp3_f)
 
             # pngquant optimization
             tmp4_f = os.path.join(tempdir1, 'tmp1_strip.1.2.png')
-            RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp3_f])
+            if quality and quality < 100:
+                RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp3_f])
+            else:
+                shutil.move(tmp3_f, tmp4_f)
 
             # magick convert single png strip to png files
             # tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')

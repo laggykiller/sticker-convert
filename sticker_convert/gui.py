@@ -16,6 +16,7 @@ from downloaders.download_kakao import DownloadKakao
 from uploaders.upload_signal import UploadSignal
 from uploaders.upload_telegram import UploadTelegram
 from uploaders.compress_wastickers import CompressWastickers
+from uploaders.xcode_imessage import XcodeImessage
 
 class GUI:
     default_input_mode = 'signal'
@@ -49,6 +50,7 @@ class GUI:
         'signal': 'Upload to Signal',
         'telegram': 'Upload to Telegram',
         'whatsapp': 'Compress to .wastickers (WhatsApp)',
+        'imessage': 'Create Xcode project (iMessage)',
         'local': 'Save to local directory only'
     }
 
@@ -683,6 +685,11 @@ class GUI:
             self.stop()
             return
         
+        if output_option == self.output_options['imessage'] and (title == '' or author == ''):
+            self.update_progress_box('Creating Xcode project (for iMessage) requires title and author')
+            self.stop()
+            return
+        
         if os.path.isdir(input_dir) == False:
             os.makedirs(input_dir)
         
@@ -769,12 +776,14 @@ class GUI:
         self.progress_bar.start(50)
         urls = []
         if output_option == self.output_options['whatsapp']:
-            CompressWastickers.compress_wastickers(in_dir=output_dir, out_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
+            urls += CompressWastickers.compress_wastickers(in_dir=output_dir, out_dir=output_dir, author=author, title=title, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         elif output_option == self.output_options['signal']:
             urls += UploadSignal.upload_stickers_signal(uuid=signal_uuid, password=signal_password, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
         elif output_option == self.output_options['telegram']:
-            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=output_dir, author=author, title=title, res_w_min=res_w_min, res_w_max=res_w_max, res_h_max=res_h_max, res_h_min=res_h_min, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
-        
+            urls += UploadTelegram.upload_stickers_telegram(token=telegram_token, user_id=telegram_userid, in_dir=output_dir, author=author, title=title, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, fake_vid=fake_vid, steps=steps, default_emoji=default_emoji)
+        elif output_option == self.output_options['imessage']:
+            urls += XcodeImessage.create_imessage_xcode(in_dir=output_dir, out_dir=output_dir, author=author, title=title, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, steps=steps, default_emoji=default_emoji)
+
         if urls != []:
             urls_str = 'All done. Stickers uploaded to:\n' + '\n'.join(urls)
             self.update_progress_box(urls_str)

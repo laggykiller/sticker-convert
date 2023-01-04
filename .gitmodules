@@ -1,0 +1,3 @@
+[submodule "sticker_convert/ios-message-stickers-template"]
+	path = sticker_convert/ios-message-stickers-template
+	url = https://github.com/NiklasPeterson/ios-message-stickers-template.git

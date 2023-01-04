@@ -71,8 +71,11 @@ class FormatVerify:
     
     @staticmethod
     def check_format(file, format=None):
-        if format != None and CodecInfo.get_file_ext(file) != format:
-            return False
+        if format != None:
+            if type(format) == str and CodecInfo.get_file_ext(file) != format:
+                return False
+            elif not ((type(format) == tuple or type(format) == list) and CodecInfo.get_file_ext(file) in format):
+                return False
         
         return True
     
