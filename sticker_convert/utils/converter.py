@@ -284,9 +284,9 @@ class StickerConvert:
             with tempfile.TemporaryDirectory() as tempdir:
                 tmp_f = os.path.join(tempdir, 'tmp-{0}.png')
                 StickerConvert.convert_generic_anim(in_f, tmp_f, fps=extraction_fps)
-                StickerConvert.convert_generic_anim(tmp_f, out_f, fps_in=fps)
+                StickerConvert.convert_generic_anim(tmp_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps_in=fps)
 
-        if shutil.which('ffmpeg'):
+        elif shutil.which('ffmpeg'):
             # Faster
             StickerConvert.convert_generic_anim_pymodule(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in)
         
