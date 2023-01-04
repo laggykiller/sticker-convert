@@ -78,9 +78,9 @@ rd /s /q zip-dl
 :: Get ImageMagick
 mkdir ImageMagick
 cd .\ImageMagick
-curl --retry 5 -O -L "https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-56-portable-Q16-x64.zip"
-tar -xf ImageMagick-7.1.0-56-portable-Q16-x64.zip
-del ImageMagick-7.1.0-56-portable-Q16-x64.zip
+curl --retry 5 -O -L "https://imagemagick.org/archive/binaries/ImageMagick-7.1.0-57-portable-Q16-x64.zip"
+tar -xf ImageMagick-7.1.0-57-portable-Q16-x64.zip
+del ImageMagick-7.1.0-57-portable-Q16-x64.zip
 cd ..
 
 :: Go back to repo root
