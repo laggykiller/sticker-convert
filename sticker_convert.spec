@@ -129,6 +129,7 @@ coll = COLLECT(
     a.binaries,
     a.zipfiles,
     a.datas,
+    Tree('./sticker_convert/ios-message-stickers-template', prefix='ios-message-stickers-template'),
     strip=False,
     upx=True,
     upx_exclude=[],
