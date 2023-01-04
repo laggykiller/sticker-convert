@@ -47,9 +47,10 @@ class DownloadLine:
         else:
             pack_ext = '.png'
 
+        num = 0
         for sticker in pack_meta['stickers']:
             sticker_id = sticker['id']
-            out_path = os.path.join(out_dir, str(sticker_id).zfill(3) + pack_ext)
+            out_path = os.path.join(out_dir, str(num).zfill(3) + pack_ext)
 
             if pack_ext == '.apng':
                 url = f'https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/iphone/animation/{sticker_id}@2x.png'
@@ -67,3 +68,5 @@ class DownloadLine:
                     break
                 except requests.exceptions.RequestException:
                     print('Cannot download', url, 'try', i)
+            
+            num += 1

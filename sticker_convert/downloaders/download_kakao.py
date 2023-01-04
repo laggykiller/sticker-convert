@@ -27,9 +27,10 @@ class DownloadKakao:
 
         MetadataHandler.set_metadata(out_dir, title=pack_id, author=author)
 
+        num = 0
         for url in pack_meta['result']['thumbnailUrls']:
             sticker_id = url.split('/')[-1]
-            out_path = os.path.join(out_dir, str(sticker_id).zfill(3) + '.png')
+            out_path = os.path.join(out_dir, str(num).zfill(3) + '.png')
             
             for i in range(3):
                 try:
@@ -42,3 +43,5 @@ class DownloadKakao:
                     break
                 except requests.exceptions.RequestException:
                     print('Cannot download', url, 'try', i)
+            
+            num += 1

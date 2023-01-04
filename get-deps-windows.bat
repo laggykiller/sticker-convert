@@ -32,7 +32,7 @@ del pngnq-s9-2.0.2.zip
 rd /s /q pngnq-s9-2.0.2
 
 :: Get optipng
-curl --retry 5 -O -L "https://sourceforge.net/projects/optipng/files/OptiPNG/optipng-0.7.7/optipng-0.7.7-win32.zip"
+curl --retry 5 -O -L "https://github.com/laggykiller/optipng/releases/download/v0.7.7/optipng-0.7.7-win32.zip"
 tar -xf optipng-0.7.7-win32.zip
 move optipng-0.7.7-win32\optipng.exe .
 del optipng-0.7.7-win32.zip

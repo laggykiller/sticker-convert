@@ -59,28 +59,34 @@ class CodecInfo:
             width = file_json['w']
             height = file_json['h']
 
-        elif CodecInfo.is_anim(file):
+        try:
             if shutil.which('ffmpeg'):
                 probe_info = ffmpeg.probe(file)
-                width = probe_info['streams'][0]['width']
-                height = probe_info['streams'][0]['height']
+                width_ffprobe = probe_info['streams'][0]['width']
+                height_ffprobe = probe_info['streams'][0]['height']
             else:
                 res = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', file]).replace('\n', '')
-                width = int(res.split('x')[0])
-                height = int(res.split('x')[1])
+                width_ffprobe = int(res.split('x')[0])
+                height_ffprobe = int(res.split('x')[1])
+        except:
+            width_ffprobe = 0
+            height_ffprobe = 0
 
-        else:
+        try:
             file = str(file) + '[0]'
             if RunBin.get_bin('magick', silent=True) == None:
                 with Image(filename=file) as img:
-                    width = img.width
-                    height = img.height
+                    width_magick = img.width
+                    height_magick = img.height
             else:
                 res = RunBin.run_cmd(['magick', 'identify', '-ping', '-format', '%wx%h', file], silence=False)
-                width = int(res.split('x')[0])
-                height = int(res.split('x')[1])
+                width_magick = int(res.split('x')[0])
+                height_magick = int(res.split('x')[1])
+        except:
+            width_magick = 0
+            height_magick = 0
         
-        return width, height
+        return max(width_ffprobe, width_magick), max(height_ffprobe, height_magick)
     
     @staticmethod
     def get_file_frames(file):

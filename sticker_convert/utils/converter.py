@@ -98,7 +98,7 @@ class StickerConvert:
 
                     tmp_f = os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f))
                     print(f'Compressing {in_f} -> {out_f} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]}')
-                    convert_method(in_f, tmp_f, res_w=param[0], res_h=param[1], quality=param[2], fps=param[3], color=param[4], duration_min=duration_min, duraiton_max=duration_max, fake_vid=fake_vid)
+                    convert_method(in_f, tmp_f, res_w=param[0], res_h=param[1], quality=param[2], fps=param[3], color=param[4], duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
                     
                     size = os.path.getsize(tmp_f)
                     if CodecInfo.is_anim(in_f):
@@ -265,16 +265,38 @@ class StickerConvert:
 
     @staticmethod
     def convert_generic_anim(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, duration_min=None, duration_max=None, **kwargs):
+        # For reducing duration of animation
+        extraction_fps = None
+        if (duration_min or duration_max) and not ('{0}' in in_f or '%d' in in_f or '%03d' in in_f):
+            duration_orig = CodecInfo.get_file_duration(in_f)
+            
+            if duration_min and duration_min > 0 and duration_orig < duration_min:
+                extraction_fps = duration_min / duration_orig * fps
+            elif duration_max and duration_max > 0 and duration_orig > duration_max:
+                extraction_fps = duration_max / duration_orig * fps
+        
+        if extraction_fps:
+            if extraction_fps < 1:
+                extraction_fps = f'1/{math.ceil(1 / extraction_fps)}'
+            else:
+                extraction_fps = math.ceil(extraction_fps)
+
+            with tempfile.TemporaryDirectory() as tempdir:
+                tmp_f = os.path.join(tempdir, 'tmp-{0}.png')
+                StickerConvert.convert_generic_anim(in_f, tmp_f, fps=extraction_fps)
+                StickerConvert.convert_generic_anim(tmp_f, out_f, fps_in=fps)
+
         if shutil.which('ffmpeg'):
             # Faster
-            StickerConvert.convert_generic_anim_pymodule(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in, duration_min=duration_min, duration_max=duration_max)
+            StickerConvert.convert_generic_anim_pymodule(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in)
+        
         else:
             # Slower (a bit) but at least it works
             # e.g. MacOS compiled version in system without ffmpeg
-            StickerConvert.convert_generic_anim_subprocess(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in, duration_min=duration_min, duration_max=duration_max)
+            StickerConvert.convert_generic_anim_subprocess(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in)
 
     @staticmethod
-    def convert_generic_anim_pymodule(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, duration_min=None, duration_max=None, **kwargs):
+    def convert_generic_anim_pymodule(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, **kwargs):
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
@@ -291,8 +313,10 @@ class StickerConvert:
                 stream = ffmpeg.input(in_f, vcodec='libvpx-vp9')
         else:
             stream = ffmpeg.input(in_f)
+
         if fps:
             stream = ffmpeg.filter(stream, 'fps', fps=fps, round='up')
+        
         if res_w and res_h:
             width, height = CodecInfo.get_file_res(in_f)
 
@@ -306,23 +330,17 @@ class StickerConvert:
                 stream = ffmpeg.filter(stream, 'scale', -1, res_h, flags='neighbor', sws_dither='none')
             stream = ffmpeg.filter(stream, 'pad', res_w, res_h, '(ow-iw)/2', '(ow-ih)/2', color='black@0')
             stream = ffmpeg.filter(stream, 'setsar', 1)
-        if duration_min or duration_max:
-            duration_orig = CodecInfo.get_file_duration(in_f)
-            if duration_min > 0 and duration_orig < duration_min:
-                factor = math.floor(duration_min / duration_orig * 10) / 10 # Round to 1 decimal place
-            elif duration_max > 0 and duration_orig > duration_max:
-                factor = math.floor(duration_max / duration_orig * 10) / 10 # Round to 1 decimal place
-            stream = ffmpeg.filter(stream, 'setpts', f'{factor}*PTS')
-        if out_f_ext == '.apng' or out_f_ext == '.png':
+
+        if (out_f_ext == '.apng' or out_f_ext == '.png') and not ('{0}' in out_f or '%d' in out_f or '%03d' in out_f):
             stream = ffmpeg.output(stream, out_f, vcodec='apng', pix_fmt='rgba', quality=95, plays=0)
         elif out_f_ext == '.webp':
-            stream = ffmpeg.output(stream, out_f, vcodec='webp', pix_fmt='yuva420p', quality=quality, lossless=0, loop=0)
+            stream = ffmpeg.output(stream, out_f.replace('{0}', '%03d'), vcodec='webp', pix_fmt='yuva420p', quality=quality, lossless=0, loop=0)
         else:
-            stream = ffmpeg.output(stream, out_f, pix_fmt='yuva420p', quality=quality, lossless=0)
+            stream = ffmpeg.output(stream, out_f.replace('{0}', '%03d'), pix_fmt='yuva420p', quality=quality, lossless=0)
         ffmpeg.run(stream, overwrite_output=True, quiet=True)
 
     @staticmethod
-    def convert_generic_anim_subprocess(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, duration_min=None, duration_max=None, **kwargs):
+    def convert_generic_anim_subprocess(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, fps_in=None, **kwargs):
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
@@ -346,6 +364,7 @@ class StickerConvert:
 
         if fps:
             cmd_list += ['-r', str(fps)]
+
         if res_w and res_h:
             width, height = CodecInfo.get_file_res(in_f)
 
@@ -360,20 +379,13 @@ class StickerConvert:
 
             cmd_list += ['-vf', f'pad={res_w}:{res_h}:(ow-iw)/2:(oh-ih)/2:color=black@0']
             cmd_list += ['-vf', f'setsar=1']
-        if duration_min or duration_max:
-            duration_orig = CodecInfo.get_file_duration(in_f)
-            if duration_min and duration_orig < duration_min:
-                factor = math.floor(duration_min / duration_orig * 10) / 10 # Round to 1 decimal place
-            elif duration_min and duration_orig > duration_max:
-                factor = math.floor(duration_max / duration_orig * 10) / 10 # Round to 1 decimal place
-            cmd_list += ['-vf', f'setpts={factor}*PTS']
 
-        if out_f_ext == '.apng' or out_f_ext == '.png':
+        if (out_f_ext == '.apng' or out_f_ext == '.png') and not ('{0}' in out_f or '%d' in out_f or '%03d' in out_f):
             cmd_list += ['-vcodec', 'apng', '-pix_fmt', 'rgba', '-quality', '95', '-plays', '0', out_f]
         elif out_f_ext == '.webp':
-            cmd_list += ['-vcodec', 'webp', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', '-loop', '0', out_f]
+            cmd_list += ['-vcodec', 'webp', '-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', '-loop', '0', out_f.replace('{0}', '%03d')]
         else:
-            cmd_list += ['-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', out_f]
+            cmd_list += ['-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', out_f.replace('{0}', '%03d')]
 
         # RunBin.run_cmd(cmd_list)
         RunBin.run_cmd(cmd_list, silence=False)
