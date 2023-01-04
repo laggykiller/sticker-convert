@@ -28,6 +28,15 @@
 - [DISCLAIMER](#disclaimer)
 
 ## Compatibility
+| Application | ⬇️ Download                          | ⬆️ Upload                                          |
+| ----------- | ------------------------------------ | --------------------------------------------------- |
+| Signal      | ✅                                   | ✅ (Require `uuid` & `password`)                   |
+| Telegram    | ✅ (Require `uuid` & `password`)     | ✅ (Require `token` & `user_id`)                   |
+| WhatsApp    | 🚫 (Manually via Android or Web)     | ⭕ (Create `.wastickers`, import by 3rd party app) |
+| Line        | ✅                                   | 🚫 (Need to submit for manual approval)            |
+| Kakao       | ⭕ (No animated version currently)   | 🚫 (Need to submit for manual approval)            |
+| iMessage    | 🚫                                   | ⭕ (Create Xcode stickerpack project for sideload) |
+
 - Signal
     - Download: Supported. (e.g. `https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx`)
     - Upload: Supported
@@ -36,7 +45,7 @@
 - Telegram (e.g. `https://telegram.me/addstickers/xxxxx`)
     - Download: Supported, but require bot token
     - Upload: Supported, but require bot token and user_id. Alternatively, you may manually upload and create sticker pack with the output of this program.
-- Whatsapp
+- WhatsApp
     - Download: You have to manually find sticker packs / extract from your phone or from WhatsApp Web
         - Android Phone: Inside "/storage/emulated/0/Whatsapp/media/Whatsapp Stickers" OR "/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Stickers"
         - Any: Go to WhatsApp Web, right click on sticker and click "Save image as..."
