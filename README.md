@@ -30,12 +30,14 @@
 ## Compatibility
 | Application | ⬇️ Download                          | ⬆️ Upload                                          |
 | ----------- | ------------------------------------ | --------------------------------------------------- |
-| Signal      | ✅                                   | ✅ (Require `uuid` & `password`)                   |
-| Telegram    | ✅ (Require `uuid` & `password`)     | ✅ (Require `token` & `user_id`)                   |
-| WhatsApp    | 🚫 (Manually via Android or Web)     | ⭕ (Create `.wastickers`, import by 3rd party app) |
+| Signal      | ✅                                   | ✅ (Require `uuid` & `password` or manually)       |
+| Telegram    | ✅ (Require `uuid` & `password`)     | ✅ (Require `token` & `user_id` or manually)       |
+| WhatsApp    | 🚫 (Manually via Android or Web)     | ⭕ (Create `.wastickers`, import by Sticker Maker) |
 | Line        | ✅                                   | 🚫 (Need to submit for manual approval)            |
 | Kakao       | ⭕ (No animated version currently)   | 🚫 (Need to submit for manual approval)            |
 | iMessage    | 🚫                                   | ⭕ (Create Xcode stickerpack project for sideload) |
+
+✅ = Supported ⭕ = Partially supported 🚫 = Not supported
 
 - Signal
     - Download: Supported. (e.g. `https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx`)
