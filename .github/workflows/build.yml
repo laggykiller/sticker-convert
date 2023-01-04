@@ -12,6 +12,8 @@ jobs:
     runs-on: [ubuntu-latest]
     steps:
     - uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: Create Release
       uses: ncipollo/release-action@v1
       with:
@@ -45,7 +47,9 @@ jobs:
             OUT_FILE_NAME: sticker-convert-windows.zip
             ASSET_MIME: application/zip
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
     - name: Set up Python 3.11
       uses: actions/setup-python@v2
       with:
