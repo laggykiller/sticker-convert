@@ -28,14 +28,14 @@
 - [DISCLAIMER](#disclaimer)
 
 ## Compatibility
-| Application | ⬇️ Download                          | ⬆️ Upload                                          |
-| ----------- | ------------------------------------ | --------------------------------------------------- |
-| Signal      | ✅                                   | ✅ (Require `uuid` & `password` or manually)       |
-| Telegram    | ✅ (Require `uuid` & `password`)     | ✅ (Require `token` & `user_id` or manually)       |
-| WhatsApp    | 🚫 (Manually via Android or Web)     | ⭕ (Create `.wastickers`, import by Sticker Maker) |
-| Line        | ✅                                   | 🚫 (Need to submit for manual approval)            |
-| Kakao       | ⭕ (No animated version currently)   | 🚫 (Need to submit for manual approval)            |
-| iMessage    | 🚫                                   | ⭕ (Create Xcode stickerpack project for sideload) |
+| Application | ⬇️ Download                              | ⬆️ Upload                                          |
+| ----------- | ---------------------------------------- | --------------------------------------------------- |
+| Signal      | ✅                                       | ✅ (Require `uuid` & `password` or manually)       |
+| Telegram    | ✅ (Require `uuid` & `password`)         | ✅ (Require `token` & `user_id` or manually)       |
+| WhatsApp    | ⭕ (Manually by Android or WhatsApp Web) | ⭕ (Create `.wastickers`, import by Sticker Maker) |
+| Line        | ✅                                       | 🚫 (Need to submit for manual approval)            |
+| Kakao       | ⭕ (No animated version currently)       | 🚫 (Need to submit for manual approval)            |
+| iMessage    | 🚫                                       | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
 
