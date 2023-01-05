@@ -26,12 +26,12 @@ class MetadataHandler:
         title_path = os.path.join(dir, 'title.txt')
         if title == None and os.path.isfile(title_path):
             with open(title_path, encoding='utf-8') as f:
-                title = f.read().replace('\n', '')
+                title = f.read().replace('\n', '').replace('\r', '')
 
         author_path = os.path.join(dir, 'author.txt')
         if author == None and os.path.isfile(author_path):
             with open(author_path, encoding='utf-8') as f:
-                author = f.read().replace('\n', '')
+                author = f.read().replace('\n', '').replace('\r', '')
         
         emoji_path = os.path.join(dir, 'emoji.txt')
         if emoji_dict == None and os.path.isfile(emoji_path):
