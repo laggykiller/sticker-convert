@@ -36,9 +36,17 @@ class DownloadLine:
             else:
                 # If no en release, use whatever comes first
                 region = pack_meta['title'].keys()[0]
+        
+        if region == 'zh-Hant':
+            region = 'zh_TW'
 
-        title = pack_meta['title'][region]
-        author = pack_meta['author'][region]
+        title = pack_meta['title'].get(region)
+        if title == None:
+            title = pack_meta['title']['en']
+
+        author = pack_meta['author'].get(region)
+        if author == None:
+            author = pack_meta['author']['en']
 
         MetadataHandler.set_metadata(out_dir, title=title, author=author)
 
