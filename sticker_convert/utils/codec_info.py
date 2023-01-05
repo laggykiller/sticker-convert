@@ -35,7 +35,7 @@ class CodecInfo:
             fps_denom = int(fps_str.split('/')[1])
             fps = fps_nom / fps_denom
         else:
-            int(RunBin.run_cmd(['ffprobe', '-v', '0', '-of', 'csv=p=0', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', file]).replace('\n', '').replace('\r', ''))
+            int(RunBin.run_cmd(['ffprobe', '-v', '0', '-of', 'csv=p=0', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', file]).strip()
 
         return fps
     
@@ -46,7 +46,7 @@ class CodecInfo:
             probe_info = ffmpeg.probe(file)
             codec = probe_info['streams'][0]['codec_name']
         else:
-            codec = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', file]).replace('\n', '').replace('\r', '')
+            codec = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', file]).strip()
 
         return codec
     
@@ -65,7 +65,7 @@ class CodecInfo:
                 width_ffprobe = probe_info['streams'][0]['width']
                 height_ffprobe = probe_info['streams'][0]['height']
             else:
-                res = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', file]).replace('\n', '').replace('\r', '')
+                res = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=width,height', '-of', 'csv=p=0:s=x', file]).strip()
                 width_ffprobe = int(res.split('x')[0])
                 height_ffprobe = int(res.split('x')[1])
         except:
@@ -100,7 +100,7 @@ class CodecInfo:
             return frames
         
         if RunBin.get_bin('ffprobe', silent=True):
-            frames_ffprobe = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames', '-print_format', 'default=nokey=1:noprint_wrappers=1', file], silence=False).replace('\n', '').replace('\r', '')
+            frames_ffprobe = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames', '-print_format', 'default=nokey=1:noprint_wrappers=1', file], silence=False).strip()
             if frames_ffprobe.isnumeric():
                 frames_ffprobe = int(frames_ffprobe)
             else:
