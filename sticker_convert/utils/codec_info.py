@@ -35,7 +35,7 @@ class CodecInfo:
             fps_denom = int(fps_str.split('/')[1])
             fps = fps_nom / fps_denom
         else:
-            int(RunBin.run_cmd(['ffprobe', '-v', '0', '-of', 'csv=p=0', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', file]).strip()
+            int(RunBin.run_cmd(['ffprobe', '-v', '0', '-of', 'csv=p=0', '-select_streams', 'v:0', '-show_entries', 'stream=r_frame_rate', file])).strip()
 
         return fps
     
