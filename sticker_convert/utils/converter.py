@@ -403,7 +403,7 @@ class StickerConvert:
             StickerConvert.convert(tmp_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, color=color, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
 
     @staticmethod
-    def convert_lottie(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, duration_min=None, duration_max=None, i_options={}, o_options={}):
+    def convert_lottie(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, duration_min=None, duration_max=None, i_options={}, o_options={}, **kwargs):
         with tempfile.TemporaryDirectory() as tempdir:
             in_f_ext = CodecInfo.get_file_ext(in_f)
             out_f_ext = CodecInfo.get_file_ext(out_f)
