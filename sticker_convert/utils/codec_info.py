@@ -1,9 +1,8 @@
 import os
-import gzip
+from rlottie_python import LottieAnimation
 import shutil
 import mimetypes
 import ffmpeg
-import json
 from utils.run_bin import RunBin
 # On Linux, old ImageMagick do not have magick command. In such case, use wand library
 if RunBin.get_bin('magick', silent=True) == None:
@@ -24,9 +23,8 @@ class CodecInfo:
     def get_file_fps(file):
         file = CodecInfo.resolve_wildcard(file)
         if CodecInfo.get_file_ext(file) == '.tgs':
-            with gzip.open(file) as f:
-                file_json = json.loads(f.read().decode(encoding='utf-8'))
-            fps = file_json['fr']
+            with LottieAnimation.from_tgs(file) as anim:
+                fps = anim.lottie_animation_get_framerate()
 
         elif shutil.which('ffmpeg'):
             tmp0_f_ffprobe = ffmpeg.probe(file)
@@ -54,10 +52,9 @@ class CodecInfo:
     def get_file_res(file):
         file = CodecInfo.resolve_wildcard(file)
         if CodecInfo.get_file_ext(file) == '.tgs':
-            with gzip.open(file) as f:
-                file_json = json.loads(f.read().decode(encoding='utf-8'))
-            width = file_json['w']
-            height = file_json['h']
+            with LottieAnimation.from_tgs(file) as anim:
+                width, height = anim.lottie_animation_get_size()
+            return width, height
 
         try:
             if shutil.which('ffmpeg'):
@@ -94,9 +91,8 @@ class CodecInfo:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == '.tgs':
-            with gzip.open(file) as f:
-                file_json = json.loads(f.read().decode(encoding='utf-8'))
-            frames = file_json['op'] - file_json['ip']
+            with LottieAnimation.from_tgs(file) as anim:
+                frames = anim.lottie_animation_get_totalframe()
             return frames
         
         if RunBin.get_bin('ffprobe', silent=True):

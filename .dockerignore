@@ -4,6 +4,7 @@ magick-src/**
 **/__pycache__
 **/creds.json
 **/bin
+**/lib
 **/stickers_input
 **/stickers_output
 **/ImageMagick

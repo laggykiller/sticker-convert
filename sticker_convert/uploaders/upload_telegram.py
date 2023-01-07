@@ -58,7 +58,7 @@ class UploadTelegram:
 
                     if FormatVerify.check_file(src, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, square=True, size_max=512000, animated=False if not fake_vid else None, format='.png'):
                         png_sticker = src
-                    elif FormatVerify.check_file(src, size_max=64000, format='.tgs'):
+                    elif FormatVerify.check_file(src, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, fps_min=60, fps_max=60, square=True, size_max=64000, duration_max=3000, format='.tgs'):
                         tgs_sticker = src
                     elif FormatVerify.check_file(src, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, fps_max=30, square=True, size_max=256000, animated=True if not fake_vid else None, duration_max=3000, format='.webm'):
                         webm_sticker = src
