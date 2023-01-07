@@ -1,12 +1,14 @@
 import os
-from rlottie_python import LottieAnimation
 import shutil
 import mimetypes
-import ffmpeg
-from utils.run_bin import RunBin
+
+from .run_bin import RunBin
+
 # On Linux, old ImageMagick do not have magick command. In such case, use wand library
 if RunBin.get_bin('magick', silent=True) == None:
     from wand.image import Image
+import ffmpeg
+from rlottie_python import LottieAnimation
 
 class CodecInfo:
     def __init__(self):

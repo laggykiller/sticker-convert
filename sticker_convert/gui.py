@@ -7,6 +7,7 @@ import shutil
 import multiprocessing
 from threading import Thread
 import webbrowser
+
 from utils.converter import StickerConvert
 from utils.codec_info import CodecInfo
 from downloaders.download_line import DownloadLine

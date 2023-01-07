@@ -1,11 +1,12 @@
 import shutil
 import os
+import json
+import plistlib
+
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from utils.metadata_handler import MetadataHandler
 from utils.codec_info import CodecInfo
-import json
-import plistlib
 
 def clean_dir(dir):
     for i in os.listdir(dir):

@@ -3,6 +3,7 @@ import os
 import anyio
 from signalstickers_client import StickersClient
 from signalstickers_client.models import LocalStickerPack, Sticker
+
 from utils.metadata_handler import MetadataHandler
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify

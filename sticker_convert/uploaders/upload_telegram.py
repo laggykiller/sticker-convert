@@ -1,13 +1,15 @@
 import os
 import re
-from telegram import Bot
-from telegram.error import TelegramError
+import tempfile
+
 from utils.converter import StickerConvert
 from utils.metadata_handler import MetadataHandler
 from utils.format_verify import FormatVerify
 from utils.codec_info import CodecInfo
 from utils.exceptions import NoTokenException
-import tempfile
+
+from telegram import Bot
+from telegram.error import TelegramError
 
 class UploadTelegram:
     @staticmethod

@@ -1,5 +1,5 @@
 import os
-from utils.codec_info import CodecInfo
+from .codec_info import CodecInfo
 from lottie.exporters.tgs_validator import TgsValidator, Severity
 import unicodedata
 import re
