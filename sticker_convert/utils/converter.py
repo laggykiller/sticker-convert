@@ -1,15 +1,17 @@
 import os
 import shutil
-from utils.run_bin import RunBin
+import traceback
+import math
+import tempfile
+
+from .run_bin import RunBin
+from .codec_info import CodecInfo
+from .lottie_convert import lottie_convert
+
 # On Linux, old ImageMagick do not have magick command. In such case, use wand library
 if RunBin.get_bin('magick', silent=True) == None:
     from wand.image import Image
 import ffmpeg
-import tempfile
-from utils.codec_info import CodecInfo
-import traceback
-import math
-from utils.lottie_convert import lottie_convert
 from rlottie_python import LottieAnimation
 
 class StickerConvert:
@@ -407,7 +409,7 @@ class StickerConvert:
             out_f_ext = CodecInfo.get_file_ext(out_f)
 
             if out_f_ext in ('.tgs', '.lottie', '.json'):
-                lottie_convert(in_f, out_f, fps=fps, width=res_w, height=res_h, fps=fps, i_options=i_options, o_options=o_options)
+                lottie_convert(in_f, out_f, width=res_w, height=res_h, fps=fps, i_options=i_options, o_options=o_options)
             else:
                 if in_f_ext == '.tgs':
                     anim = LottieAnimation.from_tgs(in_f)

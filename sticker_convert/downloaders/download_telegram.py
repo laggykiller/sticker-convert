@@ -1,10 +1,12 @@
-from telegram import Bot
 import os
 from contextlib import contextmanager
-from utils.metadata_handler import MetadataHandler
-from utils.exceptions import NoTokenException
 import shutil
 import tempfile
+
+from utils.metadata_handler import MetadataHandler
+from utils.exceptions import NoTokenException
+
+from telegram import Bot
 
 @contextmanager
 def cwd(path):

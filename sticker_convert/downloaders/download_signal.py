@@ -1,6 +1,7 @@
 import os
 import anyio
 from signalstickers_client import StickersClient
+
 from utils.metadata_handler import MetadataHandler
 
 class DownloadSignal:

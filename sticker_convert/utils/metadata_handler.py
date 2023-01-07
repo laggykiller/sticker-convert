@@ -1,6 +1,6 @@
 import os
 import json
-from utils.codec_info import CodecInfo
+from .codec_info import CodecInfo
 
 class MetadataHandler:
     @staticmethod

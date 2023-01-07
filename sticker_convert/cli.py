@@ -1,4 +1,9 @@
 import os
+import json
+import shutil
+import multiprocessing
+import argparse
+
 from utils.converter import StickerConvert
 from utils.codec_info import CodecInfo
 from downloaders.download_line import DownloadLine
@@ -9,10 +14,6 @@ from uploaders.upload_signal import UploadSignal
 from uploaders.upload_telegram import UploadTelegram
 from uploaders.compress_wastickers import CompressWastickers
 from uploaders.xcode_imessage import XcodeImessage
-import json
-import shutil
-import multiprocessing
-import argparse
 
 # Only download from a source
 # sticker_convert_cli.py --download-signal <url> --no-compress
