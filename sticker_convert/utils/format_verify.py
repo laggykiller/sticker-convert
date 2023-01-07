@@ -1,5 +1,4 @@
 import os
-from utils.run_bin import RunBin
 from utils.codec_info import CodecInfo
 from lottie.exporters.tgs_validator import TgsValidator, Severity
 import unicodedata

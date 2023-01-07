@@ -6,15 +6,11 @@ if RunBin.get_bin('magick', silent=True) == None:
     from wand.image import Image
 import ffmpeg
 import tempfile
-from utils.lottie_convert import lottie_convert
 from utils.codec_info import CodecInfo
 import traceback
-import gzip
-import json
 import math
-
-# lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
-# lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4')
+from utils.lottie_convert import lottie_convert
+from rlottie_python import LottieAnimation
 
 class StickerConvert:
     @staticmethod
@@ -45,10 +41,9 @@ class StickerConvert:
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
-        if in_f_ext == '.tgs' or in_f_ext == '.lottie':
-            return StickerConvert.convert_from_tgs
-        elif out_f_ext == '.tgs' or in_f_ext == '.lottie':
-            return StickerConvert.convert_to_tgs
+        lottie_formats = ('.tgs', '.lottie', '.json')
+        if in_f_ext in lottie_formats:
+            return StickerConvert.convert_lottie
 
         else:
             if in_f_ext == '.webp':
@@ -395,9 +390,6 @@ class StickerConvert:
 
     @staticmethod
     def convert_from_webp_anim(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, color=90, duration_min=None, duration_max=None, fake_vid=False, **kwargs):
-        in_f_ext = CodecInfo.get_file_ext(in_f)
-        out_f_ext = CodecInfo.get_file_ext(out_f)
-
         with tempfile.TemporaryDirectory() as tempdir:
             # ffmpeg do not support webp decoding (yet)
             # Converting animated .webp to image of the frames or .webp directly can result in broken frames
@@ -409,34 +401,23 @@ class StickerConvert:
             StickerConvert.convert(tmp_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, color=color, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
 
     @staticmethod
-    def convert_from_tgs(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, duration_min=None, duration_max=None, **kwargs):
+    def convert_lottie(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, duration_min=None, duration_max=None, i_options={}, o_options={}):
         with tempfile.TemporaryDirectory() as tempdir:
-            with gzip.open(in_f) as f:
-                file_json = json.loads(f.read().decode(encoding='utf-8'))
-            fps_in = file_json['fr']
-            frames_start = file_json['ip']
-            frames_end = file_json['op']
+            in_f_ext = CodecInfo.get_file_ext(in_f)
+            out_f_ext = CodecInfo.get_file_ext(out_f)
 
-            j = 1
-            for i in range(frames_start, frames_end):
-                # https://stackoverflow.com/questions/41190107/using-ffmpeg-with-python3-subprocess-to-convert-multiple-pngs-to-a-video
-                tmp2_f_frame = os.path.join(tempdir, f'tmp-{str(j).zfill(3)}.png')
-                lottie_convert(in_f, tmp2_f_frame, o_options={'frame': i})
-                j += 1
-            
-            tmp2_f = os.path.join(tempdir, 'tmp-{0}.png')
+            if out_f_ext in ('.tgs', '.lottie', '.json'):
+                lottie_convert(in_f, out_f, fps=fps, width=res_w, height=res_h, fps=fps, i_options=i_options, o_options=o_options)
+            else:
+                if in_f_ext == '.tgs':
+                    anim = LottieAnimation.from_tgs(in_f)
+                else:
+                    anim = LottieAnimation.from_file(in_f)
 
-            StickerConvert.convert_generic_anim(tmp2_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, fps_in=fps_in, duration_min=duration_min, duration_max=duration_max)
-    
-    @staticmethod
-    def convert_to_tgs(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, duration_min=None, duration_max=None, **kwargs):
-        in_f_ext = CodecInfo.get_file_ext(in_f)
+                tmp_f = os.path.join(tempdir, 'tmp.apng')
+                anim.save_animation(tmp_f)
 
-        with tempfile.TemporaryDirectory() as tempdir1, tempfile.TemporaryDirectory() as tempdir2:
-            tmp1_f = os.path.join(tempdir1, 'tmp1.webp')
-            StickerConvert.convert_generic_anim(in_f, tmp1_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, duration_min=duration_min, duration_max=duration_max)
-
-            lottie_convert(tmp1_f, out_f, fps=fps)
+                StickerConvert.convert(tmp_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, duration_min=duration_min, duration_max=duration_max)
     
     @staticmethod
     def convert_to_apng_anim(in_f, out_f, res_w=512, res_h=512, quality=90, fps=30, color=90, duration_min=None, duration_max=None, **kwargs):
