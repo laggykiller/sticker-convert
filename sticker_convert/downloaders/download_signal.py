@@ -22,7 +22,7 @@ class DownloadSignal:
             for sticker in pack.stickers:
                 await tg.spawn(save_sticker, sticker)
                 emoji_dict[sticker.id] = sticker.emoji
-                print('Downloaded', f'{sticker.id.zfill(3)}.webp')
+                print('Downloaded', f'{str(sticker.id).zfill(3)}.webp')
         
         MetadataHandler.set_metadata(out_dir, title=pack.title, author=pack.author, emoji_dict=emoji_dict)
 
