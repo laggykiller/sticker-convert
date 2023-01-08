@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
-from tkinter import StringVar, BooleanVar, IntVar, filedialog, messagebox, scrolledtext, END, Toplevel, Canvas
+from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, scrolledtext, END, Toplevel, Canvas
 from tkinter.ttk import LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar
-from tkinter.tix import Balloon, Tk
 import os
 import sys
 import multiprocessing
@@ -916,13 +915,9 @@ class EmojiWindow:
             im = im.resize((32, 32))
             ph_im = ImageTk.PhotoImage(im)
 
-            tip = Balloon(self.window.root)
-
             button = Button(self.frame_buttons, command=lambda i=emoji: self.callback_set_emoji(i))
             button.config(image=ph_im)
             button.grid(column=column, row=row)
-
-            tip.bind_widget(button, balloonmsg=', '.join(keywords))
 
             column += 1
 
