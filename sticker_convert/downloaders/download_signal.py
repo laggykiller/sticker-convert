@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import anyio
 from signalstickers_client import StickersClient
@@ -6,7 +7,7 @@ from utils.metadata_handler import MetadataHandler
 
 class DownloadSignal:
     @staticmethod
-    async def download_stickers_signal_async(url, out_dir):
+    async def download_stickers_signal_async(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
         async def save_sticker(sticker):
             async with await anyio.open_file(os.path.join(out_dir, f'{sticker.id.zfill(3)}.webp'), "wb",) as f:
                 await f.write(sticker.image_data)
@@ -18,14 +19,22 @@ class DownloadSignal:
         async with StickersClient() as client:
             pack = await client.get_pack(pack_id, pack_key)
 
+        if cb_bar:
+            cb_bar(set_progress_mode='determinate', steps=len(pack.stickers))
+
         async with anyio.create_task_group() as tg:
             for sticker in pack.stickers:
                 await tg.spawn(save_sticker, sticker)
                 emoji_dict[sticker.id] = sticker.emoji
-                print('Downloaded', f'{str(sticker.id).zfill(3)}.webp')
+                
+                cb_msg(f'Downloaded {str(sticker.id).zfill(3)}.webp')
+                if cb_bar:
+                    cb_bar(update_bar=True)
         
         MetadataHandler.set_metadata(out_dir, title=pack.title, author=pack.author, emoji_dict=emoji_dict)
 
+        return True
+
     @staticmethod
-    def download_stickers_signal(url, out_dir):
-        anyio.run(DownloadSignal.download_stickers_signal_async, url, out_dir)
+    def download_stickers_signal(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+        anyio.run(DownloadSignal.download_stickers_signal_async, url, out_dir, opt_cred, cb_msg=cb_msg, cb_bar=cb_bar)

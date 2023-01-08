@@ -1,5 +1,7 @@
+#!/usr/bin/env python3
 import shutil
 import os
+import copy
 import json
 import plistlib
 
@@ -7,6 +9,8 @@ from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from utils.metadata_handler import MetadataHandler
 from utils.codec_info import CodecInfo
+
+from mergedeep import merge
 
 def clean_dir(dir):
     for i in os.listdir(dir):
@@ -47,10 +51,49 @@ class XcodeImessage:
         # }
 
     @staticmethod
-    def create_imessage_xcode(in_dir, out_dir, author='Me', title='My sticker pack', quality_max=90, quality_min=0, fps_max=30, fps_min=3, color_min=0, color_max=90, steps=20, **kwargs):
+    def create_imessage_xcode(opt_output, opt_comp, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
+        in_dir = opt_output['dir']
+        if not out_dir:
+            out_dir = opt_output['dir']
+
+        base_spec = {
+            "size_max": {
+                "img": 500000,
+                "vid": 500000
+            },
+            'res': {
+                'w': {
+                    'min': 300,
+                    'max': 300
+                },
+                'h': {
+                    'min': 300,
+                    'max': 300
+                }
+            },
+            'duration': {
+                'max': 3000
+            },
+            'format': ('.png', '.apng', '.gif', '.jpeg', 'jpg'),
+            'square': True
+        }
+
+        small_spec = copy.deepcopy(base_spec)
+
+        medium_spec = copy.deepcopy(base_spec)
+        medium_spec['res']['w']['min'] = 408
+        medium_spec['res']['w']['max'] = 408
+        medium_spec['res']['h']['min'] = 408
+        medium_spec['res']['h']['max'] = 408
+
+        large_spec = copy.deepcopy(base_spec)
+        large_spec['res']['w']['min'] = 618
+        large_spec['res']['w']['max'] = 618
+        large_spec['res']['h']['min'] = 618
+        large_spec['res']['h']['max'] = 618
+
         urls = []
-        
-        title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=title, author=author)
+        title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=opt_output.get('title'), author=opt_output.get('author'))
         packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=100, separate_image_anim=False)
 
         res_choice = None
@@ -59,7 +102,7 @@ class XcodeImessage:
             pack_title = FormatVerify.sanitize_filename(pack_title)
 
             for src in stickers:
-                print('Verifying', src, 'for creating Xcode iMessage sticker pack')
+                cb_msg('Verifying', src, 'for creating Xcode iMessage sticker pack')
 
                 src_path = os.path.join(in_dir, src)
                 dst_path = os.path.join(out_dir, src)
@@ -68,17 +111,27 @@ class XcodeImessage:
                     res_choice, _ = CodecInfo.get_file_res(src_path)
                     res_choice = res_choice if res_choice != None else 300
 
-                if FormatVerify.check_file(src, res_w_min=res_choice, res_w_max=res_choice, res_h_min=res_choice, res_h_max=res_choice, square=True, size_max=500000, format=('.png', '.apng', '.gif', '.jpeg', 'jpg')):
+                    if res_choice == 300:
+                        spec_choice = small_spec
+                    elif res_choice == 408:
+                        spec_choice = medium_spec
+                    elif res_choice == 618:
+                        spec_choice = large_spec
+                    
+                    opt_comp_merged = merge({}, opt_comp, spec_choice)
+
+                if FormatVerify.check_file(src, spec=spec_choice):
                     if src_path != dst_path:
                         shutil.copy(src_path, dst_path)
                 else:
-                    StickerConvert.convert_and_compress_to_size(src_path, dst_path, vid_size_max=500000, img_size_max=500000, res_w_min=res_choice, res_w_max=res_choice, res_h_min=res_choice, res_h_max=res_choice, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, steps=steps)
+                    StickerConvert.convert_and_compress_to_size(src_path, dst_path, opt_comp=opt_comp_merged)
 
             XcodeImessage.add_metadata(out_dir, out_dir, author, pack_title)
             XcodeImessage.create_xcode_proj(in_dir, out_dir, author, pack_title)
 
-            print(os.path.join(out_dir, pack_title))
-            urls.append(os.path.join(out_dir, pack_title))
+            result = os.path.join(out_dir, pack_title)
+            cb_msg(result)
+            urls.append(result)
         
         return urls
 
@@ -96,9 +149,22 @@ class XcodeImessage:
             icon_source = first_image_path
 
         for icon, res in XcodeImessage().iconset.items():
+            spec_cover = {
+                "res": {
+                    "w": {
+                        "min": res[0],
+                        "max": res[0]
+                    },
+                    "h": {
+                        "min": res[1],
+                        "max": res[1]
+                    }
+                }
+            }
+
             icon_old_path = os.path.join(in_dir, icon)
             icon_new_path = os.path.join(out_dir, icon)
-            if icon in os.listdir(in_dir) and not FormatVerify.check_file(icon_old_path, res_w_min=res[0], res_w_max=res[0], res_h_min=res[1], res_h_max=res[1]):
+            if icon in os.listdir(in_dir) and not FormatVerify.check_file(icon_old_path, spec=spec_cover):
                 StickerConvert.convert_generic_image(icon_old_path, icon_new_path, res_w=res[0], res_h=res[1], quality=100)
             else:
                 StickerConvert.convert_generic_image(icon_source, icon_new_path, res_w=res[0], res_h=res[1], quality=100)

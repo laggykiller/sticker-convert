@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''Reference: https://github.com/doubleplusc/Line-sticker-downloader/blob/master/sticker_dl.py'''
 
 import requests
@@ -8,7 +9,7 @@ from utils.metadata_handler import MetadataHandler
 
 class DownloadLine:
     @staticmethod
-    def download_stickers_line(url, out_dir):
+    def download_stickers_line(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
         pack_ext = ""
 
         region = ''
@@ -20,7 +21,7 @@ class DownloadLine:
             pack_id = url.replace('https://store.line.me/stickershop/product/', '').split('/')[0]
             region = url.replace('https://store.line.me/stickershop/product/', '').split('/')[1]
         else:
-            print('Unsupported URL format')
+            cb_msg('Download failed: Unsupported URL format')
             return False
 
         pack_meta_r = requests.get(f"http://dl.stickershop.line.naver.jp/products/0/0/1/{pack_id}/android/productInfo.meta")
@@ -56,6 +57,9 @@ class DownloadLine:
         else:
             pack_ext = '.png'
 
+        if cb_bar:
+            cb_bar(set_progress_mode='determinate', steps=len(pack_meta['stickers']))
+
         num = 0
         for sticker in pack_meta['stickers']:
             sticker_id = sticker['id']
@@ -66,16 +70,27 @@ class DownloadLine:
             else:
                 url = f'http://dl.stickershop.line.naver.jp/stickershop/v1/sticker/{sticker_id}/iphone/sticker@2x.png'
             
-            for i in range(3):
+            success = False
+            for _ in range(3):
                 try:
                     image = requests.get(url, stream=True)
                     with open(out_path, 'wb') as f:
                         for chunk in image.iter_content(chunk_size=10240):
                             if chunk:
                                 f.write(chunk)
-                    print('Downloaded', url)
+                    cb_msg(f'Downloaded {url}')
+
+                    if cb_bar:
+                        cb_bar(update_bar=True)
+                        
+                    success = True
                     break
                 except requests.exceptions.RequestException:
-                    print('Cannot download', url, 'try', i)
+                    pass
+            
+            if not success:
+                cb_msg(f'Cannot download {url} (tried 3 times)')
             
             num += 1
+        
+        return True

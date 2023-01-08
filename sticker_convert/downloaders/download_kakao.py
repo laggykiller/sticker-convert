@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''Reference: https://github.com/star-39/moe-sticker-bot/blob/master/pkg/core/import.go'''
 
 import requests
@@ -8,10 +9,7 @@ from utils.metadata_handler import MetadataHandler
 
 class DownloadKakao:
     @staticmethod
-    def download_stickers_kakao(url, out_dir):
-        pack_ext = ""
-
-        region = ''
+    def download_stickers_kakao(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
         if url.startswith('https://e.kakao.com/t/'):
             pack_id = url.replace('https://e.kakao.com/t/', '')
         else:
@@ -29,8 +27,12 @@ class DownloadKakao:
         MetadataHandler.set_metadata(out_dir, title=pack_id, author=author)
 
         num = 0
+
+        if cb_bar:
+            cb_bar(set_progress_mode='determinate', steps=len(pack_meta['result']['thumbnailUrls']))
+
         for url in pack_meta['result']['thumbnailUrls']:
-            sticker_id = url.split('/')[-1]
+            # sticker_id = url.split('/')[-1]
             out_path = os.path.join(out_dir, str(num).zfill(3) + '.png')
             
             for i in range(3):
@@ -40,9 +42,13 @@ class DownloadKakao:
                         for chunk in image.iter_content(chunk_size=10240):
                             if chunk:
                                 f.write(chunk)
-                    print('Downloaded', url)
+                    cb_msg('Downloaded', url)
+                    if cb_bar:
+                        cb_bar(update_bar=True)
                     break
                 except requests.exceptions.RequestException:
-                    print('Cannot download', url, 'try', i)
+                    cb_msg('Cannot download', url, 'try', i)
             
             num += 1
+        
+        return True

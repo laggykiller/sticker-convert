@@ -34,7 +34,7 @@ def get_magick_dir():
             sys.exit()
 
 binaries = []
-datas = [('./sticker_convert/preset.json', './'), ('./sticker_convert/icon/*', './icon')]
+datas = [('./sticker_convert/resources/*', './resources')]
 
 if sys.platform == 'win32':
     apngasm_path = shutil.which("apngasm")
@@ -90,6 +90,13 @@ else:
 proot = os.path.dirname(importlib.import_module('rlottie_python').__file__)
 datas.append((os.path.join(proot, rlottie_dll), 'rlottie_python/'))
 
+# Tkinter tix
+# Example directory: %appdatalocal%/Programs/Python/Python310/tcl/tix8.4.3
+for path in sys.path:
+    tcl_path = os.path.join(path, 'tcl')
+    if os.path.isdir(tcl_path):
+        break
+
 if sys.platform == 'win32':
     suffix = 'windows'
 elif sys.platform == 'darwin':
@@ -132,7 +139,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='./sticker_convert/icon/appicon.ico'
+    icon='./sticker_convert/resources/appicon.ico'
 )
 coll = COLLECT(
     exe,
@@ -140,6 +147,8 @@ coll = COLLECT(
     a.zipfiles,
     a.datas,
     Tree('./sticker_convert/ios-message-stickers-template', prefix='ios-message-stickers-template'),
+    Tree(tcl_path, prefix='tcl'),
+    Tree('./sticker_convert/Sun-Valley-ttk-theme', prefix='Sun-Valley-ttk-theme'),
     strip=False,
     upx=True,
     upx_exclude=[],

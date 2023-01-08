@@ -1,5 +1,6 @@
 ### Todo
 
+- [ ] Add testing
 - [ ] Let user select what to do for stickers that are too long (Skip, fastforward, cut)
 - [ ] Use opencv to replace ffmpeg
 - [ ] Make the tkinter window scrollable (https://github.com/laggykiller/sticker-convert/issues/4)

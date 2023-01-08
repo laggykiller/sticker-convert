@@ -1,6 +1,6 @@
+#!/usr/bin/env python3
 import os
 import shutil
-import traceback
 import math
 import tempfile
 
@@ -20,26 +20,22 @@ class StickerConvert:
         '''
         Convert format with given res, quality, fps
         '''
-        convert_method = StickerConvert.get_convert_method(in_f, out_f, fake_vid=fake_vid)
+        convert_method = StickerConvert.get_convert_method(in_f, out_f, fake_vid)
 
         convert_method(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, color=color, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
 
     @staticmethod
-    def convert_and_compress_to_size(in_f, out_f, vid_size_max=None, img_size_max=None, 
-        res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=90, quality_min=0, fps_max=30, fps_min=3, color_min=60, color_max=90, 
-        duration_min=None, duration_max=None, fake_vid=False, steps=20):
+    def convert_and_compress_to_size(in_f, out_f, opt_comp, cb_msg=print):
         '''
         Convert format with given res, quality, fps
         Try to reduce file size to below thresholds (vid_size_max and img_size_max) by adjusting res, quality, fps
         '''
-        convert_method = StickerConvert.get_convert_method(in_f, out_f, fake_vid=fake_vid)
+        convert_method = StickerConvert.get_convert_method(in_f, out_f, opt_comp['fake_vid'])
         
-        return StickerConvert.compress_to_size(convert_method, in_f, out_f, vid_size_max=vid_size_max, img_size_max=img_size_max, 
-            res_w_min=res_w_min, res_w_max=res_w_max, res_h_min=res_h_min, res_h_max=res_h_max, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, 
-            color_min=color_min, color_max=color_max, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid, steps=steps)
+        return StickerConvert.compress_to_size(convert_method, in_f, out_f, opt_comp, cb_msg)
 
     @staticmethod
-    def get_convert_method(in_f, out_f, fake_vid=False):
+    def get_convert_method(in_f, out_f, fake_vid):
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
@@ -62,126 +58,76 @@ class StickerConvert:
                 return StickerConvert.convert_generic_image
     
     @staticmethod
-    def compress_to_size(convert_method, in_f, out_f, vid_size_max=None, img_size_max=None, 
-        res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=90, quality_min=0, 
-        fps_max=30, fps_min=3, color_min=60, color_max=90, duration_min=None, duration_max=None, fake_vid=False, steps=20):
-        
+    def compress_to_size(convert_method, in_f, out_f, opt_comp, cb_msg=print):
         def get_step_value(max, min, step, steps):
             return round((max - min) * step / steps + min)
+        
+        in_f_name = os.path.split(in_f)[1]
+        out_f_name = os.path.split(out_f)[1]
 
-        try:
-            steps_list = []
-            for step in range(steps, -1, -1):
-                steps_list.append((
-                    get_step_value(res_w_max, res_w_min, step, steps),
-                    get_step_value(res_h_max, res_h_min, step, steps),
-                    get_step_value(quality_max, quality_min, step, steps),
-                    get_step_value(fps_max, fps_min, step, steps),
-                    get_step_value(color_max, color_min, step, steps)
-                ))
+        cb_msg(f'[I] Start compressing {in_f_name} -> {out_f_name}')
 
-            with tempfile.TemporaryDirectory() as tempdir:
-                step_lower = 0
-                step_upper = steps
+        duration_min = opt_comp.get('duration', {}).get('min')
+        duration_max = opt_comp.get('duration', {}).get('max')
+        fake_vid = opt_comp.get('fake_vid')
 
-                if vid_size_max == None and img_size_max == None:
-                    # No limit to size, create the best quality result
-                    step_current = 0
+        steps_list = []
+        for step in range(opt_comp['steps'], -1, -1):
+            steps_list.append((
+                get_step_value(opt_comp['res']['w']['max'], opt_comp['res']['w']['min'], step, opt_comp['steps']),
+                get_step_value(opt_comp['res']['w']['max'], opt_comp['res']['w']['min'], step, opt_comp['steps']),
+                get_step_value(opt_comp['quality']['max'], opt_comp['quality']['min'], step, opt_comp['steps']),
+                get_step_value(opt_comp['fps']['max'], opt_comp['fps']['min'], step, opt_comp['steps']),
+                get_step_value(opt_comp['color']['max'], opt_comp['color']['min'], step, opt_comp['steps'])
+            ))
+
+        with tempfile.TemporaryDirectory() as tempdir:
+            step_lower = 0
+            step_upper = opt_comp['steps']
+
+            if opt_comp['size_max']['vid'] == None and opt_comp['size_max']['img'] == None:
+                # No limit to size, create the best quality result
+                step_current = 0
+            else:
+                step_current = round((step_lower + step_upper) / 2)
+
+            while True:
+                param = steps_list[step_current]
+
+                tmp_f = os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f))
+                cb_msg(f'[C] Compressing {in_f_name} -> {out_f_name} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]} (step {step_lower}-{step_current}-{step_upper})')
+                convert_method(
+                    in_f, tmp_f, res_w=param[0], res_h=param[1], quality=param[2], fps=param[3], color=param[4], 
+                    duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
+                
+                size = os.path.getsize(tmp_f)
+                if CodecInfo.is_anim(in_f):
+                    size_max = opt_comp['size_max']['vid']
                 else:
-                    step_current = round((step_lower + step_upper) / 2)
+                    size_max = opt_comp['size_max']['img']
 
-                while True:
-                    param = steps_list[step_current]
-
-                    tmp_f = os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f))
-                    print(f'Compressing {in_f} -> {out_f} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]}')
-                    convert_method(in_f, tmp_f, res_w=param[0], res_h=param[1], quality=param[2], fps=param[3], color=param[4], duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
-                    
-                    size = os.path.getsize(tmp_f)
-                    if CodecInfo.is_anim(in_f):
-                        size_max = vid_size_max
+                if size < size_max:
+                    if step_upper - step_lower > 1:
+                        step_upper = step_current
+                        step_current = int((step_lower + step_upper) / 2)
+                        cb_msg(f'[<] Compressed {in_f_name} -> {out_f_name} but size {size} < limit {size_max}, recompressing')
                     else:
-                        size_max = img_size_max
-                    
-                    if size == None:
                         shutil.move(os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f)), out_f)
-                        print(f'Compressed {in_f} -> {out_f} successfully (step {step_current})')
-
-                    if size < size_max:
-                        if step_upper - step_lower > 1:
-                            step_upper = step_current
-                            step_current = int((step_lower + step_upper) / 2)
-                            print(f'Compressed {in_f} -> {out_f} but size {size} is smaller than limit {size_max}, recompressing with higher quality (step {step_lower}-{step_current}-{step_upper})')
-                        else:
-                            shutil.move(os.path.join(tempdir, str(step_current) + CodecInfo.get_file_ext(out_f)), out_f)
-                            print(f'Compressed {in_f} -> {out_f} successfully (step {step_current})')
-                            return True
+                        cb_msg(f'[S] Successful compression {in_f_name} -> {out_f_name} (step {step_current})')
+                        return True
+                else:
+                    if step_upper - step_lower > 1:
+                        step_lower = step_current
+                        step_current = round((step_lower + step_upper) / 2)
+                        cb_msg(f'[>] Compressed {in_f_name} -> {out_f_name} but size {size} > limit {size_max}, recompressing')
                     else:
-                        if step_upper - step_lower > 1:
-                            step_lower = step_current
-                            step_current = round((step_lower + step_upper) / 2)
-                            print(f'Compressed {in_f} -> {out_f} but size {size} is larger than limit {size_max}, recompressing with lower quality (step {step_lower}-{step_current}-{step_upper})')
+                        if step_current < opt_comp['steps']:
+                            shutil.move(os.path.join(tempdir, str(step_current + 1) + CodecInfo.get_file_ext(out_f)), out_f)
+                            cb_msg(f'[S] Successful compression {in_f_name} -> {out_f_name} (step {step_current})')
+                            return True
                         else:
-                            if step_current < steps:
-                                shutil.move(os.path.join(tempdir, str(step_current + 1) + CodecInfo.get_file_ext(out_f)), out_f)
-                                print(f'Compressed {in_f} -> {out_f} successfully (step {step_current})')
-                                return True
-                            else:
-                                print(f'Compressing {in_f} -> {out_f} failed as size cannot get below limit {size_max} with lowest quality under current settings')
-                                return False
-
-        except Exception as e:
-            tb = traceback.format_exc()
-            print(e, tb)
-
-    # @staticmethod
-    # def compress_to_size(convert_method, in_f, out_f, vid_size_max=None, img_size_max=None, 
-    #     res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=90, quality_min=0, 
-    #     fps_max=30, fps_min=3, color_min=60, color_max=90, duration_min=None, duration_max=None, fake_vid=False, steps=20):
-
-    #     def get_step_value(max, min, step, steps):
-    #         return round((max - min) * step / steps + min)
-
-    #     try:
-    #         steps_list = []
-    #         for step in range(steps, -1, -1):
-    #             steps_list.append((
-    #                 get_step_value(res_w_max, res_w_min, step, steps),
-    #                 get_step_value(res_h_max, res_h_min, step, steps),
-    #                 get_step_value(quality_max, quality_min, step, steps),
-    #                 get_step_value(fps_max, fps_min, step, steps),
-    #                 get_step_value(color_max, color_min, step, steps)
-    #             ))
-            
-    #         for param in steps_list:
-    #             with tempfile.TemporaryDirectory() as tempdir:
-    #                 tmp_f = os.path.join(tempdir, 'temp' + CodecInfo.get_file_ext(out_f))
-    #                 print(f'Compressing {in_f} -> {out_f} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]}')
-    #                 convert_method(in_f, tmp_f, res_w=param[0], res_h=param[1], quality=param[2], fps=param[3], color=param[4], duration_min=duration_min, duraiton_max=duration_max, fake_vid=fake_vid)
-
-    #                 if vid_size_max == None and img_size_max == None:
-    #                     return True
-                    
-    #                 size = os.path.getsize(tmp_f)
-    #                 if CodecInfo.is_anim(tmp_f):
-    #                     size_max = vid_size_max
-    #                 else:
-    #                     size_max = img_size_max
-
-    #                 if size < size_max:
-    #                     shutil.move(tmp_f, out_f)
-    #                     print(f'Compressed {in_f} -> {out_f} successfully with size {size} res={param[0]}x{param[1]}, quality={param[2]}, fps={param[3]}, color={param[4]}')
-    #                     return True
-    #                 else:
-    #                     print(f'Compressed {in_f} -> {out_f} but size {size} is larger than limit {size_max}, recompressing with lower quality')
-
-    #         print(f'Compressing {in_f} -> {out_f} failed as size cannot get below limit {size_max} with lowest quality under current settings')
-    #         return False
-                    
-
-    #     except Exception as e:
-    #         tb = traceback.format_exc()
-    #         print(e, tb)
+                            cb_msg(f'[F] Failed Compression {in_f_name} -> {out_f_name}, cannot get below limit {size_max} with lowest quality under current settings')
+                            return False
 
     @staticmethod
     def magick_crop(in_f, out_f, res_w, res_h):
@@ -214,7 +160,7 @@ class StickerConvert:
     @staticmethod
     def convert_generic_image_pymodule(in_f, out_f, res_w=None, res_h=None, quality=90, **kwargs):
         # https://www.imagemagick.org/script/command-line-options.php#quality
-        # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
+        # For png, lower quality actually means less compression and larger file size (zlib compression step = quality / 10)
         # For png, filter_type = quality % 10
         if CodecInfo.get_file_ext(out_f) == '.png':
             quality = 95
@@ -231,7 +177,7 @@ class StickerConvert:
     @staticmethod
     def convert_generic_image_subprocess(in_f, out_f, res_w=None, res_h=None, quality=90, **kwargs):
         # https://www.imagemagick.org/script/command-line-options.php#quality
-        # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
+        # For png, lower quality actually means less compression and larger file size (zlib compression step = quality / 10)
         # For png, filter_type = quality % 10
         if CodecInfo.get_file_ext(out_f) == '.png':
             quality = 95
@@ -344,8 +290,8 @@ class StickerConvert:
         in_f_ext = CodecInfo.get_file_ext(in_f)
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
-        # cmd_list = ['ffmpeg', '-y', '-hide_banner', '-loglevel', 'error']
-        cmd_list = ['ffmpeg', '-y', '-hide_banner']
+        cmd_list = ['ffmpeg', '-y', '-hide_banner', '-logstep', 'error']
+        # cmd_list = ['ffmpeg', '-y', '-hide_banner']
 
         if fps_in:
             # For converting multiple images into animation
@@ -429,12 +375,14 @@ class StickerConvert:
         # magick: Will output single frame png
 
         with tempfile.TemporaryDirectory() as tempdir1, tempfile.TemporaryDirectory() as tempdir2:
-            delay = round(1000 / fps)
-
             # Convert to uncompressed apng
             # https://stackoverflow.com/a/29378555
             tmp1_f = os.path.join(tempdir1, 'tmp1.apng')
-            StickerConvert.convert_generic_anim(in_f, tmp1_f, res_w=res_w, res_h=res_h, quality=100, fps=fps, duration_min=duration_min, duration_max=duration_max)
+            StickerConvert.convert_generic_anim(in_f, tmp1_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, duration_min=duration_min, duration_max=duration_max)
+
+            # There is a possibility of fps being changed when animation is too long
+            # Delay need to be recalculated, cannot rely on fps supplied
+            delay = round(1000 / CodecInfo.get_file_fps(tmp1_f))
 
             # apngdis convert to png strip
             tmp2_f = os.path.join(tempdir1, 'tmp1_strip.png')
@@ -464,7 +412,7 @@ class StickerConvert:
                 j = os.path.join(tempdir2, i)
                 RunBin.run_cmd(['optipng', '-o4', j], silence=True)
                 # https://www.imagemagick.org/script/command-line-options.php#quality
-                # For png, lower quality actually means less compression and larger file size (zlib compression level = quality / 10)
+                # For png, lower quality actually means less compression and larger file size (zlib compression step = quality / 10)
                 # For png, filter_type = quality % 10
                 StickerConvert.convert_generic_image(j, j, res_w=res_w, res_h=res_h, quality=95)
             
