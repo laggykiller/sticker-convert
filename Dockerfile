@@ -33,4 +33,4 @@ COPY ./sticker_convert /app/
 
 Volume ["/app/stickers_input", "/app/stickers_output"]
 
-CMD ["python3", "/app/main.py", "--help"]
+CMD ["python3", "/app/main.py", "--no-confirm", "--help"]
