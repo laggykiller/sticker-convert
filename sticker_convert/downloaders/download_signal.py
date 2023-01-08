@@ -37,4 +37,4 @@ class DownloadSignal:
 
     @staticmethod
     def download_stickers_signal(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
-        anyio.run(DownloadSignal.download_stickers_signal_async, url, out_dir, opt_cred, cb_msg=cb_msg, cb_bar=cb_bar)
+        anyio.run(DownloadSignal.download_stickers_signal_async, url, out_dir, opt_cred, cb_msg, cb_bar)
