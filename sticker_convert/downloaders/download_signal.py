@@ -9,7 +9,7 @@ class DownloadSignal:
     @staticmethod
     async def download_stickers_signal_async(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
         async def save_sticker(sticker):
-            async with await anyio.open_file(os.path.join(out_dir, f'{sticker.id.zfill(3)}.webp'), "wb",) as f:
+            async with await anyio.open_file(os.path.join(out_dir, f'{str(sticker.id).zfill(3)}.webp'), "wb",) as f:
                 await f.write(sticker.image_data)
 
         pack_id = url.split('#pack_id=')[1].split('&pack_key=')[0]
