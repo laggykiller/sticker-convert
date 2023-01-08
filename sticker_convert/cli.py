@@ -254,6 +254,6 @@ class CLI:
             msg = ' '.join(str(i) for i in args)
             print(msg)
     
-    def callback_bar(self, set_progress_mode: str=None, steps: int=None, no_update_bar: bool=False):
+    def callback_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
         # Progressbar could be implemented here
         pass
