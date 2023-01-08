@@ -43,7 +43,7 @@ class CompressWastickers:
                     if FormatVerify.check_file(src, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, square=True, size_max=500000, animated=True if not fake_vid else None, duration_max=10000, format='.webp') or FormatVerify.check_file(src, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, square=True, size_max=100000, animated=False if not fake_vid else None, format='.png'):
                         shutil.copy(src, dst)
                     else:
-                        StickerConvert.convert_and_compress_to_size(src, dst, vid_size_max=500000, img_size_max=100000, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, duration_max=10, steps=steps)
+                        StickerConvert.convert_and_compress_to_size(src, dst, vid_size_max=500000, img_size_max=100000, res_w_min=512, res_w_max=512, res_h_min=512, res_h_max=512, quality_max=quality_max, quality_min=quality_min, fps_max=fps_max, fps_min=fps_min, color_min=color_min, color_max=color_max, duration_max=10000, steps=steps)
 
                 out_f = os.path.join(out_dir, FormatVerify.sanitize_filename(pack_title + '.wastickers'))
 
