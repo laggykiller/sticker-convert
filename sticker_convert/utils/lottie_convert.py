@@ -11,16 +11,20 @@ from lottie.importers import importers
 from lottie.utils.stripper import float_strip, heavy_strip
 from lottie import __version__
 
-def print_dep_message(loader):
+def print_dep_message(loader, cb_msg=print):
     if not loader.failed_modules:
         return
 
-    sys.stderr.write("Make sure you have the correct dependencies installed\n")
+    cb_msg("Make sure you have the correct dependencies installed\n")
 
     for failed, dep in loader.failed_modules.items():
-        sys.stderr.write("For %s install %s\n" % (failed, dep))
+        cb_msg("For %s install %s\n" % (failed, dep))
 
-def lottie_convert(infile, outfile, input_format=None, output_format=None, sanitize=False, optimize=1, fps=None, width=None, height=None, i_options={}, o_options={}):
+def lottie_convert(
+        infile, outfile, input_format=None, output_format=None, 
+        sanitize=False, optimize=1, fps=None, width=None, height=None, 
+        i_options={}, o_options={}, cb_msg=print):
+
     importer = None
     suf = os.path.splitext(infile)[1][1:]
     extra_arg = {'n_colors': 1, 
@@ -46,8 +50,8 @@ def lottie_convert(infile, outfile, input_format=None, output_format=None, sanit
                 importer = p
                 break
     if not importer:
-        print("Unknown importer")
-        print_dep_message(importers)
+        cb_msg("Unknown importer")
+        print_dep_message(importers, cb_msg)
         return False
 
     exporter = exporters.get_from_filename(outfile)
@@ -55,8 +59,8 @@ def lottie_convert(infile, outfile, input_format=None, output_format=None, sanit
         exporter = exporters.get(output_format)
 
     if not exporter:
-        print("Unknown exporter")
-        print_dep_message(exporters)
+        cb_msg("Unknown exporter")
+        print_dep_message(exporters, cb_msg)
         return False
 
     for opt in importer.extra_options:

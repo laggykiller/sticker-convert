@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import subprocess
 import os
 import shutil
@@ -5,7 +6,7 @@ import sys
 
 class RunBin:
     @staticmethod
-    def get_bin(bin, silent=False):
+    def get_bin(bin, silent=False, cb_msg=print):
         if sys.platform == 'win32':
             bin = bin + '.exe'
 
@@ -21,10 +22,10 @@ class RunBin:
         if which_result != None:
             return os.path.abspath(which_result)
         elif silent == False:
-            print(f'Warning: Cannot find binary file {bin}')
+            cb_msg(f'Warning: Cannot find binary file {bin}')
     
     @staticmethod
-    def run_cmd(cmd_list, silence=False):
+    def run_cmd(cmd_list, silence=False, cb_msg=print):
         cmd_list[0] = RunBin.get_bin(cmd_list[0])
 
         # subprocess.call(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
@@ -36,6 +37,6 @@ class RunBin:
         error_str = error.decode()
 
         if silence == False and error_str != '':
-            print(f"Error while executing {' '.join(cmd_list)} : {error_str}")
+            cb_msg(f"Error while executing {' '.join(cmd_list)} : {error_str}")
 
         return output_str

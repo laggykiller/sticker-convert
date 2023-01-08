@@ -1,3 +1,7 @@
 [submodule "sticker_convert/ios-message-stickers-template"]
 	path = sticker_convert/ios-message-stickers-template
 	url = https://github.com/NiklasPeterson/ios-message-stickers-template.git
+[submodule "sticker_convert/Sun-Valley-ttk-theme"]
+	path = sticker_convert/Sun-Valley-ttk-theme
+	url = https://github.com/laggykiller/Sun-Valley-ttk-theme.git
+	branch = gif-based

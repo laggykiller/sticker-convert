@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import os
 import shutil
 import mimetypes
@@ -97,7 +98,7 @@ class CodecInfo:
                 frames = anim.lottie_animation_get_totalframe()
             return frames
         
-        if RunBin.get_bin('ffprobe', silent=True):
+        if file_ext != '.webp' and RunBin.get_bin('ffprobe', silent=True):
             frames_ffprobe = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames', '-print_format', 'default=nokey=1:noprint_wrappers=1', file], silence=False).strip()
             if frames_ffprobe.isnumeric():
                 frames_ffprobe = int(frames_ffprobe)

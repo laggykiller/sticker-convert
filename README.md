@@ -83,19 +83,19 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.exe [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
-                           [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
-                           [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
-                           [--export-signal] [--export-telegram] [--export-imessage] [--no-compress]
-                           [--preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                           [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                           [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
-                           [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--duration-min DURATION]
-                           [--duration-max DURATION] [--steps STEPS] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                           [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--default-emoji DEFAULT_EMOJI]
-                           [--processes PROCESSES] [--author AUTHOR] [--title TITLE] [--signal-uuid SIGNAL_UUID]
-                           [--signal-password SIGNAL_PASSWORD] [--telegram-token TELEGRAM_TOKEN]
-                           [--telegram-userid TELEGRAM_USERID] [--save-cred]
+usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
+                       [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
+                       [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
+                       [--export-signal] [--export-telegram] [--export-imessage] [--no-compress]
+                       [--preset {signal,telegram,telegram_lottie,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
+                       [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                       [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
+                       [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
+                       [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--steps STEPS]
+                       [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
+                       [--img-format IMG_FORMAT] [--fake-vid] [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES]
+                       [--author AUTHOR] [--title TITLE] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--save-cred]
 
 CLI for stickers-convert
 
@@ -107,21 +107,22 @@ options:
   --output-dir OUTPUT_DIR
                         Specify output directory
   --download-signal DOWNLOAD_SIGNAL
-                        Download signal stickers from a URL as input (e.g.
+                        Download signal stickers from a URL as input (Example:
                         https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
   --download-telegram DOWNLOAD_TELEGRAM
-                        Download telegram stickers from a URL as input (e.g. https://telegram.me/addstickers/xxxxx)
+                        Download telegram stickers from a URL as input (Example:
+                        https://telegram.me/addstickers/xxxxx)
   --download-line DOWNLOAD_LINE
-                        Download line stickers from a URL / ID as input (e.g.
+                        Download line stickers from a URL / ID as input (Example:
                         https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
   --download-kakao DOWNLOAD_KAKAO
-                        Download kakao stickers from a URL / ID as input (e.g. https://e.kakao.com/t/xxxxx)
+                        Download kakao stickers from a URL / ID as input (Example: https://e.kakao.com/t/xxxxx)
   --export-wastickers   Create a .wastickers file for uploading to WhatsApp
   --export-signal       Upload to Signal
   --export-telegram     Upload to Telegram
   --export-imessage     Create Xcode project for importing to iMessage
   --no-compress         Do not compress files. Useful for only downloading stickers
-  --preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {signal,telegram,telegram_lottie,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
                         Apply preset for compression
   --fps-min FPS_MIN     Set minimum output fps
   --fps-max FPS_MAX     Set maximum output fps
@@ -143,10 +144,10 @@ options:
                         Set minimum number of colors (For converting to apng). >256 will disable it.
   --color-max COLOR_MAX
                         Set maximum number of colors (For converting to apng). >256 will disable it.
-  --duration-min DURATION
+  --duration-min DURATION_MIN
                         Set minimum output duration in miliseconds. Will change play speed if source is longer than
                         duration. 0 will disable limit.
-  --duration-max DURATION
+  --duration-max DURATION_MAX
                         Set maximum output duration in miliseconds. Will change play speed if source is longer than
                         duration. 0 will disable limit.
   --steps STEPS         Set number of divisions between min and max settings. Higher value is slower but yields file

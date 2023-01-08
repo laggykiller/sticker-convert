@@ -1,0 +1,32 @@
+{
+    "signal": {
+        "full_name": "Download from Signal",
+        "help": "Download signal stickers from a URL as input",
+        "example": "Example: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx",
+        "address_lbls": "URL address"
+    },
+    "telegram": {
+        "full_name": "Download from Telegram",
+        "help": "Download telegram stickers from a URL as input",
+        "example": "Example: https://telegram.me/addstickers/xxxxx",
+        "address_lbls": "URL address"
+    },
+    "line": {
+        "full_name": "Download from Line",
+        "help": "Download line stickers from a URL / ID as input",
+        "example": "Example: https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234",
+        "address_lbls": "URL address / ID"
+    },
+    "kakao": {
+        "full_name": "Download from Kakao",
+        "help": "Download kakao stickers from a URL / ID as input",
+        "example": "Example: https://e.kakao.com/t/xxxxx",
+        "address_lbls": "URL address / ID"
+    },
+    "local": {
+        "full_name": "From local directory",
+        "help": "Load files from local directory on computer",
+        "example": "No need to supply any URL",
+        "address_lbls": "URL address (N/A)"
+    }
+}
