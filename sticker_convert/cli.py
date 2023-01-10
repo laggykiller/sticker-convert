@@ -115,16 +115,11 @@ class CLI:
                 download_option = k
                 url = v
                 break
-        
-        input_dir = args.input_dir
-        if os.path.isdir(input_dir) == False:
-            self.callback_msg('Warning: Cannot find the specified input directory. Creating for you...')
-            os.makedirs(input_dir)
 
         self.opt_input = {
             'option': download_option,
             'url': url,
-            'dir': input_dir
+            'dir': args.input_dir
         }
 
     def get_opt_output(self, args):
@@ -138,15 +133,10 @@ class CLI:
             export_option = 'imessage'
         else:
             export_option = 'local'
-
-        output_dir = args.output_dir
-        if os.path.isdir(output_dir) == False:
-            self.callback_msg('Info: Cannot find the specified output directory. Creating for you...')
-            os.makedirs(output_dir)
         
         self.opt_output = {
             'option': export_option,
-            'dir': output_dir,
+            'dir': args.output_dir,
             'title': args.title,
             'author': args.author
         }
