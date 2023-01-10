@@ -1,0 +1,9 @@
+version: '3.6'
+services:
+  sticker-convert:
+    # image: sticker-convert # Uncomment for building locally
+    # build: . # Uncomment for building locally
+    image: laggykiller/sticker-convert:latest
+    volumes:
+      - ./sticker_input:/app/stickers_input
+      - ./sticker_output:/app/stickers_output

@@ -223,6 +223,11 @@ Building
 docker build . -t sticker-convert
 ```
 
+Alternatively, you may use docker-compose.yml with
+```
+docker-compose run
+```
+
 ## Running python script directly & Compiling
 See [COMPILING.md](COMPILING.md)
 
