@@ -11,7 +11,7 @@ from lottie.importers import importers
 from lottie.utils.stripper import float_strip, heavy_strip
 from lottie import __version__
 
-def print_dep_message(loader, cb_msg=print):
+def print_dep_message(loader, cb_msg=sys.stdout.write):
     if not loader.failed_modules:
         return
 
@@ -23,7 +23,7 @@ def print_dep_message(loader, cb_msg=print):
 def lottie_convert(
         infile, outfile, input_format=None, output_format=None, 
         sanitize=False, optimize=1, fps=None, width=None, height=None, 
-        i_options={}, o_options={}, cb_msg=print):
+        i_options={}, o_options={}, cb_msg=sys.stdout.write):
 
     importer = None
     suf = os.path.splitext(infile)[1][1:]

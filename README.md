@@ -87,7 +87,7 @@ usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir
                        [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
                        [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
                        [--export-signal] [--export-telegram] [--export-imessage] [--no-compress]
-                       [--preset {signal,telegram,telegram_lottie,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
+                       [--preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
                        [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
                        [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
                        [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
@@ -122,7 +122,7 @@ options:
   --export-telegram     Upload to Telegram
   --export-imessage     Create Xcode project for importing to iMessage
   --no-compress         Do not compress files. Useful for only downloading stickers
-  --preset {signal,telegram,telegram_lottie,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
                         Apply preset for compression
   --fps-min FPS_MIN     Set minimum output fps
   --fps-max FPS_MAX     Set maximum output fps

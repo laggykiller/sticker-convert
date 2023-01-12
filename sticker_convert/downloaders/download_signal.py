@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import anyio
 from signalstickers_client import StickersClient
 
@@ -7,7 +8,7 @@ from utils.metadata_handler import MetadataHandler
 
 class DownloadSignal:
     @staticmethod
-    async def download_stickers_signal_async(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+    async def download_stickers_signal_async(url, out_dir, opt_cred=None, cb_msg=sys.stdout.write, cb_bar=None):
         async def save_sticker(sticker):
             async with await anyio.open_file(os.path.join(out_dir, f'{str(sticker.id).zfill(3)}.webp'), "wb",) as f:
                 await f.write(sticker.image_data)
@@ -36,5 +37,5 @@ class DownloadSignal:
         return True
 
     @staticmethod
-    def download_stickers_signal(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+    def download_stickers_signal(url, out_dir, opt_cred=None, cb_msg=sys.stdout.write, cb_bar=None):
         anyio.run(DownloadSignal.download_stickers_signal_async, url, out_dir, opt_cred, cb_msg, cb_bar)

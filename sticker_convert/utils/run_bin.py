@@ -6,7 +6,7 @@ import sys
 
 class RunBin:
     @staticmethod
-    def get_bin(bin, silent=False, cb_msg=print):
+    def get_bin(bin, silent=False, cb_msg=sys.stdout.write):
         if sys.platform == 'win32':
             bin = bin + '.exe'
 
@@ -25,7 +25,7 @@ class RunBin:
             cb_msg(f'Warning: Cannot find binary file {bin}')
     
     @staticmethod
-    def run_cmd(cmd_list, silence=False, cb_msg=print):
+    def run_cmd(cmd_list, silence=False, cb_msg=sys.stdout.write):
         cmd_list[0] = RunBin.get_bin(cmd_list[0])
 
         # subprocess.call(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)

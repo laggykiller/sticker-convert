@@ -77,7 +77,7 @@
         "fake_vid": true,
         "default_emoji": "😀"
     },
-    "telegram_lottie": {
+    "telegram_vector": {
         "size_max": {
             "img": 6400,
             "vid": 6400

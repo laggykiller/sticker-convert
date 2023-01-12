@@ -31,7 +31,7 @@ from cli import CLI
 
 def main():
     if len(sys.argv) == 1:
-        print('Launching GUI...')
+        sys.stdout.write('Launching GUI...')
         with GUI() as w:
             w.root.mainloop()
     else:
