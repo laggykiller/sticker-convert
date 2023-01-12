@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, scrolledtext, END, Toplevel, Canvas
+from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, scrolledtext, Toplevel, Canvas
 from tkinter.ttk import LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar
 import os
 import sys
@@ -24,6 +24,7 @@ class GUI:
         self.emoji_font = ImageFont.truetype("./resources/NotoColorEmoji.ttf", 109)
 
         self.root = Tk()
+        
         self.root.tk.call("source", "./Sun-Valley-ttk-theme/sun-valley.tcl")
         self.root.tk.call("set_theme", "dark")
         # self.root.eval('tk::PlaceWindow . center')
@@ -33,8 +34,10 @@ class GUI:
             self.root.iconbitmap('resources/appicon.ico')
         self.root.title('sticker-convert')
 
+        self.create_scrollable_frame()
         self.init_frames()
         self.pack_frames()
+        self.resize_window()
 
         self.root.mainloop()
     
@@ -45,6 +48,29 @@ class GUI:
         self.save_creds()
         if self.exec_pool:
             self.exec_pool.terminate()
+        
+    def create_scrollable_frame(self):
+        self.main_frame = Frame(self.root)
+        self.main_frame.pack(fill='both', expand=1)
+
+        self.horizontal_scrollbar_frame = Frame(self.main_frame)
+        self.horizontal_scrollbar_frame.pack(fill='x', side='bottom')
+
+        self.canvas = Canvas(self.main_frame)
+        self.canvas.pack(side='left', fill='both', expand=1)
+
+        self.x_scrollbar = Scrollbar(self.horizontal_scrollbar_frame, orient='horizontal', command=self.canvas.xview)
+        self.x_scrollbar.pack(side='bottom', fill='x')
+
+        self.y_scrollbar = Scrollbar(self.main_frame, orient='vertical', command=self.canvas.yview)
+        self.y_scrollbar.pack(side='right', fill='y')
+
+        self.canvas.configure(xscrollcommand=self.x_scrollbar.set)
+        self.canvas.configure(yscrollcommand=self.y_scrollbar.set)
+        self.canvas.bind("<Configure>",lambda e: self.canvas.config(scrollregion= self.canvas.bbox('all'))) 
+
+        self.scrollable_frame = Frame(self.canvas)
+        self.canvas.create_window((0,0),window= self.scrollable_frame, anchor="nw")
 
     def init_frames(self):
         self.input_frame = InputFrame(self)
@@ -61,6 +87,21 @@ class GUI:
         self.cred_frame.frame.grid(column=0, row=2, sticky='w', padx=5, pady=5)
         self.progress_frame.frame.grid(column=0, row=3, columnspan=2, sticky='news', padx=5, pady=5)
         self.control_frame.frame.grid(column=0, row=4, columnspan=2, sticky='news', padx=5, pady=5)
+    
+    def resize_window(self):
+        self.scrollable_frame.update_idletasks()
+        width = self.scrollable_frame.winfo_width()
+        height = self.scrollable_frame.winfo_height()
+
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenwidth()
+
+        if width > screen_width:
+            width = int(screen_width * 0.9)
+        if height > screen_height:
+            height = int(screen_height * 0.9)
+
+        self.canvas.configure(width=width, height=height)
     
     def load_jsons(self):
         self.input_presets = JsonManager.load_json('resources/input.json')
@@ -199,7 +240,7 @@ class GUI:
 class InputFrame:
     def __init__(self, window):
         self.window = window
-        self.frame = LabelFrame(self.window.root, borderwidth=1, text='Input')
+        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Input')
 
         self.option_lbl = Label(self.frame, text='Input source', width=15, justify='left', anchor='w')
         self.option_var = StringVar(self.window.root)
@@ -258,7 +299,7 @@ class InputFrame:
 class CompFrame:
     def __init__(self, window):
         self.window = window
-        self.frame = LabelFrame(self.window.root, borderwidth=1, text='Compression options')
+        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Compression options')
 
         self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_compress_help('Do not compress files. Useful for only downloading stickers'))
         self.no_compress_var = BooleanVar()
@@ -628,7 +669,7 @@ class CompFrame:
 class OutputFrame:
     def __init__(self, window):
         self.window = window
-        self.frame = LabelFrame(self.window.root, borderwidth=1, text='Output')
+        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Output')
 
         self.option_lbl = Label(self.frame, text='Output options', width=18, justify='left', anchor='w')
         self.option_var = StringVar(self.window.root)
@@ -680,7 +721,7 @@ class OutputFrame:
 class CredFrame:
     def __init__(self, window):
         self.window = window
-        self.frame = LabelFrame(self.window.root, borderwidth=1, text='Credentials')
+        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Credentials')
 
         self.signal_uuid_lbl = Label(self.frame, text='Signal uuid', width=18, justify='left', anchor='w')
         self.signal_uuid_var = StringVar(self.window.root)
@@ -736,7 +777,7 @@ class ProgressFrame:
 
     def __init__(self, window):
         self.window = window
-        self.frame = LabelFrame(self.window.root, borderwidth=1, text='Progress')
+        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Progress')
 
         self.message_box = scrolledtext.ScrolledText(self.frame, height=15, wrap='word')
         self.progress_bar = Progressbar(self.frame, orient='horizontal', mode='determinate')
@@ -779,10 +820,10 @@ class ProgressFrame:
         self.message_box.config(state='normal')
 
         if cls:
-            self.message_box.delete(1.0, END)
+            self.message_box.delete(1.0, 'end')
 
         if msg:
-            self.message_box.insert(END, msg)
+            self.message_box.insert('end', msg)
 
             # Follow the end of the box if it was at the end
             # if scrollbar_prev_loc == 1.0:
@@ -800,7 +841,7 @@ class ProgressFrame:
 class ControlFrame:
     def __init__(self, window):
         self.window = window
-        self.frame = Frame(self.window.root, borderwidth=1)
+        self.frame = Frame(self.window.scrollable_frame, borderwidth=1)
 
         self.start_btn = Button(self.frame, text='Start', command=self.window.start)
         
