@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os
+import sys
 import multiprocessing
 import argparse
 
@@ -239,10 +239,10 @@ class CLI:
 
     def callback_msg(self, msg: str=None, cls: bool=True, *args):
         if msg:
-            print(msg)
+            sys.stdout.write(msg)
         elif len(args) > 0:
             msg = ' '.join(str(i) for i in args)
-            print(msg)
+            sys.stdout.write(msg)
     
     def callback_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
         # Progressbar could be implemented here

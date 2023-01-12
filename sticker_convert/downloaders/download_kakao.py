@@ -4,12 +4,13 @@
 import requests
 import json
 import os
+import sys
 
 from utils.metadata_handler import MetadataHandler
 
 class DownloadKakao:
     @staticmethod
-    def download_stickers_kakao(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+    def download_stickers_kakao(url, out_dir, opt_cred=None, cb_msg=sys.stdout.write, cb_bar=None):
         if url.startswith('https://e.kakao.com/t/'):
             pack_id = url.replace('https://e.kakao.com/t/', '')
         else:

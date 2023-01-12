@@ -3,6 +3,7 @@ import os
 import copy
 import re
 import tempfile
+import sys
 
 from utils.converter import StickerConvert
 from utils.metadata_handler import MetadataHandler
@@ -15,7 +16,7 @@ from mergedeep import merge
 
 class UploadTelegram:
     @staticmethod
-    def upload_stickers_telegram(opt_output, opt_comp, opt_cred, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
+    def upload_stickers_telegram(opt_output, opt_comp, opt_cred, cb_msg=sys.stdout.write, cb_bar=None, out_dir=None, **kwargs):
         if not opt_cred.get('telegram', {}).get('token'):
             msg = 'Token required for uploading to telegram'
             return [msg]

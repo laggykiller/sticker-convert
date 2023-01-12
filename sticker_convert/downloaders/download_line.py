@@ -4,12 +4,13 @@
 import requests
 import json
 import os
+import sys
 
 from utils.metadata_handler import MetadataHandler
 
 class DownloadLine:
     @staticmethod
-    def download_stickers_line(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+    def download_stickers_line(url, out_dir, opt_cred=None, cb_msg=sys.stdout.write, cb_bar=None):
         pack_ext = ""
 
         region = ''
