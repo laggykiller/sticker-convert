@@ -836,6 +836,13 @@ class AdvancedCompressionWindow:
         self.render_emoji_list()
 
         self.set_emoji_btn()
+        self.callback_disable_fps()
+        self.callback_disable_res_w()
+        self.callback_disable_res_h()
+        self.callback_disable_quality()
+        self.callback_disable_color()
+        self.callback_disable_duration()
+        self.callback_disable_size()
         self.resize_window()
     
     def create_scrollable_frame(self):
