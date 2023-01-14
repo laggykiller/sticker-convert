@@ -224,7 +224,6 @@ class StickerConvert:
     @staticmethod
     def convert_generic_anim(in_f, out_f, res_w=None, res_h=None, quality=None, fps=None, fps_in=None, duration_min=None, duration_max=None, **kwargs):
         # fps should not exceed original
-        print(fps, CodecInfo.get_file_fps(in_f))
         if fps:
             fps = min(fps, CodecInfo.get_file_fps(in_f))
 
