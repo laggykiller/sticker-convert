@@ -15,6 +15,11 @@ if RunBin.get_bin('magick', silent=True) == None:
 import ffmpeg
 from rlottie_python import LottieAnimation
 
+lottie_in_ext_support = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs', '.png', '.apng', '.gif', '.tiff')
+lottie_out_ext_support = ('.lottie', '.tgs', '.html', '.sif', '.svg', '.png', '.pdf', '.ps', '.gif', '.webp', '.tiff', '.dotlottie', '.video', '.webm', '.mp4', '.webm')
+
+vector_formats = ('.lottie', '.sif', '.svg', '.tnz', '.dotlottie', '.kra', '.bmp', '.py', '.tgs')
+
 class StickerConvert:
     @staticmethod
     def convert(in_f, out_f, res_w=None, res_h=None, quality=None, fps=None, color=None, duration_min=None, duration_max=None, fake_vid=False):
@@ -41,7 +46,7 @@ class StickerConvert:
         out_f_ext = CodecInfo.get_file_ext(out_f)
 
         lottie_formats = ('.tgs', '.lottie', '.json')
-        if in_f_ext in lottie_formats:
+        if in_f_ext in lottie_formats or out_f_ext in lottie_formats:
             return StickerConvert.convert_lottie
 
         else:
@@ -377,7 +382,17 @@ class StickerConvert:
             out_f_ext = CodecInfo.get_file_ext(out_f)
 
             if out_f_ext in ('.tgs', '.lottie', '.json'):
-                lottie_convert(in_f, out_f, width=res_w, height=res_h, fps=fps, i_options=i_options, o_options=o_options)
+                if in_f_ext not in vector_formats:
+                    # o_options['bmp-mode'] = 'trace' # TODO: Use potrace?
+                    o_options['bmp-mode'] = 'pixel'
+
+                if in_f_ext not in lottie_in_ext_support:
+                    tmp_f = os.path.join(tempdir, 'tmp.webp')
+                    StickerConvert.convert_generic_anim(in_f, tmp_f)
+                else:
+                    tmp_f = in_f
+
+                lottie_convert(tmp_f, out_f, width=res_w, height=res_h, fps=fps, i_options=i_options, o_options=o_options)
             else:
                 if in_f_ext == '.tgs':
                     anim = LottieAnimation.from_tgs(in_f)
