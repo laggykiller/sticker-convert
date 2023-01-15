@@ -326,12 +326,12 @@ class InputFrame:
         self.address_tip.grid(column=0, row=3, columnspan=3, sticky='w', padx=3, pady=3)
     
     def callback_set_indir(self, *args):
-        orig_input_dir = self.input_setdir_var.get()
+        orig_input_dir = self.window.input_setdir_var.get()
         if not os.path.isdir(orig_input_dir):
             orig_input_dir = os.getcwd()
         input_dir = filedialog.askdirectory(initialdir=orig_input_dir)
         if input_dir != '':
-            self.input_setdir_var.set(input_dir)
+            self.window.input_setdir_var.set(input_dir)
     
     def callback_input_option(self, *args):
         for i in self.window.input_presets.keys():
