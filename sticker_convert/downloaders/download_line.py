@@ -53,7 +53,7 @@ class DownloadLine:
 
         MetadataHandler.set_metadata(out_dir, title=title, author=author)
 
-        if pack_meta['hasAnimation'] == True:
+        if pack_meta.get('hasAnimation') == True:
             pack_ext = '.apng'
         else:
             pack_ext = '.png'
