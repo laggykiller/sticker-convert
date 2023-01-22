@@ -13,5 +13,5 @@ Currently, downloading kakao animated stickers is under research. This file docu
 - The animated stickers are fetched like this: https://item.kakaocdn.net/dw/4406368.emot_001.webp (Note: `Authorization` header is used but not necessary)
 
 ## Problems to solve
-- The webp file downloaded could not be decoded. ffmpeg complains about missing RIFF header.
+- The webp file downloaded could not be decoded. ffmpeg complains about missing RIFF header. This gist page describes how to decode the webp file: https://gist.github.com/chitacan/9802668 (webp file is decoded by `libdigitalitem_image_decoder.so`, this library needed to be reversed engineered)
 - How can we know that `so-cute-honey-bay-bee-ver-9` corresponds to `4406368`?
