@@ -32,7 +32,10 @@
 2. Install Android Studio and create an emulated device, then install KakaoTalk on the device
 3. Install BurpSuite
 4. Follow this guide to hook up Android emulated device with BurpSuite: https://blog.yarsalabs.com/setting-up-burp-for-android-application-testing/
-5. Follow this guide to bypass SSL pinning: https://redfoxsec.com/blog/ssl-pinning-bypass-android-frida/ (Tip: For `cer.cer` mentioned in this guide, use the `burp-ca.crt` you created in step 4)
+5. Follow this guide to bypass SSL pinning: https://redfoxsec.com/blog/ssl-pinning-bypass-android-frida/
+    - For `cer.cer` mentioned in this guide, use the `burp-ca.crt` you created in step 4)
+    - Run `adb shell`, `su` and `/data/local/tmp/frida-server` to start `frida-server` on Android Emulator
+    - Run `frida -U -f com.kakao.talk -l fridascript.js` while `frida-server` is running
 6. Browse for some emoticons in KakaoTalk application and view HTTP history in BurpSuite
     - To get auth_token, copy `Authorization` from header of request seen in BurpSuite
     - To get emoticon ID, look for URL such as `https://item.kakaocdn.net/dw/4404400.emot_001.webp`. Emoticon ID would be `4404400`
