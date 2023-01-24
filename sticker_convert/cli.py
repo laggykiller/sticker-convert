@@ -5,6 +5,7 @@ import argparse
 
 from flow import Flow
 from utils.json_manager import JsonManager
+from utils.get_kakao_auth_token import GetKakaoAuthToken
 
 # Only download from a source
 # sticker_convert_cli.py --download-signal <url> --no-compress
@@ -39,7 +40,8 @@ class CLI:
         parser.add_argument('--download-signal', dest='download_signal', help=f'{self.input_presets["signal"]["help"]} ({self.input_presets["signal"]["example"]})')
         parser.add_argument('--download-telegram', dest='download_telegram', help=f'{self.input_presets["telegram"]["help"]} ({self.input_presets["telegram"]["example"]})')
         parser.add_argument('--download-line', dest='download_line', help=f'{self.input_presets["line"]["help"]} ({self.input_presets["line"]["example"]})')
-        parser.add_argument('--download-kakao', dest='download_kakao', help=f'{self.input_presets["kakao"]["help"]} ({self.input_presets["kakao"]["example"]})')
+        parser.add_argument('--download-kakao-static', dest='download_kakao_static', help=f'{self.input_presets["kakao_static"]["help"]} ({self.input_presets["kakao_static"]["example"]})')
+        parser.add_argument('--download-kakao-animated', dest='download_kakao_animated', help=f'{self.input_presets["kakao_animated"]["help"]} ({self.input_presets["kakao_animated"]["example"]})')
 
         parser.add_argument('--export-wastickers', dest='export_wastickers', action='store_true', help=self.output_presets['whatsapp']['help'])
         parser.add_argument('--export-signal', dest='export_signal', action='store_true', help=self.output_presets['signal']['help'])
@@ -78,6 +80,12 @@ class CLI:
         parser.add_argument('--signal-password', dest='signal_password', help='Set signal password. Required for uploading signal stickers')
         parser.add_argument('--telegram-token', dest='telegram_token', help='Set telegram token. Required for uploading and downloading telegram stickers')
         parser.add_argument('--telegram-userid', dest='telegram_userid', help='Set telegram user_id (From real account, not bot account). Required for uploading telegram stickers')
+        parser.add_argument('--kakao-auth-token', dest='kakao_auth_token', help='Set kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx')
+        parser.add_argument('--kakao-gen-auth-token', dest='kakao_gen_auth_token', action='store_true', help='Generate kakao auth_token. Kakao username, password, country code and phone number are also required.')
+        parser.add_argument('--kakao-username', dest='kakao_username', help='Set kakao username, which is email or phone number used for signing up Kakao account (e.g. `+447700900142`). Required for generating kakao auth_token')
+        parser.add_argument('--kakao-password', dest='kakao_password', help='Set kakao password (Password of Kakao account). Required for generating kakao auth_token')
+        parser.add_argument('--kakao-country-code', dest='kakao_country_code', help='Set kakao country code of phone. Example: 82 (For korea), 44 (For UK), 1 (For USA). Required for generating kakao auth_token')
+        parser.add_argument('--kakao-phone-number', dest='kakao_phone_number', help='Set kakao phone number (Phone number associated with your Kakao account. Used for send / receive verification code via SMS.). Required for generating kakao auth_token')
         parser.add_argument('--save-cred', dest='save_cred', action="store_true", help='Save signal and telegram credentials')
 
         args = parser.parse_args()
@@ -105,7 +113,8 @@ class CLI:
             'signal': args.download_signal, 
             'line': args.download_line, 
             'telegram': args.download_telegram, 
-            'kakao': args.download_kakao
+            'kakao_static': args.download_kakao_static,
+            'kakao_animated': args.download_kakao_animated
         }
 
         download_option = 'local'
@@ -214,8 +223,22 @@ class CLI:
             'telegram': {
                 'token': args.telegram_token if args.telegram_token else creds.get('telegram', {}).get('token'),
                 'userid': args.telegram_userid if args.telegram_userid else creds.get('telegram', {}).get('userid')
+            },
+            'kakao': {
+                'auth_token': args.kakao_auth_token if args.kakao_auth_token else creds.get('kakao', {}).get('auth_token'),
+                'username': args.kakao_username if args.kakao_username else creds.get('kakao', {}).get('username'),
+                'password': args.kakao_password if args.kakao_password else creds.get('kakao', {}).get('password'),
+                'country_code': args.kakao_country_code if args.kakao_country_code else creds.get('kakao', {}).get('country_code'),
+                'phone_number': args.kakao_phone_number if args.kakao_phone_number else creds.get('kakao', {}).get('phone_number')
             }
-        }        
+        }
+
+        if args.kakao_gen_auth_token:
+            auth_token = GetKakaoAuthToken.get_kakao_auth_token(opt_cred=creds, cb_msg=self.callback_msg, cb_input=input)
+            if auth_token:
+                self.opt_cred['kakao']['auth_token'] = auth_token
+                
+                self.callback_msg(f'Got auth_token successfully: {auth_token}')
         
         if args.save_cred:
             JsonManager.save_json('creds.json', self.opt_cred)
@@ -239,10 +262,10 @@ class CLI:
 
     def callback_msg(self, msg: str=None, cls: bool=True, *args):
         if msg:
-            sys.stdout.write(msg)
+            print(msg)
         elif len(args) > 0:
             msg = ' '.join(str(i) for i in args)
-            sys.stdout.write(msg)
+            print(msg)
     
     def callback_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
         # Progressbar could be implemented here

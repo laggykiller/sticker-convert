@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, scrolledtext, Toplevel, Canvas
+from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, simpledialog, scrolledtext, Toplevel, Canvas
 from tkinter.ttk import LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar
 import os
 import sys
@@ -11,6 +11,7 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 
 from flow import Flow
 from utils.json_manager import JsonManager
+from utils.get_kakao_auth_token import GetKakaoAuthToken
 
 class GUI:
     default_input_mode = 'telegram'
@@ -36,6 +37,7 @@ class GUI:
 
         self.create_scrollable_frame()
         self.declare_variables()
+        self.set_creds()
         self.init_frames()
         self.pack_frames()
         self.resize_window()
@@ -131,6 +133,11 @@ class GUI:
         self.signal_password_var = StringVar(self.root)
         self.telegram_token_var = StringVar(self.root)
         self.telegram_userid_var = StringVar(self.root)
+        self.kakao_auth_token_var = StringVar(self.root)
+        self.kakao_username_var = StringVar(self.root)
+        self.kakao_password_var = StringVar(self.root)
+        self.kakao_country_code_var = StringVar(self.root)
+        self.kakao_phone_number_var = StringVar(self.root)
 
     def init_frames(self):
         self.input_frame = InputFrame(self)
@@ -184,10 +191,31 @@ class GUI:
             'telegram': {
                 'token': self.telegram_token_var.get(),
                 'userid': self.telegram_userid_var.get()
+            },
+            'kakao': {
+                'auth_token': self.kakao_auth_token_var.get(),
+                'username': self.kakao_username_var.get(),
+                'password': self.kakao_password_var.get(),
+                'country_code': self.kakao_country_code_var.get(),
+                'phone_number': self.kakao_phone_number_var.get()
             }
         }
 
         JsonManager.save_json('creds.json', creds)
+    
+    def set_creds(self):
+        if not self.creds:
+            return
+
+        self.signal_uuid_var.set(self.creds.get('signal', {}).get('uuid'))
+        self.signal_password_var.set(self.creds.get('signal', {}).get('password'))
+        self.telegram_token_var.set(self.creds.get('telegram', {}).get('token'))
+        self.telegram_userid_var.set(self.creds.get('telegram', {}).get('userid'))
+        self.kakao_auth_token_var.set(self.creds.get('kakao', {}).get('auth_token'))
+        self.kakao_username_var.set(self.creds.get('kakao', {}).get('username'))
+        self.kakao_password_var.set(self.creds.get('kakao', {}).get('password'))
+        self.kakao_country_code_var.set(self.creds.get('kakao', {}).get('country_code'))
+        self.kakao_phone_number_var.set(self.creds.get('kakao', {}).get('phone_number'))
     
     def callback_ask(self, question):
         return messagebox.askyesno('sticker-convert', question)
@@ -264,6 +292,13 @@ class GUI:
             'telegram': {
                 'token': self.telegram_token_var.get(),
                 'userid': self.telegram_userid_var.get()
+            },
+            'kakao': {
+                'auth_token': self.kakao_auth_token_var.get(),
+                'username': self.kakao_username_var.get(),
+                'password': self.kakao_password_var.get(),
+                'country_code': self.kakao_country_code_var.get(),
+                'phone_number': self.kakao_phone_number_var.get()
             }
         }
         
@@ -356,20 +391,20 @@ class CompFrame:
         self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Compression options')
         self.frame.grid_columnconfigure(2, weight = 1)
 
-        self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_compress_help('Do not compress files. Useful for only downloading stickers'))
+        self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Do not compress files. Useful for only downloading stickers'))
         self.no_compress_lbl = Label(self.frame, text='No compression')
         self.no_compress_cbox = Checkbutton(self.frame, variable=self.window.no_compress_var, command=self.callback_nocompress)
 
-        self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_compress_help('Apply preset for compression'))
+        self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Apply preset for compression'))
         self.comp_preset_lbl = Label(self.frame, text='Preset')
         self.comp_preset_opt = OptionMenu(self.frame, self.window.comp_preset_var, self.window.default_comp_preset, *self.window.compression_presets.keys(), command=self.callback_comp_apply_preset)
         self.comp_preset_opt.config(width=15)
 
-        self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_compress_help('Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit'))
+        self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit'))
         self.steps_lbl = Label(self.frame, text='Number of steps')       
         self.steps_entry = Entry(self.frame, textvariable=self.window.steps_var, width=8)
 
-        self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_compress_help('Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources'))
+        self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources'))
         self.processes_lbl = Label(self.frame, text='Number of processes')
         self.processes_entry = Entry(self.frame, textvariable=self.window.processes_var, width=8)
 
@@ -395,7 +430,7 @@ class CompFrame:
 
         self.callback_comp_apply_preset()
     
-    def callback_compress_help(self, message='', *args):
+    def callback_help(self, message='', *args):
         messagebox.showinfo(title='sticker-convert', message=message)
     
     def callback_comp_apply_preset(self, *args):
@@ -504,6 +539,10 @@ class CredFrame:
         self.telegram_userid_lbl = Label(self.frame, text='Telegram user_id', justify='left', anchor='w')
         self.telegram_userid_entry = Entry(self.frame, textvariable=self.window.telegram_userid_var, width=50)
 
+        self.kakao_auth_token_lbl = Label(self.frame, text='Kakao auth_token', justify='left', anchor='w')
+        self.kakao_auth_token_entry = Entry(self.frame, textvariable=self.window.kakao_auth_token_var, width=35)
+        self.kakao_gen_auth_btn = Button(self.frame, text='Generate', command=self.callback_gen_auth)
+
         self.help_btn = Button(self.frame, text='Get help', command=self.callback_cred_help)
 
         self.signal_uuid_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
@@ -514,27 +553,24 @@ class CredFrame:
         self.telegram_token_entry.grid(column=1, row=2, columnspan=2, sticky='w', padx=3, pady=3)
         self.telegram_userid_lbl.grid(column=0, row=3, sticky='w', padx=3, pady=3)
         self.telegram_userid_entry.grid(column=1, row=3, columnspan=2, sticky='w', padx=3, pady=3)
-        self.help_btn.grid(column=1, row=4, columnspan=2, sticky='e', padx=3, pady=3)
-
-        self.set_creds()
-    
-    def set_creds(self):
-        if not self.window.creds:
-            return
-
-        self.window.signal_uuid_var.set(self.window.creds.get('signal', {}).get('uuid'))
-        self.window.signal_password_var.set(self.window.creds.get('signal', {}).get('password'))
-        self.window.telegram_token_var.set(self.window.creds.get('telegram', {}).get('token'))
-        self.window.telegram_userid_var.set(self.window.creds.get('telegram', {}).get('userid'))
+        self.kakao_auth_token_lbl.grid(column=0, row=4, sticky='w', padx=3, pady=3)
+        self.kakao_auth_token_entry.grid(column=1, row=4, sticky='w', padx=3, pady=3)
+        self.kakao_gen_auth_btn.grid(column=2, row=4, sticky='e', padx=3, pady=3)
+        self.help_btn.grid(column=2, row=5, sticky='e', padx=3, pady=3)
     
     def callback_cred_help(self, *args):
         webbrowser.open('https://github.com/laggykiller/sticker-convert#faq')
+    
+    def callback_gen_auth(self, *args):
+        KakaoGenAuthWindow(self.window)
     
     def set_states(self, state):
         self.signal_uuid_entry.config(state=state)
         self.signal_password_entry.config(state=state)
         self.telegram_token_entry.config(state=state)
         self.telegram_userid_entry.config(state=state)
+        self.kakao_auth_token_entry.config(state=state)
+        self.kakao_gen_auth_btn.config(state=state)
 
 class ProgressFrame:
     progress_bar_steps = 0
@@ -614,6 +650,130 @@ class ControlFrame:
         
         self.start_btn.pack(expand=True, fill='x')
 
+class KakaoGenAuthWindow:
+    def __init__(self, window):
+        self.window = window
+
+        self.genauthwin = Toplevel(window.root)
+        self.genauthwin.title('Generate Kakao auth_token')
+        if sys.platform == 'darwin':
+            self.genauthwin.iconbitmap('resources/appicon.icns')
+        else:
+            self.genauthwin.iconbitmap('resources/appicon.ico')
+        
+        self.genauthwin.focus_force()
+
+        self.create_scrollable_frame()
+
+        self.frame_login_info = LabelFrame(self.scrollable_frame, text='Kakao login info')
+        self.frame_login_btn = Frame(self.scrollable_frame)
+
+        self.frame_login_info.grid(column=0, row=0, sticky='news', padx=3, pady=3)
+        self.frame_login_btn.grid(column=0, row=1, sticky='news', padx=3, pady=3)
+
+        # Login info frame
+        self.explanation1_lbl = Label(self.frame_login_info, text='This will simulate login to Android Kakao app', justify='left', anchor='w')
+        self.explanation2_lbl = Label(self.frame_login_info, text='You will send / receive verification code via SMS', justify='left', anchor='w')
+        self.explanation3_lbl = Label(self.frame_login_info, text='You maybe logged out of existing device', justify='left', anchor='w')
+
+        self.kakao_username_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Email or Phone number used for signing up Kakao account (e.g. `+447700900142`)'))
+        self.kakao_username_lbl = Label(self.frame_login_info, text='Username', width=18, justify='left', anchor='w')
+        self.kakao_username_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_username_var, width=30)
+
+        self.kakao_password_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Password of Kakao account'))
+        self.kakao_password_lbl = Label(self.frame_login_info, text='Password', justify='left', anchor='w')
+        self.kakao_password_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_password_var, width=30)
+
+        self.kakao_country_code_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Example: 82 (For korea), 44 (For UK), 1 (For USA)'))
+        self.kakao_country_code_lbl = Label(self.frame_login_info, text='Country code', justify='left', anchor='w')
+        self.kakao_country_code_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_country_code_var, width=30)
+
+        self.kakao_phone_number_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Phone number associated with your Kakao account. Used for send / receive verification code via SMS.'))
+        self.kakao_phone_number_lbl = Label(self.frame_login_info, text='Phone number', justify='left', anchor='w')
+        self.kakao_phone_number_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_phone_number_var, width=30)
+
+        self.explanation1_lbl.grid(column=0, row=0, columnspan=3, sticky='w', padx=3, pady=3)
+        self.explanation2_lbl.grid(column=0, row=1, columnspan=3, sticky='w', padx=3, pady=3)
+        self.explanation3_lbl.grid(column=0, row=2, columnspan=3, sticky='w', padx=3, pady=3)
+
+        self.kakao_username_help_btn.grid(column=0, row=3, sticky='w', padx=3, pady=3)
+        self.kakao_username_lbl.grid(column=1, row=3, sticky='w', padx=3, pady=3)
+        self.kakao_username_entry.grid(column=2, row=3, sticky='w', padx=3, pady=3)
+
+        self.kakao_password_help_btn.grid(column=0, row=4, sticky='w', padx=3, pady=3)
+        self.kakao_password_lbl.grid(column=1, row=4, sticky='w', padx=3, pady=3)
+        self.kakao_password_entry.grid(column=2, row=4, sticky='w', padx=3, pady=3)
+
+        self.kakao_country_code_help_btn.grid(column=0, row=5, sticky='w', padx=3, pady=3)
+        self.kakao_country_code_lbl.grid(column=1, row=5, sticky='w', padx=3, pady=3)
+        self.kakao_country_code_entry.grid(column=2, row=5, sticky='w', padx=3, pady=3)
+
+        self.kakao_phone_number_help_btn.grid(column=0, row=6, sticky='w', padx=3, pady=3)
+        self.kakao_phone_number_lbl.grid(column=1, row=6, sticky='w', padx=3, pady=3)
+        self.kakao_phone_number_entry.grid(column=2, row=6, sticky='w', padx=3, pady=3)
+
+        # Login button frame
+        self.login_btn = Button(self.frame_login_btn, text='Login and get auth_token', command=self.callback_login)
+
+        self.login_btn.pack()
+
+        self.resize_window()
+    
+    def create_scrollable_frame(self):
+        self.main_frame = Frame(self.genauthwin)
+        self.main_frame.pack(fill='both', expand=1)
+
+        self.horizontal_scrollbar_frame = Frame(self.main_frame)
+        self.horizontal_scrollbar_frame.pack(fill='x', side='bottom')
+
+        self.canvas = Canvas(self.main_frame)
+        self.canvas.pack(side='left', fill='both', expand=1)
+
+        self.x_scrollbar = Scrollbar(self.horizontal_scrollbar_frame, orient='horizontal', command=self.canvas.xview)
+        self.x_scrollbar.pack(side='bottom', fill='x')
+
+        self.y_scrollbar = Scrollbar(self.main_frame, orient='vertical', command=self.canvas.yview)
+        self.y_scrollbar.pack(side='right', fill='y')
+
+        self.canvas.configure(xscrollcommand=self.x_scrollbar.set)
+        self.canvas.configure(yscrollcommand=self.y_scrollbar.set)
+        self.canvas.bind("<Configure>",lambda e: self.canvas.config(scrollregion= self.canvas.bbox('all'))) 
+
+        self.scrollable_frame = Frame(self.canvas)
+        self.canvas.create_window((0,0),window= self.scrollable_frame, anchor="nw")
+
+    def resize_window(self):
+        self.scrollable_frame.update_idletasks()
+        width = self.scrollable_frame.winfo_width()
+        height = self.scrollable_frame.winfo_height()
+
+        screen_width = self.window.root.winfo_screenwidth()
+        screen_height = self.window.root.winfo_screenwidth()
+
+        if width > screen_width * 0.8:
+            width = int(screen_width * 0.8)
+        if height > screen_height * 0.8:
+            height = int(screen_height * 0.8)
+
+        self.canvas.configure(width=width, height=height)
+    
+    def callback_help(self, message='', *args):
+        messagebox.showinfo(title='sticker-convert', message=message)
+    
+    def callback_login(self, *args):
+        auth_token = GetKakaoAuthToken.get_kakao_auth_token(opt_cred=self.window.creds, cb_msg=self.callback_message, cb_input=self.callback_input)
+        if auth_token:
+            self.window.creds['kakao']['auth_token'] = auth_token
+            self.window.kakao_auth_token_var.set(auth_token)
+            
+            self.callback_message(f'Got auth_token successfully: {auth_token}')
+
+    def callback_input(self, question):
+        return simpledialog.askstring('sticker-convert', question)
+    
+    def callback_message(self, message):
+        messagebox.showinfo(title='sticker-convert', message=message)
+
 class AdvancedCompressionWindow:
     emoji_column_per_row = 10
     emoji_visible_rows = 5
@@ -650,7 +810,7 @@ class AdvancedCompressionWindow:
 
         self.frame_advcomp.grid_columnconfigure(6, weight=1)
 
-        self.fps_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('FPS Higher = Smoother but larger size'))
+        self.fps_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('FPS Higher = Smoother but larger size'))
         self.fps_lbl = Label(self.frame_advcomp, text='Output FPS')
         self.fps_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.fps_min_entry = Entry(self.frame_advcomp, textvariable=self.window.fps_min_var, width=8)
@@ -658,7 +818,7 @@ class AdvancedCompressionWindow:
         self.fps_max_entry = Entry(self.frame_advcomp, textvariable=self.window.fps_max_var, width=8)
         self.fps_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.fps_disable_var, command=self.callback_disable_fps)
 
-        self.res_w_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Set width.\nResolution higher = Clearer but larger size'))
+        self.res_w_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set width.\nResolution higher = Clearer but larger size'))
         self.res_w_lbl = Label(self.frame_advcomp, text='Output resolution (Width)')
         self.res_w_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.res_w_min_entry = Entry(self.frame_advcomp, textvariable=self.window.res_w_min_var, width=8)
@@ -666,7 +826,7 @@ class AdvancedCompressionWindow:
         self.res_w_max_entry = Entry(self.frame_advcomp, textvariable=self.window.res_w_max_var, width=8)
         self.res_w_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.res_w_disable_var, command=self.callback_disable_res_w)
         
-        self.res_h_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Set height.\nResolution higher = Clearer but larger size'))
+        self.res_h_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set height.\nResolution higher = Clearer but larger size'))
         self.res_h_lbl = Label(self.frame_advcomp, text='Output resolution (Height)')
         self.res_h_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.res_h_min_entry = Entry(self.frame_advcomp, textvariable=self.window.res_h_min_var, width=8)
@@ -674,7 +834,7 @@ class AdvancedCompressionWindow:
         self.res_h_max_entry = Entry(self.frame_advcomp, textvariable=self.window.res_h_max_var, width=8)
         self.res_h_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.res_h_disable_var, command=self.callback_disable_res_h)
 
-        self.quality_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Quality higher = Clearer but larger size'))
+        self.quality_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Quality higher = Clearer but larger size'))
         self.quality_lbl = Label(self.frame_advcomp, text='Output quality (0-100)')
         self.quality_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.quality_min_entry = Entry(self.frame_advcomp, textvariable=self.window.quality_min_var, width=8)
@@ -682,7 +842,7 @@ class AdvancedCompressionWindow:
         self.quality_max_entry = Entry(self.frame_advcomp, textvariable=self.window.quality_max_var, width=8)
         self.quality_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.quality_disable_var, command=self.callback_disable_quality)
 
-        self.color_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Reduce size by limiting number of colors.\nMakes image "blocky". >256 will disable this.\nApplies to png and apng only.\nColor higher = More colors but larger size'))
+        self.color_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Reduce size by limiting number of colors.\nMakes image "blocky". >256 will disable this.\nApplies to png and apng only.\nColor higher = More colors but larger size'))
         self.color_lbl = Label(self.frame_advcomp, text='Colors (0-256)')
         self.color_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.color_min_entry = Entry(self.frame_advcomp, textvariable=self.window.color_min_var, width=8)
@@ -690,7 +850,7 @@ class AdvancedCompressionWindow:
         self.color_max_entry = Entry(self.frame_advcomp, textvariable=self.window.color_max_var, width=8)
         self.color_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.color_disable_var, command=self.callback_disable_color)
 
-        self.duration_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.'))
+        self.duration_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.'))
         self.duration_lbl = Label(self.frame_advcomp, text='Duration (Miliseconds)')
         self.duration_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.duration_min_entry = Entry(self.frame_advcomp, textvariable=self.window.duration_min_var, width=8)
@@ -698,7 +858,7 @@ class AdvancedCompressionWindow:
         self.duration_max_entry = Entry(self.frame_advcomp, textvariable=self.window.duration_max_var, width=8)
         self.duration_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.duration_disable_var, command=self.callback_disable_duration)
 
-        self.size_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Set maximum file size in bytes for video and image'))
+        self.size_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set maximum file size in bytes for video and image'))
         self.size_lbl = Label(self.frame_advcomp, text='Maximum file size (bytes)')
         self.img_size_max_lbl = Label(self.frame_advcomp, text='Img:')
         self.img_size_max_entry = Entry(self.frame_advcomp, textvariable=self.window.img_size_max_var, width=8)
@@ -706,18 +866,18 @@ class AdvancedCompressionWindow:
         self.vid_size_max_entry = Entry(self.frame_advcomp, textvariable=self.window.vid_size_max_var, width=8)
         self.size_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.size_disable_var, command=self.callback_disable_size)
 
-        self.format_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Set file format for video and image'))
+        self.format_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set file format for video and image'))
         self.format_lbl = Label(self.frame_advcomp, text='File format')
         self.img_format_lbl = Label(self.frame_advcomp, text='Img:')
         self.img_format_entry = Entry(self.frame_advcomp, textvariable=self.window.img_format_var, width=8)
         self.vid_format_lbl = Label(self.frame_advcomp, text='Vid:')
         self.vid_format_entry = Entry(self.frame_advcomp, textvariable=self.window.vid_format_var, width=8)
 
-        self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Convert image to video. Useful if:\n(1) Size limit for video is larger than image\n(2) Mix image and video into same pack'))
+        self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Convert image to video. Useful if:\n(1) Size limit for video is larger than image\n(2) Mix image and video into same pack'))
         self.fake_vid_lbl = Label(self.frame_advcomp, text='Convert (faking) image to video')
         self.fake_vid_cbox = Checkbutton(self.frame_advcomp, variable=self.window.fake_vid_var)
 
-        self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_compress_help('Set the default emoji for uploading signal and telegram sticker packs'))
+        self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set the default emoji for uploading signal and telegram sticker packs'))
         self.default_emoji_lbl = Label(self.frame_advcomp, text='Default emoji')
         self.im = Image.new("RGBA", (32, 32), (255,255,255,0))
         self.ph_im = ImageTk.PhotoImage(self.im)
@@ -946,7 +1106,7 @@ class AdvancedCompressionWindow:
         self.img_size_max_entry.config(state=state)
         self.vid_size_max_entry.config(state=state)
 
-    def callback_compress_help(self, message='', *args):
+    def callback_help(self, message='', *args):
         messagebox.showinfo(title='sticker-convert', message=message)
     
     def set_emoji_btn(self):

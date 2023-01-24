@@ -3,7 +3,6 @@ import shutil
 import os
 import tempfile
 import copy
-import sys
 
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
@@ -19,7 +18,7 @@ def clean_dir(dir):
 
 class CompressWastickers:
     @staticmethod
-    def compress_wastickers(opt_output={}, opt_comp={}, cb_msg=sys.stdout.write, cb_bar=None, out_dir=None, **kwargs):
+    def compress_wastickers(opt_output={}, opt_comp={}, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
         fake_vid = opt_comp.get('fake_vid', False)
         in_dir = opt_output['dir']
         if not out_dir:
