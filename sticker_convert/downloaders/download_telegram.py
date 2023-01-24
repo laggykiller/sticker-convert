@@ -3,7 +3,6 @@ import os
 from contextlib import contextmanager
 import shutil
 import tempfile
-import sys
 
 from utils.metadata_handler import MetadataHandler
 
@@ -20,7 +19,7 @@ def cwd(path):
 
 class DownloadTelegram:
     @staticmethod
-    def download_stickers_telegram(url, out_dir, opt_cred=None, cb_msg=sys.stdout.write, cb_bar=None):
+    def download_stickers_telegram(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
         token = opt_cred.get('telegram', {}).get('token')
         if token == None:
             cb_msg('Download failed: Token required for downloading from telegram')

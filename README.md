@@ -20,6 +20,7 @@
 - [FAQ](#faq)
     - [Getting signal uuid and password](#getting-signal-uuid-and-password)
     - [Getting telegram bot token](#getting-telegram-bot-token)
+    - [Getting kakao auth_token](#getting-kakao-auth_token)
     - [Importing .wastickers into WhatsApp](#importing-wastickers-into-whatsapp)
     - [Getting stickers from WhatsApp](#getting-stickers-from-whatsapp)
     - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
@@ -34,7 +35,7 @@
 | Telegram    | ✅ (Require `uuid` & `password`)         | ✅ (Require `token` & `user_id` or manually)       |
 | WhatsApp    | ⭕ (Manually by Android or WhatsApp Web) | ⭕ (Create `.wastickers`, import by Sticker Maker) |
 | Line        | ✅                                       | 🚫 (Need to submit for manual approval)            |
-| Kakao       | ⭕ (No animated version currently)       | 🚫 (Need to submit for manual approval)            |
+| Kakao       | ✅ (Require `auth-token` for animated)   | 🚫 (Need to submit for manual approval)            |
 | iMessage    | 🚫                                       | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
@@ -59,7 +60,7 @@
         - For more information: https://github.com/doubleplusc/Line-sticker-downloader
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Kakao
-    - Download: Supported (e.g. https://e.kakao.com/t/xxxxx). Can only download static stickers. Learn more about the problems encountered [kakao_anim_note.md](kakao_anim_note.md)
+    - Download: Supported (e.g. https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400 OR 4404400). If you want to download animated stickers, you have to supply auth_token. Learn more from [kakao_anim_note.md](kakao_anim_note.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - iMessage
     - Download: Not supported.
@@ -85,8 +86,9 @@ To run in CLI mode, pass on any arguments
 ```
 usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
                        [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
-                       [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--export-wastickers]
-                       [--export-signal] [--export-telegram] [--export-imessage] [--no-compress]
+                       [--download-line DOWNLOAD_LINE] [--download-kakao-static DOWNLOAD_KAKAO_STATIC]
+                       [--download-kakao-animated DOWNLOAD_KAKAO_ANIMATED] [--export-wastickers] [--export-signal]
+                       [--export-telegram] [--export-imessage] [--no-compress]
                        [--preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
                        [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
                        [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
@@ -95,7 +97,10 @@ usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir
                        [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
                        [--img-format IMG_FORMAT] [--fake-vid] [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES]
                        [--author AUTHOR] [--title TITLE] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
-                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--save-cred]
+                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
+                       [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-gen-auth-token] [--kakao-username KAKAO_USERNAME]
+                       [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
+                       [--kakao-phone-number KAKAO_PHONE_NUMBER] [--save-cred]
 
 CLI for stickers-convert
 
@@ -115,8 +120,11 @@ options:
   --download-line DOWNLOAD_LINE
                         Download line stickers from a URL / ID as input (Example:
                         https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
-  --download-kakao DOWNLOAD_KAKAO
-                        Download kakao stickers from a URL / ID as input (Example: https://e.kakao.com/t/xxxxx)
+  --download-kakao-static DOWNLOAD_KAKAO_STATIC
+                        Download kakao stickers from a URL as input (Example: https://e.kakao.com/t/xxxxx)
+  --download-kakao-animated DOWNLOAD_KAKAO_ANIMATED
+                        Download kakao stickers from a URL / ID as input (Example: https://e.kakao.com/t/xxxxx OR
+                        kakaotalk://store/emoticon/4404400 OR 4404400)
   --export-wastickers   Create a .wastickers file for uploading to WhatsApp
   --export-signal       Upload to Signal
   --export-telegram     Upload to Telegram
@@ -177,6 +185,23 @@ options:
   --telegram-userid TELEGRAM_USERID
                         Set telegram user_id (From real account, not bot account). Required for uploading telegram
                         stickers
+  --kakao-auth-token KAKAO_AUTH_TOKEN
+                        Set kakao auth_token. Required for downloading animated stickers from
+                        https://e.kakao.com/t/xxxxx
+  --kakao-gen-auth-token
+                        Generate kakao auth_token. Kakao username, password, country code and phone number are also
+                        required.
+  --kakao-username KAKAO_USERNAME
+                        Set kakao username, which is email or phone number used for signing up Kakao account (e.g.
+                        `+447700900142`). Required for generating kakao auth_token
+  --kakao-password KAKAO_PASSWORD
+                        Set kakao password (Password of Kakao account). Required for generating kakao auth_token
+  --kakao-country-code KAKAO_COUNTRY_CODE
+                        Set kakao country code of phone. Example: 82 (For korea), 44 (For UK), 1 (For USA). Required
+                        for generating kakao auth_token
+  --kakao-phone-number KAKAO_PHONE_NUMBER
+                        Set kakao phone number (Phone number associated with your Kakao account. Used for send /
+                        receive verification code via SMS.). Required for generating kakao auth_token
   --save-cred           Save signal and telegram credentials
 ```
 
@@ -271,6 +296,9 @@ Follow instruction from this post: https://stackoverflow.com/a/52667196
 
 ![imgs/telegram-userid.png](imgs/telegram-userid.png)
 
+### Getting Kakao auth_token
+Read [kakao_anim_note.md](kakao_anim_note.md)
+
 ### Importing .wastickers into WhatsApp
 1. Download Sticker maker on your phone [[iOS version](https://apps.apple.com/us/app/sticker-maker-studio/id1443326857) | [Android version](https://play.google.com/store/apps/details?id=com.marsvard.stickermakerforwhatsapp)]
 2. Transfer the .wastickers file into your phone
@@ -295,6 +323,8 @@ To avoid this, upload telegram stickers manually using https://t.me/stickers
 - Information about Signal and Telegram stickers: https://github.com/teynav/signalApngSticker
 - Information about Line and Kakao stickers: https://github.com/star-39/moe-sticker-bot
 - Information about Line stickers: https://github.com/doubleplusc/Line-sticker-downloader
+- Information about Kakao animated stickers: https://gist.github.com/chitacan/9802668
+- Downloading and decrypting Kakao animated stickers: https://github.com/blluv/KakaoTalkEmoticonDownloader
 - Application icon taken from [Icons8](https://icons8.com/)
 
 ## DISCLAIMER

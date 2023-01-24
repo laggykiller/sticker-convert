@@ -2,7 +2,6 @@
 import os
 import copy
 import tempfile
-import sys
 
 from utils.metadata_handler import MetadataHandler
 from utils.converter import StickerConvert
@@ -16,7 +15,7 @@ from mergedeep import merge
 
 class UploadSignal:
     @staticmethod
-    async def upload_stickers_signal_async(opt_output, opt_comp, opt_cred, cb_msg=sys.stdout.write, cb_bar=None, out_dir=None, **kwargs):
+    async def upload_stickers_signal_async(opt_output, opt_comp, opt_cred, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
         if not opt_cred.get('signal', {}).get('uuid'):
             msg = 'uuid required for uploading to signal'
             return [msg]
@@ -125,5 +124,5 @@ class UploadSignal:
         return urls
 
     @staticmethod
-    def upload_stickers_signal(opt_output, opt_comp, opt_cred, cb_msg=sys.stdout.write, cb_bar=None, out_dir=None, **kwargs):
+    def upload_stickers_signal(opt_output, opt_comp, opt_cred, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
         return anyio.run(UploadSignal.upload_stickers_signal_async, opt_output, opt_comp, opt_cred, cb_msg, cb_bar, out_dir)

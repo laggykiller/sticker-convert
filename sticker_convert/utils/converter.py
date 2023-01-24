@@ -3,7 +3,6 @@ import os
 import shutil
 import math
 import tempfile
-import sys
 
 from .run_bin import RunBin
 from .codec_info import CodecInfo
@@ -31,7 +30,7 @@ class StickerConvert:
         convert_method(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, color=color, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
 
     @staticmethod
-    def convert_and_compress_to_size(in_f, out_f, opt_comp, cb_msg=sys.stdout.write):
+    def convert_and_compress_to_size(in_f, out_f, opt_comp, cb_msg=print):
         '''
         Convert format with given res, quality, fps
         Try to reduce file size to below thresholds (vid_size_max and img_size_max) by adjusting res, quality, fps
@@ -64,7 +63,7 @@ class StickerConvert:
                 return StickerConvert.convert_generic_image
     
     @staticmethod
-    def compress_to_size(convert_method, in_f, out_f, opt_comp, cb_msg=sys.stdout.write):
+    def compress_to_size(convert_method, in_f, out_f, opt_comp, cb_msg=print):
         def get_step_value(max, min, step, steps):
             if max and min:
                 return round((max - min) * step / steps + min)

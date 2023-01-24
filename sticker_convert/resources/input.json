@@ -17,10 +17,16 @@
         "example": "Example: https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234",
         "address_lbls": "URL address / ID"
     },
-    "kakao": {
-        "full_name": "Download from Kakao",
-        "help": "Download kakao stickers from a URL / ID as input",
+    "kakao_static": {
+        "full_name": "Download from Kakao (Static)",
+        "help": "Download kakao stickers from a URL as input",
         "example": "Example: https://e.kakao.com/t/xxxxx",
+        "address_lbls": "URL address"
+    },
+    "kakao_animated": {
+        "full_name": "Download from Kakao (Animated)",
+        "help": "Download kakao stickers from a URL / ID as input",
+        "example": "Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400 OR 4404400",
         "address_lbls": "URL address / ID"
     },
     "local": {

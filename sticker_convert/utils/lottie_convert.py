@@ -4,14 +4,13 @@
 Adapted from https://gitlab.com/mattbas/python-lottie/-/raw/master/bin/lottie_convert.py
 '''
 
-import sys
 import os
 from lottie.exporters import exporters
 from lottie.importers import importers
 from lottie.utils.stripper import float_strip, heavy_strip
 from lottie import __version__
 
-def print_dep_message(loader, cb_msg=sys.stdout.write):
+def print_dep_message(loader, cb_msg=print):
     if not loader.failed_modules:
         return
 
@@ -23,7 +22,7 @@ def print_dep_message(loader, cb_msg=sys.stdout.write):
 def lottie_convert(
         infile, outfile, input_format=None, output_format=None, 
         sanitize=False, optimize=1, fps=None, width=None, height=None, 
-        i_options={}, o_options={}, cb_msg=sys.stdout.write):
+        i_options={}, o_options={}, cb_msg=print):
 
     importer = None
     suf = os.path.splitext(infile)[1][1:]

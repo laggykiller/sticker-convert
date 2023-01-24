@@ -4,7 +4,6 @@ import os
 import copy
 import json
 import plistlib
-import sys
 
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
@@ -52,7 +51,7 @@ class XcodeImessage:
         # }
 
     @staticmethod
-    def create_imessage_xcode(opt_output, opt_comp, cb_msg=sys.stdout.write, cb_bar=None, out_dir=None, **kwargs):
+    def create_imessage_xcode(opt_output, opt_comp, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
         in_dir = opt_output['dir']
         if not out_dir:
             out_dir = opt_output['dir']

@@ -4,13 +4,12 @@
 import requests
 import json
 import os
-import sys
 
 from utils.metadata_handler import MetadataHandler
 
 class DownloadLine:
     @staticmethod
-    def download_stickers_line(url, out_dir, opt_cred=None, cb_msg=sys.stdout.write, cb_bar=None):
+    def download_stickers_line(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
         pack_ext = ""
 
         region = ''
@@ -74,7 +73,7 @@ class DownloadLine:
             success = False
             for _ in range(3):
                 try:
-                    image = requests.get(url, stream=True)
+                    image = requests.get(url, stream=True, timeout=5)
                     with open(out_path, 'wb') as f:
                         for chunk in image.iter_content(chunk_size=10240):
                             if chunk:

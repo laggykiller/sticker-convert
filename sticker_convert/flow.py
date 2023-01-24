@@ -6,7 +6,8 @@ from threading import Thread
 from downloaders.download_line import DownloadLine
 from downloaders.download_signal import DownloadSignal
 from downloaders.download_telegram import DownloadTelegram
-from downloaders.download_kakao import DownloadKakao
+from downloaders.download_kakao_static import DownloadKakaoStatic
+from downloaders.download_kakao_animated import DownloadKakaoAnimated
 
 from uploaders.upload_signal import UploadSignal
 from uploaders.upload_telegram import UploadTelegram
@@ -117,6 +118,12 @@ class Flow:
             msg += '[X] Downloading from and uploading to telegram requires bot token.\n'
             msg += save_to_local_tip
         
+        if (self.opt_input.get('option') == 'kakao_animated' and 
+            not self.opt_cred.get('kakao', {}).get('auth_token') and
+            self.opt_input.get('url').startswith('https://e.kakao.com/t/')):
+
+            msg += '[X] Downloading kakao animated stickers from https://e.kakao.com/t/xxxxx requires auth_token.\n'
+            msg += '    The auth_token is required for getting the item id.\n'
 
         if (self.opt_output.get('option') == 'telegram' and 
             not self.opt_cred.get('telegram', {}).get('userid')):
@@ -220,8 +227,11 @@ class Flow:
         if self.opt_input['option'] == 'telegram':
             downloaders.append(DownloadTelegram.download_stickers_telegram)
 
-        if self.opt_input['option'] == 'kakao':
-            downloaders.append(DownloadKakao.download_stickers_kakao)
+        if self.opt_input['option'] == 'kakao_static':
+            downloaders.append(DownloadKakaoStatic.download_stickers_kakao)
+        
+        if self.opt_input['option'] == 'kakao_animated':
+            downloaders.append(DownloadKakaoAnimated.download_stickers_kakao_animated)
         
         for downloader in downloaders:
             success = downloader(
