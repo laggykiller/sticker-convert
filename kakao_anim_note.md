@@ -48,7 +48,8 @@ Emoticon that are in webp and gif need to be decoded. For Kakao Android applicat
 3. `decryptData()`
 4. `cryptData()`, which decode emoticon by LFSR and XOR
 
-If interested, you may study by decompiling Kakao Android application with `jadx` and decompile `libdigitalitem_image_decoder.so` with `ghidra`
+If interested, you may study by decompiling Kakao Android application with `jadx` and decompile `libdigitalitem_image_decoder.so` with `ghidra`.
 
+- Reversing android native library: https://github.com/maddiestone/AndroidAppRE/blob/master/reversing_native_libs.md
 - Information about Kakao animated stickers: https://gist.github.com/chitacan/9802668
 - Downloading and decrypting Kakao animated stickers: https://github.com/blluv/KakaoTalkEmoticonDownloader
