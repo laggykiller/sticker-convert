@@ -29,14 +29,14 @@
 - [DISCLAIMER](#disclaimer)
 
 ## Compatibility
-| Application | ⬇️ Download                              | ⬆️ Upload                                          |
-| ----------- | ---------------------------------------- | --------------------------------------------------- |
-| Signal      | ✅                                       | ✅ (Require `uuid` & `password` or manually)       |
-| Telegram    | ✅ (Require `uuid` & `password`)         | ✅ (Require `token` & `user_id` or manually)       |
-| WhatsApp    | ⭕ (Manually by Android or WhatsApp Web) | ⭕ (Create `.wastickers`, import by Sticker Maker) |
-| Line        | ✅                                       | 🚫 (Need to submit for manual approval)            |
-| Kakao       | ✅ (Require `auth-token` for animated)   | 🚫 (Need to submit for manual approval)            |
-| iMessage    | 🚫                                       | ⭕ (Create Xcode stickerpack project for sideload) |
+| Application | ⬇️ Download                            | ⬆️ Upload                                          |
+| ----------- | -------------------------------------- | --------------------------------------------------- |
+| Signal      | ✅                                     | ✅ (Require `uuid` & `password` or manually)       |
+| Telegram    | ✅ (Require `uuid` & `password`)       | ✅ (Require `token` & `user_id` or manually)       |
+| WhatsApp    | ⭕ (By Android or WhatsApp Web)        | ⭕ (Create `.wastickers`, import by Sticker Maker) |
+| Line        | ✅                                     | 🚫 (Need to submit for manual approval)            |
+| Kakao       | ✅ (Require `auth-token` for animated) | 🚫 (Need to submit for manual approval)            |
+| iMessage    | 🚫                                     | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
 
@@ -60,7 +60,7 @@
         - For more information: https://github.com/doubleplusc/Line-sticker-downloader
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Kakao
-    - Download: Supported (e.g. https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400 OR 4404400). auth_token is required to download animated stickers from https://e.kakao.com/t/xxxxx (For querying the sticker ID that is in turn used for downloading animated stickers). Learn more from [kakao_anim_note.md](kakao_anim_note.md)
+    - Download: Supported (e.g. https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400 OR 4404400). `auth_token` is required to download animated stickers from https://e.kakao.com/t/xxxxx (For querying the sticker ID that is in turn used for downloading animated stickers). Learn more from [kakao_anim_note.md](kakao_anim_note.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - iMessage
     - Download: Not supported.
