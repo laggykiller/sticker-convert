@@ -50,17 +50,17 @@
     - Upload: Supported, but require bot token and user_id. Alternatively, you may manually upload and create sticker pack with the output of this program.
 - WhatsApp
     - Download: You have to manually find sticker packs / extract from your phone or from WhatsApp Web
-        - Android Phone: Inside "/storage/emulated/0/Whatsapp/media/Whatsapp Stickers" OR "/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Stickers"
+        - Android Phone: Inside `/storage/emulated/0/Whatsapp/media/Whatsapp Stickers` OR `/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Stickers`
         - Any: Go to WhatsApp Web, right click on sticker and click "Save image as..."
     - Upload: The program can create .wastickers file, which could then be imported into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information
 - Line
-    - Download: Supported (e.g. https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
+    - Download: Supported (e.g. `https://store.line.me/stickershop/product/1234/en` OR `line://shop/detail/1234` OR `1234`)
         - Search on official site: http://www.line-stickers.com/
         - Search on non-official site (Include region locked and expired packs): http://www.line-stickers.com/
         - For more information: https://github.com/doubleplusc/Line-sticker-downloader
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Kakao
-    - Download: Supported (e.g. https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400 OR 4404400). `auth_token` is required to download animated stickers from https://e.kakao.com/t/xxxxx (For querying the sticker ID that is in turn used for downloading animated stickers). Learn more from [kakao_anim_note.md](kakao_anim_note.md)
+    - Download: Supported (e.g. `https://e.kakao.com/t/xxxxx` OR `kakaotalk://store/emoticon/4404400` OR `4404400`). `auth_token` is required to download animated stickers from `https://e.kakao.com/t/xxxxx` (For querying the sticker ID that is in turn used for downloading animated stickers). Learn more from [kakao_anim_note.md](kakao_anim_note.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - iMessage
     - Download: Not supported.
