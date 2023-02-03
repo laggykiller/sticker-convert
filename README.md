@@ -8,14 +8,15 @@
 
 ## Downloads
 - [Pre-compiled releases](https://github.com/laggykiller/sticker-convert/releases) for Windows and MacOS. (Unzip the downloaded file and run `sticker-convert`)
-- [Docker image](https://hub.docker.com/r/laggykiller/sticker-convert) for running CLI on Linux.
+- [Docker image](https://hub.docker.com/r/laggykiller/sticker-convert) for running on Linux.
 - [Try in Google Colab without downloading](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which runs the code on Google server and get the result from Google Drive. However, it maybe slower than running on your computer. (~50 seconds per file if not converting to .apng, ~4 minute per file if you convert to .apng)
 
 ## Table of contents
 - [Compatibility](#compatibility)
 - [How to use (GUI)](#how-to-use-gui)
 - [How to use (CLI)](#how-to-use-cli)
-- [How to use (Docker)](#how-to-use-docker)
+- [How to use (Docker CLI version)](#how-to-use-docker-cli-version)
+- [How to use (Docker GUI version)](#how-to-use-docker-gui-version)
 - [Running python script directly & Compiling](#running-python-script-directly--compiling)
 - [FAQ](#faq)
     - [Getting signal uuid and password](#getting-signal-uuid-and-password)
@@ -231,7 +232,7 @@ Convert local files to a custom format
 
 `sticker-convert --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
-## How to use (Docker)
+## How to use (Docker CLI version)
 
 Running
 ```
@@ -243,15 +244,45 @@ docker run -d -it --name sticker-convert \
     python3 /app/main.py --help
 ```
 
+Alternatively, you may use docker-compose.yml with
+```
+docker-compose run
+```
+
 Building
 ```
 docker build . -t sticker-convert
 ```
 
+## How to use (Docker GUI version)
+![imgs/screenshot-docker-gui.png](imgs/screenshot-docker-gui.png)
+
+
+Running
+```
+docker pull laggykiller/sticker-convert:latest-gui
+docker run -d -it --name sticker-convert \
+    -v /path/to/your/stickers_input:/app/stickers_input \
+    -v /path/to/your/stickers_output:/app/stickers_output \
+    sticker-convert:latest-gui \
+    -p 5800:5800 \
+    -p 5900:5900 \
+    python3 /app/main.py --help
+```
+
+After that, open browser and go to `localhost:5800`. You may also use VNC and go to `localhost:5900`
+
 Alternatively, you may use docker-compose.yml with
 ```
-docker-compose run
+docker-compose -f docker-compose-gui.yml run
 ```
+
+Building
+```
+docker build -f Dockerfile.gui . -t sticker-convert
+```
+
+Note that the GUI version is based on https://github.com/jlesage/docker-baseimage-gui. Visit that repo for more information.
 
 ## Running python script directly & Compiling
 See [COMPILING.md](COMPILING.md)
