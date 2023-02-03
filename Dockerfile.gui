@@ -1,0 +1,51 @@
+FROM jlesage/baseimage-gui:alpine-3.17-v4.3
+
+WORKDIR /app
+
+RUN apk add alpine-sdk python3 py3-pip ffmpeg imagemagick optipng pngquant zip unzip cmake libpng-dev boost-dev tar sed python3-tkinter py3-opencv msttcorefonts-installer fontconfig
+
+RUN update-ms-fonts
+
+RUN mkdir /app/apngdis && \
+    cd /app/apngdis && \
+    curl -O -L https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-src.zip && \
+    unzip apngdis-2.9-src.zip
+WORKDIR /app/apngdis
+RUN make && cp /app/apngdis/apngdis /usr/local/bin && rm -rf /app/apngdis
+
+WORKDIR /app
+RUN curl -O -L https://github.com/apngasm/apngasm/archive/refs/tags/3.1.10.tar.gz && \
+    tar xvzf 3.1.10.tar.gz
+WORKDIR /app/apngasm-3.1.10
+RUN mkdir build && cd build && cmake ../ && make && make install
+WORKDIR /app
+RUN rm -rf /app/apngasm-3.1.10 && rm 3.1.10.tar.gz
+
+RUN curl -O -L https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz && \
+    tar xvzf 2.0.2.tar.gz
+WORKDIR /app/pngnq-s9-2.0.2
+RUN sed -i '1i#include <string.h>' src/rwpng.c && ./configure && make && make install
+WORKDIR /app
+RUN rm -rf /app/pngnq-s9-2.0.2 && \
+    rm /app/2.0.2.tar.gz
+
+RUN set-cont-env APP_NAME "sticker-convert"
+
+# Generate and install favicons.
+RUN \
+    APP_ICON_URL=https://github.com/laggykiller/sticker-convert/raw/master/sticker_convert/resources/appicon.png && \
+    install_app_icon.sh "$APP_ICON_URL"
+
+ENV DISPLAY_WIDTH=1920
+ENV DISPLAY_HEIGHT=1080
+
+RUN mkdir /etc/openbox
+RUN printf '<Type>normal</Type>\n<Name>sticker-convert</Name>' >> /etc/openbox/main-window-selection.xml
+
+COPY ./requirements.txt /app/
+RUN pip3 install -r requirements.txt
+COPY ./sticker_convert /app/
+
+COPY startapp.sh /startapp.sh
+
+Volume ["/app/stickers_input", "/app/stickers_output"]

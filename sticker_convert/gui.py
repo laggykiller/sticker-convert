@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, simpledialog, scrolledtext, Toplevel, Canvas
+from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, simpledialog, scrolledtext, Toplevel, Canvas, PhotoImage
 from tkinter.ttk import LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar
 import os
 import sys
@@ -31,8 +31,11 @@ class GUI:
         # self.root.eval('tk::PlaceWindow . center')
         if sys.platform == 'darwin':
             self.root.iconbitmap('resources/appicon.icns')
-        else:
+        elif sys.platform == 'win32':
             self.root.iconbitmap('resources/appicon.ico')
+        else:
+            self.icon = PhotoImage(file='resources/appicon.png')
+            self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
         self.root.title('sticker-convert')
 
         self.create_scrollable_frame()
@@ -658,8 +661,11 @@ class KakaoGenAuthWindow:
         self.genauthwin.title('Generate Kakao auth_token')
         if sys.platform == 'darwin':
             self.genauthwin.iconbitmap('resources/appicon.icns')
-        else:
+        elif sys.platform == 'win32':
             self.genauthwin.iconbitmap('resources/appicon.ico')
+        else:
+            self.icon = PhotoImage(file='resources/appicon.png')
+            self.genauthwin.tk.call('wm', 'iconphoto', self.genauthwin._w, self.icon)
         
         self.genauthwin.focus_force()
 
@@ -787,8 +793,11 @@ class AdvancedCompressionWindow:
         self.advcompwin.title('Advanced compression options')
         if sys.platform == 'darwin':
             self.advcompwin.iconbitmap('resources/appicon.icns')
-        else:
+        elif sys.platform == 'win32':
             self.advcompwin.iconbitmap('resources/appicon.ico')
+        else:
+            self.icon = PhotoImage(file='resources/appicon.png')
+            self.advcompwin.tk.call('wm', 'iconphoto', self.advcompwin._w, self.icon)
         
         self.advcompwin.focus_force()
 
