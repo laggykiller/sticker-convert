@@ -240,13 +240,13 @@ docker pull laggykiller/sticker-convert:latest
 docker run -d -it --name sticker-convert \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
-    sticker-convert:latest \
+    laggykiller/sticker-convert:latest \
     python3 /app/main.py --help
 ```
 
 Alternatively, you may use docker-compose.yml with
 ```
-docker-compose run
+docker compose up
 ```
 
 Building
@@ -261,20 +261,19 @@ docker build . -t sticker-convert
 Running
 ```
 docker pull laggykiller/sticker-convert:latest-gui
-docker run -d -it --name sticker-convert \
+docker run -d -it --name sticker-convert-gui \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
-    sticker-convert:latest-gui \
     -p 5800:5800 \
     -p 5900:5900 \
-    python3 /app/main.py --help
+    laggykiller/sticker-convert:latest-gui
 ```
 
 After that, open browser and go to `localhost:5800`. You may also use VNC and go to `localhost:5900`
 
 Alternatively, you may use docker-compose.yml with
 ```
-docker-compose -f docker-compose-gui.yml run
+docker compose -f docker-compose-gui.yml up
 ```
 
 Building
