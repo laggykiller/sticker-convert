@@ -294,16 +294,13 @@ See [COMPILING.md](COMPILING.md)
 
 ![imgs/signal-uuid-password.png](imgs/signal-uuid-password.png)
 
-1. Install Signal Desktop from https://signal.org/en/download/
+1. Install Signal Desktop BETA VERSION from https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta
 2. Link Signal Desktop with your phone
-3. Open Signal Desktop in the commandline
-    - Windows: Open search, type cmd, type `%localappdata%\Programs\signal-desktop\Signal.exe --enable-dev-tools` and press enter
-    - MacOS: Open terminal, type `/Applications/Signal.app/Contents/MacOS/Signal --enable-dev-tools`
-    - Linux: Open terminal, type `signal-desktop --enable-dev-tools`
+3. Launch Signal Desktop BETA VERSION
 4. On the top bar, go to `View -> Toggle Developers tools`
 5. Open console
-    - `uuid` is the output of running: `window.reduxStore.getState().items.uuid_id`
-    - `password` is the output of running: `window.reduxStore.getState().items.password`
+    - `uuid` is the output of running: `window.SignalDebug.getReduxState().items.uuid_id`
+    - `password` is the output of running: `window.SignalDebug.getReduxState().items.password`
 
 Reference: https://github.com/teynav/signalApngSticker
 
