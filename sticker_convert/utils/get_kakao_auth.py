@@ -244,9 +244,9 @@ class KakaoLoginManager:
         authorization_token = self.access_token + '-' + self.device_uuid
         return authorization_token
 
-class GetKakaoAuthToken:
+class GetKakaoAuth:
     @staticmethod
-    def get_kakao_auth_token(opt_cred, cb_msg=print, cb_input=input):
+    def get_kakao_auth(opt_cred, cb_msg=print, cb_input=input):
         log_man = KakaoLoginManager(opt_cred, cb_msg, cb_input)
 
         authorization_token = log_man.get_authorization_token()

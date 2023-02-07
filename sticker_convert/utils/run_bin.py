@@ -7,6 +7,9 @@ import sys
 class RunBin:
     @staticmethod
     def get_bin(bin, silent=False, cb_msg=print):
+        if os.path.isfile(bin):
+            return bin
+
         if sys.platform == 'win32':
             bin = bin + '.exe'
 

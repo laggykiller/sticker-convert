@@ -11,7 +11,8 @@ from PIL import Image, ImageTk, ImageDraw, ImageFont
 
 from flow import Flow
 from utils.json_manager import JsonManager
-from utils.get_kakao_auth_token import GetKakaoAuthToken
+from utils.get_kakao_auth import GetKakaoAuth
+from utils.get_signal_auth import GetSignalAuth
 
 class GUI:
     default_input_mode = 'telegram'
@@ -536,6 +537,8 @@ class CredFrame:
         self.signal_password_lbl = Label(self.frame, text='Signal password', justify='left', anchor='w')
         self.signal_password_entry = Entry(self.frame, textvariable=self.window.signal_password_var, width=50)
 
+        self.signal_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_signal_get_auth)
+
         self.telegram_token_lbl = Label(self.frame, text='Telegram token', justify='left', anchor='w')
         self.telegram_token_entry = Entry(self.frame, textvariable=self.window.telegram_token_var, width=50)
 
@@ -544,7 +547,7 @@ class CredFrame:
 
         self.kakao_auth_token_lbl = Label(self.frame, text='Kakao auth_token', justify='left', anchor='w')
         self.kakao_auth_token_entry = Entry(self.frame, textvariable=self.window.kakao_auth_token_var, width=35)
-        self.kakao_gen_auth_btn = Button(self.frame, text='Generate', command=self.callback_gen_auth)
+        self.kakao_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_kakao_get_auth)
 
         self.help_btn = Button(self.frame, text='Get help', command=self.callback_cred_help)
 
@@ -552,20 +555,24 @@ class CredFrame:
         self.signal_uuid_entry.grid(column=1, row=0, columnspan=2, sticky='w', padx=3, pady=3)
         self.signal_password_lbl.grid(column=0, row=1, sticky='w', padx=3, pady=3)
         self.signal_password_entry.grid(column=1, row=1, columnspan=2, sticky='w', padx=3, pady=3)
-        self.telegram_token_lbl.grid(column=0, row=2, sticky='w', padx=3, pady=3)
-        self.telegram_token_entry.grid(column=1, row=2, columnspan=2, sticky='w', padx=3, pady=3)
-        self.telegram_userid_lbl.grid(column=0, row=3, sticky='w', padx=3, pady=3)
-        self.telegram_userid_entry.grid(column=1, row=3, columnspan=2, sticky='w', padx=3, pady=3)
-        self.kakao_auth_token_lbl.grid(column=0, row=4, sticky='w', padx=3, pady=3)
-        self.kakao_auth_token_entry.grid(column=1, row=4, sticky='w', padx=3, pady=3)
-        self.kakao_gen_auth_btn.grid(column=2, row=4, sticky='e', padx=3, pady=3)
-        self.help_btn.grid(column=2, row=5, sticky='e', padx=3, pady=3)
+        self.signal_get_auth_btn.grid(column=2, row=2, sticky='e', padx=3, pady=3)
+        self.telegram_token_lbl.grid(column=0, row=3, sticky='w', padx=3, pady=3)
+        self.telegram_token_entry.grid(column=1, row=3, columnspan=2, sticky='w', padx=3, pady=3)
+        self.telegram_userid_lbl.grid(column=0, row=4, sticky='w', padx=3, pady=3)
+        self.telegram_userid_entry.grid(column=1, row=4, columnspan=2, sticky='w', padx=3, pady=3)
+        self.kakao_auth_token_lbl.grid(column=0, row=5, sticky='w', padx=3, pady=3)
+        self.kakao_auth_token_entry.grid(column=1, row=5, sticky='w', padx=3, pady=3)
+        self.kakao_get_auth_btn.grid(column=2, row=5, sticky='e', padx=3, pady=3)
+        self.help_btn.grid(column=2, row=6, sticky='e', padx=3, pady=3)
     
     def callback_cred_help(self, *args):
         webbrowser.open('https://github.com/laggykiller/sticker-convert#faq')
     
-    def callback_gen_auth(self, *args):
-        KakaoGenAuthWindow(self.window)
+    def callback_kakao_get_auth(self, *args):
+        KakaoGetAuthWindow(self.window)
+    
+    def callback_signal_get_auth(self, *args):
+        SignalGetAuthWindow(self.window)
     
     def set_states(self, state):
         self.signal_uuid_entry.config(state=state)
@@ -573,7 +580,7 @@ class CredFrame:
         self.telegram_token_entry.config(state=state)
         self.telegram_userid_entry.config(state=state)
         self.kakao_auth_token_entry.config(state=state)
-        self.kakao_gen_auth_btn.config(state=state)
+        self.kakao_get_auth_btn.config(state=state)
 
 class ProgressFrame:
     progress_bar_steps = 0
@@ -653,21 +660,21 @@ class ControlFrame:
         
         self.start_btn.pack(expand=True, fill='x')
 
-class KakaoGenAuthWindow:
+class KakaoGetAuthWindow:
     def __init__(self, window):
         self.window = window
 
-        self.genauthwin = Toplevel(window.root)
-        self.genauthwin.title('Generate Kakao auth_token')
+        self.gen_kakao_auth_win = Toplevel(window.root)
+        self.gen_kakao_auth_win.title('Get Kakao auth_token')
         if sys.platform == 'darwin':
-            self.genauthwin.iconbitmap('resources/appicon.icns')
+            self.gen_kakao_auth_win.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
-            self.genauthwin.iconbitmap('resources/appicon.ico')
+            self.gen_kakao_auth_win.iconbitmap('resources/appicon.ico')
         else:
             self.icon = PhotoImage(file='resources/appicon.png')
-            self.genauthwin.tk.call('wm', 'iconphoto', self.genauthwin._w, self.icon)
+            self.gen_kakao_auth_win.tk.call('wm', 'iconphoto', self.gen_kakao_auth_win._w, self.icon)
         
-        self.genauthwin.focus_force()
+        self.gen_kakao_auth_win.focus_force()
 
         self.create_scrollable_frame()
 
@@ -726,7 +733,7 @@ class KakaoGenAuthWindow:
         self.resize_window()
     
     def create_scrollable_frame(self):
-        self.main_frame = Frame(self.genauthwin)
+        self.main_frame = Frame(self.gen_kakao_auth_win)
         self.main_frame.pack(fill='both', expand=1)
 
         self.horizontal_scrollbar_frame = Frame(self.main_frame)
@@ -767,12 +774,109 @@ class KakaoGenAuthWindow:
         messagebox.showinfo(title='sticker-convert', message=message)
     
     def callback_login(self, *args):
-        auth_token = GetKakaoAuthToken.get_kakao_auth_token(opt_cred=self.window.creds, cb_msg=self.callback_message, cb_input=self.callback_input)
+        auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=self.window.creds, cb_msg=self.callback_message, cb_input=self.callback_input)
         if auth_token:
             self.window.creds['kakao']['auth_token'] = auth_token
             self.window.kakao_auth_token_var.set(auth_token)
             
             self.callback_message(f'Got auth_token successfully: {auth_token}')
+
+    def callback_input(self, question):
+        return simpledialog.askstring('sticker-convert', question)
+    
+    def callback_message(self, message):
+        messagebox.showinfo(title='sticker-convert', message=message)
+
+class SignalGetAuthWindow:
+    def __init__(self, window):
+        self.window = window
+
+        self.get_signal_auth_win = Toplevel(window.root)
+        self.get_signal_auth_win.title('Get Signal uuid and password')
+        if sys.platform == 'darwin':
+            self.get_signal_auth_win.iconbitmap('resources/appicon.icns')
+        elif sys.platform == 'win32':
+            self.get_signal_auth_win.iconbitmap('resources/appicon.ico')
+        else:
+            self.icon = PhotoImage(file='resources/appicon.png')
+            self.get_signal_auth_win.tk.call('wm', 'iconphoto', self.get_signal_auth_win._w, self.icon)
+        
+        self.get_signal_auth_win.focus_force()
+
+        self.create_scrollable_frame()
+
+        self.frame_info = Frame(self.scrollable_frame)
+        self.frame_start_btn = Frame(self.scrollable_frame)
+
+        self.frame_info.grid(column=0, row=0, sticky='news', padx=3, pady=3)
+        self.frame_start_btn.grid(column=0, row=1, sticky='news', padx=3, pady=3)
+
+        # Info frame
+        self.explanation1_lbl = Label(self.frame_info, text='You will be guided to install Signal Desktop BETA VERSION', justify='left', anchor='w')
+        self.explanation2_lbl = Label(self.frame_info, text='After installation, you need to login to Signal Desktop', justify='left', anchor='w')
+        self.explanation3_lbl = Label(self.frame_info, text='uuid and password will be automatically fetched', justify='left', anchor='w')
+
+        self.explanation1_lbl.grid(column=0, row=0, columnspan=3, sticky='w', padx=3, pady=3)
+        self.explanation2_lbl.grid(column=0, row=1, columnspan=3, sticky='w', padx=3, pady=3)
+        self.explanation3_lbl.grid(column=0, row=2, columnspan=3, sticky='w', padx=3, pady=3)
+
+        # Start button frame
+        self.login_btn = Button(self.frame_start_btn, text='Get uuid and password', command=self.callback_login)
+
+        self.login_btn.pack()
+
+        self.resize_window()
+    
+    def create_scrollable_frame(self):
+        self.main_frame = Frame(self.get_signal_auth_win)
+        self.main_frame.pack(fill='both', expand=1)
+
+        self.horizontal_scrollbar_frame = Frame(self.main_frame)
+        self.horizontal_scrollbar_frame.pack(fill='x', side='bottom')
+
+        self.canvas = Canvas(self.main_frame)
+        self.canvas.pack(side='left', fill='both', expand=1)
+
+        self.x_scrollbar = Scrollbar(self.horizontal_scrollbar_frame, orient='horizontal', command=self.canvas.xview)
+        self.x_scrollbar.pack(side='bottom', fill='x')
+
+        self.y_scrollbar = Scrollbar(self.main_frame, orient='vertical', command=self.canvas.yview)
+        self.y_scrollbar.pack(side='right', fill='y')
+
+        self.canvas.configure(xscrollcommand=self.x_scrollbar.set)
+        self.canvas.configure(yscrollcommand=self.y_scrollbar.set)
+        self.canvas.bind("<Configure>",lambda e: self.canvas.config(scrollregion= self.canvas.bbox('all'))) 
+
+        self.scrollable_frame = Frame(self.canvas)
+        self.canvas.create_window((0,0),window= self.scrollable_frame, anchor="nw")
+
+    def resize_window(self):
+        self.scrollable_frame.update_idletasks()
+        width = self.scrollable_frame.winfo_width()
+        height = self.scrollable_frame.winfo_height()
+
+        screen_width = self.window.root.winfo_screenwidth()
+        screen_height = self.window.root.winfo_screenwidth()
+
+        if width > screen_width * 0.8:
+            width = int(screen_width * 0.8)
+        if height > screen_height * 0.8:
+            height = int(screen_height * 0.8)
+
+        self.canvas.configure(width=width, height=height)
+    
+    def callback_help(self, message='', *args):
+        messagebox.showinfo(title='sticker-convert', message=message)
+    
+    def callback_login(self, *args):
+        uuid, password = GetSignalAuth.get_signal_auth(cb_msg=self.callback_message, cb_input=self.callback_input)
+        if uuid and password:
+            self.window.creds['signal']['uuid'] = uuid
+            self.window.creds['signal']['password'] = password
+            self.window.signal_uuid_var.set(uuid)
+            self.window.signal_password_var.set(password)
+            
+            self.callback_message(f'Got uuid and password successfully: {uuid}, {password}')
 
     def callback_input(self, question):
         return simpledialog.askstring('sticker-convert', question)
