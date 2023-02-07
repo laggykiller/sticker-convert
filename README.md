@@ -302,7 +302,10 @@ See [COMPILING.md](COMPILING.md)
     - `uuid` is the output of running: `window.SignalDebug.getReduxState().items.uuid_id`
     - `password` is the output of running: `window.SignalDebug.getReduxState().items.password`
 
-Reference: https://github.com/teynav/signalApngSticker
+Reference
+- https://github.com/teynav/signalApngSticker
+- https://github.com/signalstickers/signalstickers-client
+- https://github.com/signalstickers/signalstickers-client/issues/15
 
 ### Getting telegram bot token
 `token` needed for uploading and downloading Telegram stickers
