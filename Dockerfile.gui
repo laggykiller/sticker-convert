@@ -48,4 +48,6 @@ COPY ./sticker_convert /app/
 
 COPY startapp.sh /startapp.sh
 
+RUN chmod -R 777 /app
+
 Volume ["/app/stickers_input", "/app/stickers_output"]
