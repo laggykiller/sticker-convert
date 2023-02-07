@@ -31,6 +31,8 @@ COPY ./requirements.txt /app/
 RUN pip3 install -r requirements.txt
 COPY ./sticker_convert /app/
 
+RUN chmod -R 777 /app
+
 Volume ["/app/stickers_input", "/app/stickers_output"]
 
 CMD ["python3", "/app/main.py", "--no-confirm", "--help"]
