@@ -91,15 +91,16 @@ usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir
                        [--download-kakao-animated DOWNLOAD_KAKAO_ANIMATED] [--export-wastickers] [--export-signal]
                        [--export-telegram] [--export-imessage] [--no-compress]
                        [--preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                       [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                       [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
-                       [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                       [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--steps STEPS]
-                       [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                       [--img-format IMG_FORMAT] [--fake-vid] [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES]
-                       [--author AUTHOR] [--title TITLE] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
-                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
-                       [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-gen-auth-token] [--kakao-username KAKAO_USERNAME]
+                       [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
+                       [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
+                       [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
+                       [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--duration-min DURATION_MIN]
+                       [--duration-max DURATION_MAX] [--steps STEPS] [--vid-size-max VID_SIZE_MAX]
+                       [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT]
+                       [--fake-vid] [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES] [--author AUTHOR]
+                       [--title TITLE] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                       [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
+                       [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth] [--kakao-username KAKAO_USERNAME]
                        [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
                        [--kakao-phone-number KAKAO_PHONE_NUMBER] [--save-cred]
 
@@ -181,6 +182,7 @@ options:
                         Set signal uuid. Required for uploading signal stickers
   --signal-password SIGNAL_PASSWORD
                         Set signal password. Required for uploading signal stickers
+  --signal-get-auth     Generate Signal uuid and password.
   --telegram-token TELEGRAM_TOKEN
                         Set telegram token. Required for uploading and downloading telegram stickers
   --telegram-userid TELEGRAM_USERID
@@ -189,8 +191,7 @@ options:
   --kakao-auth-token KAKAO_AUTH_TOKEN
                         Set kakao auth_token. Required for downloading animated stickers from
                         https://e.kakao.com/t/xxxxx
-  --kakao-gen-auth-token
-                        Generate kakao auth_token. Kakao username, password, country code and phone number are also
+  --kakao-get-auth      Generate kakao auth_token. Kakao username, password, country code and phone number are also
                         required.
   --kakao-username KAKAO_USERNAME
                         Set kakao username, which is email or phone number used for signing up Kakao account (e.g.
@@ -291,6 +292,10 @@ See [COMPILING.md](COMPILING.md)
 ### Getting signal uuid and password
 `uuid` and `password` are needed for uploading Signal stickers.
 (Note: If you don't want to do this, you can still upload stickers manually by Signal Desktop)
+
+You can get them easily with `Generate` button (In GUI) or `--signal-get-auth` (In CLI)
+
+Alternatively, follow instructions below to get them manually:
 
 ![imgs/signal-uuid-password.png](imgs/signal-uuid-password.png)
 

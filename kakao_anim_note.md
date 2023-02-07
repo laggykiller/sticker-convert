@@ -1,7 +1,7 @@
 ## Summary
 - Downloading Kakao animated stickers does not require auth_token (Authorization header during request).
 - However, in order to download animated stickers, you need to get the id of the emoticon pack, which needs auth_token.
-- You can get auth_token easily from GUI generate button, via CLI `--kakao-gen-auth-token` or manually get from rooted Android device (You are recommended to do it on emulated Android device)
+- You can get auth_token easily from GUI generate button, via CLI `--kakao-get-auth` or manually get from rooted Android device (You are recommended to do it on emulated Android device)
 - Explanation of login information
     - Username: Email or Phone number used for signing up Kakao account. (e.g. `+447700900142`)
     - Password: Password of Kakao account

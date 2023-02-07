@@ -5,7 +5,8 @@ import argparse
 
 from flow import Flow
 from utils.json_manager import JsonManager
-from utils.get_kakao_auth_token import GetKakaoAuthToken
+from utils.get_kakao_auth import GetKakaoAuth
+from utils.get_signal_auth import GetSignalAuth
 
 # Only download from a source
 # sticker_convert_cli.py --download-signal <url> --no-compress
@@ -78,10 +79,11 @@ class CLI:
 
         parser.add_argument('--signal-uuid', dest='signal_uuid', help='Set signal uuid. Required for uploading signal stickers')
         parser.add_argument('--signal-password', dest='signal_password', help='Set signal password. Required for uploading signal stickers')
+        parser.add_argument('--signal-get-auth', dest='signal_get_auth', action='store_true', help='Generate Signal uuid and password.')
         parser.add_argument('--telegram-token', dest='telegram_token', help='Set telegram token. Required for uploading and downloading telegram stickers')
         parser.add_argument('--telegram-userid', dest='telegram_userid', help='Set telegram user_id (From real account, not bot account). Required for uploading telegram stickers')
         parser.add_argument('--kakao-auth-token', dest='kakao_auth_token', help='Set kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx')
-        parser.add_argument('--kakao-gen-auth-token', dest='kakao_gen_auth_token', action='store_true', help='Generate kakao auth_token. Kakao username, password, country code and phone number are also required.')
+        parser.add_argument('--kakao-get-auth', dest='kakao_get_auth', action='store_true', help='Generate kakao auth_token. Kakao username, password, country code and phone number are also required.')
         parser.add_argument('--kakao-username', dest='kakao_username', help='Set kakao username, which is email or phone number used for signing up Kakao account (e.g. `+447700900142`). Required for generating kakao auth_token')
         parser.add_argument('--kakao-password', dest='kakao_password', help='Set kakao password (Password of Kakao account). Required for generating kakao auth_token')
         parser.add_argument('--kakao-country-code', dest='kakao_country_code', help='Set kakao country code of phone. Example: 82 (For korea), 44 (For UK), 1 (For USA). Required for generating kakao auth_token')
@@ -233,12 +235,20 @@ class CLI:
             }
         }
 
-        if args.kakao_gen_auth_token:
-            auth_token = GetKakaoAuthToken.get_kakao_auth_token(opt_cred=creds, cb_msg=self.callback_msg, cb_input=input)
+        if args.kakao_get_auth:
+            auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_input=input)
             if auth_token:
                 self.opt_cred['kakao']['auth_token'] = auth_token
                 
                 self.callback_msg(f'Got auth_token successfully: {auth_token}')
+        
+        if args.signal_get_auth:
+            uuid, password = GetSignalAuth.get_signal_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_input=input)
+            if uuid and password:
+                self.opt_cred['signal']['uuid'] = uuid
+                self.opt_cred['signal']['password'] = password
+                
+                self.callback_msg(f'Got uuid and password successfully: {uuid}, {password}')
         
         if args.save_cred:
             JsonManager.save_json('creds.json', self.opt_cred)
