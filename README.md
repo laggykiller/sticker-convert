@@ -15,8 +15,7 @@
 - [Compatibility](#compatibility)
 - [How to use (GUI)](#how-to-use-gui)
 - [How to use (CLI)](#how-to-use-cli)
-- [How to use (Docker CLI version)](#how-to-use-docker-cli-version)
-- [How to use (Docker GUI version)](#how-to-use-docker-gui-version)
+- [How to use (Docker)](#how-to-use-docker)
 - [Running python script directly & Compiling](#running-python-script-directly--compiling)
 - [FAQ](#faq)
     - [Getting signal uuid and password](#getting-signal-uuid-and-password)
@@ -233,11 +232,26 @@ Convert local files to a custom format
 
 `sticker-convert --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png`
 
-## How to use (Docker CLI version)
+## How to use (Docker)
+![imgs/screenshot-docker-gui.png](imgs/screenshot-docker-gui.png)
 
-Running
+Downloading
 ```
 docker pull laggykiller/sticker-convert:latest
+```
+
+Running (GUI)
+```
+docker run -d -it --name sticker-convert \
+    -v /path/to/your/stickers_input:/app/stickers_input \
+    -v /path/to/your/stickers_output:/app/stickers_output \
+    -p 5800:5800 \ # Port for Web UI
+    -p 5900:5900 \ # Optional for VNC
+    laggykiller/sticker-convert:latest
+```
+
+Running (CLI)
+```
 docker run -d -it --name sticker-convert \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
@@ -245,41 +259,19 @@ docker run -d -it --name sticker-convert \
     python3 /app/main.py --help
 ```
 
-Alternatively, you may use docker-compose.yml with
+Alternative: Use docker-compose.yml (GUI)
 ```
 docker compose up
+```
+
+Alternative: Use docker-compose.yml (CLI)
+```
+docker compose -f docker-compose-cli.yml up
 ```
 
 Building
 ```
 docker build . -t sticker-convert
-```
-
-## How to use (Docker GUI version)
-![imgs/screenshot-docker-gui.png](imgs/screenshot-docker-gui.png)
-
-
-Running
-```
-docker pull laggykiller/sticker-convert:latest-gui
-docker run -d -it --name sticker-convert-gui \
-    -v /path/to/your/stickers_input:/app/stickers_input \
-    -v /path/to/your/stickers_output:/app/stickers_output \
-    -p 5800:5800 \
-    -p 5900:5900 \
-    laggykiller/sticker-convert:latest-gui
-```
-
-After that, open browser and go to `localhost:5800`. You may also use VNC and go to `localhost:5900`
-
-Alternatively, you may use docker-compose.yml with
-```
-docker compose -f docker-compose-gui.yml up
-```
-
-Building
-```
-docker build -f Dockerfile.gui . -t sticker-convert
 ```
 
 Note that the GUI version is based on https://github.com/jlesage/docker-baseimage-gui. Visit that repo for more information.

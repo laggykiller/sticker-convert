@@ -35,7 +35,6 @@ class SignalDesktopManager:
         self.cb_input = cb_input
 
     def download_signal_desktop(self, download_url, signal_bin_path):
-        print(download_url)
         webbrowser.open(download_url)
 
         if self.cb_input == input:
@@ -47,15 +46,17 @@ class SignalDesktopManager:
             self.cb_input(f'Signal Desktop not detected.\nDownload and install Signal Desktop from {download_url}\nAfter installation, quit Signal Desktop and press {prompt}')
 
     def get_signal_chromedriver_version(self, electron_bin_path):
-        if sys.platform == 'win32':
-            for s in strings(electron_bin_path):
-                if 'Chrome/' in s and ' Electron/' in s:
-                    return s.replace('Chrome/', '').split('.', 1)[0]
-        else:
+        if RunBin.get_bin('strings'):
             output_str = RunBin.run_cmd(cmd_list=['strings', electron_bin_path], silence=True)
-            for s in output_str.split('\n'):
-                if 'Chrome/' in s and ' Electron/' in s:
-                    return s.replace('Chrome/', '').split('.', 1)[0]
+            ss = output_str.split('\n')
+        else:
+            ss = strings(electron_bin_path)
+
+        for s in ss:
+            if 'Chrome/' in s and ' Electron/' in s:
+                major_version = s.replace('Chrome/', '').split('.', 1)[0]
+                if major_version.isnumeric():
+                    return major_version
     
     def get_local_chromedriver(self, chromedriver_download_dir):
         local_chromedriver_version = None
@@ -101,15 +102,16 @@ class SignalDesktopManager:
             chromedriver_name = 'chromedriver.exe'
         else:
             chromedriver_name = 'chromedriver'
-            st = os.stat(chromedriver_name)
-            os.chmod(chromedriver_name, st.st_mode | stat.S_IEXEC)
         
-        return os.path.abspath(os.path.join(chromedriver_download_dir, chromedriver_name))
+        chromedriver_path = os.path.abspath(os.path.join(chromedriver_download_dir, chromedriver_name))
+        if not sys.platform == 'win32':
+            st = os.stat(chromedriver_path)
+            os.chmod(chromedriver_path, st.st_mode | stat.S_IEXEC)
+        
+        return chromedriver_path
     
     def killall_signal(self):
         if sys.platform == 'win32':
-            RunBin.run_cmd(cmd_list=['taskkill', '/F', '/im', 'Signal.exe'], silence=True)
-            RunBin.run_cmd(cmd_list=['taskkill', '/F', '/im', r'Signal Beta.exe'], silence=True)
             os.system('taskkill /F /im "Signal.exe"')
             os.system('taskkill /F /im "Signal Beta.exe"')
         else:
@@ -120,6 +122,7 @@ class SignalDesktopManager:
         options = webdriver.ChromeOptions()
         options.binary_location = signal_bin_path
         options.add_argument(f"user-data-dir={signal_user_data_dir}")
+        options.add_argument('no-sandbox')
 
         self.driver = webdriver.Chrome(options=options, executable_path=chromedriver_path)
 
@@ -178,6 +181,8 @@ class SignalDesktopManager:
 
         if not (os.path.isfile(signal_bin_path) or shutil.which(signal_bin_path)):
             self.download_signal_desktop(signal_download_url, signal_bin_path)
+        
+        electron_bin_path = shutil.which(electron_bin_path) if not os.path.isfile(electron_bin_path) else electron_bin_path
         
         signal_bin_path = signal_bin_path if not shutil.which(signal_bin_path) else shutil.which(signal_bin_path)
         
