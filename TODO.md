@@ -1,6 +1,6 @@
 ### Todo
 
-- [ ] Add support for getting Signal uuid and password in docker (May need to switch to debian-based iamge)
+- [ ] If running without display, run signal-desktop with pyvirtualdisplay, read QR code and display on terminal
 - [ ] Add testing
 - [ ] Let user select what to do for stickers that are too long (Skip, fastforward, cut)
 - [ ] Use opencv to replace ffmpeg

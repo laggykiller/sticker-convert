@@ -123,6 +123,10 @@ For Linux, the following binaries are required:
     - For ubuntu, you may use this ppa repository: https://launchpad.net/~zero-tsuki/+archive/ubuntu/ppa/+packages
 - `zip`
     - Available in many distro's package manager (`sudo apt install zip`)
+- `binutils` (For `strings` command)
+    - Available in many distro's package manager (`sudo apt install binutils`)
+- `psmisc` (For `killall` command)
+    - Available in many distro's package manager (`sudo apt install psmisc`)
 
 Note that Arch Linux have all of the required packages in official repository and AUR.
 

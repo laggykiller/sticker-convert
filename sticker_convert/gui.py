@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, simpledialog, scrolledtext, Toplevel, Canvas, PhotoImage
-from tkinter.ttk import LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar
+from ttkbootstrap import LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar, Style
 import os
 import sys
 import multiprocessing
@@ -26,10 +26,8 @@ class GUI:
         self.emoji_font = ImageFont.truetype("./resources/NotoColorEmoji.ttf", 109)
 
         self.root = Tk()
+        self.style = Style('darkly').get_instance()
         
-        self.root.tk.call("source", "./Sun-Valley-ttk-theme/sun-valley.tcl")
-        self.root.tk.call("set_theme", "dark")
-        # self.root.eval('tk::PlaceWindow . center')
         if sys.platform == 'darwin':
             self.root.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
@@ -184,7 +182,26 @@ class GUI:
             messagebox.showerror(title='sticker-convert', message='Warning: json(s) under "resources" directory cannot be found')
             sys.exit()
         
-        self.creds = JsonManager.load_json('creds.json')
+        if os.path.isfile('creds.json'):
+            self.creds = JsonManager.load_json('creds.json')
+        else:
+            self.creds = {
+            'signal': {
+                'uuid': '',
+                'password': ''
+            },
+            'telegram': {
+                'token': '',
+                'userid': ''
+            },
+            'kakao': {
+                'auth_token': '',
+                'username': '',
+                'password': '',
+                'country_code': '',
+                'phone_number': ''
+            }
+        }
         
     def save_creds(self):
         creds = {
