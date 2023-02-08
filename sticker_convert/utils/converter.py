@@ -416,6 +416,8 @@ class StickerConvert:
             tmp1_f = os.path.join(tempdir1, 'tmp1.apng')
             StickerConvert.convert_generic_anim(in_f, tmp1_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, duration_min=duration_min, duration_max=duration_max)
 
+            assert os.path.isfile(tmp1_f), 'Failed at (1) convert_generic_anim'
+
             # There is a possibility of fps being changed when animation is too long
             # Delay need to be recalculated, cannot rely on fps supplied
             delay = round(1000 / CodecInfo.get_file_fps(tmp1_f))
@@ -430,12 +432,16 @@ class StickerConvert:
             tmp2_f = os.path.join(tempdir1, 'tmp1_strip.png')
             RunBin.run_cmd(['apngdis', tmp1_f, '-S'])
 
+            assert os.path.isfile(tmp2_f), 'Failed at (2) apngdis'
+
             # pngnq-s9 optimization
             tmp3_f = os.path.join(tempdir1, 'tmp1_strip.1.png')
             if color and color <= 256:
                 RunBin.run_cmd(['pngnq-s9', '-L', '-Qn', '-T15', '-n', str(color), '-e', '.1.png', tmp2_f])
             else:
                 shutil.move(tmp2_f, tmp3_f)
+            
+            assert os.path.isfile(tmp3_f), 'Failed at (3) pngnq-s9'
 
             # pngquant optimization
             tmp4_f = os.path.join(tempdir1, 'tmp1_strip.1.2.png')
@@ -443,11 +449,15 @@ class StickerConvert:
                 RunBin.run_cmd(['pngquant', '--nofs', '--quality', f'0-{quality}', '--strip', '--ext', '.2.png', tmp3_f])
             else:
                 shutil.move(tmp3_f, tmp4_f)
+            
+            assert os.path.isfile(tmp4_f), 'Failed at (4) pngquant'
 
             # magick convert single png strip to png files
             # tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
             tmp5_f = os.path.join(tempdir2, 'tmp2-{0}.png')
             StickerConvert.magick_crop(tmp4_f, tmp5_f, res_w, res_h)
+
+            assert len(os.listdir(tempdir2)) > 0, 'Failed at (5) magick cropping'
             
             # optipng and magick convert optimize png files
             for i in os.listdir(tempdir2):

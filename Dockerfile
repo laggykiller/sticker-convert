@@ -6,9 +6,25 @@ RUN apt update -y
 RUN apt install --no-install-recommends -y python3 python3-pip python3-opencv python3-tk \
     curl wget gpg zip unzip cmake tar sed build-essential pkg-config locales binutils psmisc \
     libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev \
-    ffmpeg imagemagick optipng pngquant apngdis
+    libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig \
+    ffmpeg optipng pngquant apngdis
 
 WORKDIR /app
+
+# ImageMagick on Ubuntu repo does not have delegates (e.g. webp file conversion would not work)
+# ImageMagick on Debian repo cannot convert some files for unclear reason (Because of old version?)
+# Debian repo version also has small default caching set in policy.xml
+# RUN sed -i 's,<policy domain="resource" name="disk" value="1GiB"/>,<policy domain="resource" name="disk" value="8GiB"/>,g' /etc/ImageMagick-6/policy.xml
+# ImageMagick appimage seems to be most reliable and easiest
+# However, appimage cannot be directly used on Docker due to lack of FUSE
+# Quick hack is to extract appimage to root
+RUN curl -o magick -L https://github.com/ImageMagick/ImageMagick/releases/download/7.1.0-61/ImageMagick--gcc-x86_64.AppImage
+RUN chmod +x ./magick
+RUN ./magick --appimage-extract
+RUN cp -r ./squashfs-root/* /
+RUN rm ./magick
+RUN rm -rf ./squashfs-root
+
 RUN curl -O -L https://github.com/apngasm/apngasm/archive/refs/tags/3.1.10.tar.gz && \
     tar xvzf 3.1.10.tar.gz
 WORKDIR /app/apngasm-3.1.10
@@ -29,15 +45,9 @@ RUN cat signal-desktop-keyring.gpg | tee -a /usr/share/keyrings/signal-desktop-k
 RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main' |\
     tee -a /etc/apt/sources.list.d/signal-xenial.list
 RUN apt update -y
-RUN apt install -y signal-desktop-beta
-
-RUN apt purge -y build-essential cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev
+RUN apt install --no-install-recommends -y signal-desktop-beta
 
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en 
-ENV LC_ALL en_US.UTF-8
-ENV LC_TIME en_US.UTF-8
 
 RUN set-cont-env APP_NAME "sticker-convert"
 
@@ -58,10 +68,13 @@ RUN mkdir '/root/.config/Signal Beta'
 RUN chmod 777 '/root/.config/Signal'
 RUN chmod 777 '/root/.config/Signal Beta'
 
-COPY ./requirements.txt /app/
-RUN pip3 install -r requirements.txt
-COPY ./sticker_convert /app/
+RUN apt clean autoclean
+RUN apt autoremove --yes
+RUN rm -rf /var/lib/{apt,dpkg,cache,log}/
 
+COPY ./requirements.txt /app/
+RUN pip3 install --no-cache-dir -r requirements.txt
+COPY ./sticker_convert /app/
 COPY startapp.sh /startapp.sh
 
 RUN chmod -R 777 /app

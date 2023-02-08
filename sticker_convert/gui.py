@@ -594,6 +594,7 @@ class CredFrame:
     def set_states(self, state):
         self.signal_uuid_entry.config(state=state)
         self.signal_password_entry.config(state=state)
+        self.signal_get_auth_btn.config(state=state)
         self.telegram_token_entry.config(state=state)
         self.telegram_userid_entry.config(state=state)
         self.kakao_auth_token_entry.config(state=state)
