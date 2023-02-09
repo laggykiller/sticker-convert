@@ -7,14 +7,14 @@ import json
 from urllib.parse import urlparse, parse_qs
 
 class KakaoLoginManager:
-    def __init__(self, opt_cred, cb_msg=print, cb_input=input):
+    def __init__(self, opt_cred, cb_msg_block=input, cb_ask_str=input):
         self.username = opt_cred['kakao']['username']
         self.password = opt_cred['kakao']['password']
         self.country_code = opt_cred['kakao']['country_code']
         self.phone_number = opt_cred['kakao']['phone_number']
 
-        self.cb_msg = cb_msg
-        self.cb_input = cb_input
+        self.cb_msg_block = cb_msg_block
+        self.cb_ask_str = cb_ask_str
 
         self.device_uuid = secrets.token_hex(32)
         self.device_ssaid = secrets.token_hex(20)
@@ -47,7 +47,7 @@ class KakaoLoginManager:
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at login: {response.text}')
+            self.cb_msg_block(f'Failed at login: {response.text}')
             return False
 
         self.headers['Ss'] = response.headers['Set-SS']
@@ -62,7 +62,7 @@ class KakaoLoginManager:
                 self.country_iso = country_dict['iso']
 
         if not self.country_iso:
-            self.cb_msg('Invalid country code')
+            self.cb_msg_block('Invalid country code')
             return False
 
         return True
@@ -82,7 +82,7 @@ class KakaoLoginManager:
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at entering phone number: {response.text}')
+            self.cb_msg_block(f'Failed at entering phone number: {response.text}')
             return False
         
         self.verify_method = response_json['view']
@@ -94,7 +94,7 @@ class KakaoLoginManager:
             msg = response_json['viewData']['moMessage']
             return self.verify_send_sms(dest_number, msg)
         else:
-            self.cb_msg(f'Unknown verification method: {response.text}')
+            self.cb_msg_block(f'Unknown verification method: {response.text}')
             return False
     
     def verify_send_sms(self, dest_number, msg):
@@ -103,29 +103,35 @@ class KakaoLoginManager:
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at confirm sending SMS: {response.text}')
+            self.cb_msg_block(f'Failed at confirm sending SMS: {response.text}')
             return False
 
         if sys.platform == 'win32':
             print('If you want to copy from terminal, highlight then right click')
+        elif sys.platform == 'darwin':
+            print('If you want to copy from terminal, highlight then press Command+C')
         else:
             print('If you want to copy from terminal, highlight then press Ctrl+Shift+C')
 
         print(dest_number)
         print(msg)
 
-        self.cb_input(f'Send SMS message (in double quotes) to number {dest_number} then press enter: "{msg}"')
+        prompt = f'Send SMS message (in double quotes) to number {dest_number} then press enter: "{msg}"'
+        if self.cb_ask_str != input:
+            self.cb_ask_str(prompt, initialvalue=msg, cli_show_initialvalue=False)
+        else:
+            input(prompt)
 
         response = requests.post('https://katalk.kakao.com/android/account2/mo-confirm', headers=self.headers)
 
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at verifying SMS sent: {response.text}')
+            self.cb_msg_block(f'Failed at verifying SMS sent: {response.text}')
             return False
         
         if response_json.get('reason') or 'error' in response_json.get('message', ''):
-            self.cb_msg(f'Failed at verifying SMS sent: {response.text}')
+            self.cb_msg_block(f'Failed at verifying SMS sent: {response.text}')
             return False
         
         self.confirm_url = response_json.get('viewData', {}).get('url')
@@ -133,7 +139,7 @@ class KakaoLoginManager:
         return True
 
     def verify_receive_sms(self):
-        passcode = self.cb_input('Enter passcode received from SMS:')
+        passcode = self.cb_ask_str('Enter passcode received from SMS:')
 
         json_data = {
             'passcode': passcode,
@@ -144,7 +150,7 @@ class KakaoLoginManager:
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at verifying passcode: {response.text}')
+            self.cb_msg_block(f'Failed at verifying passcode: {response.text}')
             return False
 
         self.confirm_url = response_json.get('viewData', {}).get('url')
@@ -183,7 +189,7 @@ class KakaoLoginManager:
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at confirm device change: {response.text}')
+            self.cb_msg_block(f'Failed at confirm device change: {response.text}')
             return False
         
         return True
@@ -194,13 +200,13 @@ class KakaoLoginManager:
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at passcode callback: {response.text}')
+            self.cb_msg_block(f'Failed at passcode callback: {response.text}')
             return False
 
         self.nickname = response_json.get('viewData', {}).get('nickname')
         
         if self.nickname == None:
-            self.cb_msg(f'Failed at passcode callback: {response.text}')
+            self.cb_msg_block(f'Failed at passcode callback: {response.text}')
             return False
 
         return True
@@ -217,7 +223,7 @@ class KakaoLoginManager:
         response_json = json.loads(response.text)
 
         if response_json['status'] != 0:
-            self.cb_msg(f'Failed at get profile: {response.text}')
+            self.cb_msg_block(f'Failed at get profile: {response.text}')
             return False
 
         self.access_token = response_json['signupData']['oauth2Token']['accessToken']
@@ -246,8 +252,8 @@ class KakaoLoginManager:
 
 class GetKakaoAuth:
     @staticmethod
-    def get_kakao_auth(opt_cred, cb_msg=print, cb_input=input):
-        log_man = KakaoLoginManager(opt_cred, cb_msg, cb_input)
+    def get_kakao_auth(opt_cred, cb_msg_block=input, cb_ask_str=input):
+        log_man = KakaoLoginManager(opt_cred, cb_msg_block, cb_ask_str)
 
         authorization_token = log_man.get_authorization_token()
 
