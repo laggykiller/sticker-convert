@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import sys
 import multiprocessing
 import argparse
 
@@ -25,6 +24,8 @@ from utils.get_signal_auth import GetSignalAuth
 # sticker_convert_cli.py --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png
 
 class CLI:
+    no_confirm = False
+
     def cli(self):
         self.input_presets = JsonManager.load_json('resources/input.json')
         self.compression_presets = JsonManager.load_json('resources/compression.json')
@@ -102,9 +103,15 @@ class CLI:
         flow = Flow(
             self.opt_input, self.opt_comp, self.opt_output, self.opt_cred, 
             self.input_presets, self.output_presets,
-            self.callback_msg, self.callback_bar, self.callback_ask
+            self.callback_msg, self.callback_bar, self.callback_ask_bool
         )
-    
+
+        success = flow.prepare()
+
+        if not success:
+            self.callback_msg(msg='An error occured during this run.')
+            return
+
         success = flow.start()
 
         if not success:
@@ -236,14 +243,14 @@ class CLI:
         }
 
         if args.kakao_get_auth:
-            auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_input=input)
+            auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=creds, cb_msg=self.callback_msg_block, cb_ask_str=self.callback_ask_str)
             if auth_token:
                 self.opt_cred['kakao']['auth_token'] = auth_token
                 
                 self.callback_msg(f'Got auth_token successfully: {auth_token}')
         
         if args.signal_get_auth:
-            uuid, password = GetSignalAuth.get_signal_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_input=input)
+            uuid, password = GetSignalAuth.get_signal_auth(opt_cred=creds, cb_msg=self.callback_msg_block)
             if uuid and password:
                 self.opt_cred['signal']['uuid'] = uuid
                 self.opt_cred['signal']['password'] = password
@@ -253,8 +260,22 @@ class CLI:
         if args.save_cred:
             JsonManager.save_json('creds.json', self.opt_cred)
             self.callback_msg('Saved credentials to creds.json')
+    
+    def callback_ask_str(self, msg: str=None, initialvalue: str=None, cli_show_initialvalue: bool=True):
+        self.callback_msg(msg)
 
-    def callback_ask(self, question):
+        hint = ''
+        if cli_show_initialvalue and initialvalue:
+            hint = f' [Default: {initialvalue}]'
+
+        response = input(f'Enter your response and press enter{hint} > ')
+
+        if initialvalue and not response:
+            response = initialvalue
+        
+        return response
+
+    def callback_ask_bool(self, question, initialvalue):
         self.callback_msg(question)
 
         if self.no_confirm:
@@ -269,13 +290,18 @@ class CLI:
                 return False
             else:
                 return True
+    
+    def callback_msg(msg, *args, **kwargs):
+        print(msg)
 
-    def callback_msg(self, msg: str=None, cls: bool=True, *args):
+    def callback_msg_block(self, msg: str=None, cls: bool=True, *args):
         if msg:
-            print(msg)
+            self.callback_msg(msg)
         elif len(args) > 0:
             msg = ' '.join(str(i) for i in args)
-            print(msg)
+            self.callback_msg(msg)
+        if not self.no_confirm:
+            input('Press Enter to continue...')
     
     def callback_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
         # Progressbar could be implemented here

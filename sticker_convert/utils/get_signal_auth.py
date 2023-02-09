@@ -30,23 +30,23 @@ def strings(filename, min=4):
             yield result
 
 class SignalDesktopManager:
-    def __init__(self, cb_msg=print, cb_input=input):
-        self.cb_msg = cb_msg
-        self.cb_input = cb_input
+    def __init__(self, cb_ask_str=input):
+        self.cb_ask_str = cb_ask_str
 
     def download_signal_desktop(self, download_url, signal_bin_path):
         webbrowser.open(download_url)
 
-        if self.cb_input == input:
-            prompt = 'Enter'
-        else:
-            prompt = 'OK'
+        print(download_url)
 
+        prompt = f'Signal Desktop not detected.\nDownload and install Signal Desktop BETA version\nAfter installation, quit Signal Desktop before continuing'
         while not (os.path.isfile(signal_bin_path) or shutil.which(signal_bin_path)):
-            self.cb_input(f'Signal Desktop not detected.\nDownload and install Signal Desktop from {download_url}\nAfter installation, quit Signal Desktop and press {prompt}')
+            if self.cb_ask_str != input:
+                self.cb_ask_str(prompt, initialvalue=download_url, cli_show_initialvalue=False)
+            else:
+                input(prompt)
 
     def get_signal_chromedriver_version(self, electron_bin_path):
-        if RunBin.get_bin('strings'):
+        if RunBin.get_bin('strings', silent=True):
             output_str = RunBin.run_cmd(cmd_list=['strings', electron_bin_path], silence=True)
             ss = output_str.split('\n')
         else:
@@ -127,6 +127,8 @@ class SignalDesktopManager:
         self.driver = webdriver.Chrome(options=options, executable_path=chromedriver_path)
 
     def get_cred(self, signal_bin_version):
+        # https://stackoverflow.com/a/73456344
+
         while True:
             try:
                 if signal_bin_version == 'prod':
@@ -135,7 +137,7 @@ class SignalDesktopManager:
                 else:
                     uuid = self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id')
                     password = self.driver.execute_script('return window.SignalDebug.getReduxState().items.password')
-            except JavascriptException:
+            except JavascriptException as e:
                 uuid, password = None, None
 
             if uuid and password:
@@ -200,7 +202,7 @@ class SignalDesktopManager:
 
 class GetSignalAuth:
     @staticmethod
-    def get_signal_auth(cb_msg=print, cb_input=input):
-        m = SignalDesktopManager(cb_msg, cb_input)
+    def get_signal_auth(cb_ask_str=input):
+        m = SignalDesktopManager(cb_ask_str)
         uuid, password = m.get_uuid_password()
         return uuid, password

@@ -18,9 +18,12 @@ from utils.converter import StickerConvert
 from utils.codec_info import CodecInfo
 
 class Flow:
+    compress_fails = []
+    out_urls = []
+
     def __init__(self,
         opt_input, opt_comp, opt_output, opt_cred, 
-        input_presets, output_presets, cb_msg, cb_bar, cb_ask):
+        input_presets, output_presets, cb_msg, cb_bar, cb_ask_bool):
 
         self.opt_input = opt_input
         self.opt_comp = opt_comp
@@ -30,40 +33,42 @@ class Flow:
         self.output_presets = output_presets
         self.cb_msg = cb_msg
         self.cb_bar = cb_bar
-        self.cb_ask = cb_ask
+        self.cb_ask_bool = cb_ask_bool
 
-    def start(self):
         if os.path.isdir(self.opt_input['dir']) == False:
             os.makedirs(self.opt_input['dir'])
 
         if os.path.isdir(self.opt_output['dir']) == False:
             os.makedirs(self.opt_output['dir'])
+        
+    def prepare(self):
+        tasks = (
+            self.sanitize,
+            self.verify_input
+        )
 
+        for task in tasks:
+            success = task()
+            if not success:
+                return False
+
+        return True
+
+    def start(self):
         self.cb_bar(set_progress_mode='indeterminate')
-
-        self.compress_fails = []
-        self.out_urls = []
-
         self.cb_msg(cls=True)
 
-        success = self.sanitize()
-        if not success:
-            return False
-        
-        success = self.verify_input()
-        if not success:
-            return False
+        tasks = (
+            self.download,
+            self.compress,
+            self.export,
+            self.report
+        )
 
-        success = self.download()
-        if not success:
-            return False
-
-        if self.opt_comp['no_compress'] == False:
-            self.compress()
-
-        self.export()
-
-        self.report()
+        for task in tasks:
+            success = task()
+            if not success:
+                return False
 
         return True
     
@@ -176,7 +181,7 @@ class Flow:
             msg += f'Input directory is set to {self.opt_input["dir"]}\n'
             msg += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
 
-            response = self.cb_ask(msg)
+            response = self.cb_ask_bool(msg)
 
             if response == False:
                 return False
@@ -188,7 +193,7 @@ class Flow:
             msg += 'please choose "No compression" or --no-compression\n'
             msg += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
 
-            response = self.cb_ask(msg)
+            response = self.cb_ask_bool(msg)
 
             if response == False:
                 return False
@@ -206,7 +211,7 @@ class Flow:
             msg += 'You may continue, but the files will need to be compressed again before export\n'
             msg += 'You are recommended to choose the matching option for compression and output. Continue?'
 
-            response = self.cb_ask(msg)
+            response = self.cb_ask_bool(msg)
 
             if response == False:
                 return False
@@ -246,6 +251,8 @@ class Flow:
         return True
 
     def compress(self):
+        if self.opt_comp['no_compress'] == True:
+            return
         msg = 'Compressing...'
 
         input_dir = self.opt_input['dir']

@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-from tkinter import Tk, StringVar, BooleanVar, IntVar, filedialog, messagebox, simpledialog, scrolledtext, Toplevel, Canvas, PhotoImage
-from ttkbootstrap import LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar, Style
 import os
 import sys
 import multiprocessing
 from threading import Thread
 import webbrowser
+from functools import partial
 
 from PIL import Image, ImageTk, ImageDraw, ImageFont
+from tkinter import filedialog
+from ttkbootstrap import Window, Toplevel, LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar, Canvas, PhotoImage, StringVar, BooleanVar, IntVar
+from ttkbootstrap.scrolled import ScrolledText
+from ttkbootstrap.dialogs import Messagebox, Querybox
 
 from flow import Flow
 from utils.json_manager import JsonManager
@@ -18,15 +21,12 @@ class GUI:
     default_input_mode = 'telegram'
     default_output_mode = 'signal'
 
-    exec_pool = None
-
     def __init__(self):
         self.load_jsons()
 
         self.emoji_font = ImageFont.truetype("./resources/NotoColorEmoji.ttf", 109)
 
-        self.root = Tk()
-        self.style = Style('darkly').get_instance()
+        self.root = Window(themename='darkly')
         
         if sys.platform == 'darwin':
             self.root.iconbitmap('resources/appicon.icns')
@@ -43,16 +43,12 @@ class GUI:
         self.init_frames()
         self.pack_frames()
         self.resize_window()
-
-        self.root.mainloop()
     
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.save_creds()
-        if self.exec_pool:
-            self.exec_pool.terminate()
         
     def create_scrollable_frame(self):
         self.main_frame = Frame(self.root)
@@ -179,7 +175,7 @@ class GUI:
         self.emoji_list = JsonManager.load_json('resources/emoji.json')
 
         if not (self.compression_presets and self.input_presets and self.output_presets):
-            messagebox.showerror(title='sticker-convert', message='Warning: json(s) under "resources" directory cannot be found')
+            Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
         
         if os.path.isfile('creds.json'):
@@ -237,14 +233,8 @@ class GUI:
         self.kakao_password_var.set(self.creds.get('kakao', {}).get('password'))
         self.kakao_country_code_var.set(self.creds.get('kakao', {}).get('country_code'))
         self.kakao_phone_number_var.set(self.creds.get('kakao', {}).get('phone_number'))
-    
-    def callback_ask(self, question):
-        return messagebox.askyesno('sticker-convert', question)
 
     def start(self):
-        Thread(target=self.start_process, daemon=True).start()
-
-    def start_process(self):
         self.save_creds()
         self.set_inputs('disabled')
         self.control_frame.start_btn.config(state='disabled')
@@ -323,16 +313,27 @@ class GUI:
             }
         }
         
-        flow = Flow(
+        self.flow = Flow(
             opt_input, opt_comp, opt_output, opt_cred, 
             self.input_presets, self.output_presets,
-            self.progress_frame.update_message_box, self.progress_frame.update_progress_bar, self.callback_ask
+            self.callback_msg, self.callback_bar, self.callback_ask_bool
             )
-        
-        success = flow.start()
+
+        # Prepare will generate messagebox (Toplevel), which require running in main thread
+        success = self.flow.prepare()
 
         if not success:
-            self.progress_frame.update_message_box(msg='An error occured during this run.')
+            self.callback_msg(msg='An error occured during this run.')
+            self.stop()
+            return
+        
+        Thread(target=self.start_process, daemon=True).start()
+
+    def start_process(self):
+        success = self.flow.start()
+
+        if not success:
+            self.callback_msg(msg='An error occured during this run.')
 
         self.stop()
     
@@ -352,25 +353,44 @@ class GUI:
         if state == 'normal':
             self.input_frame.callback_input_option()
             self.comp_frame.callback_nocompress()
+    
+    def callback_ask_str(self, question, initialvalue: str=None, cli_show_initialvalue: bool=True, parent=None):
+        response = Querybox.get_string(question, title='sticker-convert', initialvalue=initialvalue, parent=parent)
+        return response
+
+    def callback_ask_bool(self, question, parent=None):
+        response = Messagebox.yesno(question, title='sticker-convert', parent=parent)
+        if response == 'Yes':
+            return True
+        return False
+
+    def callback_msg(self, *args, **kwargs):
+        self.progress_frame.update_message_box(*args, **kwargs)
+    
+    def callback_msg_block(self, message='', parent=None, *args):
+        Messagebox.show_info(message, title='sticker-convert', parent=parent)
+    
+    def callback_bar(self, *args, **kwargs):
+        self.progress_frame.update_progress_bar(*args, **kwargs)
 
 class InputFrame:
-    def __init__(self, window):
-        self.window = window
-        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Input')
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Input')
 
         self.input_option_lbl = Label(self.frame, text='Input source', width=15, justify='left', anchor='w')
-        input_full_names = [i['full_name'] for i in self.window.input_presets.values()]
-        default_input_full_name = self.window.input_presets[self.window.default_input_mode]['full_name']
-        self.input_option_opt = OptionMenu(self.frame, self.window.input_option_var, default_input_full_name, *input_full_names, command=self.callback_input_option)
+        input_full_names = [i['full_name'] for i in self.gui.input_presets.values()]
+        default_input_full_name = self.gui.input_presets[self.gui.default_input_mode]['full_name']
+        self.input_option_opt = OptionMenu(self.frame, self.gui.input_option_var, default_input_full_name, *input_full_names, command=self.callback_input_option, bootstyle='secondary')
         self.input_option_opt.config(width=32)
 
         self.input_setdir_lbl = Label(self.frame, text='Input directory', width=35, justify='left', anchor='w')
-        self.input_setdir_entry = Entry(self.frame, textvariable=self.window.input_setdir_var, width=60)
-        self.setdir_btn = Button(self.frame, text='Choose directory...', command=self.callback_set_indir, width=16)
+        self.input_setdir_entry = Entry(self.frame, textvariable=self.gui.input_setdir_var, width=60)
+        self.setdir_btn = Button(self.frame, text='Choose directory...', command=self.callback_set_indir, width=16, bootstyle='secondary')
 
-        self.address_lbl = Label(self.frame, text=self.window.input_presets[self.window.default_input_mode]['address_lbls'], width=18, justify='left', anchor='w')
-        self.address_entry = Entry(self.frame, textvariable=self.window.input_address_var, width=80)
-        self.address_tip = Label(self.frame, text=self.window.input_presets[self.window.default_input_mode]['example'], justify='left', anchor='w')
+        self.address_lbl = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['address_lbls'], width=18, justify='left', anchor='w')
+        self.address_entry = Entry(self.frame, textvariable=self.gui.input_address_var, width=80)
+        self.address_tip = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['example'], justify='left', anchor='w')
 
         self.input_option_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.input_option_opt.grid(column=1, row=0, columnspan=2, sticky='w', padx=3, pady=3)
@@ -382,18 +402,18 @@ class InputFrame:
         self.address_tip.grid(column=0, row=3, columnspan=3, sticky='w', padx=3, pady=3)
     
     def callback_set_indir(self, *args):
-        orig_input_dir = self.window.input_setdir_var.get()
+        orig_input_dir = self.gui.input_setdir_var.get()
         if not os.path.isdir(orig_input_dir):
             orig_input_dir = os.getcwd()
         input_dir = filedialog.askdirectory(initialdir=orig_input_dir)
-        if input_dir != '':
-            self.window.input_setdir_var.set(input_dir)
+        if input_dir:
+            self.gui.input_setdir_var.set(input_dir)
     
     def callback_input_option(self, *args):
-        for i in self.window.input_presets.keys():
-            if self.window.input_option_var.get() == self.window.input_presets[i]['full_name']:
-                self.address_tip.config(text=self.window.input_presets[i]['example'])
-                self.address_lbl.config(text=self.window.input_presets[i]['address_lbls'])
+        for i in self.gui.input_presets.keys():
+            if self.gui.input_option_var.get() == self.gui.input_presets[i]['full_name']:
+                self.address_tip.config(text=self.gui.input_presets[i]['example'])
+                self.address_lbl.config(text=self.gui.input_presets[i]['address_lbls'])
                 if i == 'local':
                     self.address_entry.config(state='disabled')
                 else:
@@ -407,29 +427,29 @@ class InputFrame:
         self.setdir_btn.config(state=state)
 
 class CompFrame:
-    def __init__(self, window):
-        self.window = window
-        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Compression options')
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Compression options')
         self.frame.grid_columnconfigure(2, weight = 1)
 
-        self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Do not compress files. Useful for only downloading stickers'))
+        self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Do not compress files. Useful for only downloading stickers'), bootstyle='secondary')
         self.no_compress_lbl = Label(self.frame, text='No compression')
-        self.no_compress_cbox = Checkbutton(self.frame, variable=self.window.no_compress_var, command=self.callback_nocompress)
+        self.no_compress_cbox = Checkbutton(self.frame, variable=self.gui.no_compress_var, command=self.callback_nocompress, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Apply preset for compression'))
+        self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Apply preset for compression'), bootstyle='secondary')
         self.comp_preset_lbl = Label(self.frame, text='Preset')
-        self.comp_preset_opt = OptionMenu(self.frame, self.window.comp_preset_var, self.window.default_comp_preset, *self.window.compression_presets.keys(), command=self.callback_comp_apply_preset)
+        self.comp_preset_opt = OptionMenu(self.frame, self.gui.comp_preset_var, self.gui.default_comp_preset, *self.gui.compression_presets.keys(), command=self.callback_comp_apply_preset, bootstyle='secondary')
         self.comp_preset_opt.config(width=15)
 
-        self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit'))
+        self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit'), bootstyle='secondary')
         self.steps_lbl = Label(self.frame, text='Number of steps')       
-        self.steps_entry = Entry(self.frame, textvariable=self.window.steps_var, width=8)
+        self.steps_entry = Entry(self.frame, textvariable=self.gui.steps_var, width=8)
 
-        self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.callback_help('Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources'))
+        self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources'), bootstyle='secondary')
         self.processes_lbl = Label(self.frame, text='Number of processes')
-        self.processes_entry = Entry(self.frame, textvariable=self.window.processes_var, width=8)
+        self.processes_entry = Entry(self.frame, textvariable=self.gui.processes_var, width=8)
 
-        self.comp_advanced_btn = Button(self.frame, text='Advanced...', command=self.callback_compress_advanced)
+        self.comp_advanced_btn = Button(self.frame, text='Advanced...', command=self.callback_compress_advanced, bootstyle='secondary')
 
         self.no_compress_help_btn.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.no_compress_lbl.grid(column=1, row=0, sticky='w', padx=3, pady=3)
@@ -451,36 +471,33 @@ class CompFrame:
 
         self.callback_comp_apply_preset()
     
-    def callback_help(self, message='', *args):
-        messagebox.showinfo(title='sticker-convert', message=message)
-    
     def callback_comp_apply_preset(self, *args):
-        selection = self.window.comp_preset_var.get()
-        self.window.fps_min_var.set(self.window.compression_presets[selection]['fps']['min'])
-        self.window.fps_max_var.set(self.window.compression_presets[selection]['fps']['max'])
-        self.window.res_w_min_var.set(self.window.compression_presets[selection]['res']['w']['min'])
-        self.window.res_w_max_var.set(self.window.compression_presets[selection]['res']['w']['max'])
-        self.window.res_h_min_var.set(self.window.compression_presets[selection]['res']['h']['min'])
-        self.window.res_h_max_var.set(self.window.compression_presets[selection]['res']['h']['max'])
-        self.window.quality_min_var.set(self.window.compression_presets[selection]['quality']['min'])
-        self.window.quality_max_var.set(self.window.compression_presets[selection]['quality']['max'])
-        self.window.color_min_var.set(self.window.compression_presets[selection]['color']['min'])
-        self.window.color_max_var.set(self.window.compression_presets[selection]['color']['max'])
-        self.window.duration_min_var.set(self.window.compression_presets[selection]['duration']['min'])
-        self.window.duration_max_var.set(self.window.compression_presets[selection]['duration']['max'])
-        self.window.img_size_max_var.set(self.window.compression_presets[selection]['size_max']['img'])
-        self.window.vid_size_max_var.set(self.window.compression_presets[selection]['size_max']['vid'])
-        self.window.img_format_var.set(self.window.compression_presets[selection]['format']['img'])
-        self.window.vid_format_var.set(self.window.compression_presets[selection]['format']['vid'])
-        self.window.fake_vid_var.set(self.window.compression_presets[selection]['fake_vid'])
-        self.window.default_emoji_var.set(self.window.compression_presets[selection]['default_emoji'])
-        self.window.steps_var.set(self.window.compression_presets[selection]['steps'])
+        selection = self.gui.comp_preset_var.get()
+        self.gui.fps_min_var.set(self.gui.compression_presets[selection]['fps']['min'])
+        self.gui.fps_max_var.set(self.gui.compression_presets[selection]['fps']['max'])
+        self.gui.res_w_min_var.set(self.gui.compression_presets[selection]['res']['w']['min'])
+        self.gui.res_w_max_var.set(self.gui.compression_presets[selection]['res']['w']['max'])
+        self.gui.res_h_min_var.set(self.gui.compression_presets[selection]['res']['h']['min'])
+        self.gui.res_h_max_var.set(self.gui.compression_presets[selection]['res']['h']['max'])
+        self.gui.quality_min_var.set(self.gui.compression_presets[selection]['quality']['min'])
+        self.gui.quality_max_var.set(self.gui.compression_presets[selection]['quality']['max'])
+        self.gui.color_min_var.set(self.gui.compression_presets[selection]['color']['min'])
+        self.gui.color_max_var.set(self.gui.compression_presets[selection]['color']['max'])
+        self.gui.duration_min_var.set(self.gui.compression_presets[selection]['duration']['min'])
+        self.gui.duration_max_var.set(self.gui.compression_presets[selection]['duration']['max'])
+        self.gui.img_size_max_var.set(self.gui.compression_presets[selection]['size_max']['img'])
+        self.gui.vid_size_max_var.set(self.gui.compression_presets[selection]['size_max']['vid'])
+        self.gui.img_format_var.set(self.gui.compression_presets[selection]['format']['img'])
+        self.gui.vid_format_var.set(self.gui.compression_presets[selection]['format']['vid'])
+        self.gui.fake_vid_var.set(self.gui.compression_presets[selection]['fake_vid'])
+        self.gui.default_emoji_var.set(self.gui.compression_presets[selection]['default_emoji'])
+        self.gui.steps_var.set(self.gui.compression_presets[selection]['steps'])
     
     def callback_compress_advanced(self, *args):
-        AdvancedCompressionWindow(self.window)
+        AdvancedCompressionWindow(self.gui)
     
     def callback_nocompress(self, *args):
-        if self.window.no_compress_var.get() == True:
+        if self.gui.no_compress_var.get() == True:
             self.set_inputs_comp(state='disabled')
         else:
             self.set_inputs_comp(state='normal')
@@ -496,25 +513,25 @@ class CompFrame:
         self.set_inputs_comp(state=state)
 
 class OutputFrame:
-    def __init__(self, window):
-        self.window = window
-        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Output')
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Output')
 
         self.output_option_lbl = Label(self.frame, text='Output options', width=18, justify='left', anchor='w')
-        output_full_names = [i['full_name'] for i in self.window.output_presets.values()]
-        defult_output_full_name = self.window.output_presets[self.window.default_output_mode]['full_name']
-        self.output_option_opt = OptionMenu(self.frame, self.window.output_option_var, defult_output_full_name, *output_full_names)
+        output_full_names = [i['full_name'] for i in self.gui.output_presets.values()]
+        defult_output_full_name = self.gui.output_presets[self.gui.default_output_mode]['full_name']
+        self.output_option_opt = OptionMenu(self.frame, self.gui.output_option_var, defult_output_full_name, *output_full_names, bootstyle='secondary')
         self.output_option_opt.config(width=32)
 
         self.output_setdir_lbl = Label(self.frame, text='Output directory', justify='left', anchor='w')
-        self.output_setdir_entry = Entry(self.frame, textvariable=self.window.output_setdir_var, width=60)
-        self.output_setdir_btn = Button(self.frame, text='Choose directory...', command=self.callback_set_outdir, width=16)
+        self.output_setdir_entry = Entry(self.frame, textvariable=self.gui.output_setdir_var, width=60)
+        self.output_setdir_btn = Button(self.frame, text='Choose directory...', command=self.callback_set_outdir, width=16, bootstyle='secondary')
 
         self.title_lbl = Label(self.frame, text='Title')
-        self.title_entry = Entry(self.frame, textvariable=self.window.title_var, width=80)
+        self.title_entry = Entry(self.frame, textvariable=self.gui.title_var, width=80)
         
         self.author_lbl = Label(self.frame, text='Author')
-        self.author_entry = Entry(self.frame, textvariable=self.window.author_var, width=80)
+        self.author_entry = Entry(self.frame, textvariable=self.gui.author_var, width=80)
 
         self.output_option_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.output_option_opt.grid(column=1, row=0, columnspan=2, sticky='w', padx=3, pady=3)
@@ -527,12 +544,12 @@ class OutputFrame:
         self.author_entry.grid(column=1, columnspan=2, row=3, sticky='w', padx=3, pady=3)
     
     def callback_set_outdir(self, *args):
-        orig_output_dir = self.window.output_setdir_var.get()
+        orig_output_dir = self.gui.output_setdir_var.get()
         if not os.path.isdir(orig_output_dir):
             orig_output_dir = os.getcwd()
         output_dir = filedialog.askdirectory(initialdir=orig_output_dir)
-        if output_dir != '':
-            self.window.output_setdir_var.set(output_dir)
+        if output_dir:
+            self.gui.output_setdir_var.set(output_dir)
     
     def set_states(self, state):
         self.title_entry.config(state=state)
@@ -542,31 +559,31 @@ class OutputFrame:
         self.output_setdir_btn.config(state=state)
 
 class CredFrame:
-    def __init__(self, window):
-        self.window = window
-        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Credentials')
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Credentials')
 
         self.frame.grid_columnconfigure(1, weight=1)
 
         self.signal_uuid_lbl = Label(self.frame, text='Signal uuid', width=18, justify='left', anchor='w')
-        self.signal_uuid_entry = Entry(self.frame, textvariable=self.window.signal_uuid_var, width=50)
+        self.signal_uuid_entry = Entry(self.frame, textvariable=self.gui.signal_uuid_var, width=50)
 
         self.signal_password_lbl = Label(self.frame, text='Signal password', justify='left', anchor='w')
-        self.signal_password_entry = Entry(self.frame, textvariable=self.window.signal_password_var, width=50)
+        self.signal_password_entry = Entry(self.frame, textvariable=self.gui.signal_password_var, width=50)
 
-        self.signal_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_signal_get_auth)
+        self.signal_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_signal_get_auth, bootstyle='secondary')
 
         self.telegram_token_lbl = Label(self.frame, text='Telegram token', justify='left', anchor='w')
-        self.telegram_token_entry = Entry(self.frame, textvariable=self.window.telegram_token_var, width=50)
+        self.telegram_token_entry = Entry(self.frame, textvariable=self.gui.telegram_token_var, width=50)
 
         self.telegram_userid_lbl = Label(self.frame, text='Telegram user_id', justify='left', anchor='w')
-        self.telegram_userid_entry = Entry(self.frame, textvariable=self.window.telegram_userid_var, width=50)
+        self.telegram_userid_entry = Entry(self.frame, textvariable=self.gui.telegram_userid_var, width=50)
 
         self.kakao_auth_token_lbl = Label(self.frame, text='Kakao auth_token', justify='left', anchor='w')
-        self.kakao_auth_token_entry = Entry(self.frame, textvariable=self.window.kakao_auth_token_var, width=35)
-        self.kakao_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_kakao_get_auth)
+        self.kakao_auth_token_entry = Entry(self.frame, textvariable=self.gui.kakao_auth_token_var, width=35)
+        self.kakao_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_kakao_get_auth, bootstyle='secondary')
 
-        self.help_btn = Button(self.frame, text='Get help', command=self.callback_cred_help)
+        self.help_btn = Button(self.frame, text='Get help', command=self.callback_cred_help, bootstyle='secondary')
 
         self.signal_uuid_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.signal_uuid_entry.grid(column=1, row=0, columnspan=2, sticky='w', padx=3, pady=3)
@@ -583,13 +600,16 @@ class CredFrame:
         self.help_btn.grid(column=2, row=6, sticky='e', padx=3, pady=3)
     
     def callback_cred_help(self, *args):
-        webbrowser.open('https://github.com/laggykiller/sticker-convert#faq')
+        faq_site = 'https://github.com/laggykiller/sticker-convert#faq'
+        success = webbrowser.open(faq_site)
+        if not success:
+            self.gui.callback_ask_str('You can get help from:', initialvalue=faq_site)
     
     def callback_kakao_get_auth(self, *args):
-        KakaoGetAuthWindow(self.window)
+        KakaoGetAuthWindow(self.gui)
     
     def callback_signal_get_auth(self, *args):
-        SignalGetAuthWindow(self.window)
+        SignalGetAuthWindow(self.gui)
     
     def set_states(self, state):
         self.signal_uuid_entry.config(state=state)
@@ -604,11 +624,12 @@ class ProgressFrame:
     progress_bar_steps = 0
     auto_scroll = True
 
-    def __init__(self, window):
-        self.window = window
-        self.frame = LabelFrame(self.window.scrollable_frame, borderwidth=1, text='Progress')
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Progress')
 
-        self.message_box = scrolledtext.ScrolledText(self.frame, height=15, wrap='word')
+        self.message_box = ScrolledText(self.frame, height=15, wrap='word')
+        self.message_box._text.config(state='disabled')
         self.progress_bar = Progressbar(self.frame, orient='horizontal', mode='determinate')
 
         self.message_box.bind('<Enter>', self.callback_disable_autoscroll)
@@ -646,7 +667,7 @@ class ProgressFrame:
         if msg:
             msg += '\n'
 
-        self.message_box.config(state='normal')
+        self.message_box._text.config(state='normal')
 
         if cls:
             self.message_box.delete(1.0, 'end')
@@ -657,11 +678,11 @@ class ProgressFrame:
             # Follow the end of the box if it was at the end
             # if scrollbar_prev_loc == 1.0:
             if self.auto_scroll:
-                self.message_box.yview_moveto(1.0)
+                self.message_box._text.yview_moveto(1.0)
             
-            sys.stdout.write(msg)
+            print(msg)
 
-        self.message_box.config(state='disabled')
+        self.message_box._text.config(state='disabled')
     
     def callback_disable_autoscroll(self, *args):
         self.auto_scroll = False
@@ -670,29 +691,29 @@ class ProgressFrame:
         self.auto_scroll = True
 
 class ControlFrame:
-    def __init__(self, window):
-        self.window = window
-        self.frame = Frame(self.window.scrollable_frame, borderwidth=1)
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = Frame(self.gui.scrollable_frame, borderwidth=1)
 
-        self.start_btn = Button(self.frame, text='Start', command=self.window.start)
+        self.start_btn = Button(self.frame, text='Start', command=self.gui.start)
         
         self.start_btn.pack(expand=True, fill='x')
 
 class KakaoGetAuthWindow:
-    def __init__(self, window):
-        self.window = window
+    def __init__(self, gui):
+        self.gui = gui
 
-        self.gen_kakao_auth_win = Toplevel(window.root)
-        self.gen_kakao_auth_win.title('Get Kakao auth_token')
+        self.get_kakao_auth_win = Toplevel(self.gui.root)
+        self.get_kakao_auth_win.title('Get Kakao auth_token')
         if sys.platform == 'darwin':
-            self.gen_kakao_auth_win.iconbitmap('resources/appicon.icns')
+            self.get_kakao_auth_win.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
-            self.gen_kakao_auth_win.iconbitmap('resources/appicon.ico')
+            self.get_kakao_auth_win.iconbitmap('resources/appicon.ico')
         else:
             self.icon = PhotoImage(file='resources/appicon.png')
-            self.gen_kakao_auth_win.tk.call('wm', 'iconphoto', self.gen_kakao_auth_win._w, self.icon)
+            self.get_kakao_auth_win.tk.call('wm', 'iconphoto', self.get_kakao_auth_win._w, self.icon)
         
-        self.gen_kakao_auth_win.focus_force()
+        self.get_kakao_auth_win.focus_force()
 
         self.create_scrollable_frame()
 
@@ -707,21 +728,21 @@ class KakaoGetAuthWindow:
         self.explanation2_lbl = Label(self.frame_login_info, text='You will send / receive verification code via SMS', justify='left', anchor='w')
         self.explanation3_lbl = Label(self.frame_login_info, text='You maybe logged out of existing device', justify='left', anchor='w')
 
-        self.kakao_username_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Email or Phone number used for signing up Kakao account (e.g. `+447700900142`)'))
+        self.kakao_username_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Email or Phone number used for signing up Kakao account (e.g. `+447700900142`)'), bootstyle='secondary')
         self.kakao_username_lbl = Label(self.frame_login_info, text='Username', width=18, justify='left', anchor='w')
-        self.kakao_username_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_username_var, width=30)
+        self.kakao_username_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_username_var, width=30)
 
-        self.kakao_password_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Password of Kakao account'))
+        self.kakao_password_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Password of Kakao account'), bootstyle='secondary')
         self.kakao_password_lbl = Label(self.frame_login_info, text='Password', justify='left', anchor='w')
-        self.kakao_password_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_password_var, width=30)
+        self.kakao_password_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_password_var, width=30)
 
-        self.kakao_country_code_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Example: 82 (For korea), 44 (For UK), 1 (For USA)'))
+        self.kakao_country_code_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Example: 82 (For korea), 44 (For UK), 1 (For USA)'), bootstyle='secondary')
         self.kakao_country_code_lbl = Label(self.frame_login_info, text='Country code', justify='left', anchor='w')
-        self.kakao_country_code_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_country_code_var, width=30)
+        self.kakao_country_code_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_country_code_var, width=30)
 
-        self.kakao_phone_number_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_help('Phone number associated with your Kakao account. Used for send / receive verification code via SMS.'))
+        self.kakao_phone_number_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Phone number associated with your Kakao account. Used for send / receive verification code via SMS.'), bootstyle='secondary')
         self.kakao_phone_number_lbl = Label(self.frame_login_info, text='Phone number', justify='left', anchor='w')
-        self.kakao_phone_number_entry = Entry(self.frame_login_info, textvariable=self.window.kakao_phone_number_var, width=30)
+        self.kakao_phone_number_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_phone_number_var, width=30)
 
         self.explanation1_lbl.grid(column=0, row=0, columnspan=3, sticky='w', padx=3, pady=3)
         self.explanation2_lbl.grid(column=0, row=1, columnspan=3, sticky='w', padx=3, pady=3)
@@ -751,7 +772,7 @@ class KakaoGetAuthWindow:
         self.resize_window()
     
     def create_scrollable_frame(self):
-        self.main_frame = Frame(self.gen_kakao_auth_win)
+        self.main_frame = Frame(self.get_kakao_auth_win)
         self.main_frame.pack(fill='both', expand=1)
 
         self.horizontal_scrollbar_frame = Frame(self.main_frame)
@@ -778,8 +799,8 @@ class KakaoGetAuthWindow:
         width = self.scrollable_frame.winfo_width()
         height = self.scrollable_frame.winfo_height()
 
-        screen_width = self.window.root.winfo_screenwidth()
-        screen_height = self.window.root.winfo_screenwidth()
+        screen_width = self.gui.root.winfo_screenwidth()
+        screen_height = self.gui.root.winfo_screenwidth()
 
         if width > screen_width * 0.8:
             width = int(screen_width * 0.8)
@@ -788,28 +809,21 @@ class KakaoGetAuthWindow:
 
         self.canvas.configure(width=width, height=height)
     
-    def callback_help(self, message='', *args):
-        messagebox.showinfo(title='sticker-convert', message=message)
-    
     def callback_login(self, *args):
-        auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=self.window.creds, cb_msg=self.callback_message, cb_input=self.callback_input)
+        callback_msg_block_kakao = partial(self.gui.callback_msg_block, parent=self.get_kakao_auth_win)
+        callback_ask_str_kakao = partial(self.gui.callback_ask_str, parent=self.get_kakao_auth_win)
+        auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=self.gui.creds, cb_msg_block=callback_msg_block_kakao, cb_ask_str=callback_ask_str_kakao)
         if auth_token:
-            self.window.creds['kakao']['auth_token'] = auth_token
-            self.window.kakao_auth_token_var.set(auth_token)
+            self.gui.creds['kakao']['auth_token'] = auth_token
+            self.gui.kakao_auth_token_var.set(auth_token)
             
-            self.callback_message(f'Got auth_token successfully: {auth_token}')
-
-    def callback_input(self, question):
-        return simpledialog.askstring('sticker-convert', question)
-    
-    def callback_message(self, message):
-        messagebox.showinfo(title='sticker-convert', message=message)
+            callback_msg_block_kakao(f'Got auth_token successfully: {auth_token}')
 
 class SignalGetAuthWindow:
-    def __init__(self, window):
-        self.window = window
+    def __init__(self, gui):
+        self.gui = gui
 
-        self.get_signal_auth_win = Toplevel(window.root)
+        self.get_signal_auth_win = Toplevel(self.gui.root)
         self.get_signal_auth_win.title('Get Signal uuid and password')
         if sys.platform == 'darwin':
             self.get_signal_auth_win.iconbitmap('resources/appicon.icns')
@@ -839,7 +853,7 @@ class SignalGetAuthWindow:
         self.explanation3_lbl.grid(column=0, row=2, columnspan=3, sticky='w', padx=3, pady=3)
 
         # Start button frame
-        self.login_btn = Button(self.frame_start_btn, text='Get uuid and password', command=self.callback_login)
+        self.login_btn = Button(self.frame_start_btn, text='Get uuid and password', command=self.callback_login, bootstyle='secondary')
 
         self.login_btn.pack()
 
@@ -873,8 +887,8 @@ class SignalGetAuthWindow:
         width = self.scrollable_frame.winfo_width()
         height = self.scrollable_frame.winfo_height()
 
-        screen_width = self.window.root.winfo_screenwidth()
-        screen_height = self.window.root.winfo_screenwidth()
+        screen_width = self.gui.root.winfo_screenwidth()
+        screen_height = self.gui.root.winfo_screenwidth()
 
         if width > screen_width * 0.8:
             width = int(screen_width * 0.8)
@@ -883,45 +897,40 @@ class SignalGetAuthWindow:
 
         self.canvas.configure(width=width, height=height)
     
-    def callback_help(self, message='', *args):
-        messagebox.showinfo(title='sticker-convert', message=message)
-    
     def callback_login(self, *args):
-        uuid, password = GetSignalAuth.get_signal_auth(cb_msg=self.callback_message, cb_input=self.callback_input)
+        callback_msg_block_signal = partial(self.gui.callback_msg_block, parent=self.get_signal_auth_win)
+        callback_ask_str_signal = partial(self.gui.callback_ask_str, parent=self.get_signal_auth_win)
+        uuid, password = GetSignalAuth.get_signal_auth(cb_ask_str=callback_ask_str_signal)
         if uuid and password:
-            self.window.creds['signal']['uuid'] = uuid
-            self.window.creds['signal']['password'] = password
-            self.window.signal_uuid_var.set(uuid)
-            self.window.signal_password_var.set(password)
+            self.gui.creds['signal']['uuid'] = uuid
+            self.gui.creds['signal']['password'] = password
+            self.gui.signal_uuid_var.set(uuid)
+            self.gui.signal_password_var.set(password)
             
-            self.callback_message(f'Got uuid and password successfully: {uuid}, {password}')
-
-    def callback_input(self, question):
-        return simpledialog.askstring('sticker-convert', question)
-    
-    def callback_message(self, message):
-        messagebox.showinfo(title='sticker-convert', message=message)
+            callback_msg_block_signal(f'Got uuid and password successfully:\nuuid={uuid}\npassword={password}')
+        else:
+            callback_msg_block_signal('Failed to get uuid and password')
 
 class AdvancedCompressionWindow:
     emoji_column_per_row = 10
     emoji_visible_rows = 5
     emoji_btns = []
 
-    def __init__(self, window):
-        self.window = window
-        self.categories = list({entry['category'] for entry in self.window.emoji_list})
+    def __init__(self, gui):
+        self.gui = gui
+        self.categories = list({entry['category'] for entry in self.gui.emoji_list})
 
-        self.advcompwin = Toplevel(window.root)
-        self.advcompwin.title('Advanced compression options')
+        self.adv_comp_win = Toplevel(self.gui.root)
+        self.adv_comp_win.title('Advanced compression options')
         if sys.platform == 'darwin':
-            self.advcompwin.iconbitmap('resources/appicon.icns')
+            self.adv_comp_win.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
-            self.advcompwin.iconbitmap('resources/appicon.ico')
+            self.adv_comp_win.iconbitmap('resources/appicon.ico')
         else:
             self.icon = PhotoImage(file='resources/appicon.png')
-            self.advcompwin.tk.call('wm', 'iconphoto', self.advcompwin._w, self.icon)
+            self.adv_comp_win.tk.call('wm', 'iconphoto', self.adv_comp_win._w, self.icon)
         
-        self.advcompwin.focus_force()
+        self.adv_comp_win.focus_force()
 
         if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
             self.mousewheel = ('<MouseWheel>',)
@@ -941,74 +950,76 @@ class AdvancedCompressionWindow:
 
         self.frame_advcomp.grid_columnconfigure(6, weight=1)
 
-        self.fps_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('FPS Higher = Smoother but larger size'))
+        callback_msg_block_adv_comp_win = partial(self.gui.callback_msg_block, parent=self.adv_comp_win)
+
+        self.fps_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('FPS Higher = Smoother but larger size'), bootstyle='secondary')
         self.fps_lbl = Label(self.frame_advcomp, text='Output FPS')
         self.fps_min_lbl = Label(self.frame_advcomp, text='Min:')
-        self.fps_min_entry = Entry(self.frame_advcomp, textvariable=self.window.fps_min_var, width=8)
+        self.fps_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.fps_min_var, width=8)
         self.fps_max_lbl = Label(self.frame_advcomp, text='Max:')
-        self.fps_max_entry = Entry(self.frame_advcomp, textvariable=self.window.fps_max_var, width=8)
-        self.fps_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.fps_disable_var, command=self.callback_disable_fps)
+        self.fps_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.fps_max_var, width=8)
+        self.fps_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.fps_disable_var, command=self.callback_disable_fps, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.res_w_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set width.\nResolution higher = Clearer but larger size'))
+        self.res_w_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set width.\nResolution higher = Clearer but larger size'), bootstyle='secondary')
         self.res_w_lbl = Label(self.frame_advcomp, text='Output resolution (Width)')
         self.res_w_min_lbl = Label(self.frame_advcomp, text='Min:')
-        self.res_w_min_entry = Entry(self.frame_advcomp, textvariable=self.window.res_w_min_var, width=8)
+        self.res_w_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_w_min_var, width=8)
         self.res_w_max_lbl = Label(self.frame_advcomp, text='Max:')
-        self.res_w_max_entry = Entry(self.frame_advcomp, textvariable=self.window.res_w_max_var, width=8)
-        self.res_w_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.res_w_disable_var, command=self.callback_disable_res_w)
+        self.res_w_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_w_max_var, width=8)
+        self.res_w_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.res_w_disable_var, command=self.callback_disable_res_w, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
         
-        self.res_h_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set height.\nResolution higher = Clearer but larger size'))
+        self.res_h_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set height.\nResolution higher = Clearer but larger size'), bootstyle='secondary')
         self.res_h_lbl = Label(self.frame_advcomp, text='Output resolution (Height)')
         self.res_h_min_lbl = Label(self.frame_advcomp, text='Min:')
-        self.res_h_min_entry = Entry(self.frame_advcomp, textvariable=self.window.res_h_min_var, width=8)
+        self.res_h_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_h_min_var, width=8)
         self.res_h_max_lbl = Label(self.frame_advcomp, text='Max:')
-        self.res_h_max_entry = Entry(self.frame_advcomp, textvariable=self.window.res_h_max_var, width=8)
-        self.res_h_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.res_h_disable_var, command=self.callback_disable_res_h)
+        self.res_h_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_h_max_var, width=8)
+        self.res_h_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.res_h_disable_var, command=self.callback_disable_res_h, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.quality_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Quality higher = Clearer but larger size'))
+        self.quality_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Quality higher = Clearer but larger size'), bootstyle='secondary')
         self.quality_lbl = Label(self.frame_advcomp, text='Output quality (0-100)')
         self.quality_min_lbl = Label(self.frame_advcomp, text='Min:')
-        self.quality_min_entry = Entry(self.frame_advcomp, textvariable=self.window.quality_min_var, width=8)
+        self.quality_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.quality_min_var, width=8)
         self.quality_max_lbl = Label(self.frame_advcomp, text='Max:')
-        self.quality_max_entry = Entry(self.frame_advcomp, textvariable=self.window.quality_max_var, width=8)
-        self.quality_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.quality_disable_var, command=self.callback_disable_quality)
+        self.quality_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.quality_max_var, width=8)
+        self.quality_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.quality_disable_var, command=self.callback_disable_quality, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.color_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Reduce size by limiting number of colors.\nMakes image "blocky". >256 will disable this.\nApplies to png and apng only.\nColor higher = More colors but larger size'))
+        self.color_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Reduce size by limiting number of colors.\nMakes image "blocky". >256 will disable this.\nApplies to png and apng only.\nColor higher = More colors but larger size'), bootstyle='secondary')
         self.color_lbl = Label(self.frame_advcomp, text='Colors (0-256)')
         self.color_min_lbl = Label(self.frame_advcomp, text='Min:')
-        self.color_min_entry = Entry(self.frame_advcomp, textvariable=self.window.color_min_var, width=8)
+        self.color_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.color_min_var, width=8)
         self.color_max_lbl = Label(self.frame_advcomp, text='Max:')
-        self.color_max_entry = Entry(self.frame_advcomp, textvariable=self.window.color_max_var, width=8)
-        self.color_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.color_disable_var, command=self.callback_disable_color)
+        self.color_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.color_max_var, width=8)
+        self.color_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.color_disable_var, command=self.callback_disable_color, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.duration_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.'))
+        self.duration_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.'), bootstyle='secondary')
         self.duration_lbl = Label(self.frame_advcomp, text='Duration (Miliseconds)')
         self.duration_min_lbl = Label(self.frame_advcomp, text='Min:')
-        self.duration_min_entry = Entry(self.frame_advcomp, textvariable=self.window.duration_min_var, width=8)
+        self.duration_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.duration_min_var, width=8)
         self.duration_max_lbl = Label(self.frame_advcomp, text='Max:')
-        self.duration_max_entry = Entry(self.frame_advcomp, textvariable=self.window.duration_max_var, width=8)
-        self.duration_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.duration_disable_var, command=self.callback_disable_duration)
+        self.duration_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.duration_max_var, width=8)
+        self.duration_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.duration_disable_var, command=self.callback_disable_duration, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.size_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set maximum file size in bytes for video and image'))
+        self.size_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set maximum file size in bytes for video and image'), bootstyle='secondary')
         self.size_lbl = Label(self.frame_advcomp, text='Maximum file size (bytes)')
         self.img_size_max_lbl = Label(self.frame_advcomp, text='Img:')
-        self.img_size_max_entry = Entry(self.frame_advcomp, textvariable=self.window.img_size_max_var, width=8)
+        self.img_size_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.img_size_max_var, width=8)
         self.vid_size_max_lbl = Label(self.frame_advcomp, text='Vid:')
-        self.vid_size_max_entry = Entry(self.frame_advcomp, textvariable=self.window.vid_size_max_var, width=8)
-        self.size_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.window.size_disable_var, command=self.callback_disable_size)
+        self.vid_size_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.vid_size_max_var, width=8)
+        self.size_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.size_disable_var, command=self.callback_disable_size, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.format_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set file format for video and image'))
+        self.format_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set file format for video and image'), bootstyle='secondary')
         self.format_lbl = Label(self.frame_advcomp, text='File format')
         self.img_format_lbl = Label(self.frame_advcomp, text='Img:')
-        self.img_format_entry = Entry(self.frame_advcomp, textvariable=self.window.img_format_var, width=8)
+        self.img_format_entry = Entry(self.frame_advcomp, textvariable=self.gui.img_format_var, width=8)
         self.vid_format_lbl = Label(self.frame_advcomp, text='Vid:')
-        self.vid_format_entry = Entry(self.frame_advcomp, textvariable=self.window.vid_format_var, width=8)
+        self.vid_format_entry = Entry(self.frame_advcomp, textvariable=self.gui.vid_format_var, width=8)
 
-        self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Convert image to video. Useful if:\n(1) Size limit for video is larger than image\n(2) Mix image and video into same pack'))
+        self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Convert image to video. Useful if:\n(1) Size limit for video is larger than image\n(2) Mix image and video into same pack'), bootstyle='secondary')
         self.fake_vid_lbl = Label(self.frame_advcomp, text='Convert (faking) image to video')
-        self.fake_vid_cbox = Checkbutton(self.frame_advcomp, variable=self.window.fake_vid_var)
+        self.fake_vid_cbox = Checkbutton(self.frame_advcomp, variable=self.gui.fake_vid_var, onvalue=True, offvalue=False, bootstyle='success-round-toggle')
 
-        self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: self.callback_help('Set the default emoji for uploading signal and telegram sticker packs'))
+        self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set the default emoji for uploading signal and telegram sticker packs'), bootstyle='secondary')
         self.default_emoji_lbl = Label(self.frame_advcomp, text='Default emoji')
         self.im = Image.new("RGBA", (32, 32), (255,255,255,0))
         self.ph_im = ImageTk.PhotoImage(self.im)
@@ -1099,7 +1110,7 @@ class AdvancedCompressionWindow:
         self.categories_lbl = Label(self.frame_emoji_search, text='Category', width=15, justify='left', anchor='w')
         self.categories_var = StringVar(self.scrollable_frame)
         self.categories_var.set('Smileys & Emotion')
-        self.categories_opt = OptionMenu(self.frame_emoji_search, self.categories_var, 'Smileys & Emotion', *self.categories, command=self.render_emoji_list)
+        self.categories_opt = OptionMenu(self.frame_emoji_search, self.categories_var, 'Smileys & Emotion', *self.categories, command=self.render_emoji_list, bootstyle='secondary')
         self.categories_opt.config(width=30)
 
         self.search_lbl = Label(self.frame_emoji_search, text='Search')
@@ -1137,7 +1148,7 @@ class AdvancedCompressionWindow:
         self.resize_window()
     
     def create_scrollable_frame(self):
-        self.main_frame = Frame(self.advcompwin)
+        self.main_frame = Frame(self.adv_comp_win)
         self.main_frame.pack(fill='both', expand=1)
 
         self.horizontal_scrollbar_frame = Frame(self.main_frame)
@@ -1164,8 +1175,8 @@ class AdvancedCompressionWindow:
         width = self.scrollable_frame.winfo_width()
         height = self.scrollable_frame.winfo_height()
 
-        screen_width = self.window.root.winfo_screenwidth()
-        screen_height = self.window.root.winfo_screenwidth()
+        screen_width = self.gui.root.winfo_screenwidth()
+        screen_height = self.gui.root.winfo_screenwidth()
 
         if width > screen_width * 0.8:
             width = int(screen_width * 0.8)
@@ -1175,7 +1186,7 @@ class AdvancedCompressionWindow:
         self.canvas.configure(width=width, height=height)
     
     def callback_disable_fps(self, *args):
-        if self.window.fps_disable_var.get() == True:
+        if self.gui.fps_disable_var.get() == True:
             state = 'disabled'
         else:
             state = 'normal'
@@ -1184,7 +1195,7 @@ class AdvancedCompressionWindow:
         self.fps_max_entry.config(state=state)
 
     def callback_disable_res_w(self, *args):
-        if self.window.res_w_disable_var.get() == True:
+        if self.gui.res_w_disable_var.get() == True:
             state = 'disabled'
         else:
             state = 'normal'
@@ -1193,7 +1204,7 @@ class AdvancedCompressionWindow:
         self.res_w_max_entry.config(state=state)
 
     def callback_disable_res_h(self, *args):
-        if self.window.res_h_disable_var.get() == True:
+        if self.gui.res_h_disable_var.get() == True:
             state = 'disabled'
         else:
             state = 'normal'
@@ -1202,7 +1213,7 @@ class AdvancedCompressionWindow:
         self.res_h_max_entry.config(state=state)
 
     def callback_disable_quality(self, *args):
-        if self.window.quality_disable_var.get() == True:
+        if self.gui.quality_disable_var.get() == True:
             state = 'disabled'
         else:
             state = 'normal'
@@ -1211,7 +1222,7 @@ class AdvancedCompressionWindow:
         self.quality_max_entry.config(state=state)
 
     def callback_disable_color(self, *args):
-        if self.window.color_disable_var.get() == True:
+        if self.gui.color_disable_var.get() == True:
             state = 'disabled'
         else:
             state = 'normal'
@@ -1220,7 +1231,7 @@ class AdvancedCompressionWindow:
         self.color_max_entry.config(state=state)
 
     def callback_disable_duration(self, *args):
-        if self.window.duration_disable_var.get() == True:
+        if self.gui.duration_disable_var.get() == True:
             state = 'disabled'
         else:
             state = 'normal'
@@ -1229,20 +1240,17 @@ class AdvancedCompressionWindow:
         self.duration_max_entry.config(state=state)
 
     def callback_disable_size(self, *args):
-        if self.window.size_disable_var.get() == True:
+        if self.gui.size_disable_var.get() == True:
             state = 'disabled'
         else:
             state = 'normal'
 
         self.img_size_max_entry.config(state=state)
         self.vid_size_max_entry.config(state=state)
-
-    def callback_help(self, message='', *args):
-        messagebox.showinfo(title='sticker-convert', message=message)
     
     def set_emoji_btn(self):
         self.im = Image.new("RGBA", (128, 128), (255,255,255,0))
-        ImageDraw.Draw(self.im).text((0, 0), self.window.default_emoji_var.get(), embedded_color=True, font=self.window.emoji_font)
+        ImageDraw.Draw(self.im).text((0, 0), self.gui.default_emoji_var.get(), embedded_color=True, font=self.gui.emoji_font)
         self.im = self.im.resize((32, 32))
         self.ph_im = ImageTk.PhotoImage(self.im)
         self.default_emoji_dsp.config(image=self.ph_im)
@@ -1258,7 +1266,7 @@ class AdvancedCompressionWindow:
         row = 0
 
         self.emoji_btns = []
-        for entry in self.window.emoji_list:
+        for entry in self.gui.emoji_list:
             # Filtering
             search_term = self.search_var.get().lower()
             emoji = entry['emoji']
@@ -1280,11 +1288,11 @@ class AdvancedCompressionWindow:
                     continue
     
             im = Image.new("RGBA", (196, 196), (255,255,255,0))
-            ImageDraw.Draw(im).text((16, 16), emoji, embedded_color=True, font=self.window.emoji_font)
+            ImageDraw.Draw(im).text((16, 16), emoji, embedded_color=True, font=self.gui.emoji_font)
             im = im.resize((32, 32))
             ph_im = ImageTk.PhotoImage(im)
 
-            button = Button(self.frame_buttons, command=lambda i=emoji: self.callback_set_emoji(i))
+            button = Button(self.frame_buttons, command=lambda i=emoji: self.callback_set_emoji(i), bootstyle='dark')
             button.config(image=ph_im)
             button.grid(column=column, row=row)
 
@@ -1325,5 +1333,5 @@ class AdvancedCompressionWindow:
         self.emoji_canvas.yview_scroll(int(-1*(event.delta/self.delta_divide)), "units")
 
     def callback_set_emoji(self, emoji):
-        self.window.default_emoji_var.set(emoji)
+        self.gui.default_emoji_var.set(emoji)
         self.set_emoji_btn()
