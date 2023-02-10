@@ -340,6 +340,6 @@ class CLI:
 
     def check_bin(self):
         for bin, check_cmd in self.bins.items():
-            result = RunBin.check_bin(bin, check_cmd, self.callback_ask_bool)
+            result = RunBin.check_bin(bin, check_cmd, self.callback_ask_bool, self.callback_msg)
             if result == False:
                 sys.exit()

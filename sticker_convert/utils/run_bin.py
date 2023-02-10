@@ -53,14 +53,18 @@ class RunBin:
         return output_str, sp.returncode
 
     @staticmethod
-    def check_bin(bin, check_cmd=['-v'], cb_ask_bool=input):
+    def check_bin(bin, check_cmd=['-v'], cb_ask_bool=input, cb_msg=cb_msg):
         while True:
             msg = ''
             advice = ''
 
-            if not RunBin.get_bin(bin):
+            bin_path = RunBin.get_bin(bin)
+
+            if not bin_path:
                 msg = f'Failed to find binary {bin}.\nRead Documentations to check how to download it.\nCheck again?'
             else:
+                if sys.platform == 'darwin':
+                    RunBin.run_cmd(['xattr', '-d', 'com.apple.quarantine', bin_path], silence=True, cb_msg=cb_msg)
                 output_str, returncode = RunBin.run_cmd([bin, *check_cmd], silence=True)
                 if returncode != 0 and not (bin == 'apngasm' and returncode == 2) and not (bin == 'apngdis' and returncode == 1):
                     msg = f'Error occured when executing binary {bin}.{advice}\nCheck again?'

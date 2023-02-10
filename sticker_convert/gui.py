@@ -417,7 +417,7 @@ class GUI:
     
     def check_bin_thread(self):
         for bin, check_cmd in self.bins.items():
-            result = RunBin.check_bin(bin, check_cmd, self.callback_ask_bool)
+            result = RunBin.check_bin(bin, check_cmd, self.callback_ask_bool, self.callback_msg)
             if result == False:
                 self.exec_in_main(sys.exit)
 
