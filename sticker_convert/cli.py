@@ -51,14 +51,14 @@ class CLI:
             parser_input.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
         parser_input_src = parser_input.add_mutually_exclusive_group()
         for k, v in self.input_presets.items():
-            parser_input_src.add_argument(f'--download-{k.replace("_", "-")}', dest=k, help=f'{v["help"]}\n({v["example"]})')
+            parser_input_src.add_argument(f'--download-{k.replace("_", "-")}', dest=f'download_{k}', help=f'{v["help"]}\n({v["example"]})')
 
         parser_output = parser.add_argument_group('Output options')
         for k, v in self.help['output'].items():
             parser_output.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
         parser_output_dst = parser_output.add_mutually_exclusive_group()
         for k, v in self.output_presets.items():
-            parser_output_dst.add_argument(f'--export-{k.replace("_", "-")}', dest=k, help=v['help'])
+            parser_output_dst.add_argument(f'--export-{k.replace("_", "-")}', dest=f'export_{k}', action='store_true', help=v['help'])
 
         parser_comp = parser.add_argument_group('Compression options')
         parser_comp.add_argument('--no-compress', dest='no_compress', action='store_true', help=self.help['comp']['no_compress'])
@@ -72,7 +72,7 @@ class CLI:
                     'color_min', 'color_max',
                     'duration_min', 'duration_max',
                     'vid_size_max', 'img_size_max')
-        flags_str = ('vid_format', 'img_formt')
+        flags_str = ('vid_format', 'img_format')
         flags_bool = ('fake_vid')
         for k, v in self.help['comp'].items():
             if k in flags_int:
@@ -140,7 +140,7 @@ class CLI:
         }
 
     def get_opt_output(self, args):
-        if args.export_wastickers:
+        if args.export_whatsapp:
             export_option = 'whatsapp'
         elif args.export_signal:
             export_option = 'signal'
@@ -161,10 +161,10 @@ class CLI:
     def get_opt_comp(self, args):
         preset = args.preset
         if args.preset == 'custom':
-            if sum((args.export_wastickers, args.export_signal, args.export_telegram, args.export_imessage)) > 1:
+            if sum((args.export_whatsapp, args.export_signal, args.export_telegram, args.export_imessage)) > 1:
                 # Let the verify functions in export do the compression
                 args.no_compress = True
-            elif args.export_wastickers:
+            elif args.export_whatsapp:
                 preset = 'whatsapp'
             elif args.export_signal:
                 preset = 'signal'
@@ -242,19 +242,27 @@ class CLI:
         }
 
         if args.kakao_get_auth:
-            auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_msg_block=self.callback_msg_block, cb_ask_str=self.callback_ask_str)
+            m = GetKakaoAuth(opt_cred=creds, cb_msg=self.callback_msg, cb_msg_block=self.callback_msg_block, cb_ask_str=self.callback_ask_str)
+            auth_token = m.get_cred()
+
             if auth_token:
                 self.opt_cred['kakao']['auth_token'] = auth_token
                 
                 self.callback_msg(f'Got auth_token successfully: {auth_token}')
         
         if args.signal_get_auth:
-            uuid, password = GetSignalAuth.get_signal_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_msg_block=self.callback_msg_block)
-            if uuid and password:
-                self.opt_cred['signal']['uuid'] = uuid
-                self.opt_cred['signal']['password'] = password
+            m = GetSignalAuth(cb_msg=self.callback_msg, cb_ask_str=self.callback_ask_str)
+
+            uuid, password = None, None
+            while True:
+                uuid, password = m.get_cred()
+
+                if uuid and password:
+                    self.opt_cred['signal']['uuid'] = uuid
+                    self.opt_cred['signal']['password'] = password
                 
-                self.callback_msg(f'Got uuid and password successfully: {uuid}, {password}')
+                    self.callback_msg(f'Got uuid and password successfully: {uuid}, {password}')
+                    break
         
         if args.save_cred:
             JsonManager.save_json('creds.json', self.opt_cred)
