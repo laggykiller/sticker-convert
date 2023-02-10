@@ -31,54 +31,76 @@ class RunBin:
     def run_cmd(cmd_list, silence=False, cb_msg=print):
         cmd_list[0] = RunBin.get_bin(cmd_list[0])
 
-        if silence:
-            sp = subprocess.Popen(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        else:
-            sp = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # sp = subprocess.Popen(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        sp = subprocess.run(cmd_list, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
-        output, error = sp.communicate()
-
-        output_str = ''
-        if output:
-            output_str = output.decode()
-        
-        error_str = ''
-        if error:
-            error_str = error.decode()
+        output_str = sp.stdout.decode()
+        error_str = sp.stderr.decode()
 
         if silence == False and error_str != '':
             cb_msg(f"Error while executing {' '.join(cmd_list)} : {error_str}")
             return False
 
-        return output_str, sp.returncode
+        return output_str
 
     @staticmethod
     def check_bin(bin, check_cmd=['-v'], cb_ask_bool=input, cb_msg=print):
         while True:
-            msg = ''
-            advice = ''
+            msg = RunBin.check_bin_once(bin, check_cmd, cb_ask_bool, cb_msg)
 
-            bin_path = RunBin.get_bin(bin)
-
-            if not bin_path:
-                msg = f'Failed to find binary {bin}.\nRead Documentations to check how to download it.\nCheck again?'
-            else:
-                if sys.platform == 'darwin':
-                    RunBin.run_cmd(['xattr', '-d', 'com.apple.quarantine', bin_path], silence=True, cb_msg=cb_msg)
-                output_str, returncode = RunBin.run_cmd([bin, *check_cmd], silence=True)
-                if returncode != 0 and not (bin == 'apngasm' and returncode == 2) and not (bin == 'apngdis' and returncode == 1):
-                    msg = f'Error occured when executing binary {bin}.{advice}\nCheck again?'
-                    if sys.platform != 'win32':
-                        advice += '\nIs the permission correct?'
-                    if sys.platform == 'darwin':
-                        advice += '\nDid MacOS blocked it because from identified developer?'
-                        advice += '\nGo to System Preferences > Security & Privacy and click "Open Anyway"'
-                
-            if msg != '':
-                response = cb_ask_bool(f'Error occured when executing binary {bin}.{advice}\nCheck again?')
+            if msg:
+                response = cb_ask_bool(msg)
                 if response:
                     continue
                 else:
                     return False
             
             return True
+
+    @staticmethod
+    def check_bin_once(bin, check_cmd=['-v'], cb_ask_bool=input, cb_msg=print):
+        msg = None
+
+        bin_path = RunBin.get_bin(bin)
+        if not bin_path:
+            msg = f'Failed to find binary {bin}.\nRead Documentations to check how to download it.\nCheck again?'
+            return msg
+
+        if sys.platform == 'darwin':
+            RunBin.run_cmd(['xattr', '-d', 'com.apple.quarantine', bin_path], silence=True, cb_msg=cb_msg)
+
+        if bin == 'apngasm':
+            try:
+                os.remove('./resources/testing_apngasm.png')
+            except OSError:
+                pass
+        elif bin == 'apngdis':
+            try:
+                os.remove('./resources/testing_strip.png')
+            except OSError:
+                pass
+
+        returncode = subprocess.call([bin_path, *check_cmd], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+        if returncode != 0:
+            advice = ''
+            if sys.platform != 'win32':
+                advice += '\nIs the permission correct?'
+            elif sys.platform == 'darwin':
+                advice += '\nDid MacOS blocked it because from identified developer?'
+                advice += '\nGo to System Preferences > Security & Privacy and click "Open Anyway"'
+            msg = f'Error occured when executing binary {bin}.{advice}\nCheck again?'
+            return msg
+
+        if bin == 'apngasm':
+            try:
+                os.remove('./resources/testing_apngasm.png')
+            except OSError:
+                msg = f'Executing binary {bin} gave unexpected result.\nCheck again?'
+                return msg
+        elif bin == 'apngdis':
+            try:
+                os.remove('./resources/testing_strip.png')
+            except OSError:
+                msg = f'Executing binary {bin} gave unexpected result.\nCheck again?'
+                return msg

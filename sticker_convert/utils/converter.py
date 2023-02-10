@@ -360,7 +360,7 @@ class StickerConvert:
             cmd_list += ['-pix_fmt', 'yuva420p', '-quality', str(quality), '-lossless', '0', out_f.replace('{0}', '%03d')]
 
         # RunBin.run_cmd(cmd_list)
-        RunBin.run_cmd(cmd_list, silence=False)
+        RunBin.run_cmd(cmd_list, silence=True)
 
     @staticmethod
     def convert_from_webp_anim(in_f, out_f, res_w=None, res_h=None, quality=None, fps=None, color=None, duration_min=None, duration_max=None, fake_vid=False, **kwargs):

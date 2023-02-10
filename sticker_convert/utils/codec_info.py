@@ -79,7 +79,7 @@ class CodecInfo:
                     width_magick = img.width
                     height_magick = img.height
             else:
-                res = RunBin.run_cmd(['magick', 'identify', '-ping', '-format', '%wx%h', file], silence=False)
+                res = RunBin.run_cmd(['magick', 'identify', '-ping', '-format', '%wx%h', file], silence=True)
                 width_magick = int(res.split('x')[0])
                 height_magick = int(res.split('x')[1])
         except:
@@ -99,7 +99,7 @@ class CodecInfo:
             return frames
         
         if file_ext != '.webp' and RunBin.get_bin('ffprobe', silent=True):
-            frames_ffprobe = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames', '-print_format', 'default=nokey=1:noprint_wrappers=1', file], silence=False).strip()
+            frames_ffprobe = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v:0', '-count_frames', '-show_entries', 'stream=nb_read_frames', '-print_format', 'default=nokey=1:noprint_wrappers=1', file], silence=True).strip()
             if frames_ffprobe.isnumeric():
                 frames_ffprobe = int(frames_ffprobe)
             else:
@@ -108,7 +108,7 @@ class CodecInfo:
             frames_ffprobe = 1
 
         if RunBin.get_bin('magick', silent=True):
-            frames_magick = RunBin.run_cmd(['magick', 'identify', file], silence=False).count('\n')
+            frames_magick = RunBin.run_cmd(['magick', 'identify', file], silence=True).count('\n')
         else:
             with Image(filename=file) as img:
                 frames_magick = img.iterator_length()
