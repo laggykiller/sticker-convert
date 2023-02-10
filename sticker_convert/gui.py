@@ -31,15 +31,13 @@ class GUI:
         self.emoji_font = ImageFont.truetype("./resources/NotoColorEmoji.ttf", 109)
 
         self.root = Window(themename='darkly')
-        
-        if sys.platform == 'darwin':
-            self.root.iconbitmap(bitmap='resources/appicon.icns')
-            self.root.iconbitmap(default='resources/appicon.icns')
-        elif sys.platform == 'win32':
-            self.root.iconbitmap(bitmap='resources/appicon.ico')
-            self.root.iconbitmap(default='resources/appicon.ico')
 
         self.icon = PhotoImage(file='resources/appicon.png')
+        self.root.iconphoto(1, self.icon)
+        if sys.platform == 'darwin':
+            self.root.iconbitmap(bitmap='resources/appicon.icns')
+        else:
+            self.root.iconbitmap(bitmap='resources/appicon.ico')
         self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
         self.root.title('sticker-convert')
 
@@ -754,14 +752,13 @@ class KakaoGetAuthWindow:
 
         self.get_kakao_auth_win = Toplevel(self.gui.root)
         self.get_kakao_auth_win.title('Get Kakao auth_token')
-        if sys.platform == 'darwin':
-            self.get_kakao_auth_win.iconbitmap(bitmap='resources/appicon.icns')
-            self.get_kakao_auth_win.iconbitmap(default='resources/appicon.icns')
-        elif sys.platform == 'win32':
-            self.get_kakao_auth_win.iconbitmap(bitmap='resources/appicon.ico')
-            self.get_kakao_auth_win.iconbitmap(default='resources/appicon.ico')
-
+        
         self.icon = PhotoImage(file='resources/appicon.png')
+        self.get_kakao_auth_win.iconphoto(1, self.icon)
+        if sys.platform == 'darwin':
+            self.root.iconbitmap(bitmap='resources/appicon.icns')
+        else:
+            self.root.iconbitmap(bitmap='resources/appicon.ico')
         self.get_kakao_auth_win.tk.call('wm', 'iconphoto', self.get_kakao_auth_win._w, self.icon)
         
         self.get_kakao_auth_win.focus_force()
@@ -885,14 +882,13 @@ class SignalGetAuthWindow:
 
         self.get_signal_auth_win = Toplevel(self.gui.root)
         self.get_signal_auth_win.title('Get Signal uuid and password')
-        if sys.platform == 'darwin':
-            self.get_signal_auth_win.iconbitmap(bitmap='resources/appicon.icns')
-            self.get_signal_auth_win.iconbitmap(default='resources/appicon.icns')
-        elif sys.platform == 'win32':
-            self.get_signal_auth_win.iconbitmap(bitmap='resources/appicon.ico')
-            self.get_signal_auth_win.iconbitmap(default='resources/appicon.ico')
-
+        
         self.icon = PhotoImage(file='resources/appicon.png')
+        self.get_signal_auth_win.iconphoto(1, self.icon)
+        if sys.platform == 'darwin':
+            self.root.iconbitmap(bitmap='resources/appicon.icns')
+        else:
+            self.root.iconbitmap(bitmap='resources/appicon.ico')
         self.get_signal_auth_win.tk.call('wm', 'iconphoto', self.get_signal_auth_win._w, self.icon)
         
         self.get_signal_auth_win.focus_force()
@@ -995,14 +991,13 @@ class AdvancedCompressionWindow:
 
         self.adv_comp_win = Toplevel(self.gui.root)
         self.adv_comp_win.title('Advanced compression options')
-        if sys.platform == 'darwin':
-            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.icns')
-            self.adv_comp_win.iconbitmap(default='resources/appicon.icns')
-        elif sys.platform == 'win32':
-            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.ico')
-            self.adv_comp_win.iconbitmap(default='resources/appicon.ico')
 
         self.icon = PhotoImage(file='resources/appicon.png')
+        self.adv_comp_win.iconphoto(1, self.icon)
+        if sys.platform == 'darwin':
+            self.root.iconbitmap(bitmap='resources/appicon.icns')
+        else:
+            self.root.iconbitmap(bitmap='resources/appicon.ico')
         self.adv_comp_win.tk.call('wm', 'iconphoto', self.adv_comp_win._w, self.icon)
         
         self.adv_comp_win.focus_force()
