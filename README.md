@@ -308,6 +308,8 @@ To become an identified developer, I have to pay USD$99 to Apple.
 
 To bypass this problem, open terminal and execute `sudo spctl --master-disable` before running `sticker-convert`.
 
+If macOS still complains about individual binaries (e.g. apngasm), go to `System Preferences > Security & Privacy` and press `Open Anyway` for each file.
+
 To learn more, read this page: https://disable-gatekeeper.github.io/
 
 ### Getting signal uuid and password
