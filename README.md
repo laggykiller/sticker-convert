@@ -306,7 +306,9 @@ See [COMPILING.md](COMPILING.md)
 ### MacOS complains that program from unidentified developer
 To become an identified developer, I have to pay USD$99 to Apple every year.
 
-To bypass this problem, open terminal and execute `sudo spctl --master-disable` before running `sticker-convert`.
+There are two ways to bypass this problem:
+1. Permanent: Open terminal and execute `sudo spctl --master-disable` before running `sticker-convert`.
+2. Temporary: Open terminal and execute `xattr -d com.apple.quarantine ./Downloads/sticker-convert-macos.zip` before extracting the downloaded zip file.
 
 If macOS still complains about individual binaries (e.g. apngasm), go to `System Preferences > Security & Privacy` and press `Open Anyway` for each file.
 
