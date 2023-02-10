@@ -304,7 +304,7 @@ See [COMPILING.md](COMPILING.md)
 ## FAQ
 
 ### MacOS complains that program from unidentified developer
-To become an identified developer, I have to pay USD$99 to Apple.
+To become an identified developer, I have to pay USD$99 to Apple every year.
 
 To bypass this problem, open terminal and execute `sudo spctl --master-disable` before running `sticker-convert`.
 
