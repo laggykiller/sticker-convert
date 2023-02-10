@@ -36,7 +36,7 @@ class GUI:
         self.root.iconphoto(1, self.icon)
         if sys.platform == 'darwin':
             self.root.iconbitmap(bitmap='resources/appicon.icns')
-        else:
+        elif sys.platform == 'win32':
             self.root.iconbitmap(bitmap='resources/appicon.ico')
         self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
         self.root.title('sticker-convert')
@@ -756,9 +756,9 @@ class KakaoGetAuthWindow:
         self.icon = PhotoImage(file='resources/appicon.png')
         self.get_kakao_auth_win.iconphoto(1, self.icon)
         if sys.platform == 'darwin':
-            self.root.iconbitmap(bitmap='resources/appicon.icns')
-        else:
-            self.root.iconbitmap(bitmap='resources/appicon.ico')
+            self.get_kakao_auth_win.iconbitmap(bitmap='resources/appicon.icns')
+        elif sys.platform == 'win32':
+            self.get_kakao_auth_win.iconbitmap(bitmap='resources/appicon.ico')
         self.get_kakao_auth_win.tk.call('wm', 'iconphoto', self.get_kakao_auth_win._w, self.icon)
         
         self.get_kakao_auth_win.focus_force()
@@ -886,9 +886,9 @@ class SignalGetAuthWindow:
         self.icon = PhotoImage(file='resources/appicon.png')
         self.get_signal_auth_win.iconphoto(1, self.icon)
         if sys.platform == 'darwin':
-            self.root.iconbitmap(bitmap='resources/appicon.icns')
-        else:
-            self.root.iconbitmap(bitmap='resources/appicon.ico')
+            self.get_signal_auth_win.iconbitmap(bitmap='resources/appicon.icns')
+        elif sys.platform == 'win32':
+            self.get_signal_auth_win.iconbitmap(bitmap='resources/appicon.ico')
         self.get_signal_auth_win.tk.call('wm', 'iconphoto', self.get_signal_auth_win._w, self.icon)
         
         self.get_signal_auth_win.focus_force()
@@ -995,9 +995,9 @@ class AdvancedCompressionWindow:
         self.icon = PhotoImage(file='resources/appicon.png')
         self.adv_comp_win.iconphoto(1, self.icon)
         if sys.platform == 'darwin':
-            self.root.iconbitmap(bitmap='resources/appicon.icns')
-        else:
-            self.root.iconbitmap(bitmap='resources/appicon.ico')
+            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.icns')
+        elif sys.platform == 'win32':
+            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.ico')
         self.adv_comp_win.tk.call('wm', 'iconphoto', self.adv_comp_win._w, self.icon)
         
         self.adv_comp_win.focus_force()
