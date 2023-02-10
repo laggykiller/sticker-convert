@@ -36,9 +36,9 @@ class GUI:
             self.root.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
             self.root.iconbitmap('resources/appicon.ico')
-        else:
-            self.icon = PhotoImage(file='resources/appicon.png')
-            self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
+
+        self.icon = PhotoImage(file='resources/appicon.png')
+        self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
         self.root.title('sticker-convert')
 
         self.create_scrollable_frame()
@@ -188,7 +188,7 @@ class GUI:
         self.emoji_list = JsonManager.load_json('resources/emoji.json')
 
         if not (self.compression_presets and self.input_presets and self.output_presets):
-            Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
+            Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert', icon='resources/appicon.png')
             sys.exit()
         
         if os.path.isfile('creds.json'):
@@ -394,10 +394,10 @@ class GUI:
         return response
     
     def callback_ask_str(self, question, initialvalue: str=None, cli_show_initialvalue: bool=True, parent=None):
-        return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent))
+        return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent, icon='resources/appicon.png'))
 
     def callback_ask_bool(self, question, parent=None):
-        response = self.exec_in_main(partial(Messagebox.yesno, question, title='sticker-convert', parent=parent))
+        response = self.exec_in_main(partial(Messagebox.yesno, question, title='sticker-convert', parent=parent, icon='resources/appicon.png'))
 
         if response == 'Yes':
             return True
@@ -407,7 +407,7 @@ class GUI:
         self.progress_frame.update_message_box(*args, **kwargs)
     
     def callback_msg_block(self, message='', parent=None, *args):
-        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
+        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent, icon='resources/appicon.png'))
     
     def callback_bar(self, *args, **kwargs):
         self.progress_frame.update_progress_bar(*args, **kwargs)
@@ -756,9 +756,8 @@ class KakaoGetAuthWindow:
             self.get_kakao_auth_win.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
             self.get_kakao_auth_win.iconbitmap('resources/appicon.ico')
-        else:
-            self.icon = PhotoImage(file='resources/appicon.png')
-            self.get_kakao_auth_win.tk.call('wm', 'iconphoto', self.get_kakao_auth_win._w, self.icon)
+        self.icon = PhotoImage(file='resources/appicon.png')
+        self.get_kakao_auth_win.tk.call('wm', 'iconphoto', self.get_kakao_auth_win._w, self.icon)
         
         self.get_kakao_auth_win.focus_force()
 
@@ -885,9 +884,8 @@ class SignalGetAuthWindow:
             self.get_signal_auth_win.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
             self.get_signal_auth_win.iconbitmap('resources/appicon.ico')
-        else:
-            self.icon = PhotoImage(file='resources/appicon.png')
-            self.get_signal_auth_win.tk.call('wm', 'iconphoto', self.get_signal_auth_win._w, self.icon)
+        self.icon = PhotoImage(file='resources/appicon.png')
+        self.get_signal_auth_win.tk.call('wm', 'iconphoto', self.get_signal_auth_win._w, self.icon)
         
         self.get_signal_auth_win.focus_force()
 
@@ -993,9 +991,8 @@ class AdvancedCompressionWindow:
             self.adv_comp_win.iconbitmap('resources/appicon.icns')
         elif sys.platform == 'win32':
             self.adv_comp_win.iconbitmap('resources/appicon.ico')
-        else:
-            self.icon = PhotoImage(file='resources/appicon.png')
-            self.adv_comp_win.tk.call('wm', 'iconphoto', self.adv_comp_win._w, self.icon)
+        self.icon = PhotoImage(file='resources/appicon.png')
+        self.adv_comp_win.tk.call('wm', 'iconphoto', self.adv_comp_win._w, self.icon)
         
         self.adv_comp_win.focus_force()
 
