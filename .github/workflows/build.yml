@@ -33,6 +33,7 @@ jobs:
                 sh ./get-deps-macos.sh
                 pyinstaller sticker_convert.spec
                 cd dist/
+                sudo xattr -r -d com.apple.quarantine sticker-convert-macos/
                 zip -r9 sticker-convert-macos.zip sticker-convert-macos/
             OUT_FILE_NAME: sticker-convert-macos.zip
             ASSET_MIME: application/zip
