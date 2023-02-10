@@ -13,7 +13,7 @@ except ImportError:
     os.system('pip3 install requests')
     import requests
 
-soup = BeautifulSoup(requests.get("https://imagemagick.org/archive/binaries").text, "lxml")
+soup = BeautifulSoup(requests.get("https://imagemagick.org/archive/binaries").text, "html.parser")
 
 for x in soup.find_all("a", href=True):
     file = x['href']
