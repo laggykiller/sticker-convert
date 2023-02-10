@@ -11,4 +11,5 @@ CairoSVG==2.5.2
 rlottie-python>=1.0.0
 mergedeep>=1.3.4
 selenium>=3.141.0
+tqdm>=4.64.0
 git+https://github.com/laggykiller/ttkbootstrap.git

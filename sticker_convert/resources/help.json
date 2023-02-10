@@ -1,0 +1,60 @@
+{
+    "global": {
+        "no_confirm": "Do not ask any questions."
+    },
+    "input": {
+        "input_dir": "Specify input directory."
+    },
+    "output": {
+        "output_dir": "Specify output directory.",
+        "author": "Set author of created sticker pack.",
+        "title": "Set name of created sticker pack."
+    },
+    "comp": {
+        "no_compress": "Do not compress files. Useful for only downloading stickers.",
+        "preset": "Apply preset for compression.",
+        "steps": "Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit.",
+        "processes": "Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources.",
+        "fps": "FPS Higher = Smoother but larger size.",
+        "fps_min": "Set minimum output fps.",
+        "fps_max": "Set maximum output fps.",
+        "res": "Resolution higher = Clearer but larger size.",
+        "res_min": "Set minimum width and height",
+        "res_max": "Set maximum width and height",
+        "res_w_min": "Set minimum width.",
+        "res_w_max": "Set maximum height.",
+        "res_h_min": "Set minimum height.",
+        "res_h_max": "Set minimum height.",
+        "quality": "Quality higher = Clearer but larger size.",
+        "quality_min": "Set minimum quality.",
+        "quality_max": "Set maximum quality.",
+        "color": "Reduce size by limiting number of colors.\nMakes image 'blocky'. >256 will disable this.\nApplies to png and apng only.\nColor higher = More colors but larger size.",
+        "color_min": "Set minimum number of colors (For converting to apng and apng only).",
+        "color_max": "Set maximum number of colors (For converting to apng and apng only).",
+        "duration": "Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.",
+        "duration_min": "Set minimum output duration in miliseconds.",
+        "duration_max": "Set maximum output duration in miliseconds.",
+        "size": "Set maximum file size in bytes for video and image.",
+        "vid_size_max": "Set maximum file size limit for animated stickers.",
+        "img_size_max": "Set maximum file size limit for static stickers.",
+        "format": "Set file format for video and image.",
+        "vid_format": "Set file format if input is animated.",
+        "img_format": "Set file format if input is static.",
+        "fake_vid": "Convert (faking) image to video.\nUseful if:\n(1) Size limit for video is larger than image;\n(2) Mix image and video into same pack.",
+        "default_emoji": "Set the default emoji for uploading Signal and Telegram sticker packs."
+    },
+    "cred": {
+        "signal_uuid": "Set Signal uuid. Required for uploading Signal stickers.",
+        "signal_password": "Set Signal password. Required for uploading Signal stickers.",
+        "signal_get_auth": "Generate Signal uuid and password.",
+        "telegram_token": "Set Telegram token. Required for uploading and downloading Telegram stickers.",
+        "telegram_userid": "Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.",
+        "kakao_auth_token": "Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx",
+        "kakao_get_auth": "Generate Kakao auth_token. Kakao username, password, country code and phone number are also required.",
+        "kakao_username": "Set Kakao username, which is email or phone number used for signing up Kakao account\nExample: +447700900142\nRequired for generating Kakao auth_token.",
+        "kakao_password": "Set Kakao password (Password of Kakao account).\nRequired for generating Kakao auth_token.",
+        "kakao_country_code": "Set Kakao country code of phone.\nExample: 82 (For korea), 44 (For UK), 1 (For USA).\nRequired for generating Kakao auth_token.",
+        "kakao_phone_number": "Set Kakao phone number (Phone number associated with your Kakao account)\nDo NOT enter country code\nExample: 7700900142\nUsed for send / receive verification code via SMS.\nRequired for generating Kakao auth_token.",
+        "save_cred": "Save Signal and Telegram credentials."
+    }
+}

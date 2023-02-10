@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 import os
 import sys
-import multiprocessing
-from threading import Thread
+import time
+from multiprocessing import cpu_count
+from threading import Thread, Lock, current_thread, main_thread
+from queue import Queue
 import webbrowser
 from functools import partial
+from uuid import uuid4
 
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from tkinter import filedialog
@@ -43,6 +46,11 @@ class GUI:
         self.init_frames()
         self.pack_frames()
         self.resize_window()
+
+        self.response_dict_lock = Lock()
+        self.response_dict = {}
+        self.action_queue = Queue()
+        self.root.after(500, self.poll_actions)
     
     def __enter__(self):
         return self
@@ -115,7 +123,7 @@ class GUI:
         self.processes_var = IntVar(self.root)
 
         self.comp_preset_var.set(self.default_comp_preset)
-        self.processes_var.set(multiprocessing.cpu_count())
+        self.processes_var.set(cpu_count())
 
         # Output
         self.output_option_var = StringVar(self.root)
@@ -169,6 +177,7 @@ class GUI:
         self.canvas.configure(width=width, height=height)
     
     def load_jsons(self):
+        self.help = JsonManager.load_json('resources/help.json')
         self.input_presets = JsonManager.load_json('resources/input.json')
         self.compression_presets = JsonManager.load_json('resources/compression.json')
         self.output_presets = JsonManager.load_json('resources/output.json')
@@ -200,7 +209,7 @@ class GUI:
         }
         
     def save_creds(self):
-        creds = {
+        self.creds = {
             'signal': {
                 'uuid': self.signal_uuid_var.get(),
                 'password': self.signal_password_var.get()
@@ -218,7 +227,7 @@ class GUI:
             }
         }
 
-        JsonManager.save_json('creds.json', creds)
+        JsonManager.save_json('creds.json', self.creds)
     
     def set_creds(self):
         if not self.creds:
@@ -235,6 +244,9 @@ class GUI:
         self.kakao_phone_number_var.set(self.creds.get('kakao', {}).get('phone_number'))
 
     def start(self):
+        Thread(target=self.start_process, daemon=True).start()
+
+    def start_process(self):
         self.save_creds()
         self.set_inputs('disabled')
         self.control_frame.start_btn.config(state='disabled')
@@ -318,18 +330,7 @@ class GUI:
             self.input_presets, self.output_presets,
             self.callback_msg, self.callback_bar, self.callback_ask_bool
             )
-
-        # Prepare will generate messagebox (Toplevel), which require running in main thread
-        success = self.flow.prepare()
-
-        if not success:
-            self.callback_msg(msg='An error occured during this run.')
-            self.stop()
-            return
         
-        Thread(target=self.start_process, daemon=True).start()
-
-    def start_process(self):
         success = self.flow.start()
 
         if not success:
@@ -354,12 +355,46 @@ class GUI:
             self.input_frame.callback_input_option()
             self.comp_frame.callback_nocompress()
     
-    def callback_ask_str(self, question, initialvalue: str=None, cli_show_initialvalue: bool=True, parent=None):
-        response = Querybox.get_string(question, title='sticker-convert', initialvalue=initialvalue, parent=parent)
+    def poll_actions(self):
+        if self.action_queue.empty():
+            self.root.after(500, self.poll_actions)
+            return
+        
+        action = self.action_queue.get_nowait()
+        response_id = action[0]
+        response = action[1]()
+        if response_id:
+            with self.response_dict_lock:
+                self.response_dict[response_id] = response
+
+        self.root.after(500, self.poll_actions)
+    
+    def get_response_from_id(self, response_id):
+        # If executed from main thread, need to poll_actions() manually as it got blocked
+        if current_thread() is main_thread():
+            self.poll_actions()
+
+        while response_id not in self.response_dict:
+            time.sleep(0.1)
+        
+        with self.response_dict_lock:
+            response = self.response_dict[response_id]
+            del self.response_dict[response_id]
+
         return response
 
+    def exec_in_main(self, action):
+        response_id = str(uuid4())    
+        self.action_queue.put([response_id, action])
+        response = self.get_response_from_id(response_id)
+        return response
+    
+    def callback_ask_str(self, question, initialvalue: str=None, cli_show_initialvalue: bool=True, parent=None):
+        return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent))
+
     def callback_ask_bool(self, question, parent=None):
-        response = Messagebox.yesno(question, title='sticker-convert', parent=parent)
+        response = self.exec_in_main(partial(Messagebox.yesno, question, title='sticker-convert', parent=parent))
+
         if response == 'Yes':
             return True
         return False
@@ -368,7 +403,7 @@ class GUI:
         self.progress_frame.update_message_box(*args, **kwargs)
     
     def callback_msg_block(self, message='', parent=None, *args):
-        Messagebox.show_info(message, title='sticker-convert', parent=parent)
+        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
     
     def callback_bar(self, *args, **kwargs):
         self.progress_frame.update_progress_bar(*args, **kwargs)
@@ -432,20 +467,20 @@ class CompFrame:
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Compression options')
         self.frame.grid_columnconfigure(2, weight = 1)
 
-        self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Do not compress files. Useful for only downloading stickers'), bootstyle='secondary')
+        self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block(self.gui.help['comp']['no_compress']), bootstyle='secondary')
         self.no_compress_lbl = Label(self.frame, text='No compression')
         self.no_compress_cbox = Checkbutton(self.frame, variable=self.gui.no_compress_var, command=self.callback_nocompress, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Apply preset for compression'), bootstyle='secondary')
+        self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block(self.gui.help['comp']['preset']), bootstyle='secondary')
         self.comp_preset_lbl = Label(self.frame, text='Preset')
         self.comp_preset_opt = OptionMenu(self.frame, self.gui.comp_preset_var, self.gui.default_comp_preset, *self.gui.compression_presets.keys(), command=self.callback_comp_apply_preset, bootstyle='secondary')
         self.comp_preset_opt.config(width=15)
 
-        self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit'), bootstyle='secondary')
+        self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block(self.gui.help['comp']['steps']), bootstyle='secondary')
         self.steps_lbl = Label(self.frame, text='Number of steps')       
         self.steps_entry = Entry(self.frame, textvariable=self.gui.steps_var, width=8)
 
-        self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block('Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources'), bootstyle='secondary')
+        self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block(self.gui.help['comp']['processes']), bootstyle='secondary')
         self.processes_lbl = Label(self.frame, text='Number of processes')
         self.processes_entry = Entry(self.frame, textvariable=self.gui.processes_var, width=8)
 
@@ -715,6 +750,9 @@ class KakaoGetAuthWindow:
         
         self.get_kakao_auth_win.focus_force()
 
+        self.callback_msg_block_kakao = partial(self.gui.callback_msg_block, parent=self.get_kakao_auth_win)
+        self.callback_ask_str_kakao = partial(self.gui.callback_ask_str, parent=self.get_kakao_auth_win)
+
         self.create_scrollable_frame()
 
         self.frame_login_info = LabelFrame(self.scrollable_frame, text='Kakao login info')
@@ -728,19 +766,19 @@ class KakaoGetAuthWindow:
         self.explanation2_lbl = Label(self.frame_login_info, text='You will send / receive verification code via SMS', justify='left', anchor='w')
         self.explanation3_lbl = Label(self.frame_login_info, text='You maybe logged out of existing device', justify='left', anchor='w')
 
-        self.kakao_username_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Email or Phone number used for signing up Kakao account (e.g. `+447700900142`)'), bootstyle='secondary')
+        self.kakao_username_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_username']), bootstyle='secondary')
         self.kakao_username_lbl = Label(self.frame_login_info, text='Username', width=18, justify='left', anchor='w')
         self.kakao_username_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_username_var, width=30)
 
-        self.kakao_password_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Password of Kakao account'), bootstyle='secondary')
+        self.kakao_password_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_password']), bootstyle='secondary')
         self.kakao_password_lbl = Label(self.frame_login_info, text='Password', justify='left', anchor='w')
         self.kakao_password_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_password_var, width=30)
 
-        self.kakao_country_code_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Example: 82 (For korea), 44 (For UK), 1 (For USA)'), bootstyle='secondary')
+        self.kakao_country_code_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_country_code']), bootstyle='secondary')
         self.kakao_country_code_lbl = Label(self.frame_login_info, text='Country code', justify='left', anchor='w')
         self.kakao_country_code_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_country_code_var, width=30)
 
-        self.kakao_phone_number_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.gui.callback_msg_block('Phone number associated with your Kakao account. Used for send / receive verification code via SMS.'), bootstyle='secondary')
+        self.kakao_phone_number_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_phone_number']), bootstyle='secondary')
         self.kakao_phone_number_lbl = Label(self.frame_login_info, text='Phone number', justify='left', anchor='w')
         self.kakao_phone_number_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_phone_number_var, width=30)
 
@@ -809,15 +847,21 @@ class KakaoGetAuthWindow:
 
         self.canvas.configure(width=width, height=height)
     
-    def callback_login(self, *args):
-        callback_msg_block_kakao = partial(self.gui.callback_msg_block, parent=self.get_kakao_auth_win)
-        callback_ask_str_kakao = partial(self.gui.callback_ask_str, parent=self.get_kakao_auth_win)
-        auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=self.gui.creds, cb_msg_block=callback_msg_block_kakao, cb_ask_str=callback_ask_str_kakao)
+    def callback_login(self):
+        Thread(target=self.callback_login_thread, daemon=True).start()
+    
+    def callback_login_thread(self, *args):
+        self.gui.save_creds()
+        m = GetKakaoAuth(opt_cred=self.gui.creds, cb_msg=self.gui.callback_msg, cb_msg_block=self.callback_msg_block_kakao, cb_ask_str=self.callback_ask_str_kakao)
+
+        auth_token = m.get_cred()
+
         if auth_token:
             self.gui.creds['kakao']['auth_token'] = auth_token
             self.gui.kakao_auth_token_var.set(auth_token)
-            
-            callback_msg_block_kakao(f'Got auth_token successfully: {auth_token}')
+        
+            self.callback_msg_block_kakao(f'Got auth_token successfully: {auth_token}')
+            self.gui.save_creds()
 
 class SignalGetAuthWindow:
     def __init__(self, gui):
@@ -834,6 +878,9 @@ class SignalGetAuthWindow:
             self.get_signal_auth_win.tk.call('wm', 'iconphoto', self.get_signal_auth_win._w, self.icon)
         
         self.get_signal_auth_win.focus_force()
+
+        self.callback_msg_block_signal = partial(self.gui.callback_msg_block, parent=self.get_signal_auth_win)
+        self.callback_ask_str_signal = partial(self.gui.callback_ask_str, parent=self.get_signal_auth_win)
 
         self.create_scrollable_frame()
 
@@ -897,19 +944,27 @@ class SignalGetAuthWindow:
 
         self.canvas.configure(width=width, height=height)
     
-    def callback_login(self, *args):
-        callback_msg_block_signal = partial(self.gui.callback_msg_block, parent=self.get_signal_auth_win)
-        callback_ask_str_signal = partial(self.gui.callback_ask_str, parent=self.get_signal_auth_win)
-        uuid, password = GetSignalAuth.get_signal_auth(cb_ask_str=callback_ask_str_signal)
-        if uuid and password:
-            self.gui.creds['signal']['uuid'] = uuid
-            self.gui.creds['signal']['password'] = password
-            self.gui.signal_uuid_var.set(uuid)
-            self.gui.signal_password_var.set(password)
+    def callback_login(self):
+        Thread(target=self.callback_login_thread, daemon=True).start()
+    
+    def callback_login_thread(self, *args):
+        m = GetSignalAuth(cb_msg=self.gui.callback_msg, cb_ask_str=self.callback_ask_str_signal)
+
+        uuid, password = None, None
+        while Toplevel.winfo_exists(self.get_signal_auth_win):
+            uuid, password = m.get_cred()
+
+            if uuid and password:
+                self.gui.creds['signal']['uuid'] = uuid
+                self.gui.creds['signal']['password'] = password
+                self.gui.signal_uuid_var.set(uuid)
+                self.gui.signal_password_var.set(password)
+                
+                self.callback_msg_block_signal(f'Got uuid and password successfully:\nuuid={uuid}\npassword={password}')
+                self.gui.save_creds()
+                return
             
-            callback_msg_block_signal(f'Got uuid and password successfully:\nuuid={uuid}\npassword={password}')
-        else:
-            callback_msg_block_signal('Failed to get uuid and password')
+        self.gui.callback_msg_block('Failed to get uuid and password')
 
 class AdvancedCompressionWindow:
     emoji_column_per_row = 10
@@ -952,7 +1007,7 @@ class AdvancedCompressionWindow:
 
         callback_msg_block_adv_comp_win = partial(self.gui.callback_msg_block, parent=self.adv_comp_win)
 
-        self.fps_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('FPS Higher = Smoother but larger size'), bootstyle='secondary')
+        self.fps_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['fps']), bootstyle='secondary')
         self.fps_lbl = Label(self.frame_advcomp, text='Output FPS')
         self.fps_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.fps_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.fps_min_var, width=8)
@@ -960,7 +1015,7 @@ class AdvancedCompressionWindow:
         self.fps_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.fps_max_var, width=8)
         self.fps_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.fps_disable_var, command=self.callback_disable_fps, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.res_w_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set width.\nResolution higher = Clearer but larger size'), bootstyle='secondary')
+        self.res_w_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['res']), bootstyle='secondary')
         self.res_w_lbl = Label(self.frame_advcomp, text='Output resolution (Width)')
         self.res_w_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.res_w_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_w_min_var, width=8)
@@ -968,7 +1023,7 @@ class AdvancedCompressionWindow:
         self.res_w_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_w_max_var, width=8)
         self.res_w_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.res_w_disable_var, command=self.callback_disable_res_w, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
         
-        self.res_h_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set height.\nResolution higher = Clearer but larger size'), bootstyle='secondary')
+        self.res_h_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['res']), bootstyle='secondary')
         self.res_h_lbl = Label(self.frame_advcomp, text='Output resolution (Height)')
         self.res_h_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.res_h_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_h_min_var, width=8)
@@ -976,7 +1031,7 @@ class AdvancedCompressionWindow:
         self.res_h_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_h_max_var, width=8)
         self.res_h_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.res_h_disable_var, command=self.callback_disable_res_h, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.quality_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Quality higher = Clearer but larger size'), bootstyle='secondary')
+        self.quality_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['quality']), bootstyle='secondary')
         self.quality_lbl = Label(self.frame_advcomp, text='Output quality (0-100)')
         self.quality_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.quality_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.quality_min_var, width=8)
@@ -984,7 +1039,7 @@ class AdvancedCompressionWindow:
         self.quality_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.quality_max_var, width=8)
         self.quality_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.quality_disable_var, command=self.callback_disable_quality, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.color_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Reduce size by limiting number of colors.\nMakes image "blocky". >256 will disable this.\nApplies to png and apng only.\nColor higher = More colors but larger size'), bootstyle='secondary')
+        self.color_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['color']), bootstyle='secondary')
         self.color_lbl = Label(self.frame_advcomp, text='Colors (0-256)')
         self.color_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.color_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.color_min_var, width=8)
@@ -992,7 +1047,7 @@ class AdvancedCompressionWindow:
         self.color_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.color_max_var, width=8)
         self.color_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.color_disable_var, command=self.callback_disable_color, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.duration_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.'), bootstyle='secondary')
+        self.duration_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['duration']), bootstyle='secondary')
         self.duration_lbl = Label(self.frame_advcomp, text='Duration (Miliseconds)')
         self.duration_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.duration_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.duration_min_var, width=8)
@@ -1000,7 +1055,7 @@ class AdvancedCompressionWindow:
         self.duration_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.duration_max_var, width=8)
         self.duration_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.duration_disable_var, command=self.callback_disable_duration, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.size_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set maximum file size in bytes for video and image'), bootstyle='secondary')
+        self.size_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['size']), bootstyle='secondary')
         self.size_lbl = Label(self.frame_advcomp, text='Maximum file size (bytes)')
         self.img_size_max_lbl = Label(self.frame_advcomp, text='Img:')
         self.img_size_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.img_size_max_var, width=8)
@@ -1008,18 +1063,18 @@ class AdvancedCompressionWindow:
         self.vid_size_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.vid_size_max_var, width=8)
         self.size_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.size_disable_var, command=self.callback_disable_size, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.format_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set file format for video and image'), bootstyle='secondary')
+        self.format_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['format']), bootstyle='secondary')
         self.format_lbl = Label(self.frame_advcomp, text='File format')
         self.img_format_lbl = Label(self.frame_advcomp, text='Img:')
         self.img_format_entry = Entry(self.frame_advcomp, textvariable=self.gui.img_format_var, width=8)
         self.vid_format_lbl = Label(self.frame_advcomp, text='Vid:')
         self.vid_format_entry = Entry(self.frame_advcomp, textvariable=self.gui.vid_format_var, width=8)
 
-        self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Convert image to video. Useful if:\n(1) Size limit for video is larger than image\n(2) Mix image and video into same pack'), bootstyle='secondary')
+        self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['fake_vid']), bootstyle='secondary')
         self.fake_vid_lbl = Label(self.frame_advcomp, text='Convert (faking) image to video')
         self.fake_vid_cbox = Checkbutton(self.frame_advcomp, variable=self.gui.fake_vid_var, onvalue=True, offvalue=False, bootstyle='success-round-toggle')
 
-        self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win('Set the default emoji for uploading signal and telegram sticker packs'), bootstyle='secondary')
+        self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['default_emoji']), bootstyle='secondary')
         self.default_emoji_lbl = Label(self.frame_advcomp, text='Default emoji')
         self.im = Image.new("RGBA", (32, 32), (255,255,255,0))
         self.ph_im = ImageTk.PhotoImage(self.im)

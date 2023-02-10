@@ -29,14 +29,20 @@ def strings(filename, min=4):
         if len(result) >= min:  # catch result at EOF
             yield result
 
-class SignalDesktopManager:
-    def __init__(self, cb_ask_str=input):
+class GetSignalAuth:
+    def __init__(self, signal_bin_version='beta', chromedriver_download_dir='./bin', cb_msg=print, cb_ask_str=input):
+        self.signal_bin_version = signal_bin_version
+        self.chromedriver_download_dir = chromedriver_download_dir
+
         self.cb_ask_str = cb_ask_str
+        self.cb_msg = cb_msg
+
+        self.launch_signal_desktop()
 
     def download_signal_desktop(self, download_url, signal_bin_path):
         webbrowser.open(download_url)
 
-        print(download_url)
+        self.cb_msg(download_url)
 
         prompt = f'Signal Desktop not detected.\nDownload and install Signal Desktop BETA version\nAfter installation, quit Signal Desktop before continuing'
         while not (os.path.isfile(signal_bin_path) or shutil.which(signal_bin_path)):
@@ -89,6 +95,7 @@ class SignalDesktopManager:
             chromedriver_platform = 'linux64'
         
         chromedriver_url = f'https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_{chromedriver_platform}.zip'
+        self.cb_msg(f'Downloading chromedriver: {chromedriver_url}')
 
         with tempfile.TemporaryDirectory() as tmpdir:
             chromedriver_zip_path = os.path.join(tmpdir, 'chromedriver.zip')
@@ -126,28 +133,26 @@ class SignalDesktopManager:
 
         self.driver = webdriver.Chrome(options=options, executable_path=chromedriver_path)
 
-    def get_cred(self, signal_bin_version):
+    def get_cred(self):
         # https://stackoverflow.com/a/73456344
+        uuid, password = None, None
+        try:
+            if self.signal_bin_version == 'prod':
+                uuid = self.driver.execute_script('return window.reduxStore.getState().items.uuid_id')
+                password = self.driver.execute_script('return window.reduxStore.getState().items.password')
+            else:
+                uuid = self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id')
+                password = self.driver.execute_script('return window.SignalDebug.getReduxState().items.password')
+        except JavascriptException as e:
+            pass
 
-        while True:
-            try:
-                if signal_bin_version == 'prod':
-                    uuid = self.driver.execute_script('return window.reduxStore.getState().items.uuid_id')
-                    password = self.driver.execute_script('return window.reduxStore.getState().items.password')
-                else:
-                    uuid = self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id')
-                    password = self.driver.execute_script('return window.SignalDebug.getReduxState().items.password')
-            except JavascriptException as e:
-                uuid, password = None, None
+        return uuid, password
 
-            if uuid and password:
-                return uuid, password
-            time.sleep(1)
-
-    def close_driver(self):
+    def close(self):
+        self.cb_msg('Closing Signal Desktop')
         self.driver.quit()
 
-    def get_uuid_password(self, signal_bin_version='beta', chromedriver_download_dir='./bin'):
+    def launch_signal_desktop(self):
         if sys.platform == 'win32':
             signal_bin_path_prod = os.path.expandvars("%localappdata%/Programs/signal-desktop/Signal.exe")
             signal_bin_path_beta = os.path.expandvars("%localappdata%/Programs/signal-desktop-beta/Signal Beta.exe")
@@ -170,7 +175,7 @@ class SignalDesktopManager:
             electron_bin_path_prod = signal_bin_path_prod
             electron_bin_path_beta = signal_bin_path_beta
 
-        if signal_bin_version == 'prod':
+        if self.signal_bin_version == 'prod':
             signal_bin_path = signal_bin_path_prod
             signal_user_data_dir = signal_user_data_dir_prod
             electron_bin_path = electron_bin_path_prod
@@ -189,20 +194,16 @@ class SignalDesktopManager:
         signal_bin_path = signal_bin_path if not shutil.which(signal_bin_path) else shutil.which(signal_bin_path)
         
         major_version = self.get_signal_chromedriver_version(electron_bin_path)
+        self.cb_msg(f'Signal Desktop is using chrome version {major_version}')
         
-        chromedriver_path, local_chromedriver_version = self.get_local_chromedriver(chromedriver_download_dir=chromedriver_download_dir)
-        if not (chromedriver_path and local_chromedriver_version == major_version):
-            chromedriver_path = self.download_chromedriver(major_version, chromedriver_download_dir=chromedriver_download_dir)
+        chromedriver_path, local_chromedriver_version = self.get_local_chromedriver(chromedriver_download_dir=self.chromedriver_download_dir)
+        if chromedriver_path and local_chromedriver_version == major_version:
+            self.cb_msg(f'Found chromedriver version {local_chromedriver_version}, skip downloading')
+        else:
+            chromedriver_path = self.download_chromedriver(major_version, chromedriver_download_dir=self.chromedriver_download_dir)
+
+        self.cb_msg('Killing all Signal Desktop processes')
         self.killall_signal()
+
+        self.cb_msg('Starting Signal Desktop with Selenium')
         self.launch_signal(signal_bin_path, signal_user_data_dir, chromedriver_path)
-        uuid, password = self.get_cred(signal_bin_version)
-        self.close_driver()
-
-        return uuid, password
-
-class GetSignalAuth:
-    @staticmethod
-    def get_signal_auth(cb_ask_str=input):
-        m = SignalDesktopManager(cb_ask_str)
-        uuid, password = m.get_uuid_password()
-        return uuid, password

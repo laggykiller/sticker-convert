@@ -40,25 +40,14 @@ class Flow:
 
         if os.path.isdir(self.opt_output['dir']) == False:
             os.makedirs(self.opt_output['dir'])
-        
-    def prepare(self):
-        tasks = (
-            self.sanitize,
-            self.verify_input
-        )
-
-        for task in tasks:
-            success = task()
-            if not success:
-                return False
-
-        return True
 
     def start(self):
         self.cb_bar(set_progress_mode='indeterminate')
         self.cb_msg(cls=True)
 
         tasks = (
+            self.sanitize,
+            self.verify_input,
             self.download,
             self.compress,
             self.export,

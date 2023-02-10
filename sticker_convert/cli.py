@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
+import os
+import sys
 import multiprocessing
 import argparse
+
+from tqdm import tqdm
 
 from flow import Flow
 from utils.json_manager import JsonManager
@@ -25,71 +29,69 @@ from utils.get_signal_auth import GetSignalAuth
 
 class CLI:
     no_confirm = False
+    progress_bar = None
 
     def cli(self):
+        self.help = JsonManager.load_json('resources/help.json')
         self.input_presets = JsonManager.load_json('resources/input.json')
         self.compression_presets = JsonManager.load_json('resources/compression.json')
         self.output_presets = JsonManager.load_json('resources/output.json')
 
-        if not (self.compression_presets and self.input_presets and self.output_presets):
+        if not (self.help and self.compression_presets and self.input_presets and self.output_presets):
             self.callback_msg('Warning: preset json(s) cannot be found')
             return
 
-        parser = argparse.ArgumentParser(description='CLI for stickers-convert')
-        parser.add_argument('--no-confirm', dest='no_confirm', action='store_true', help='Do not ask any questions')
-        parser.add_argument('--input-dir', dest='input_dir', default='./stickers_input', help='Specify input directory')
-        parser.add_argument('--output-dir', dest='output_dir', default='./stickers_output', help='Specify output directory')
-        parser.add_argument('--download-signal', dest='download_signal', help=f'{self.input_presets["signal"]["help"]} ({self.input_presets["signal"]["example"]})')
-        parser.add_argument('--download-telegram', dest='download_telegram', help=f'{self.input_presets["telegram"]["help"]} ({self.input_presets["telegram"]["example"]})')
-        parser.add_argument('--download-line', dest='download_line', help=f'{self.input_presets["line"]["help"]} ({self.input_presets["line"]["example"]})')
-        parser.add_argument('--download-kakao-static', dest='download_kakao_static', help=f'{self.input_presets["kakao_static"]["help"]} ({self.input_presets["kakao_static"]["example"]})')
-        parser.add_argument('--download-kakao-animated', dest='download_kakao_animated', help=f'{self.input_presets["kakao_animated"]["help"]} ({self.input_presets["kakao_animated"]["example"]})')
+        parser = argparse.ArgumentParser(description='CLI for stickers-convert', formatter_class=argparse.RawTextHelpFormatter)
 
-        parser.add_argument('--export-wastickers', dest='export_wastickers', action='store_true', help=self.output_presets['whatsapp']['help'])
-        parser.add_argument('--export-signal', dest='export_signal', action='store_true', help=self.output_presets['signal']['help'])
-        parser.add_argument('--export-telegram', dest='export_telegram', action='store_true', help=self.output_presets['telegram']['help'])
-        parser.add_argument('--export-imessage', dest='export_imessage', action='store_true', help=self.output_presets['imessage']['help'])
+        parser.add_argument(f'--no-confirm', dest='no_confirm', action='store_true', help=self.help['global']['no_confirm'])
+        
+        parser_input = parser.add_argument_group('Input options')
+        for k, v in self.help['input'].items():
+            parser_input.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
+        parser_input_src = parser_input.add_mutually_exclusive_group()
+        for k, v in self.input_presets.items():
+            parser_input_src.add_argument(f'--download-{k.replace("_", "-")}', dest=k, help=f'{v["help"]}\n({v["example"]})')
 
-        parser.add_argument('--no-compress', dest='no_compress', action='store_true', help='Do not compress files. Useful for only downloading stickers')
-        parser.add_argument('--preset', dest='preset', default='custom', choices=self.compression_presets.keys(), help='Apply preset for compression')
-        parser.add_argument('--fps-min', dest='fps_min', type=int, default=None, help='Set minimum output fps')
-        parser.add_argument('--fps-max', dest='fps_max', type=int, default=None, help='Set maximum output fps')
-        parser.add_argument('--res-min', dest='res_min', type=int, default=None, help='Set minimum output resolution (width and height)')
-        parser.add_argument('--res-max', dest='res_max', type=int, default=None, help='Set maximum output resolution (width and height)')
-        parser.add_argument('--res-w-min', dest='res_w_min', type=int, default=None, help='Set minimum output resolution (width)')
-        parser.add_argument('--res-w-max', dest='res_w_max', type=int, default=None, help='Set maximum output resolution (width)')
-        parser.add_argument('--res-h-min', dest='res_h_min', type=int, default=None, help='Set minimum output resolution (height)')
-        parser.add_argument('--res-h-max', dest='res_h_max', type=int, default=None, help='Set maximum output resolution (height)')
-        parser.add_argument('--quality-min', dest='quality_min', type=int, default=None, help='Set minimum quality')
-        parser.add_argument('--quality-max', dest='quality_max', type=int, default=None, help='Set maximum quality')
-        parser.add_argument('--color-min', dest='color_min', type=int, default=None, help='Set minimum number of colors (For converting to apng). >256 will disable it.')
-        parser.add_argument('--color-max', dest='color_max', type=int, default=None, help='Set maximum number of colors (For converting to apng). >256 will disable it.')
-        parser.add_argument('--duration-min', dest='duration_min', type=int, default=None, help='Set minimum output duration in miliseconds. Will change play speed if source is longer than duration. 0 will disable limit.')
-        parser.add_argument('--duration-max', dest='duration_max', type=int, default=None, help='Set maximum output duration in miliseconds. Will change play speed if source is longer than duration. 0 will disable limit.')
-        parser.add_argument('--steps', dest='steps', type=int, default=None, help='Set number of divisions between min and max settings. Higher value is slower but yields file more closer to the specified file size limit')
-        parser.add_argument('--vid-size-max', dest='vid_size_max', type=int, default=None, help='Set maximum file size limit for animated stickers')
-        parser.add_argument('--img-size-max', dest='img_size_max', type=int, default=None, help='Set maximum file size limit for static stickers')
-        parser.add_argument('--vid-format', dest='vid_format', default=None, help='Set file format if input is a animated')
-        parser.add_argument('--img-format', dest='img_format', default=None, help='Set file format if input is a static image')
-        parser.add_argument('--fake-vid', dest='fake_vid', action='store_true', help='Convert (faking) image to video. Useful if (1) Size limit for video is larger than image; (2) Mix image and video into same pack')
-        parser.add_argument('--default-emoji', dest='default_emoji', default=self.compression_presets['custom']['default_emoji'], help='Set the default emoji for uploading signal and telegram sticker packs')
-        parser.add_argument('--processes', dest='processes', type=int, help='Set number of processes. Default to number of logical processors in system')
+        parser_output = parser.add_argument_group('Output options')
+        for k, v in self.help['output'].items():
+            parser_output.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
+        parser_output_dst = parser_output.add_mutually_exclusive_group()
+        for k, v in self.output_presets.items():
+            parser_output_dst.add_argument(f'--export-{k.replace("_", "-")}', dest=k, help=v['help'])
 
-        parser.add_argument('--author', dest='author', default='Me', help='Set author of created sticker pack')
-        parser.add_argument('--title', dest='title', default='My sticker pack', help='Set name of created sticker pack')
+        parser_comp = parser.add_argument_group('Compression options')
+        parser_comp.add_argument('--no-compress', dest='no_compress', action='store_true', help=self.help['comp']['no_compress'])
+        parser_comp.add_argument('--preset', dest='preset', default='custom', choices=self.compression_presets.keys(), help=self.help['comp']['preset'])
+        flags_int = ('steps', 'processes', 
+                    'fps_min', 'fps_max', 
+                    'res_min', 'res_max', 
+                    'res_w_min', 'res_w_max', 
+                    'res_h_min', 'res_h_max',
+                    'quality_min', 'quality_max',
+                    'color_min', 'color_max',
+                    'duration_min', 'duration_max',
+                    'vid_size_max', 'img_size_max')
+        flags_str = ('vid_format', 'img_formt')
+        flags_bool = ('fake_vid')
+        for k, v in self.help['comp'].items():
+            if k in flags_int:
+                keyword_args = {'type': int, 'default': None}
+            elif k in flags_str:
+                keyword_args = {'default': None}
+            elif k in flags_bool:
+                keyword_args = {'action': 'store_true'}
+            else:
+                continue
+            parser_input_src.add_argument(f'--{k.replace("_", "-")}', **keyword_args, dest=k, help=v)
+        parser_comp.add_argument('--default-emoji', dest='default_emoji', default=self.compression_presets['custom']['default_emoji'], help=self.help['comp']['default_emoji'])
 
-        parser.add_argument('--signal-uuid', dest='signal_uuid', help='Set signal uuid. Required for uploading signal stickers')
-        parser.add_argument('--signal-password', dest='signal_password', help='Set signal password. Required for uploading signal stickers')
-        parser.add_argument('--signal-get-auth', dest='signal_get_auth', action='store_true', help='Generate Signal uuid and password.')
-        parser.add_argument('--telegram-token', dest='telegram_token', help='Set telegram token. Required for uploading and downloading telegram stickers')
-        parser.add_argument('--telegram-userid', dest='telegram_userid', help='Set telegram user_id (From real account, not bot account). Required for uploading telegram stickers')
-        parser.add_argument('--kakao-auth-token', dest='kakao_auth_token', help='Set kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx')
-        parser.add_argument('--kakao-get-auth', dest='kakao_get_auth', action='store_true', help='Generate kakao auth_token. Kakao username, password, country code and phone number are also required.')
-        parser.add_argument('--kakao-username', dest='kakao_username', help='Set kakao username, which is email or phone number used for signing up Kakao account (e.g. `+447700900142`). Required for generating kakao auth_token')
-        parser.add_argument('--kakao-password', dest='kakao_password', help='Set kakao password (Password of Kakao account). Required for generating kakao auth_token')
-        parser.add_argument('--kakao-country-code', dest='kakao_country_code', help='Set kakao country code of phone. Example: 82 (For korea), 44 (For UK), 1 (For USA). Required for generating kakao auth_token')
-        parser.add_argument('--kakao-phone-number', dest='kakao_phone_number', help='Set kakao phone number (Phone number associated with your Kakao account. Used for send / receive verification code via SMS.). Required for generating kakao auth_token')
-        parser.add_argument('--save-cred', dest='save_cred', action="store_true", help='Save signal and telegram credentials')
+        parser_cred = parser.add_argument_group('Credentials options')
+        flags_bool = ('signal_get_auth', 'kakao_get_auth')
+        for k, v in self.help['cred'].items():
+            keyword_args = {}
+            if k in flags_bool:
+                keyword_args = {'action': 'store_true'}
+            parser_cred.add_argument(f'--{k.replace("_", "-")}', **keyword_args, dest=k, help=v)
 
         args = parser.parse_args()
         
@@ -105,12 +107,6 @@ class CLI:
             self.input_presets, self.output_presets,
             self.callback_msg, self.callback_bar, self.callback_ask_bool
         )
-
-        success = flow.prepare()
-
-        if not success:
-            self.callback_msg(msg='An error occured during this run.')
-            return
 
         success = flow.start()
 
@@ -243,14 +239,14 @@ class CLI:
         }
 
         if args.kakao_get_auth:
-            auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=creds, cb_msg=self.callback_msg_block, cb_ask_str=self.callback_ask_str)
+            auth_token = GetKakaoAuth.get_kakao_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_msg_block=self.callback_msg_block, cb_ask_str=self.callback_ask_str)
             if auth_token:
                 self.opt_cred['kakao']['auth_token'] = auth_token
                 
                 self.callback_msg(f'Got auth_token successfully: {auth_token}')
         
         if args.signal_get_auth:
-            uuid, password = GetSignalAuth.get_signal_auth(opt_cred=creds, cb_msg=self.callback_msg_block)
+            uuid, password = GetSignalAuth.get_signal_auth(opt_cred=creds, cb_msg=self.callback_msg, cb_msg_block=self.callback_msg_block)
             if uuid and password:
                 self.opt_cred['signal']['uuid'] = uuid
                 self.opt_cred['signal']['password'] = password
@@ -275,7 +271,7 @@ class CLI:
         
         return response
 
-    def callback_ask_bool(self, question, initialvalue):
+    def callback_ask_bool(self, question, parent=None):
         self.callback_msg(question)
 
         if self.no_confirm:
@@ -291,8 +287,24 @@ class CLI:
             else:
                 return True
     
-    def callback_msg(msg, *args, **kwargs):
-        print(msg)
+    def callback_msg(self, *args, **kwargs):
+        msg = kwargs.get('msg')
+        # cls = kwargs.get('cls')
+
+        if not msg and len(args) == 1:
+            msg = str(args[0])
+
+        # if cls:
+        #     if sys.platform == 'win32':
+        #         os.system('cls')
+        #     else:
+        #         os.system('clear')
+
+        if msg:
+            if self.progress_bar:
+                self.progress_bar.write(msg)
+            else:
+                print(msg)
 
     def callback_msg_block(self, msg: str=None, cls: bool=True, *args):
         if msg:
@@ -304,5 +316,13 @@ class CLI:
             input('Press Enter to continue...')
     
     def callback_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
-        # Progressbar could be implemented here
-        pass
+        if update_bar:
+            self.progress_bar.update()
+        elif set_progress_mode == 'determinate':
+            self.progress_bar = tqdm(total=steps)
+        elif set_progress_mode == 'indeterminate':
+            if self.progress_bar:
+                self.progress_bar.close()
+                self.progress_bar = None
+        elif set_progress_mode == 'clear':
+            self.progress_bar.reset()
