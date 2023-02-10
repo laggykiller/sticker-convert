@@ -33,9 +33,11 @@ class GUI:
         self.root = Window(themename='darkly')
         
         if sys.platform == 'darwin':
-            self.root.iconbitmap('resources/appicon.icns')
+            self.root.iconbitmap(bitmap='resources/appicon.icns')
+            self.root.iconbitmap(default='resources/appicon.icns')
         elif sys.platform == 'win32':
-            self.root.iconbitmap('resources/appicon.ico')
+            self.root.iconbitmap(bitmap='resources/appicon.ico')
+            self.root.iconbitmap(default='resources/appicon.ico')
 
         self.icon = PhotoImage(file='resources/appicon.png')
         self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
@@ -188,7 +190,7 @@ class GUI:
         self.emoji_list = JsonManager.load_json('resources/emoji.json')
 
         if not (self.compression_presets and self.input_presets and self.output_presets):
-            Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert', icon='resources/appicon.png')
+            Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
         
         if os.path.isfile('creds.json'):
@@ -394,10 +396,10 @@ class GUI:
         return response
     
     def callback_ask_str(self, question, initialvalue: str=None, cli_show_initialvalue: bool=True, parent=None):
-        return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent, icon='resources/appicon.png'))
+        return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent))
 
     def callback_ask_bool(self, question, parent=None):
-        response = self.exec_in_main(partial(Messagebox.yesno, question, title='sticker-convert', parent=parent, icon='resources/appicon.png'))
+        response = self.exec_in_main(partial(Messagebox.yesno, question, title='sticker-convert', parent=parent))
 
         if response == 'Yes':
             return True
@@ -407,7 +409,7 @@ class GUI:
         self.progress_frame.update_message_box(*args, **kwargs)
     
     def callback_msg_block(self, message='', parent=None, *args):
-        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent, icon='resources/appicon.png'))
+        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
     
     def callback_bar(self, *args, **kwargs):
         self.progress_frame.update_progress_bar(*args, **kwargs)
@@ -753,9 +755,12 @@ class KakaoGetAuthWindow:
         self.get_kakao_auth_win = Toplevel(self.gui.root)
         self.get_kakao_auth_win.title('Get Kakao auth_token')
         if sys.platform == 'darwin':
-            self.get_kakao_auth_win.iconbitmap('resources/appicon.icns')
+            self.get_kakao_auth_win.iconbitmap(bitmap='resources/appicon.icns')
+            self.get_kakao_auth_win.iconbitmap(default='resources/appicon.icns')
         elif sys.platform == 'win32':
-            self.get_kakao_auth_win.iconbitmap('resources/appicon.ico')
+            self.get_kakao_auth_win.iconbitmap(bitmap='resources/appicon.ico')
+            self.get_kakao_auth_win.iconbitmap(default='resources/appicon.ico')
+
         self.icon = PhotoImage(file='resources/appicon.png')
         self.get_kakao_auth_win.tk.call('wm', 'iconphoto', self.get_kakao_auth_win._w, self.icon)
         
@@ -881,9 +886,12 @@ class SignalGetAuthWindow:
         self.get_signal_auth_win = Toplevel(self.gui.root)
         self.get_signal_auth_win.title('Get Signal uuid and password')
         if sys.platform == 'darwin':
-            self.get_signal_auth_win.iconbitmap('resources/appicon.icns')
+            self.get_signal_auth_win.iconbitmap(bitmap='resources/appicon.icns')
+            self.get_signal_auth_win.iconbitmap(default='resources/appicon.icns')
         elif sys.platform == 'win32':
-            self.get_signal_auth_win.iconbitmap('resources/appicon.ico')
+            self.get_signal_auth_win.iconbitmap(bitmap='resources/appicon.ico')
+            self.get_signal_auth_win.iconbitmap(default='resources/appicon.ico')
+
         self.icon = PhotoImage(file='resources/appicon.png')
         self.get_signal_auth_win.tk.call('wm', 'iconphoto', self.get_signal_auth_win._w, self.icon)
         
@@ -988,9 +996,12 @@ class AdvancedCompressionWindow:
         self.adv_comp_win = Toplevel(self.gui.root)
         self.adv_comp_win.title('Advanced compression options')
         if sys.platform == 'darwin':
-            self.adv_comp_win.iconbitmap('resources/appicon.icns')
+            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.icns')
+            self.adv_comp_win.iconbitmap(default='resources/appicon.icns')
         elif sys.platform == 'win32':
-            self.adv_comp_win.iconbitmap('resources/appicon.ico')
+            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.ico')
+            self.adv_comp_win.iconbitmap(default='resources/appicon.ico')
+
         self.icon = PhotoImage(file='resources/appicon.png')
         self.adv_comp_win.tk.call('wm', 'iconphoto', self.adv_comp_win._w, self.icon)
         
