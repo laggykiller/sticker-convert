@@ -900,7 +900,7 @@ class SignalGetAuthWindow:
         self.explanation3_lbl.grid(column=0, row=2, columnspan=3, sticky='w', padx=3, pady=3)
 
         # Start button frame
-        self.login_btn = Button(self.frame_start_btn, text='Get uuid and password', command=self.callback_login, bootstyle='secondary')
+        self.login_btn = Button(self.frame_start_btn, text='Get uuid and password', command=self.callback_login)
 
         self.login_btn.pack()
 
