@@ -31,15 +31,50 @@ class RunBin:
     def run_cmd(cmd_list, silence=False, cb_msg=print):
         cmd_list[0] = RunBin.get_bin(cmd_list[0])
 
-        # subprocess.call(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
-        sp = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if silence:
+            sp = subprocess.Popen(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
+        else:
+            sp = subprocess.Popen(cmd_list, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         output, error = sp.communicate()
 
-        output_str = output.decode()
-        error_str = error.decode()
+        output_str = ''
+        if output:
+            output_str = output.decode()
+        
+        error_str = ''
+        if error:
+            error_str = error.decode()
 
         if silence == False and error_str != '':
             cb_msg(f"Error while executing {' '.join(cmd_list)} : {error_str}")
+            return False
 
-        return output_str
+        return output_str, sp.returncode
+
+    @staticmethod
+    def check_bin(bin, check_cmd=['-v'], cb_ask_bool=input):
+        while True:
+            msg = ''
+            advice = ''
+
+            if not RunBin.get_bin(bin):
+                msg = f'Failed to find binary {bin}.\nRead Documentations to check how to download it.\nCheck again?'
+            else:
+                output_str, returncode = RunBin.run_cmd([bin, *check_cmd], silence=True)
+                if returncode != 0 and not (bin == 'apngasm' and returncode == 2) and not (bin == 'apngdis' and returncode == 1):
+                    msg = f'Error occured when executing binary {bin}.{advice}\nCheck again?'
+                    if sys.platform != 'win32':
+                        advice += '\nIs the permission correct?'
+                    if sys.platform == 'darwin':
+                        advice += '\nDid MacOS blocked it because from identified developer?'
+                        advice += '\nGo to System Preferences > Security & Privacy and click "Open Anyway"'
+                
+            if msg != '':
+                response = cb_ask_bool(f'Error occured when executing binary {bin}.{advice}\nCheck again?')
+                if response:
+                    continue
+                else:
+                    return False
+            
+            return True

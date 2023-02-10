@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import sys
 import multiprocessing
 import argparse
@@ -7,6 +6,7 @@ import argparse
 from tqdm import tqdm
 
 from flow import Flow
+from utils.run_bin import RunBin
 from utils.json_manager import JsonManager
 from utils.get_kakao_auth import GetKakaoAuth
 from utils.get_signal_auth import GetSignalAuth
@@ -32,6 +32,7 @@ class CLI:
     progress_bar = None
 
     def cli(self):
+        self.bins = JsonManager.load_json('resources/bins.json')
         self.help = JsonManager.load_json('resources/help.json')
         self.input_presets = JsonManager.load_json('resources/input.json')
         self.compression_presets = JsonManager.load_json('resources/compression.json')
@@ -94,6 +95,8 @@ class CLI:
             parser_cred.add_argument(f'--{k.replace("_", "-")}', **keyword_args, dest=k, help=v)
 
         args = parser.parse_args()
+
+        self.check_bin()
         
         self.no_confirm = args.no_confirm
 
@@ -326,3 +329,9 @@ class CLI:
                 self.progress_bar = None
         elif set_progress_mode == 'clear':
             self.progress_bar.reset()
+
+    def check_bin(self):
+        for bin, check_cmd in self.bins.items():
+            result = RunBin.check_bin(bin, check_cmd, self.callback_ask_bool)
+            if result == False:
+                sys.exit()

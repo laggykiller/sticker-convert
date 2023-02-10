@@ -1,0 +1,11 @@
+{
+    "apngasm": ["-v"],
+    "apngdis": [],
+    "magick": ["-version"],
+    "pngnq-s9": ["-V"],
+    "pngquant": ["-h"],
+    "optipng": ["-v"],
+    "ffmpeg": ["-version"],
+    "ffprobe": ["-version"],
+    "zip": ["-h"]
+}

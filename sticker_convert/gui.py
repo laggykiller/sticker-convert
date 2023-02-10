@@ -16,6 +16,7 @@ from ttkbootstrap.scrolled import ScrolledText
 from ttkbootstrap.dialogs import Messagebox, Querybox
 
 from flow import Flow
+from utils.run_bin import RunBin
 from utils.json_manager import JsonManager
 from utils.get_kakao_auth import GetKakaoAuth
 from utils.get_signal_auth import GetSignalAuth
@@ -51,6 +52,8 @@ class GUI:
         self.response_dict = {}
         self.action_queue = Queue()
         self.root.after(500, self.poll_actions)
+
+        self.check_bin()
     
     def __enter__(self):
         return self
@@ -177,6 +180,7 @@ class GUI:
         self.canvas.configure(width=width, height=height)
     
     def load_jsons(self):
+        self.bins = JsonManager.load_json('resources/bins.json')
         self.help = JsonManager.load_json('resources/help.json')
         self.input_presets = JsonManager.load_json('resources/input.json')
         self.compression_presets = JsonManager.load_json('resources/compression.json')
@@ -407,6 +411,15 @@ class GUI:
     
     def callback_bar(self, *args, **kwargs):
         self.progress_frame.update_progress_bar(*args, **kwargs)
+    
+    def check_bin(self):
+        Thread(target=self.check_bin_thread, daemon=True).start()
+    
+    def check_bin_thread(self):
+        for bin, check_cmd in self.bins.items():
+            result = RunBin.check_bin(bin, check_cmd, self.callback_ask_bool)
+            if result == False:
+                self.exec_in_main(sys.exit)
 
 class InputFrame:
     def __init__(self, gui):
