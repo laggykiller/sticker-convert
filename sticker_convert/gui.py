@@ -700,6 +700,7 @@ class ProgressFrame:
             msg = str(args[0])
         
         if msg:
+            print(msg)
             msg += '\n'
 
         self.message_box._text.config(state='normal')
@@ -714,8 +715,6 @@ class ProgressFrame:
             # if scrollbar_prev_loc == 1.0:
             if self.auto_scroll:
                 self.message_box._text.yview_moveto(1.0)
-            
-            print(msg)
 
         self.message_box._text.config(state='disabled')
     
