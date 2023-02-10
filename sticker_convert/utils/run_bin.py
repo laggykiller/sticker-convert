@@ -53,7 +53,7 @@ class RunBin:
         return output_str, sp.returncode
 
     @staticmethod
-    def check_bin(bin, check_cmd=['-v'], cb_ask_bool=input, cb_msg=cb_msg):
+    def check_bin(bin, check_cmd=['-v'], cb_ask_bool=input, cb_msg=print):
         while True:
             msg = ''
             advice = ''
