@@ -18,6 +18,7 @@
 - [How to use (Docker)](#how-to-use-docker)
 - [Running python script directly & Compiling](#running-python-script-directly--compiling)
 - [FAQ](#faq)
+    - [MacOS complains that program from unidentified developer](#macos-complains-that-program-from-unidentified-developer)
     - [Getting signal uuid and password](#getting-signal-uuid-and-password)
     - [Getting telegram bot token](#getting-telegram-bot-token)
     - [Getting kakao auth_token](#getting-kakao-auth_token)
@@ -301,6 +302,13 @@ Note that the GUI version is based on https://github.com/jlesage/docker-baseimag
 See [COMPILING.md](COMPILING.md)
 
 ## FAQ
+
+### MacOS complains that program from unidentified developer
+To become an identified developer, I have to pay USD$99 to Apple.
+
+To bypass this problem, open terminal and execute `sudo spctl --master-disable` before running `sticker-convert`.
+
+To learn more, read this page: https://disable-gatekeeper.github.io/
 
 ### Getting signal uuid and password
 `uuid` and `password` are needed for uploading Signal stickers.
