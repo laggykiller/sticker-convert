@@ -84,126 +84,147 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--output-dir OUTPUT_DIR]
-                       [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
-                       [--download-line DOWNLOAD_LINE] [--download-kakao-static DOWNLOAD_KAKAO_STATIC]
-                       [--download-kakao-animated DOWNLOAD_KAKAO_ANIMATED] [--export-wastickers] [--export-signal]
-                       [--export-telegram] [--export-imessage] [--no-compress]
+usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--download-signal SIGNAL]
+                       [--download-telegram TELEGRAM] [--download-line LINE]
+                       [--download-kakao-static KAKAO_STATIC] [--download-kakao-animated KAKAO_ANIMATED]
+                       [--download-local LOCAL] [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
+                       [--export-signal SIGNAL | --export-telegram TELEGRAM | --export-whatsapp WHATSAPP | --export-imessage IMESSAGE | --export-local LOCAL]
+                       [--no-compress]
                        [--preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                       [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
-                       [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
-                       [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
-                       [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--duration-min DURATION_MIN]
-                       [--duration-max DURATION_MAX] [--steps STEPS] [--vid-size-max VID_SIZE_MAX]
-                       [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT]
-                       [--fake-vid] [--default-emoji DEFAULT_EMOJI] [--processes PROCESSES] [--author AUTHOR]
-                       [--title TITLE] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
-                       [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
-                       [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth] [--kakao-username KAKAO_USERNAME]
-                       [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
-                       [--kakao-phone-number KAKAO_PHONE_NUMBER] [--save-cred]
+                       [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
+                       [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
+                       [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
+                       [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
+                       [--duration-min DURATION_MIN] [--duration-max DURATION_MAX]
+                       [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
+                       [--fake-vid] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
+                       [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
+                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
+                       [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
+                       [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
+                       [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
+                       [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
 options:
   -h, --help            show this help message and exit
-  --no-confirm          Do not ask any questions
+  --no-confirm          Do not ask any questions.
+
+Input options:
   --input-dir INPUT_DIR
-                        Specify input directory
-  --output-dir OUTPUT_DIR
-                        Specify output directory
-  --download-signal DOWNLOAD_SIGNAL
-                        Download signal stickers from a URL as input (Example:
-                        https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
-  --download-telegram DOWNLOAD_TELEGRAM
-                        Download telegram stickers from a URL as input (Example:
-                        https://telegram.me/addstickers/xxxxx)
-  --download-line DOWNLOAD_LINE
-                        Download line stickers from a URL / ID as input (Example:
-                        https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
-  --download-kakao-static DOWNLOAD_KAKAO_STATIC
-                        Download kakao stickers from a URL as input (Example: https://e.kakao.com/t/xxxxx)
-  --download-kakao-animated DOWNLOAD_KAKAO_ANIMATED
-                        Download kakao stickers from a URL / ID as input (Example: https://e.kakao.com/t/xxxxx OR
-                        kakaotalk://store/emoticon/4404400 OR 4404400)
-  --export-wastickers   Create a .wastickers file for uploading to WhatsApp
-  --export-signal       Upload to Signal
-  --export-telegram     Upload to Telegram
-  --export-imessage     Create Xcode project for importing to iMessage
-  --no-compress         Do not compress files. Useful for only downloading stickers
-  --preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
-                        Apply preset for compression
-  --fps-min FPS_MIN     Set minimum output fps
-  --fps-max FPS_MAX     Set maximum output fps
-  --res-min RES_MIN     Set minimum output resolution (width and height)
-  --res-max RES_MAX     Set maximum output resolution (width and height)
-  --res-w-min RES_W_MIN
-                        Set minimum output resolution (width)
-  --res-w-max RES_W_MAX
-                        Set maximum output resolution (width)
-  --res-h-min RES_H_MIN
-                        Set minimum output resolution (height)
-  --res-h-max RES_H_MAX
-                        Set maximum output resolution (height)
-  --quality-min QUALITY_MIN
-                        Set minimum quality
-  --quality-max QUALITY_MAX
-                        Set maximum quality
-  --color-min COLOR_MIN
-                        Set minimum number of colors (For converting to apng). >256 will disable it.
-  --color-max COLOR_MAX
-                        Set maximum number of colors (For converting to apng). >256 will disable it.
-  --duration-min DURATION_MIN
-                        Set minimum output duration in miliseconds. Will change play speed if source is longer than
-                        duration. 0 will disable limit.
-  --duration-max DURATION_MAX
-                        Set maximum output duration in miliseconds. Will change play speed if source is longer than
-                        duration. 0 will disable limit.
-  --steps STEPS         Set number of divisions between min and max settings. Higher value is slower but yields file
-                        more closer to the specified file size limit
-  --vid-size-max VID_SIZE_MAX
-                        Set maximum file size limit for animated stickers
-  --img-size-max IMG_SIZE_MAX
-                        Set maximum file size limit for static stickers
-  --vid-format VID_FORMAT
-                        Set file format if input is a animated
-  --img-format IMG_FORMAT
-                        Set file format if input is a static image
-  --fake-vid            Convert (faking) image to video. Useful if (1) Size limit for video is larger than image; (2)
-                        Mix image and video into same pack
-  --default-emoji DEFAULT_EMOJI
-                        Set the default emoji for uploading signal and telegram sticker packs
+                        Specify input directory.
+  --download-signal SIGNAL
+                        Download signal stickers from a URL as input
+                        (Example: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
+  --download-telegram TELEGRAM
+                        Download telegram stickers from a URL as input
+                        (Example: https://telegram.me/addstickers/xxxxx)
+  --download-line LINE  Download line stickers from a URL / ID as input
+                        (Example: https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
+  --download-kakao-static KAKAO_STATIC
+                        Download kakao stickers from a URL as input
+                        (Example: https://e.kakao.com/t/xxxxx)
+  --download-kakao-animated KAKAO_ANIMATED
+                        Download kakao stickers from a URL / ID as input
+                        (Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400 OR 4404400)
+  --download-local LOCAL
+                        Load files from local directory on computer
+                        (No need to supply any URL)
+  --steps STEPS         Set number of divisions between min and max settings.
+                        Steps higher = Slower but yields file more closer to the specified file size limit.
   --processes PROCESSES
-                        Set number of processes. Default to number of logical processors in system
-  --author AUTHOR       Set author of created sticker pack
-  --title TITLE         Set name of created sticker pack
+                        Set number of processes. Default to number of logical processors in system.
+                        Processes higher = Compress faster but consume more resources.
+  --fps-min FPS_MIN     Set minimum output fps.
+  --fps-max FPS_MAX     Set maximum output fps.
+  --res-min RES_MIN     Set minimum width and height
+  --res-max RES_MAX     Set maximum width and height
+  --res-w-min RES_W_MIN
+                        Set minimum width.
+  --res-w-max RES_W_MAX
+                        Set maximum height.
+  --res-h-min RES_H_MIN
+                        Set minimum height.
+  --res-h-max RES_H_MAX
+                        Set minimum height.
+  --quality-min QUALITY_MIN
+                        Set minimum quality.
+  --quality-max QUALITY_MAX
+                        Set maximum quality.
+  --color-min COLOR_MIN
+                        Set minimum number of colors (For converting to apng and apng only).
+  --color-max COLOR_MAX
+                        Set maximum number of colors (For converting to apng and apng only).
+  --duration-min DURATION_MIN
+                        Set minimum output duration in miliseconds.
+  --duration-max DURATION_MAX
+                        Set maximum output duration in miliseconds.
+  --vid-size-max VID_SIZE_MAX
+                        Set maximum file size limit for animated stickers.
+  --img-size-max IMG_SIZE_MAX
+                        Set maximum file size limit for static stickers.
+  --vid-format VID_FORMAT
+                        Set file format if input is animated.
+  --fake-vid            Convert (faking) image to video.
+                        Useful if:
+                        (1) Size limit for video is larger than image;
+                        (2) Mix image and video into same pack.
+
+Output options:
+  --output-dir OUTPUT_DIR
+                        Specify output directory.
+  --author AUTHOR       Set author of created sticker pack.
+  --title TITLE         Set name of created sticker pack.
+  --export-signal SIGNAL
+                        Upload to Signal
+  --export-telegram TELEGRAM
+                        Upload to Telegram
+  --export-whatsapp WHATSAPP
+                        Create a .wastickers file for uploading to WhatsApp
+  --export-imessage IMESSAGE
+                        Create Xcode project for importing to iMessage
+  --export-local LOCAL  Save to local directory only
+
+Compression options:
+  --no-compress         Do not compress files. Useful for only downloading stickers.
+  --preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
+                        Apply preset for compression.
+  --default-emoji DEFAULT_EMOJI
+                        Set the default emoji for uploading Signal and Telegram sticker packs.
+
+Credentials options:
   --signal-uuid SIGNAL_UUID
-                        Set signal uuid. Required for uploading signal stickers
+                        Set Signal uuid. Required for uploading Signal stickers.
   --signal-password SIGNAL_PASSWORD
-                        Set signal password. Required for uploading signal stickers
+                        Set Signal password. Required for uploading Signal stickers.
   --signal-get-auth     Generate Signal uuid and password.
   --telegram-token TELEGRAM_TOKEN
-                        Set telegram token. Required for uploading and downloading telegram stickers
+                        Set Telegram token. Required for uploading and downloading Telegram stickers.
   --telegram-userid TELEGRAM_USERID
-                        Set telegram user_id (From real account, not bot account). Required for uploading telegram
-                        stickers
+                        Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.
   --kakao-auth-token KAKAO_AUTH_TOKEN
-                        Set kakao auth_token. Required for downloading animated stickers from
-                        https://e.kakao.com/t/xxxxx
-  --kakao-get-auth      Generate kakao auth_token. Kakao username, password, country code and phone number are also
-                        required.
+                        Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx
+  --kakao-get-auth      Generate Kakao auth_token. Kakao username, password, country code and phone number are also required.
   --kakao-username KAKAO_USERNAME
-                        Set kakao username, which is email or phone number used for signing up Kakao account (e.g.
-                        `+447700900142`). Required for generating kakao auth_token
+                        Set Kakao username, which is email or phone number used for signing up Kakao account
+                        Example: +447700900142
+                        Required for generating Kakao auth_token.
   --kakao-password KAKAO_PASSWORD
-                        Set kakao password (Password of Kakao account). Required for generating kakao auth_token
+                        Set Kakao password (Password of Kakao account).
+                        Required for generating Kakao auth_token.
   --kakao-country-code KAKAO_COUNTRY_CODE
-                        Set kakao country code of phone. Example: 82 (For korea), 44 (For UK), 1 (For USA). Required
-                        for generating kakao auth_token
+                        Set Kakao country code of phone.
+                        Example: 82 (For korea), 44 (For UK), 1 (For USA).
+                        Required for generating Kakao auth_token.
   --kakao-phone-number KAKAO_PHONE_NUMBER
-                        Set kakao phone number (Phone number associated with your Kakao account. Used for send /
-                        receive verification code via SMS.). Required for generating kakao auth_token
-  --save-cred           Save signal and telegram credentials
+                        Set Kakao phone number (Phone number associated with your Kakao account)
+                        Do NOT enter country code
+                        Example: 7700900142
+                        Used for send / receive verification code via SMS.
+                        Required for generating Kakao auth_token.
+  --save-cred SAVE_CRED
+                        Save Signal and Telegram credentials.
 ```
 
 Note: If you are running python script directly, run with `main.py`
