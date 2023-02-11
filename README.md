@@ -18,14 +18,10 @@
 - [How to use (Docker)](#how-to-use-docker)
 - [Running python script directly & Compiling](#running-python-script-directly--compiling)
 - [FAQ](#faq)
+    - [Platform-specific guides (e.g. Getting credentials)](#platform-specific-guides-eg-getting-credentials)
     - [MacOS complains that program from unidentified developer](#macos-complains-that-program-from-unidentified-developer)
-    - [Getting signal uuid and password](#getting-signal-uuid-and-password)
-    - [Getting telegram bot token](#getting-telegram-bot-token)
-    - [Getting kakao auth_token](#getting-kakao-auth_token)
-    - [Importing .wastickers into WhatsApp](#importing-wastickers-into-whatsapp)
-    - [Getting stickers from WhatsApp](#getting-stickers-from-whatsapp)
     - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
-    - [Why the telegram sticker link ends with _by_xxxbot?](#why-the-telegram-sticker-link-ends-with-_by_xxxbot)
+- [Future plans](#future-plans)
 - [Credits](#credits)
 - [DISCLAIMER](#disclaimer)
 
@@ -299,9 +295,15 @@ docker build . -t sticker-convert
 Note that the GUI version is based on https://github.com/jlesage/docker-baseimage-gui. Visit that repo for more information.
 
 ## Running python script directly & Compiling
-See [COMPILING.md](COMPILING.md)
+See [docs/COMPILING.md](docs/COMPILING.md)
 
 ## FAQ
+
+### Platform-specific guides (e.g. Getting credentials)
+- [Signal](docs/guide_signal.md)
+- [Telegram](docs/guide_telegram.md)
+- [WhatsApp](docs/guide_whatsapp.md)
+- [Kakao](docs/guide_kakao.md)
 
 ### MacOS complains that program from unidentified developer
 To become an identified developer, I have to pay USD$99 to Apple every year.
@@ -314,70 +316,13 @@ If macOS still complains about individual binaries (e.g. apngasm), go to `System
 
 To learn more, read this page: https://disable-gatekeeper.github.io/
 
-### Getting signal uuid and password
-`uuid` and `password` are needed for uploading Signal stickers.
-(Note: If you don't want to do this, you can still upload stickers manually by Signal Desktop)
-
-You can get them easily with `Generate` button (In GUI) or `--signal-get-auth` (In CLI)
-
-Alternatively, follow instructions below to get them manually:
-
-![imgs/signal-uuid-password.png](imgs/signal-uuid-password.png)
-
-1. Install Signal Desktop BETA VERSION from https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta
-2. Link Signal Desktop with your phone
-3. Launch Signal Desktop BETA VERSION
-4. On the top bar, go to `View -> Toggle Developers tools`
-5. Open console
-    - `uuid` is the output of running: `window.SignalDebug.getReduxState().items.uuid_id`
-    - `password` is the output of running: `window.SignalDebug.getReduxState().items.password`
-
-Reference
-- https://github.com/teynav/signalApngSticker
-- https://github.com/signalstickers/signalstickers-client
-- https://github.com/signalstickers/signalstickers-client/issues/15
-
-### Getting telegram bot token
-`token` needed for uploading and downloading Telegram stickers
-(Note: If you don't want to do this, you can still upload stickers manually by using this: https://t.me/stickers)
-
-![imgs/telegram-bot.png](imgs/telegram-bot.png)
-
-1. Contact botfather on telegram: https://t.me/botfather
-2. Follow instructions here to create a bot and get token: https://core.telegram.org/bots/features#creating-a-new-bot
-3. The token looks like this: `110201543:AAHdqTcvCH1vGWJxfSeofSAs0K5PALDsaw`
-4. **You need to send `/start` to your newly created bot**
-
-### Getting telegram user_id
-`user_id` needed for uploading Telegram stickers. Note that the user_id should be from a real account, not from the bot account.
-(Note: If you don't want to do this, you can still upload stickers manually by using this: https://t.me/stickers)
-
-Follow instruction from this post: https://stackoverflow.com/a/52667196
-
-![imgs/telegram-userid.png](imgs/telegram-userid.png)
-
-### Getting Kakao auth_token
-Read [kakao_anim_note.md](kakao_anim_note.md)
-
-### Importing .wastickers into WhatsApp
-1. Download Sticker maker on your phone [[iOS version](https://apps.apple.com/us/app/sticker-maker-studio/id1443326857) | [Android version](https://play.google.com/store/apps/details?id=com.marsvard.stickermakerforwhatsapp)]
-2. Transfer the .wastickers file into your phone
-3. Share the file to Sticker Maker app
-4. Inside Sticker Maker app, you can then import the stickers into WhatsApp
-
-### Getting stickers from WhatsApp
-- Android Phone: Inside "/storage/emulated/0/Whatsapp/media/Whatsapp Stickers" OR "/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Stickers"
-- Any: Go to WhatsApp Web, right click on sticker and click "Save image as..."
-
 ### I want to upload stickers that are in stickers_output that have not been uploaded yet
 CLI: Run with `--no-compress --export-xxxxx`
 
 GUI: Select `From local directory` for Input source, tick `No compression` box and select `Upload to xxxxx` for Output options
 
-### Why the telegram sticker link ends with _by_xxxbot?
-Sticker pack created by bot should end with this suffix as enforced by Telegram.
-
-To avoid this, upload telegram stickers manually using https://t.me/stickers
+## Future plans
+See [docs/TODO.md](docs/TODO.md)
 
 ## Credits
 - Information about Signal and Telegram stickers: https://github.com/teynav/signalApngSticker
