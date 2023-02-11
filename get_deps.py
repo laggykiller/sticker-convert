@@ -28,10 +28,11 @@ def download(url, file=None):
             with open(file, 'wb+') as f:
                 response = urllib.request.urlopen(url)
                 f.write(response.read())
-                break
+                return
         except Exception as e:
             print(f'Try {i}: Download failed for {url}')
             print(e)
+    raise Exception(f'Failed to download {url}')
 
 def cp_files_in_dir(src, dst='.'):
     for i in os.listdir(src):
@@ -110,6 +111,8 @@ def win_pngquant():
     shutil.move('pngquant-dl/pngquant/pngquant.exe', './')
     shutil.rmtree('pngquant-dl')
 
+    assert os.path.isfile('pngquant.exe')
+
 def win_ffmpeg():
     print('Getting ffmpeg')
     url = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
@@ -123,6 +126,9 @@ def win_ffmpeg():
     shutil.move(f'ffmpeg-dl/{file.replace(".zip", "")}/bin/ffprobe.exe', './')
     shutil.rmtree('ffmpeg-dl')
 
+    assert os.path.isfile('ffmpeg.exe')
+    assert os.path.isfile('ffprobe.exe')
+
 def win_bzip2():
     print('Getting bzip2')
     url = 'https://sourceforge.net/projects/gnuwin32/files/bzip2/1.0.5/bzip2-1.0.5-bin.zip'
@@ -134,6 +140,8 @@ def win_bzip2():
     os.chdir('../')
     cp_files_in_dir('bzip2-dl/bin')
     shutil.rmtree('bzip2-dl')
+
+    assert os.path.isfile('bzip2.exe')
 
 def win_zip():
     print('Getting zip')
@@ -147,6 +155,8 @@ def win_zip():
     cp_files_in_dir('zip-dl/bin')
     shutil.rmtree('zip-dl')
 
+    assert os.path.isfile('zip.exe')
+
 def win_magick():
     print('Getting magick')
     soup = BeautifulSoup(urllib.request.urlopen("https://imagemagick.org/archive/binaries").read().decode(), "html.parser")
@@ -159,6 +169,9 @@ def win_magick():
     download(url, file)
     unzip(file)
     os.remove(file)
+
+    assert os.path.isfile('magick.exe')
+
     os.chdir('../')
 
 def mac_brew():
@@ -170,6 +183,8 @@ def mac_brew():
 def mac_apngasm():
     shutil.copy('/usr/local/bin/apngasm', './')
 
+    assert os.path.isfile('apngasm')
+
 def mac_apngdis():
     print('Getting apngdis')
     url = 'https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip'
@@ -178,6 +193,8 @@ def mac_apngdis():
     unzip(file)
     os.remove(file)
     os.remove('readme.txt')
+
+    assert os.path.isfile('apngdis')
 
 def mac_pngnqs9():
     print('Getting pngnq-s9')
@@ -201,12 +218,18 @@ def mac_pngnqs9():
     shutil.move(f'pngnq-s9-dl/pngnq-s9-{version}/src/pngnq-s9', '.')
     shutil.rmtree('pngnq-s9-dl')
 
+    assert os.path.isfile('pngnq-s9')
+
 def mac_pngquant():
     print('Getting pngquant')
     shutil.copy('/usr/local/bin/pngquant', './')
 
+    assert os.path.isfile('pngquant')
+
 def mac_optipng():
     cp_files_in_dir('/usr/local/opt/optipng/bin')
+
+    assert os.path.isfile('optipng')
 
 def mac_ffmpeg():
     print('Getting ffmpeg')
@@ -216,6 +239,8 @@ def mac_ffmpeg():
     unzip(file)
     os.remove(file)
 
+    assert os.path.isfile('ffmpeg')
+
 def mac_ffprobe():
     print('Getting ffprobe')
     url = 'https://evermeet.cx/ffprobe/getrelease/zip'
@@ -224,11 +249,15 @@ def mac_ffprobe():
     unzip(file)
     os.remove(file)
 
+    assert os.path.isfile('ffprobe')
+
 def mac_magick():
     print('Getting magick')
     shutil.copy('/usr/local/opt/imagemagick/bin', './')
     shutil.copy('/usr/local/opt/imagemagick/lib', './')
     shutil.copy('/usr/local/opt/imagemagick/etc', './')
+
+    assert os.path.isfile('bin/magick')
 
 def mac_cp_lib():
     print('Getting libraries')
