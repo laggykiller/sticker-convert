@@ -30,7 +30,7 @@ jobs:
           - os: macos-latest
             TARGET: macos
             CMD_BUILD: |
-                python3 get-deps.py
+                python3 get_deps.py
                 pyinstaller sticker_convert.spec
                 cd dist/
                 zip -r9 sticker-convert-macos.zip sticker-convert-macos/
@@ -39,7 +39,7 @@ jobs:
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: |
-                python3 get-deps.py
+                python3 get_deps.py
                 $env:Path += ";C:\Program Files\UniConvertor-2.0rc5\dlls"
                 pyinstaller sticker_convert.spec
                 cd dist
