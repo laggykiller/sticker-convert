@@ -304,7 +304,6 @@ def mac_cp_lib():
         'libtool',
         'libvmaf',
         'libwebm',
-        'little-cms',
         'little-cms2',
         'lz4',
         # 'lzlib',
