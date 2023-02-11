@@ -263,9 +263,9 @@ def mac_ffprobe():
 
 def mac_magick():
     print('Getting magick')
-    shutil.copytree('/usr/local/opt/imagemagick/bin', './')
-    shutil.copytree('/usr/local/opt/imagemagick/lib', './')
-    shutil.copytree('/usr/local/opt/imagemagick/etc', './')
+    shutil.copytree('/usr/local/opt/imagemagick/bin', './bin')
+    shutil.copytree('/usr/local/opt/imagemagick/lib', './lib')
+    shutil.copytree('/usr/local/opt/imagemagick/etc', './etc')
 
     assert os.path.isfile('bin/magick')
 
