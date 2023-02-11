@@ -31,6 +31,7 @@ jobs:
             TARGET: macos
             CMD_BUILD: |
                 sh ./get-deps-macos.sh
+                pip3 install -y pyinstaller
                 pyinstaller sticker_convert.spec
                 cd dist/
                 find ./sticker-convert-macos -exec xattr -d com.apple.quarantine {} \;
@@ -41,6 +42,7 @@ jobs:
             TARGET: windows
             CMD_BUILD: |
                 ./get-deps-windows.bat
+                pip3 install -y pyinstaller
                 $env:Path += ";C:\Program Files\UniConvertor-2.0rc5\dlls"
                 pyinstaller sticker_convert.spec
                 cd dist
