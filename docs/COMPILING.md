@@ -6,7 +6,7 @@ Install python3 from https://www.python.org/
 Install the required python modules with `pip3 install -r requirements-build.txt`
 
 ## 3.1 Executables / Binaries (Windows)
-NOTE: You may run `get-deps-windows.bat` to get them automatically
+NOTE: You may run `python3 get_deps.py` to get them automatically. Please run as Administrator.
 
 For Windows, the following executables are required:
 - `ffmpeg.exe` and `ffprobe.exe`
@@ -50,7 +50,7 @@ For Windows, the following executables are required:
 Place executables inside `sticker_convert/bin`
 
 ## 3.2 Executables / Binaries (MacOS)
-NOTE: You may run `get-deps-macos.sh` to get them automatically
+NOTE: You may run `python3 get_deps.py` to get them automatically. Please run with sudo.
 
 For MacOS, the following binaries are required:
 - `ffmpeg` and `ffprobe`
@@ -77,7 +77,7 @@ For MacOS, the following binaries are required:
 ## 3.3 Executables / Binaries (Linux) (Tested with Ubuntu 20.04)
 Some packages are usually not available in repo. To compile them, install these packages:
 
-`sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config python3-tkinter python3-opencv`
+`sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config python3-tkinter python3-opencv binutils psmisc`
 
 For Linux, the following binaries are required:
 - `ffmpeg` and `ffprobe`
@@ -131,17 +131,17 @@ For Linux, the following binaries are required:
 Note that Arch Linux have all of the required packages in official repository and AUR.
 
 ## 4 Running the script
-Change directory into `sticker_convert` directory and run `python ./main.py`
+Change directory into `sticker_convert` directory and run `python3 ./main.py`
 
 # Compiling
 This repository uses `pyinstaller` for compiling. Install with `pip3 install pyinstaller`
 
 ## Compiling on windows
-1. Run `get-deps-windows.bat` to get dependencies automatically
+1. Run `python3 get_deps.py` to get dependencies automatically. Please run as Administrator.
 2. Run `pyinstaller sticker_convert.spec`
 3. Compilation result in `dist` directory
 
 ##  Compiling on MacOS
-1. Run `get-deps-macos.sh` to get dependencies automatically
+1. Run `python3 get_deps.py` to get dependencies automatically. Please run with sudo.
 2. Run `pyinstaller sticker_convert.spec`
 3. Compilation result in `dist` directory
