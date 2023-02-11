@@ -3,7 +3,7 @@
 Install python3 from https://www.python.org/
 
 ## 2. Install python modules
-Install the required python modules with `pip3 install -r requirements.txt`
+Install the required python modules with `pip3 install -r requirements-build.txt`
 
 ## 3.1 Executables / Binaries (Windows)
 NOTE: You may run `get-deps-windows.bat` to get them automatically
