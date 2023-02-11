@@ -218,7 +218,7 @@ def mac_pngnqs9():
         rwpng = f.read()
     with open('src/rwpng.c', 'w+') as f:
         f.write('#include <string.h>\n')
-        f.write('rwpng')
+        f.write(rwpng)
     subprocess.run(['./configure'])
     subprocess.run(['make'])
     # subprocess.run(['make', 'install'])
