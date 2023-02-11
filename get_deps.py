@@ -5,6 +5,7 @@ import subprocess
 import shutil
 import zipfile
 import urllib.request
+import urllib.error
 
 try:
     from bs4 import BeautifulSoup
@@ -29,7 +30,7 @@ def download(url, file=None):
                 response = urllib.request.urlopen(url)
                 f.write(response.read())
                 return
-        except Exception as e:
+        except (urllib.error.HTTPError, urllib.error.URLError) as e:
             print(f'Try {i}: Download failed for {url}')
             print(e)
     raise Exception(f'Failed to download {url}')
