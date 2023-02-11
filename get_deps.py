@@ -19,7 +19,7 @@ except ImportError:
     import requests
 
 session = requests.Session()
-headers = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
+headers = {"User-Agent": "curl/7.54.1"}
 
 def clean_dir(dir):
     shutil.rmtree(dir, ignore_errors=True)
