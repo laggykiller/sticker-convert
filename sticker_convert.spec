@@ -55,12 +55,14 @@ if sys.platform == 'win32':
 
     
 elif sys.platform == 'darwin':
-    binaries += [(f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin')]
-    binaries += [(f'./sticker_convert/ImageMagick/lib/*.dylib', f'./ImageMagick/lib')]
-    binaries += [(f'./sticker_convert/ImageMagick/lib/*.a', f'./ImageMagick/lib')]
-    binaries += [(f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.la', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders')]
-    binaries += [(f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.so', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders')]
-    binaries += [(f'./sticker_convert/ImageMagick/etc/ImageMagick-7/*.xml', f'./ImageMagick/etc/ImageMagick-7')]
+    binaries += [
+        (f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'),
+        (f'./sticker_convert/ImageMagick/lib/*.dylib', f'./ImageMagick/lib'),
+        (f'./sticker_convert/ImageMagick/lib/*.a', f'./ImageMagick/lib'),
+        (f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.la', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders'),
+        (f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.so', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders'),
+        (f'./sticker_convert/ImageMagick/etc/ImageMagick-7/*.xml', f'./ImageMagick/etc/ImageMagick-7')
+        ]
 
 bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
 for bin in bin_list:
@@ -92,10 +94,10 @@ datas.append((os.path.join(proot, rlottie_dll), 'rlottie_python/'))
 
 # Tkinter tix
 # Example directory: %appdatalocal%/Programs/Python/Python310/tcl/tix8.4.3
-for path in sys.path:
-    tcl_path = os.path.join(path, 'tcl')
-    if os.path.isdir(tcl_path):
-        break
+# for path in sys.path:
+#     tcl_path = os.path.join(path, 'tcl')
+#     if os.path.isdir(tcl_path):
+#         break
 
 if sys.platform == 'win32':
     suffix = 'windows'

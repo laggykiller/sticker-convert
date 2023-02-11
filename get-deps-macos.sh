@@ -58,14 +58,14 @@ brew install optipng
 cp /usr/local/opt/optipng/bin/* ./
 
 # Get ffmpeg
-curl --retry 5 -O -L https://evermeet.cx/ffmpeg/ffmpeg-5.1.2.zip
-unzip ffmpeg-5.1.2.zip
-rm ffmpeg-5.1.2.zip
+curl --retry 5 -o ffmpeg.zip -L https://evermeet.cx/ffmpeg/getrelease/zip
+unzip ffmpeg.zip
+rm ffmpeg.zip
 
 # Get ffprobe
-curl --retry 5 -O -L https://evermeet.cx/ffmpeg/ffprobe-5.1.2.zip
-unzip ffprobe-5.1.2.zip
-rm ffprobe-5.1.2.zip
+curl --retry 5 -o ffprobe.zip -L https://evermeet.cx/ffprobe/getrelease/zip
+unzip ffprobe.zip
+rm ffprobe.zip
 
 # Get libwebm
 brew install libwebm
