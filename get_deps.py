@@ -219,10 +219,10 @@ def mac_pngnqs9():
     with open('src/rwpng.c', 'w+') as f:
         f.write('#include <string.h>\n')
         f.write('rwpng')
-    shutil.run(['./configure'])
-    shutil.run(['make'])
-    # shutil.run(['make', 'install'])
-    shutil.run(['chmod', '+x', 'src/pngnq-s9'])
+    subprocess.run(['./configure'])
+    subprocess.run(['make'])
+    # subprocess.run(['make', 'install'])
+    subprocess.run(['chmod', '+x', 'src/pngnq-s9'])
     shutil.move(f'pngnq-s9-dl/pngnq-s9-{version}/src/pngnq-s9', '.')
     shutil.rmtree('pngnq-s9-dl')
 
