@@ -48,7 +48,8 @@ RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > s
 # ImageMagick appimage seems to be most reliable and easiest
 # However, appimage cannot be directly used on Docker due to lack of FUSE
 # Quick hack is to extract appimage to root
-RUN curl -o magick -L https://github.com/ImageMagick/ImageMagick/releases/latest/download/ImageMagick--gcc-x86_64.AppImage && \
+# RUN curl -o magick -L https://github.com/ImageMagick/ImageMagick/releases/latest/download/ImageMagick--gcc-x86_64.AppImage && \
+RUN curl -o magick -L https://github.com/ImageMagick/ImageMagick/releases/download/7.1.0-57/ImageMagick--clang-x86_64.AppImage && \
     chmod +x ./magick && \
     ./magick --appimage-extract && \
     cp -r ./squashfs-root/* / && \

@@ -48,6 +48,8 @@ class GUI:
         self.pack_frames()
         self.resize_window()
 
+        self.msg_lock = Lock()
+        self.bar_lock = Lock()
         self.response_dict_lock = Lock()
         self.response_dict = {}
         self.action_queue = Queue()
@@ -407,10 +409,12 @@ class GUI:
         self.exec_in_main(partial(self.progress_frame.update_message_box, *args, **kwargs))
     
     def callback_msg_block(self, message='', parent=None, *args):
-        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
+        with self.msg_lock:
+            Messagebox.show_info(message, title='sticker-convert', parent=parent)
     
     def callback_bar(self, *args, **kwargs):
-        self.exec_in_main(partial(self.progress_frame.update_progress_bar, *args, **kwargs))
+        with self.bar_lock:
+            self.progress_frame.update_progress_bar(*args, **kwargs)
     
     def check_bin(self):
         Thread(target=self.check_bin_thread, daemon=True).start()
