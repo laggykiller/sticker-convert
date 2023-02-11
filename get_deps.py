@@ -44,7 +44,10 @@ def cp_files_in_dir(src, dst='.'):
     for i in os.listdir(src):
         src_f = os.path.join(src, i)
         dst_f = os.path.join(dst, i)
-        shutil.copy(src_f, dst_f)
+        if os.path.isfile(src_f):
+            shutil.copy(src_f, dst_f)
+        # else:
+        #     shutil.copytree(src_f, dst_f)
 
 def win_cairo():
     print('Installing uniconvertor for getting cairo')
@@ -262,9 +265,9 @@ def mac_ffprobe():
 
 def mac_magick():
     print('Getting magick')
-    shutil.copy('/usr/local/opt/imagemagick/bin', './')
-    shutil.copy('/usr/local/opt/imagemagick/lib', './')
-    shutil.copy('/usr/local/opt/imagemagick/etc', './')
+    shutil.copytree('/usr/local/opt/imagemagick/bin', './')
+    shutil.copytree('/usr/local/opt/imagemagick/lib', './')
+    shutil.copytree('/usr/local/opt/imagemagick/etc', './')
 
     assert os.path.isfile('bin/magick')
 
