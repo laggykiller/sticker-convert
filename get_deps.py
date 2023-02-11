@@ -4,7 +4,7 @@ import os
 import subprocess
 import shutil
 import zipfile
-import urllib
+import urllib.request
 
 try:
     from bs4 import BeautifulSoup
