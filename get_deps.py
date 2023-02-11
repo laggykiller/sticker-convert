@@ -5,14 +5,21 @@ import subprocess
 import shutil
 import zipfile
 import tarfile
-import urllib.request
-import urllib.error
 
 try:
     from bs4 import BeautifulSoup
 except ImportError:
     os.system('pip3 install beautifulsoup4')
     from bs4 import BeautifulSoup
+
+try:
+    import requests
+except ImportError:
+    os.system('pip3 install requests')
+    import requests
+
+session = requests.Session()
+headers = {"User-Agent": "Mozilla/5.0 (X11; CrOS x86_64 12871.102.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.141 Safari/537.36"}
 
 def clean_dir(dir):
     shutil.rmtree(dir, ignore_errors=True)
@@ -31,11 +38,12 @@ def download(url, file=None):
         file = url.split('/')[-1]
     for i in range(5):
         try:
+            r0 = session.head(url, allow_redirects=True)
+            response = requests.get(r0.url)
             with open(file, 'wb+') as f:
-                response = urllib.request.urlopen(url)
-                f.write(response.read())
+                f.write(response.content)
                 return
-        except (urllib.error.HTTPError, urllib.error.URLError) as e:
+        except requests.exceptions.RequestException as e:
             print(f'Try {i}: Download failed for {url}')
             print(e)
     raise Exception(f'Failed to download {url}')
@@ -168,7 +176,7 @@ def win_zip():
 
 def win_magick():
     print('Getting magick')
-    soup = BeautifulSoup(urllib.request.urlopen("https://imagemagick.org/archive/binaries").read().decode(), "html.parser")
+    soup = BeautifulSoup(requests.get("https://imagemagick.org/archive/binaries").text, "html.parser")
 
     for x in soup.find_all("a", href=True):
         file = x['href']
