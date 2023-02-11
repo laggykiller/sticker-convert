@@ -223,6 +223,7 @@ def mac_pngnqs9():
     subprocess.run(['make'])
     # subprocess.run(['make', 'install'])
     subprocess.run(['chmod', '+x', 'src/pngnq-s9'])
+    os.chdir('../../')
     shutil.move(f'pngnq-s9-dl/pngnq-s9-{version}/src/pngnq-s9', '.')
     shutil.rmtree('pngnq-s9-dl')
 
