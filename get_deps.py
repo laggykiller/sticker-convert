@@ -38,8 +38,8 @@ def download(url, file=None):
         file = url.split('/')[-1]
     for i in range(5):
         try:
-            r0 = session.head(url, allow_redirects=True)
-            response = requests.get(r0.url)
+            r0 = session.head(url, allow_redirects=True, headers=headers)
+            response = session.get(r0.url, headers=headers)
             with open(file, 'wb+') as f:
                 f.write(response.content)
                 return
@@ -176,7 +176,7 @@ def win_zip():
 
 def win_magick():
     print('Getting magick')
-    soup = BeautifulSoup(requests.get("https://imagemagick.org/archive/binaries").text, "html.parser")
+    soup = BeautifulSoup(session.get("https://imagemagick.org/archive/binaries", headers=headers).text, "html.parser")
 
     for x in soup.find_all("a", href=True):
         file = x['href']
@@ -338,7 +338,6 @@ repo_root = os.getcwd()
 # Prepare bin directory
 os.chdir('sticker_convert')
 clean_dir('bin')
-clean_dir('lib')
 clean_dir('ImageMagick')
 
 if sys.platform == 'win32':
@@ -357,6 +356,7 @@ if sys.platform == 'win32':
     win_magick()
 elif sys.platform == 'darwin':
     print('Notice: You should run this script with sudo!')
+    clean_dir('lib')
     os.chdir('bin')
     mac_brew()
     mac_apngasm()

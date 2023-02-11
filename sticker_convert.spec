@@ -19,7 +19,7 @@ def get_bin(bin):
 
 def get_magick_dir():
     # Prioritize local binaries
-    if os.path.isdir('./sticker_convert/ImageMagick'):
+    if os.path.isdir('./sticker_convert/ImageMagick') and len(os.listdir('./sticker_convert/ImageMagick')) > 0:
         return os.path.abspath(f'./sticker_convert/ImageMagick')
     else:
         magick_path = shutil.which("magick")
@@ -71,10 +71,10 @@ for bin in bin_list:
         binaries.append((bin_path, './bin'))
 
 # Add local binaries at last so they are not overwritten by those found in system
-if os.path.isdir('./sticker_convert/bin'):
+if os.path.isdir('./sticker_convert/bin') and len(os.listdir('./sticker_convert/bin')) > 0:
     binaries += [('./sticker_convert/bin/*', './bin')]
 
-if os.path.isdir('./sticker_convert/lib'):
+if os.path.isdir('./sticker_convert/lib') and len(os.listdir('./sticker_convert/lib')) > 0:
     binaries += [('./sticker_convert/lib/*', './lib')]
 
 # signalstickers_client needs a custom cacert.pem
