@@ -45,10 +45,11 @@ class DownloadTelegram:
                 with cwd(tempdir):
                     f_name_orig = i.get_file().download()
                 f_path_orig = os.path.join(tempdir, f_name_orig)
-                f_name = str(num).zfill(3) + os.path.splitext(f_name_orig)[-1]
+                f_id = str(num).zfill(3)
+                f_name = f_id + os.path.splitext(f_name_orig)[-1]
                 f_path = os.path.join(out_dir, f_name)
                 shutil.move(f_path_orig, f_path)
-                emoji_dict[os.path.splitext(f_name)[0]] = i.emoji
+                emoji_dict[f_id] = i.emoji
                 cb_msg(f'Downloaded {f_name}')
                 if cb_bar:
                     cb_bar(update_bar=True)

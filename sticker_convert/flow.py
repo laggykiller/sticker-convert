@@ -241,7 +241,14 @@ class Flow:
 
     def compress(self):
         if self.opt_comp['no_compress'] == True:
-            return
+            self.cb_msg('no_compress is set to True, skip compression')
+            if len(os.listdir(self.opt_output['dir'])) == 0 and not len(os.listdir(self.opt_input['dir'])) == 0:
+                for i in os.listdir(self.opt_input['dir']):
+                    src_f = os.path.join(self.opt_input['dir'], i)
+                    dst_f = os.path.join(self.opt_output['dir'], i)
+                    if os.path.isfile(src_f):
+                        shutil.copy(src_f, dst_f)
+            return True
         msg = 'Compressing...'
 
         input_dir = self.opt_input['dir']

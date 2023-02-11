@@ -54,8 +54,7 @@ class UploadSignal:
         png_spec['format'] = '.png'
 
         webp_spec = copy.deepcopy(base_spec)
-        webp_spec['format'] = 'webp'
-        webp_spec['animated'] = False if not fake_vid else None
+        webp_spec['format'] = '.webp'
 
         opt_comp_merged = merge({}, opt_comp, base_spec)
         
