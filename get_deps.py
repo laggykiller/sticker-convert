@@ -181,7 +181,7 @@ def mac_brew():
     subprocess.run(['NONINTERACTIVE=1', '/bin/bash', '-c', '"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'], shell=True)
     packages = ['pkg-config', 'apngasm', 'imagemagick', 'pngquant', 'optipng', 'libwebm']
     for package in packages:
-        subprocess.run(['brew', 'install', package], shell=True)
+        os.system(f'brew install {package}')
 
 def mac_apngasm():
     shutil.copy('/usr/local/bin/apngasm', './')
