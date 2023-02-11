@@ -388,7 +388,7 @@ class GUI:
         return response
 
     def exec_in_main(self, action):
-        response_id = str(uuid4())    
+        response_id = str(uuid4())
         self.action_queue.put([response_id, action])
         response = self.get_response_from_id(response_id)
         return response
@@ -404,13 +404,13 @@ class GUI:
         return False
 
     def callback_msg(self, *args, **kwargs):
-        self.progress_frame.update_message_box(*args, **kwargs)
+        self.exec_in_main(partial(self.progress_frame.update_message_box, *args, **kwargs))
     
     def callback_msg_block(self, message='', parent=None, *args):
         self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
     
     def callback_bar(self, *args, **kwargs):
-        self.progress_frame.update_progress_bar(*args, **kwargs)
+        self.exec_in_main(partial(self.progress_frame.update_progress_bar, *args, **kwargs))
     
     def check_bin(self):
         Thread(target=self.check_bin_thread, daemon=True).start()
