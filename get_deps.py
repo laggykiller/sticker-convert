@@ -4,6 +4,7 @@ import os
 import subprocess
 import shutil
 import zipfile
+import tarfile
 import urllib.request
 import urllib.error
 
@@ -20,6 +21,10 @@ def clean_dir(dir):
 def unzip(file):
     with zipfile.ZipFile(file, 'r') as zip_ref:
         zip_ref.extractall()
+
+def untar(file):
+    with tarfile.open(file) as tar_ref:
+        tar_ref.extractall()
 
 def download(url, file=None):
     if not file:
@@ -207,7 +212,7 @@ def mac_pngnqs9():
     os.mkdir('pngnq-s9-dl')
     os.chdir('pngnq-s9-dl')
     download(url, file)
-    unzip(file)
+    untar(file)
     os.chdir(f'pngnq-s9-{version}')
     with open('src/rwpng.c') as f:
         rwpng = f.read()
