@@ -252,7 +252,7 @@ def mac_ffmpeg():
 
 def mac_ffprobe():
     print('Getting ffprobe')
-    url = 'https://evermeet.cx/ffprobe/getrelease/zip'
+    url = 'https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip'
     file = 'ffprobe.zip'
     download(url, file)
     unzip(file)
