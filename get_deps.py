@@ -181,8 +181,6 @@ def win_magick():
 
     assert os.path.isfile('magick.exe')
 
-    os.chdir('../')
-
 def mac_brew():
     print('Installing packages from brew')
     download('https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh')
@@ -328,6 +326,8 @@ if sys.platform not in ('win32', 'darwin'):
     print(f'{sys.platform} is not supported')
     sys.exit()
 
+repo_root = os.getcwd()
+
 # Prepare bin directory
 os.chdir('sticker_convert')
 clean_dir('bin')
@@ -364,4 +364,4 @@ elif sys.platform == 'darwin':
     os.chdir('../lib')
     mac_cp_lib()
 
-os.chdir('../../')
+os.chdir(repo_root)
