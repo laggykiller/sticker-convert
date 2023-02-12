@@ -66,8 +66,6 @@ class UploadTelegram:
 
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=opt_output.get('title'), author=opt_output.get('author'))
-        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_anim_pack=50, file_per_image_pack=120, separate_image_anim=not fake_vid)
-
         if title == None:
             raise TypeError('title cannot be', title)
         if emoji_dict == None:
@@ -82,6 +80,7 @@ class UploadTelegram:
         bot = Bot(opt_cred['telegram']['token'])
         userid = opt_cred['telegram']['userid']
 
+        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_anim_pack=50, file_per_image_pack=120, separate_image_anim=not fake_vid)
         for pack_title, stickers in packs.items():
             png_sticker = None
             tgs_sticker = None

@@ -28,8 +28,9 @@ from utils.get_signal_auth import GetSignalAuth
 # sticker_convert_cli.py --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png
 
 class CLI:
-    no_confirm = False
-    progress_bar = None
+    def __init__(self):
+        self.no_confirm = False
+        self.progress_bar = None
 
     def cli(self):
         self.bins = JsonManager.load_json('resources/bins.json')

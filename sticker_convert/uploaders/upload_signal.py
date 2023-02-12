@@ -60,8 +60,6 @@ class UploadSignal:
         
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=opt_output.get('title'), author=opt_output.get('author'))
-        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=200, separate_image_anim=False)
-
         if title == None:
             raise TypeError(f'title cannot be {title}')
         if author == None:
@@ -75,6 +73,7 @@ class UploadSignal:
             MetadataHandler.generate_emoji_file(dir=in_dir, default_emoji=opt_comp.get("default_emoji"))
             return [msg]
         
+        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=200, separate_image_anim=False)
         for pack_title, stickers in packs.items():
             pack = LocalStickerPack()
             pack.author = author

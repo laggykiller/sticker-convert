@@ -18,9 +18,6 @@ from utils.converter import StickerConvert
 from utils.codec_info import CodecInfo
 
 class Flow:
-    compress_fails = []
-    out_urls = []
-
     def __init__(self,
         opt_input, opt_comp, opt_output, opt_cred, 
         input_presets, output_presets, cb_msg, cb_bar, cb_ask_bool):
@@ -34,6 +31,9 @@ class Flow:
         self.cb_msg = cb_msg
         self.cb_bar = cb_bar
         self.cb_ask_bool = cb_ask_bool
+
+        self.compress_fails = []
+        self.out_urls = []
 
         if os.path.isdir(self.opt_input['dir']) == False:
             os.makedirs(self.opt_input['dir'])

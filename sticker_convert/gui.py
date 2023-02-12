@@ -331,13 +331,13 @@ class GUI:
             }
         }
         
-        self.flow = Flow(
+        flow = Flow(
             opt_input, opt_comp, opt_output, opt_cred, 
             self.input_presets, self.output_presets,
             self.callback_msg, self.callback_bar, self.callback_ask_bool
             )
         
-        success = self.flow.start()
+        success = flow.start()
 
         if not success:
             self.callback_msg(msg='An error occured during this run.')
