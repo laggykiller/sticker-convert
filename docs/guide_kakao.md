@@ -6,7 +6,7 @@
 | `kakaotalk://store/emoticon/4404400`     | Not required (But no easy way to get it)         |
 | `4404400`                                | Not required (But no easy way to get it)         |
 
-- To download animated stickers, you have to options:
+- To download animated stickers, you have two options:
     - Method 1: (RECOMMENDED) Get the share link of the emoticon pack from Kakao app on phone, which does not need auth_token (`https://emoticon.kakao.com/items/xxxxx`)
     - Method 2: Use `https://e.kakao.com/t/xxxxx` which needs auth_token (Authorization header during request).
 
