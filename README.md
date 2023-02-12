@@ -1,5 +1,6 @@
 # sticker-convert
 ![imgs/banner.png](imgs/banner.png)
+![imgs/screenshot](imgs/screenshot.png)
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
 - With GUI and CLI that runs on Windows, MacOS and Linux
@@ -64,8 +65,6 @@
     - Upload: The program can create Xcode project for iMessage sticker pack, which could then be compiled and sideloaded using Xcode.
 
 ## How to use (GUI)
-![imgs/screenshot](imgs/screenshot.png)
-
 1. Run `sticker-convert.exe`, `sticker-convert` or `python3 main.py`
 2. Choose input source.
     - If you are downloading, enter URL address if you want to download from (If applicable)
