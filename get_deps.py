@@ -44,8 +44,8 @@ def download(url, file=None):
                 f.write(response.content)
                 return
         except requests.exceptions.RequestException as e:
-            print(f'Try {i}: Download failed for {url}')
-            print(e)
+            print(f'Try {i}: Download failed for {url}', flush=True)
+            print(e, flush=True)
     raise Exception(f'Failed to download {url}')
 
 def cp_files_in_dir(src, dst='.'):
@@ -58,7 +58,7 @@ def cp_files_in_dir(src, dst='.'):
         #     shutil.copytree(src_f, dst_f)
 
 def win_cairo():
-    print('Installing uniconvertor for getting cairo')
+    print('Installing uniconvertor for getting cairo', flush=True)
     url = 'https://downloads.sk1project.net/uc2/MS_Windows/uniconvertor-2.0rc5-win64_headless.msi'
     file = 'uniconvertor.msi'
     version = url.split('uniconvertor-')[1].split('-')[0]
@@ -68,7 +68,7 @@ def win_cairo():
     subprocess.run(['powershell', '-command', f"[Environment]::SetEnvironmentVariable('Path', $env:Path + ';C:\\Program Files\\UniConvertor-{version}\\dlls', 'Machine')"], shell=True)
 
 def win_apngasm():
-    print('Getting apngasm')
+    print('Getting apngasm', flush=True)
     url = 'https://github.com/laggykiller/apngasm/releases/download/3.1.3/apngasm_3.1-3_AMD64.zip'
     file = 'apngasm.zip'
     download(url, file)
@@ -80,7 +80,7 @@ def win_apngasm():
     assert os.path.isfile('apngasm.exe')
 
 def win_apngdis():
-    print('Getting apngdis')
+    print('Getting apngdis', flush=True)
     url = 'https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-win64.zip'
     file = 'apngdis.zip'
     download(url, file)
@@ -91,7 +91,7 @@ def win_apngdis():
     assert os.path.isfile('apngdis.exe')
 
 def win_pngnqs9():
-    print('Getting pngnq-s9')
+    print('Getting pngnq-s9', flush=True)
     url = 'https://sourceforge.net/projects/pngnqs9/files/pngnq-s9-2.0.2.zip'
     file = 'pngnq-s9.zip'
     version = url.split('pngnq-s9-')[1].split('.zip')[0]
@@ -104,7 +104,7 @@ def win_pngnqs9():
     assert os.path.isfile('pngnq-s9.exe')
 
 def win_optipng():
-    print('Getting optipng')
+    print('Getting optipng', flush=True)
     url = 'https://sourceforge.net/projects/optipng/files/optipng-0.7.7-win32.zip'
     file = 'optipng.zip'
     version = url.split('optipng-')[-1].split('.zip')[0]
@@ -117,7 +117,7 @@ def win_optipng():
     assert os.path.isfile('optipng.exe')
 
 def win_pngquant():
-    print('Getting pngquant')
+    print('Getting pngquant', flush=True)
     url = 'https://github.com/laggykiller/pngquant/releases/download/2.17.0/pngquant-windows.zip'
     file = 'pngquant.zip'
     os.mkdir('pngquant-dl')
@@ -131,7 +131,7 @@ def win_pngquant():
     assert os.path.isfile('pngquant.exe')
 
 def win_ffmpeg():
-    print('Getting ffmpeg')
+    print('Getting ffmpeg', flush=True)
     url = 'https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip'
     file = url.split('/')[-1]
     os.mkdir('ffmpeg-dl')
@@ -147,7 +147,7 @@ def win_ffmpeg():
     assert os.path.isfile('ffprobe.exe')
 
 def win_bzip2():
-    print('Getting bzip2')
+    print('Getting bzip2', flush=True)
     url = 'https://sourceforge.net/projects/gnuwin32/files/bzip2/1.0.5/bzip2-1.0.5-bin.zip'
     file = 'bzip.zip'
     os.mkdir('bzip2-dl')
@@ -161,7 +161,7 @@ def win_bzip2():
     assert os.path.isfile('bzip2.exe')
 
 def win_zip():
-    print('Getting zip')
+    print('Getting zip', flush=True)
     url = 'http://downloads.sourceforge.net/gnuwin32/zip-3.0-bin.zip'
     file = 'zip.zip'
     os.mkdir('zip-dl')
@@ -175,7 +175,7 @@ def win_zip():
     assert os.path.isfile('zip.exe')
 
 def win_magick():
-    print('Getting magick')
+    print('Getting magick', flush=True)
     soup = BeautifulSoup(session.get("https://imagemagick.org/archive/binaries", headers=headers).text, "html.parser")
 
     for x in soup.find_all("a", href=True):
@@ -200,7 +200,7 @@ def win_magick():
 #     assert os.path.isfile('magick.exe')
 
 def mac_brew():
-    print('Installing packages from brew')
+    print('Installing packages from brew', flush=True)
     download('https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh')
     subprocess.run(['NONINTERACTIVE=1', '/bin/bash', '-c', '"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'], shell=True)
     packages = ['pkg-config', 'apngasm', 'imagemagick', 'pngquant', 'optipng', 'libwebm']
@@ -214,7 +214,7 @@ def mac_apngasm():
     assert os.path.isfile('apngasm')
 
 def mac_apngdis():
-    print('Getting apngdis')
+    print('Getting apngdis', flush=True)
     url = 'https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-bin-macos.zip'
     file = 'apngdis.zip'
     download(url, file)
@@ -225,7 +225,7 @@ def mac_apngdis():
     assert os.path.isfile('apngdis')
 
 def mac_pngnqs9():
-    print('Getting pngnq-s9')
+    print('Getting pngnq-s9', flush=True)
     url = 'https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz'
     file = 'pngnqs9.zip'
     version = url.split('/')[-1].replace('.tar.gz', '')
@@ -250,7 +250,7 @@ def mac_pngnqs9():
     assert os.path.isfile('pngnq-s9')
 
 def mac_pngquant():
-    print('Getting pngquant')
+    print('Getting pngquant', flush=True)
     shutil.copy('/usr/local/bin/pngquant', './')
 
     assert os.path.isfile('pngquant')
@@ -261,7 +261,7 @@ def mac_optipng():
     assert os.path.isfile('optipng')
 
 def mac_ffmpeg():
-    print('Getting ffmpeg')
+    print('Getting ffmpeg', flush=True)
     url = 'https://evermeet.cx/ffmpeg/getrelease/zip'
     file = 'ffmpeg.zip'
     download(url, file)
@@ -271,7 +271,7 @@ def mac_ffmpeg():
     assert os.path.isfile('ffmpeg')
 
 def mac_ffprobe():
-    print('Getting ffprobe')
+    print('Getting ffprobe', flush=True)
     url = 'https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip'
     file = 'ffprobe.zip'
     download(url, file)
@@ -281,7 +281,7 @@ def mac_ffprobe():
     assert os.path.isfile('ffprobe')
 
 def mac_magick():
-    print('Getting magick')
+    print('Getting magick', flush=True)
 
     # Specific version
     # url = 'https://raw.githubusercontent.com/Homebrew/homebrew-core/458c9820bd1c2df18b77fa06054828b8987f8dbc/Formula/imagemagick.rb'
@@ -296,7 +296,7 @@ def mac_magick():
     assert os.path.isfile('bin/magick')
 
 def mac_cp_lib():
-    print('Getting libraries')
+    print('Getting libraries', flush=True)
     packages = (
         'aom',
         'apngasm',
@@ -348,7 +348,7 @@ def mac_cp_lib():
         cp_files_in_dir(f'/usr/local/opt/{package}/lib')
 
 if sys.platform not in ('win32', 'darwin'):
-    print(f'{sys.platform} is not supported')
+    print(f'{sys.platform} is not supported', flush=True)
     sys.exit()
 
 repo_root = os.getcwd()
@@ -359,7 +359,7 @@ clean_dir('bin')
 clean_dir('ImageMagick')
 
 if sys.platform == 'win32':
-    print('Notice: You should run this script as Administrator!')
+    print('Notice: You should run this script as Administrator!', flush=True)
     os.chdir('bin')
     win_apngasm()
     win_apngdis()
@@ -374,7 +374,7 @@ if sys.platform == 'win32':
     win_magick()
     # win_magick_55()
 elif sys.platform == 'darwin':
-    print('Notice: You should run this script with sudo!')
+    print('Notice: You should run this script with sudo!', flush=True)
     clean_dir('lib')
     os.chdir('bin')
     mac_brew()
