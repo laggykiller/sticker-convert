@@ -276,14 +276,9 @@ docker run -d -it --name sticker-convert \
     python3 /app/main.py --help
 ```
 
-Alternative: Use docker-compose.yml (GUI)
+Alternative: Use docker-compose.yml
 ```
 docker compose up
-```
-
-Alternative: Use docker-compose.yml (CLI)
-```
-docker compose -f docker-compose-cli.yml up
 ```
 
 Building
