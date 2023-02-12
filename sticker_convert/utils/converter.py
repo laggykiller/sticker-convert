@@ -418,9 +418,18 @@ class StickerConvert:
 
             assert os.path.isfile(tmp1_f), 'Failed at (1) convert_generic_anim'
 
-            # There is a possibility of fps being changed when animation is too long
-            # Delay need to be recalculated, cannot rely on fps supplied
-            delay = round(1000 / CodecInfo.get_file_fps(tmp1_f))
+            # Change fps (delay) if too short / long
+            fps_orig = CodecInfo.get_file_fps(tmp1_f)
+            delay_orig = round(1000 / fps_orig)
+            frames_orig = CodecInfo.get_file_frames(tmp1_f)
+            duration_orig = frames_orig * delay_orig
+
+            delay = delay_orig
+            if (duration_min or duration_max) and not ('{0}' in in_f or '%d' in in_f or '%03d' in in_f):
+                if duration_min and duration_min > 0 and duration_orig < duration_min:
+                    delay = math.ceil(duration_min / frames_orig)
+                elif duration_max and duration_max > 0 and duration_orig > duration_max:
+                    delay = math.floor(duration_max / frames_orig)
 
             # Get res_w and res_h if not supplied
             if not res_w:

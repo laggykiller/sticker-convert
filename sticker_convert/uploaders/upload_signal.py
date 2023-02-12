@@ -92,7 +92,7 @@ class UploadSignal:
                             FormatVerify.check_file(src, spec=webp_spec)):
                         
                         if fake_vid or CodecInfo.is_anim(src):
-                            sticker_path = os.path.join(tempdir, src_name + '.apng')
+                            sticker_path = os.path.join(tempdir, src_name + '.webp')
                         else:
                             sticker_path = os.path.join(tempdir, src_name + '.png')
                         StickerConvert.convert_and_compress_to_size(src, sticker_path, opt_comp_merged, cb_msg)

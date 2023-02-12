@@ -208,8 +208,6 @@ class Flow:
         return True
 
     def download(self):
-        self.cb_msg('Downloading...')
-        
         downloaders = []
 
         if self.opt_input['option'] == 'signal':
@@ -226,6 +224,12 @@ class Flow:
         
         if self.opt_input['option'] == 'kakao_animated':
             downloaders.append(DownloadKakaoAnimated.download_stickers_kakao_animated)
+        
+        if len(downloaders) > 0:
+            self.cb_msg('Downloading...')
+        else:
+            self.cb_msg('Nothing to download')
+            return True
         
         for downloader in downloaders:
             success = downloader(

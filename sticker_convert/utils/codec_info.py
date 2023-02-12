@@ -44,10 +44,18 @@ class CodecInfo:
     def get_file_codec(file):
         file = CodecInfo.resolve_wildcard(file)
         if shutil.which('ffmpeg'):
-            probe_info = ffmpeg.probe(file)
-            codec = probe_info['streams'][0]['codec_name']
+            try:
+                probe_info = ffmpeg.probe(file)
+                codec = probe_info['streams'][0]['codec_name']
+                return codec
+            except:
+                pass
+        
+        codec = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', file])
+        if type(codec) == str:
+            codec = codec.strip()
         else:
-            codec = RunBin.run_cmd(['ffprobe', '-v', 'error', '-select_streams', 'v', '-show_entries', 'stream=codec_name', '-of', 'default=noprint_wrappers=1:nokey=1', file]).strip()
+            codec = None
 
         return codec
     
