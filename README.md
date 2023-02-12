@@ -58,7 +58,7 @@
         - For more information: https://github.com/doubleplusc/Line-sticker-downloader
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Kakao
-    - Download: Supported (e.g. `https://e.kakao.com/t/xxxxx` OR `kakaotalk://store/emoticon/4404400` OR `4404400`). `auth_token` is required to download animated stickers from `https://e.kakao.com/t/xxxxx` (For querying the sticker ID that is in turn used for downloading animated stickers). Learn more from [kakao_anim_note.md](kakao_anim_note.md)
+    - Download: Supported (e.g. `https://e.kakao.com/t/xxxxx` OR `kakaotalk://store/emoticon/4404400` OR `https://emoticon.kakao.com/items/xxxxx` OR `4404400`). It is rather complicated, learn more from [docs/guide_kakao.md](docs/guide_kakao.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - iMessage
     - Download: Not supported.
@@ -80,26 +80,30 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--download-signal SIGNAL]
-                       [--download-telegram TELEGRAM] [--download-line LINE]
-                       [--download-kakao-static KAKAO_STATIC] [--download-kakao-animated KAKAO_ANIMATED]
-                       [--download-local LOCAL] [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
-                       [--export-signal SIGNAL | --export-telegram TELEGRAM | --export-whatsapp WHATSAPP | --export-imessage IMESSAGE | --export-local LOCAL]
+usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR]
+                       [--download-signal DOWNLOAD_SIGNAL]
+                       [--download-telegram DOWNLOAD_TELEGRAM]
+                       [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO]
+                       [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
+                       [--export-signal | --export-telegram | --export-whatsapp | --export-imessage]
                        [--no-compress]
                        [--preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                       [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                       [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
-                       [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN]
-                       [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
+                       [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN]
+                       [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
+                       [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
+                       [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
+                       [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
+                       [--color-min COLOR_MIN] [--color-max COLOR_MAX]
                        [--duration-min DURATION_MIN] [--duration-max DURATION_MAX]
-                       [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                       [--fake-vid] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
+                       [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                       [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
+                       [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
                        [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
                        [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
                        [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
                        [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                       [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
-                       [--save-cred SAVE_CRED]
+                       [--kakao-country-code KAKAO_COUNTRY_CODE]
+                       [--kakao-phone-number KAKAO_PHONE_NUMBER] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
@@ -110,23 +114,19 @@ options:
 Input options:
   --input-dir INPUT_DIR
                         Specify input directory.
-  --download-signal SIGNAL
+  --download-signal DOWNLOAD_SIGNAL
                         Download signal stickers from a URL as input
                         (Example: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
-  --download-telegram TELEGRAM
+  --download-telegram DOWNLOAD_TELEGRAM
                         Download telegram stickers from a URL as input
                         (Example: https://telegram.me/addstickers/xxxxx)
-  --download-line LINE  Download line stickers from a URL / ID as input
+  --download-line DOWNLOAD_LINE
+                        Download line stickers from a URL / ID as input
                         (Example: https://store.line.me/stickershop/product/1234/en OR line://shop/detail/1234 OR 1234)
-  --download-kakao-static KAKAO_STATIC
-                        Download kakao stickers from a URL as input
-                        (Example: https://e.kakao.com/t/xxxxx)
-  --download-kakao-animated KAKAO_ANIMATED
+  --download-kakao DOWNLOAD_KAKAO
                         Download kakao stickers from a URL / ID as input
-                        (Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400 OR 4404400)
-  --download-local LOCAL
-                        Load files from local directory on computer
-                        (No need to supply any URL)
+                        (Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400
+                        OR https://emoticon.kakao.com/items/xxxxx OR 4404400)
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
   --processes PROCESSES
@@ -162,6 +162,8 @@ Input options:
                         Set maximum file size limit for static stickers.
   --vid-format VID_FORMAT
                         Set file format if input is animated.
+  --img-format IMG_FORMAT
+                        Set file format if input is static.
   --fake-vid            Convert (faking) image to video.
                         Useful if:
                         (1) Size limit for video is larger than image;
@@ -172,15 +174,10 @@ Output options:
                         Specify output directory.
   --author AUTHOR       Set author of created sticker pack.
   --title TITLE         Set name of created sticker pack.
-  --export-signal SIGNAL
-                        Upload to Signal
-  --export-telegram TELEGRAM
-                        Upload to Telegram
-  --export-whatsapp WHATSAPP
-                        Create a .wastickers file for uploading to WhatsApp
-  --export-imessage IMESSAGE
-                        Create Xcode project for importing to iMessage
-  --export-local LOCAL  Save to local directory only
+  --export-signal       Upload to Signal
+  --export-telegram     Upload to Telegram
+  --export-whatsapp     Create a .wastickers file for uploading to WhatsApp
+  --export-imessage     Create Xcode project for importing to iMessage
 
 Compression options:
   --no-compress         Do not compress files. Useful for only downloading stickers.

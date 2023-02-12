@@ -406,11 +406,11 @@ class GUI:
         return False
 
     def callback_msg(self, *args, **kwargs):
-        self.exec_in_main(partial(self.progress_frame.update_message_box, *args, **kwargs))
+        with self.msg_lock:
+            self.progress_frame.update_message_box(*args, **kwargs)
     
     def callback_msg_block(self, message='', parent=None, *args):
-        with self.msg_lock:
-            Messagebox.show_info(message, title='sticker-convert', parent=parent)
+        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
     
     def callback_bar(self, *args, **kwargs):
         with self.bar_lock:

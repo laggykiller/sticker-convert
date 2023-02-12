@@ -166,9 +166,9 @@ class StickerConvert:
             quality = 95
 
         if RunBin.get_bin('magick', silent=True) == None:
-            StickerConvert.convert_generic_image_pymodule(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality)
+            StickerConvert.convert_generic_image_pymodule(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, **kwargs)
         else:
-            StickerConvert.convert_generic_image_subprocess(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality)
+            StickerConvert.convert_generic_image_subprocess(in_f, out_f, res_w=res_w, res_h=res_h, quality=quality, **kwargs)
         
         if CodecInfo.get_file_ext(out_f) == '.png':
             StickerConvert.png_optimize(out_f, out_f, quality=quality, color=color)
@@ -187,6 +187,8 @@ class StickerConvert:
                 img.background_color = 'none'
                 img.gravity = 'center'
                 img.extent(width=res_w, height=res_h)
+            if kwargs.get('coalesce'):
+                img.coalesce()
             img.compression_quality = quality
             img.save(filename=out_f)
     
@@ -198,10 +200,17 @@ class StickerConvert:
         if CodecInfo.get_file_ext(out_f) == '.png' or not quality:
             quality = 95
         
+        cmd = ['magick', in_f, '-quality', str(quality)]
+
         if res_w and res_h:
-            RunBin.run_cmd(['magick', in_f, '-resize', f'{res_w}x{res_h}', '-background', 'none', '-gravity', 'center', '-extent', f'{res_w}x{res_h}', '-quality', str(quality), out_f])
-        else:
-            RunBin.run_cmd(['magick', in_f, '-quality', str(quality), out_f])
+            cmd += ['-resize', f'{res_w}x{res_h}', '-background', 'none', '-gravity', 'center', '-extent', f'{res_w}x{res_h}']
+
+        if kwargs.get('coalesce'):
+            cmd += ['-coalesce']
+        
+        cmd += [out_f]
+
+        RunBin.run_cmd(cmd)
 
     @staticmethod
     def png_optimize(in_f, out_f, quality=None, color=None, **kwargs):
@@ -371,7 +380,7 @@ class StickerConvert:
             # Converting to .webm first is safe way of handling .webp
 
             tmp_f = os.path.join(tempdir, 'tmp.webm')
-            StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality)
+            StickerConvert.convert_generic_image(in_f, tmp_f, quality=quality, coalesce=True)
             StickerConvert.convert(tmp_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, color=color, duration_min=duration_min, duration_max=duration_max, fake_vid=fake_vid)
 
     @staticmethod

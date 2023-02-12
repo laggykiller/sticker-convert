@@ -52,6 +52,8 @@ class CLI:
             parser_input.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
         parser_input_src = parser_input.add_mutually_exclusive_group()
         for k, v in self.input_presets.items():
+            if k == 'local':
+                continue
             parser_input_src.add_argument(f'--download-{k.replace("_", "-")}', dest=f'download_{k}', help=f'{v["help"]}\n({v["example"]})')
 
         parser_output = parser.add_argument_group('Output options')
@@ -59,6 +61,8 @@ class CLI:
             parser_output.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
         parser_output_dst = parser_output.add_mutually_exclusive_group()
         for k, v in self.output_presets.items():
+            if k == 'local':
+                continue
             parser_output_dst.add_argument(f'--export-{k.replace("_", "-")}', dest=f'export_{k}', action='store_true', help=v['help'])
 
         parser_comp = parser.add_argument_group('Compression options')
@@ -122,8 +126,7 @@ class CLI:
             'signal': args.download_signal, 
             'line': args.download_line, 
             'telegram': args.download_telegram, 
-            'kakao_static': args.download_kakao_static,
-            'kakao_animated': args.download_kakao_animated
+            'kakao': args.download_kakao,
         }
 
         download_option = 'local'

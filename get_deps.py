@@ -189,21 +189,22 @@ def win_magick():
 
     assert os.path.isfile('magick.exe')
 
-def win_magick_55():
-    url = 'https://github.com/laggykiller/ImageMagick/releases/download/7.1.0-55/ImageMagick-7.1.0-55-portable-Q16-x64.zip'
-    file = 'magick.zip'
-    download(url, file)
-    unzip(file)
-    os.remove(file)
+# Specific version
+# def win_magick_55():
+#     url = 'https://github.com/laggykiller/ImageMagick/releases/download/7.1.0-55/ImageMagick-7.1.0-55-portable-Q16-x64.zip'
+#     file = 'magick.zip'
+#     download(url, file)
+#     unzip(file)
+#     os.remove(file)
 
-    assert os.path.isfile('magick.exe')
+#     assert os.path.isfile('magick.exe')
 
 def mac_brew():
     print('Installing packages from brew')
     download('https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh')
     subprocess.run(['NONINTERACTIVE=1', '/bin/bash', '-c', '"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"'], shell=True)
-    # packages = ['pkg-config', 'apngasm', 'imagemagick', 'pngquant', 'optipng', 'libwebm']
-    packages = ['pkg-config', 'apngasm', 'pngquant', 'optipng', 'libwebm']
+    packages = ['pkg-config', 'apngasm', 'imagemagick', 'pngquant', 'optipng', 'libwebm']
+    # packages = ['pkg-config', 'apngasm', 'pngquant', 'optipng', 'libwebm']
     for package in packages:
         os.system(f'brew install {package}')
 
@@ -281,10 +282,12 @@ def mac_ffprobe():
 
 def mac_magick():
     print('Getting magick')
-    url = 'https://raw.githubusercontent.com/Homebrew/homebrew-core/458c9820bd1c2df18b77fa06054828b8987f8dbc/Formula/imagemagick.rb'
-    file = 'imagemagick.rb'
-    download(url, file)
-    os.system(f'brew install -s {file}')
+
+    # Specific version
+    # url = 'https://raw.githubusercontent.com/Homebrew/homebrew-core/458c9820bd1c2df18b77fa06054828b8987f8dbc/Formula/imagemagick.rb'
+    # file = 'imagemagick.rb'
+    # download(url, file)
+    # os.system(f'brew install -s {file}')
 
     shutil.copytree('/usr/local/opt/imagemagick/bin', './bin')
     shutil.copytree('/usr/local/opt/imagemagick/lib', './lib')
@@ -368,8 +371,8 @@ if sys.platform == 'win32':
     win_bzip2()
     win_zip()
     os.chdir('../ImageMagick')
-    # win_magick()
-    win_magick_55()
+    win_magick()
+    # win_magick_55()
 elif sys.platform == 'darwin':
     print('Notice: You should run this script with sudo!')
     clean_dir('lib')

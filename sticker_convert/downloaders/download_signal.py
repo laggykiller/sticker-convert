@@ -9,6 +9,10 @@ from utils.codec_info import CodecInfo
 class DownloadSignal:
     @staticmethod
     async def download_stickers_signal_async(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+        if 'signal.art' not in url:
+            cb_msg('Download failed: Unrecognized URL format')
+            return False
+
         pack_id = url.split('#pack_id=')[1].split('&pack_key=')[0]
         pack_key = url.split('&pack_key=')[1]
         emoji_dict = {}

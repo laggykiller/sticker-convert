@@ -24,6 +24,10 @@ class DownloadTelegram:
         if token == None:
             cb_msg('Download failed: Token required for downloading from telegram')
             return False
+    
+        if 'telegram.me' not in url:
+            cb_msg('Download failed: Unrecognized URL format')
+            return False
 
         bot= Bot(token)
 

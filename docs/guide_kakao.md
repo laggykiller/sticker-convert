@@ -1,6 +1,20 @@
 # Summary of getting credentials for Kakao
+| Link                                     | Require auth token to download animated sticker? |
+| ---------------------------------------- | -------------------------------------------------|
+| `https://emoticon.kakao.com/items/xxxxx` | Not required (Recommended method)                |
+| `https://e.kakao.com/t/xxxxx`            | Required                                         |
+| `kakaotalk://store/emoticon/4404400`     | Not required (But no easy way to get it)         |
+| `4404400`                                | Not required (But no easy way to get it)         |
+
 - Downloading Kakao animated stickers does not require auth_token (Authorization header during request).
-- However, in order to download animated stickers, you need to get the id of the emoticon pack, which needs auth_token.
+- However, in order to download animated stickers, you have to options:
+    - Method 1: (RECOMMENDED) Get the share link of the emoticon pack from Kakao app on phone. (`https://emoticon.kakao.com/items/xxxxx`)
+    - Method 2: Get the id of the emoticon pack from `https://e.kakao.com/t/xxxxx`, which needs auth_token.
+
+## Method 1: Get share link
+![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
+
+## Method 2: Get auth_token
 - You can get auth_token easily from GUI generate button, via CLI `--kakao-get-auth` or manually get from rooted Android device (You are recommended to do it on emulated Android device)
 - Explanation of login information
     - Username: Email or Phone number used for signing up Kakao account. (e.g. `+447700900142`)
@@ -14,20 +28,20 @@
     - You maybe logged out of existing device
 - The auth_token will expire after a period of time (About a week?), which you have to regenerate it.
 
-## How to get auth_token (GUI)
+### How to get auth_token (GUI)
 1. Create KakaoTalk account on Phone
 2. Press on `Generate` button in sticker-convert GUI
 3. Enter account detail in the window
 4. Press on `Login and get auth_token` and follow instructions
 
-## How to get auth_token (CLI)
+### How to get auth_token (CLI)
 1. Create KakaoTalk account on Phone
 2. Add `--kakao-gen-auth-token --kakao-username <YOUR_USERNAME> --kakao-password <YOUR_PASSWORD> --kakao-country-code <YOUR_COUNTRY_CODE> --kakao-phone-number <YOUR_PHONE_NUMBER>` as arguments
     - Note: If you had saved username, password, country_code and phone_number before, you may choose not to add them as arguments
     - You may also add `--save-cred` to save the auth_token and login information for later use
 3. Execute command and follow instructions
 
-## How to get auth_token (Manually) or get emoticon ID
+### How to get auth_token (Manually) or get emoticon ID
 1. Create KakaoTalk account on Phone
 2. Install Android Studio and create an emulated device, then install KakaoTalk on the device
 3. Install BurpSuite
@@ -40,7 +54,7 @@
     - To get auth_token, copy `Authorization` from header of request seen in BurpSuite
     - To get emoticon ID, look for URL such as `https://item.kakaocdn.net/dw/4404400.emot_001.webp`. Emoticon ID would be `4404400`
 
-## Technical sidenote: Decoding of animated emoticon
+# Technical sidenote: Decoding of animated emoticon
 Emoticon that are in webp and gif need to be decoded. For Kakao Android application, `com/kakao/digitalitem/image/lib/ImageDecode.java` calls `libdigitalitem_image_decoder.so`...
 
 1. `nativeWebpImageResizeDecode()` or `nativeGifImageDecode()`
@@ -53,3 +67,4 @@ If interested, you may study by decompiling Kakao Android application with `jadx
 - Reversing android native library: https://github.com/maddiestone/AndroidAppRE/blob/master/reversing_native_libs.md
 - Information about Kakao animated stickers: https://gist.github.com/chitacan/9802668
 - Downloading and decrypting Kakao animated stickers: https://github.com/blluv/KakaoTalkEmoticonDownloader
+- Using share link to get pack id: https://github.com/star-39/moe-sticker-bot
