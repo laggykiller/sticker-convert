@@ -1,4 +1,4 @@
-# Summary of getting credentials for Kakao
+# Summary of downloading animated stickers in Kakao
 | Link                                     | Require auth token to download animated sticker? |
 | ---------------------------------------- | -------------------------------------------------|
 | `https://emoticon.kakao.com/items/xxxxx` | Not required (Recommended method)                |
