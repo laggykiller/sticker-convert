@@ -6,10 +6,9 @@
 | `kakaotalk://store/emoticon/4404400`     | Not required (But no easy way to get it)         |
 | `4404400`                                | Not required (But no easy way to get it)         |
 
-- Downloading Kakao animated stickers does not require auth_token (Authorization header during request).
-- However, in order to download animated stickers, you have to options:
-    - Method 1: (RECOMMENDED) Get the share link of the emoticon pack from Kakao app on phone. (`https://emoticon.kakao.com/items/xxxxx`)
-    - Method 2: Get the id of the emoticon pack from `https://e.kakao.com/t/xxxxx`, which needs auth_token.
+- To download animated stickers, you have to options:
+    - Method 1: (RECOMMENDED) Get the share link of the emoticon pack from Kakao app on phone, which does not need auth_token (`https://emoticon.kakao.com/items/xxxxx`)
+    - Method 2: Use `https://e.kakao.com/t/xxxxx` which needs auth_token (Authorization header during request).
 
 ## Method 1: Get share link
 ![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
