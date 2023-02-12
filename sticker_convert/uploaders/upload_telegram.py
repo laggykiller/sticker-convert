@@ -116,10 +116,10 @@ class UploadTelegram:
                     else:
                         if fake_vid or CodecInfo.is_anim(src):
                             webm_sticker = os.path.join(tempdir, src_name + '.webm')
-                            StickerConvert.convert_and_compress_to_size(src, webm_sticker, opt_comp=opt_comp_merged)
+                            StickerConvert.convert_and_compress_to_size(src, webm_sticker, opt_comp_merged, cb_msg)
                         else:
                             png_sticker = os.path.join(tempdir, src_name + '.png')
-                            StickerConvert.convert_and_compress_to_size(src, png_sticker, opt_comp=opt_comp_merged)
+                            StickerConvert.convert_and_compress_to_size(src, png_sticker, opt_comp_merged, cb_msg)
                     
                     try:
                         emoji = emoji_dict[src_name]

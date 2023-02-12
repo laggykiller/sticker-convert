@@ -77,11 +77,11 @@ class CompressWastickers:
                     if FormatVerify.check_file(src, spec=webp_spec) or FormatVerify.check_file(src, spec=png_spec):
                         shutil.copy(src, dst)
                     else:
-                        StickerConvert.convert_and_compress_to_size(src, dst, opt_comp=opt_comp_merged)
+                        StickerConvert.convert_and_compress_to_size(src, dst, opt_comp_merged, cb_msg)
 
                 out_f = os.path.join(out_dir, FormatVerify.sanitize_filename(pack_title + '.wastickers'))
 
-                CompressWastickers.add_metadata(in_dir, tempdir, author, title, opt_comp)
+                CompressWastickers.add_metadata(in_dir, tempdir, author, title, opt_comp, cb_msg, cb_bar)
                 CompressWastickers.compress(out_f, tempdir)
 
             cb_msg(out_f)
@@ -90,7 +90,7 @@ class CompressWastickers:
         return urls
 
     @staticmethod
-    def add_metadata(in_dir, tmp_dir, author, title, opt_comp):
+    def add_metadata(in_dir, tmp_dir, author, title, opt_comp, cb_msg=print, cb_bar=None):
         spec_cover = {
             "size_max": {
                 "img": 50000,
@@ -115,11 +115,11 @@ class CompressWastickers:
             if FormatVerify.check_file(cover_path, spec=spec_cover):
                 shutil.copy(os.path.join(in_dir, 'cover.png'), cover_path)
             else:
-                StickerConvert.convert_and_compress_to_size(os.path.join(in_dir, f'cover.png'), cover_path, opt_comp=opt_comp_merged)
+                StickerConvert.convert_and_compress_to_size(os.path.join(in_dir, f'cover.png'), cover_path, opt_comp_merged, cb_msg)
         else:
             # First image in the directory, extracting first frame
             first_image = [i for i in os.listdir(in_dir) if not i.endswith('.txt') and not i.endswith('.wastickers')][0]
-            StickerConvert.compress_to_size(StickerConvert.convert_generic_image, os.path.join(in_dir, f'{first_image}[0]'), cover_path, opt_comp=opt_comp_merged)
+            StickerConvert.compress_to_size(StickerConvert.convert_generic_image, os.path.join(in_dir, f'{first_image}[0]'), cover_path, opt_comp_merged, cb_msg)
         
         MetadataHandler.set_metadata(tmp_dir, author=author, title=title)
     

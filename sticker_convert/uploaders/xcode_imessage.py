@@ -124,7 +124,7 @@ class XcodeImessage:
                     if src_path != dst_path:
                         shutil.copy(src_path, dst_path)
                 else:
-                    StickerConvert.convert_and_compress_to_size(src_path, dst_path, opt_comp=opt_comp_merged)
+                    StickerConvert.convert_and_compress_to_size(src_path, dst_path, opt_comp_merged, cb_msg)
 
             XcodeImessage.add_metadata(out_dir, out_dir, author, pack_title)
             XcodeImessage.create_xcode_proj(in_dir, out_dir, author, pack_title)

@@ -95,7 +95,7 @@ class UploadSignal:
                             sticker_path = os.path.join(tempdir, src_name + '.apng')
                         else:
                             sticker_path = os.path.join(tempdir, src_name + '.png')
-                        StickerConvert.convert_and_compress_to_size(src, sticker_path, opt_comp_merged)
+                        StickerConvert.convert_and_compress_to_size(src, sticker_path, opt_comp_merged, cb_msg)
                     else:
                         sticker_path = src
 
