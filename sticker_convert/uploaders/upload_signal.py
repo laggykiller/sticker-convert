@@ -55,6 +55,7 @@ class UploadSignal:
 
         webp_spec = copy.deepcopy(base_spec)
         webp_spec['format'] = '.webp'
+        webp_spec['animated'] = False
 
         opt_comp_merged = merge({}, opt_comp, base_spec)
         
