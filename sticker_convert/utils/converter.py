@@ -407,7 +407,7 @@ class StickerConvert:
                 else:
                     anim = LottieAnimation.from_file(in_f)
 
-                tmp_f = os.path.join(tempdir, 'tmp.apng')
+                tmp_f = os.path.join(tempdir, 'tmp.webp')
                 anim.save_animation(tmp_f)
 
                 StickerConvert.convert(tmp_f, out_f, res_w=res_w, res_h=res_h, quality=quality, fps=fps, duration_min=duration_min, duration_max=duration_max)
