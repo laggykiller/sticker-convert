@@ -33,7 +33,7 @@
 | Telegram    | ✅ (Require `uuid` & `password`)       | ✅ (Require `token` & `user_id` or manually)       |
 | WhatsApp    | ⭕ (By Android or WhatsApp Web)        | ⭕ (Create `.wastickers`, import by Sticker Maker) |
 | Line        | ✅                                     | 🚫 (Need to submit for manual approval)            |
-| Kakao       | ✅ (Require `auth-token` for animated) | 🚫 (Need to submit for manual approval)            |
+| Kakao       | ✅ (Need 'share link' for animated)    | 🚫 (Need to submit for manual approval)            |
 | iMessage    | 🚫                                     | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
