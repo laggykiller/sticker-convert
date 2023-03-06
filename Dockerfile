@@ -1,4 +1,4 @@
-FROM jlesage/baseimage-gui:debian-11-v4.3.5
+FROM jlesage/baseimage-gui:debian-11-v4
 
 WORKDIR /app
 
@@ -63,7 +63,8 @@ RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && loca
 RUN set-cont-env APP_NAME "sticker-convert"
 
 # Generate and install favicons.
-RUN APP_ICON_URL=https://github.com/laggykiller/sticker-convert/raw/master/sticker_convert/resources/appicon.png && \
+COPY ./sticker_convert/resources/appicon.png /app/
+RUN APP_ICON_URL=/app/appicon.png && \
     install_app_icon.sh "$APP_ICON_URL"
 
 ENV DISPLAY_WIDTH=1920
