@@ -1,5 +1,5 @@
 anyio~=2.2.0
-beautifulsoup4~=4.11.2
+beautifulsoup4~=4.12.0
 ffmpeg-python~=0.2.0
 lottie~=0.7.0
 mergedeep~=1.3.4
