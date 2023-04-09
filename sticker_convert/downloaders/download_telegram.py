@@ -25,7 +25,7 @@ class DownloadTelegram:
             cb_msg('Download failed: Token required for downloading from telegram')
             return False
     
-        if 'telegram.me' not in url or 't.me' not in url:
+        if not ('telegram.me' in url or 't.me' in url):
             cb_msg('Download failed: Unrecognized URL format')
             return False
 
