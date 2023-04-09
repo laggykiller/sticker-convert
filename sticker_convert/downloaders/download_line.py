@@ -52,10 +52,10 @@ class DownloadLine:
 
         MetadataHandler.set_metadata(out_dir, title=title, author=author)
 
-        if pack_meta.get('hasAnimation') == True:
-            pack_ext = '.apng'
-        else:
+        if pack_meta.get('stickerResourceType') in ('STATIC', 'PER_STICKER_TEXT', 'NAME_TEXT'):
             pack_ext = '.png'
+        else:
+            pack_ext = '.apng'
 
         if cb_bar:
             cb_bar(set_progress_mode='determinate', steps=len(pack_meta['stickers']))
@@ -65,7 +65,9 @@ class DownloadLine:
             sticker_id = sticker['id']
             out_path = os.path.join(out_dir, str(num).zfill(3) + pack_ext)
 
-            if pack_ext == '.apng':
+            if pack_meta.get('stickerResourceType') == 'POPUP':
+                url = f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/android/sticker_popup.png'
+            elif pack_meta.get('stickerResourceType') in ('ANIMATION', 'ANIMATION_SOUND'):
                 url = f'https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/iphone/animation/{sticker_id}@2x.png'
             else:
                 url = f'http://dl.stickershop.line.naver.jp/stickershop/v1/sticker/{sticker_id}/iphone/sticker@2x.png'
