@@ -214,6 +214,17 @@ class Flow:
             if response == False:
                 return False
         
+        # Warn about telegram_vector compression preset.
+        if self.opt_comp['format']['img'] == '.tgs' or self.opt_comp['format']['vid'] == '.tgs':
+            msg = 'Warning: You should not convert bitmap to .tgs\n'
+            msg += 'If you want to create telegram stickers, choose `telegram` instead of `telegram_vector` for compression preset.\n'
+            msg += 'If you continue, it will likely fail unless you know what you are doing. Continue?'
+            
+            response = self.cb_ask_bool(msg)
+
+            if response == False:
+                return False
+        
         return True
 
     def download(self):
