@@ -294,7 +294,9 @@ See [docs/COMPILING.md](docs/COMPILING.md)
 - [Signal](docs/guide_signal.md)
 - [Telegram](docs/guide_telegram.md)
 - [WhatsApp](docs/guide_whatsapp.md)
+- [Line](docs/guide_line.md)
 - [Kakao](docs/guide_kakao.md)
+- [iMessage](docs/guide_imessage.md)
 
 ### MacOS complains that program from unidentified developer
 To become an identified developer, I have to pay USD$99 to Apple every year.
