@@ -27,13 +27,13 @@
 - [DISCLAIMER](#disclaimer)
 
 ## Compatibility
-| Application | ⬇️ Download                            | ⬆️ Upload                                          |
-| ----------- | -------------------------------------- | --------------------------------------------------- |
-| Signal      | ✅                                     | ✅ (Require `uuid` & `password` or manually)       |
-| Telegram    | ✅ (Require `uuid` & `password`)       | ✅ (Require `token` & `user_id` or manually)       |
-| WhatsApp    | ⭕ (By Android or WhatsApp Web)        | ⭕ (Create `.wastickers`, import by Sticker Maker) |
-| Line        | ✅                                     | 🚫 (Need to submit for manual approval)            |
-| Kakao       | ✅ (Need 'share link' for animated)    | 🚫 (Need to submit for manual approval)            |
+| Application                           | ⬇️ Download                            | ⬆️ Upload                                          |
+| ------------------------------------- | -------------------------------------- | --------------------------------------------------- |
+| [Signal](docs/guide_signal.md)        | ✅                                     | ✅ (Require `uuid` & `password` or manually)       |
+| [Telegram](docs/guide_telegram.md)    | ✅ (Require `uuid` & `password`)       | ✅ (Require `token` & `user_id` or manually)       |
+| [WhatsApp](docs/guide_whatsapp.md)    | ⭕ (By Android or WhatsApp Web)        | ⭕ (Create `.wastickers`, import by Sticker Maker) |
+| Line                                  | ✅                                     | 🚫 (Need to submit for manual approval)            |
+| [Kakao](docs/guide_kakao.md)          | ✅ (Need 'share link' for animated)    | 🚫 (Need to submit for manual approval)            |
 | iMessage    | 🚫                                     | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
