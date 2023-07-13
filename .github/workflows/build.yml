@@ -27,15 +27,6 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: macos-latest
-            TARGET: macos
-            CMD_BUILD: |
-                python3 get_deps.py
-                pyinstaller sticker_convert.spec
-                cd dist/
-                zip -r9 sticker-convert-macos.zip sticker-convert-macos/
-            OUT_FILE_NAME: sticker-convert-macos.zip
-            ASSET_MIME: application/zip
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: |
@@ -45,6 +36,25 @@ jobs:
                 cd dist
                 ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert-windows
             OUT_FILE_NAME: sticker-convert-windows.zip
+            ASSET_MIME: application/zip
+          - os: macos-latest
+            TARGET: macos
+            CMD_BUILD: |
+                python3 get_deps.py
+                pyinstaller sticker_convert.spec
+                cd dist/
+                zip -r9 sticker-convert-macos.zip sticker-convert-macos/
+            OUT_FILE_NAME: sticker-convert-macos.zip
+            ASSET_MIME: application/zip
+          - os: ubuntu-20.04
+            TARGET: linux
+            CMD_BUILD: |
+                wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+                chmod +x ./appimage-builder
+                ./appimage-builder
+                mv ./sticker-convert-latest-x86_64.AppImage ./sticker-convert
+                zip -r9 ./sticker-convert-linux.zip ./sticker-convert
+            OUT_FILE_NAME: sticker-convert-linux.zip
             ASSET_MIME: application/zip
     steps:
     - uses: actions/checkout@v2

@@ -55,6 +55,7 @@ magick-src/**
 **/ImageMagick
 *.exe
 *.dll
+AppDir/**
 creds.json
 bzcmp
 bzdiff

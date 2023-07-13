@@ -23,7 +23,7 @@ RUN curl -O -L https://github.com/apngasm/apngasm/archive/refs/tags/3.1.10.tar.g
     rm -rf ./apngasm-3.1.10 && \
     rm 3.1.10.tar.gz
 
-# Install pngnq
+# Install pngnq-s9
 RUN curl -O -L https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz && \
     tar xvzf 2.0.2.tar.gz && \
     cd ./pngnq-s9-2.0.2 && \

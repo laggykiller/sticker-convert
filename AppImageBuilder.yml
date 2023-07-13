@@ -1,0 +1,129 @@
+# appimage-builder recipe see https://appimage-builder.readthedocs.io for details
+# Works on ubuntu20
+version: 1
+script:
+  # Remove any previous build
+  - rm -rf AppDir  | true
+
+  # Make usr dirs
+  - mkdir -p AppDir/usr/src
+  - mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps/
+  - mkdir -p AppDir/usr/bin
+
+  # Copy the python application code into the AppDir
+  - rsync -av sticker_convert/ AppDir/usr/src --exclude bin --exclude ImageMagick --exclude __pycache__ --exclude stickers_input --exclude stickers_output --exclude creds.json
+  # Copy appicon
+  - cp ./sticker_convert/resources/appicon.png AppDir/usr/share/icons/hicolor/256x256/apps/sticker-convert.png
+
+  # Install application dependencies
+  - python3 -m pip install --system --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
+
+  # Download ImageMagick AppImage
+  - curl -O -L https://imagemagick.org/archive/binaries/magick
+  # Copy ImageMagick
+  - chmod +x ./magick
+  - ./magick --appimage-extract
+  - rsync -av squashfs-root/ AppDir --exclude AppRun --exclude imagemagick.desktop --exclude imagemagick.png --exclude share --exclude usr/include --exclude usr/share
+  - rm ./magick
+  - rm -rf ./squashfs-root
+
+  # Download ffmpeg & ffprobe
+  - curl -o ffmpeg -L https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffmpeg-linux-x64
+  - curl -o ffprobe -L https://github.com/eugeneware/ffmpeg-static/releases/latest/download/ffprobe-linux-x64
+  - chmod +x ./ffmpeg
+  - chmod +x ./ffprobe
+  # Copy ffmpeg & ffprobe
+  - mv ./ffmpeg AppDir/usr/bin
+  - mv ./ffprobe AppDir/usr/bin
+
+  # Compile pngnq-s9
+  - curl -O -L https://github.com/ImageProcessing-ElectronicPublications/pngnq-s9/archive/refs/tags/2.0.2.tar.gz
+  - tar xvzf 2.0.2.tar.gz
+  # Fix bug that causes compilation to fail
+  - cd ./pngnq-s9-2.0.2
+  - sed -i '1i#include <string.h>' src/rwpng.c
+  - ./configure --prefix=$(pwd)/../AppDir
+  - make
+  - make install
+  - cd ../
+  - rm -rf ./pngnq-s9-2.0.2
+  - rm ./2.0.2.tar.gz
+
+  # Compile pngquant as current version does not have '--strip' option
+  - rm -rf pngquant  | true
+  - git clone --recursive --branch 2.17.0 https://github.com/kornelski/pngquant.git
+  - cd ./pngquant
+  - cargo build --release
+  - cd ../
+  - cp ./pngquant/target/release/pngquant AppDir/usr/bin
+  - rm -rf ./pngquant
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: com.laggykiller.sticker_convert
+    name: sticker-convert
+    icon: sticker-convert
+    version: latest
+    exec: usr/bin/python3
+    exec_args: "$APPDIR/usr/src/main.py $@"
+
+  apt:
+    arch: amd64
+    allow_unauthenticated: true
+    sources:
+    - sourceline: deb https://ppa.launchpadcontent.net/zero-tsuki/ppa/ubuntu focal main
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal main restricted
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal universe
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates universe
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal multiverse
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates multiverse
+    - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
+    - sourceline: deb http://security.ubuntu.com/ubuntu focal-security main restricted
+    - sourceline: deb http://security.ubuntu.com/ubuntu focal-security universe
+    - sourceline: deb http://security.ubuntu.com/ubuntu focal-security multiverse
+
+    include:
+      - python3
+      - python3-tk
+      - python3-opencv
+      - python3-pkg-resources
+      - python3-certifi
+      - python3-distutils
+      - python3-apt
+      - zip
+      - unzip
+      - optipng
+      - apngdis
+      - apngasm=3.1.10~139~ubuntu20.04.1
+    exclude: []
+
+  runtime:
+    env:
+      # Set python home
+      # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHONHOME
+      PYTHONHOME: '${APPDIR}/usr'
+      # Path to the site-packages dir or other modules dirs
+      # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
+      PYTHONPATH: '${APPDIR}/usr/lib/python3.8/site-packages'
+      # SSL Certificates are placed in a different location for every system therefore we ship our own copy
+      # SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.8/site-packages/certifi/cacert.pem'
+      # Tcl library has to be specified or else cannot find init.tcl
+      TCL_LIBRARY: '${APPDIR}/usr/share/tcl8.6'
+
+  files:
+    include:
+    - /usr/local/bin/pngquant
+    - /usr/local/bin/pngnq-s9
+    exclude:
+    - usr/share/man
+    - usr/share/doc/*/README.*
+    - usr/share/doc/*/changelog.*
+    - usr/share/doc/*/NEWS.*
+    - usr/share/doc/*/TODO.*
+
+AppImage:
+  arch: x86_64
+  update-information: guess

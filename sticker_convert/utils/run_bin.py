@@ -3,6 +3,7 @@ import subprocess
 import os
 import shutil
 import sys
+import tempfile
 
 class RunBin:
     @staticmethod
@@ -69,38 +70,34 @@ class RunBin:
         if sys.platform == 'darwin':
             RunBin.run_cmd(['xattr', '-d', 'com.apple.quarantine', bin_path], silence=True, cb_msg=cb_msg)
 
-        if bin == 'apngasm':
-            try:
-                os.remove('./resources/testing_apngasm.png')
-            except OSError:
-                pass
-        elif bin == 'apngdis':
-            try:
-                os.remove('./resources/testing_strip.png')
-            except OSError:
-                pass
+        with tempfile.TemporaryDirectory() as tempdir:
+            if bin == 'apngasm' or bin == 'apngdis':
+                shutil.copy('./resources/testing.png', os.path.join(tempdir, 'testing.png'))
+                check_cmd_replaced = []
+                for i in check_cmd:
+                    if i.startswith('{tempdir}/'):
+                        i = os.path.join(tempdir, i.replace('{tempdir}/', ''))
+                    check_cmd_replaced.append(i)
+            else:
+                check_cmd_replaced = check_cmd
 
-        returncode = subprocess.call([bin_path, *check_cmd], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            returncode = subprocess.call([bin_path, *check_cmd_replaced], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-        if returncode != 0:
-            advice = ''
-            if sys.platform != 'win32':
-                advice += '\nIs the permission correct?'
-            elif sys.platform == 'darwin':
-                advice += '\nDid MacOS blocked it because from identified developer?'
-                advice += '\nGo to System Preferences > Security & Privacy and click "Open Anyway"'
-            msg = f'Error occured when executing binary {bin}.{advice}\nCheck again?'
-            return msg
-
-        if bin == 'apngasm':
-            try:
-                os.remove('./resources/testing_apngasm.png')
-            except OSError:
-                msg = f'Executing binary {bin} gave unexpected result.\nCheck again?'
+            if returncode != 0:
+                advice = ''
+                if sys.platform != 'win32':
+                    advice += '\nIs the permission correct?'
+                elif sys.platform == 'darwin':
+                    advice += '\nDid MacOS blocked it because from identified developer?'
+                    advice += '\nGo to System Preferences > Security & Privacy and click "Open Anyway"'
+                msg = f'Error occured when executing binary {bin}.{advice}\nCheck again?'
                 return msg
-        elif bin == 'apngdis':
+
             try:
-                os.remove('./resources/testing_strip.png')
+                if bin == 'apngasm':
+                    os.remove(os.path.join(tempdir, 'testing_apngasm.png'))
+                elif bin == 'apngdis':
+                    os.remove(os.path.join(tempdir, 'testing_strip.png'))
             except OSError:
                 msg = f'Executing binary {bin} gave unexpected result.\nCheck again?'
                 return msg

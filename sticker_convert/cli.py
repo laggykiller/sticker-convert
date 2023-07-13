@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import sys
 import multiprocessing
 import argparse
@@ -269,7 +270,9 @@ class CLI:
                     break
         
         if args.save_cred:
-            JsonManager.save_json('creds.json', self.opt_cred)
+            appimage_path = os.getenv('APPIMAGE')
+            creds_path = 'creds.json' if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+            JsonManager.save_json(creds_path, self.creds)
             self.callback_msg('Saved credentials to creds.json')
     
     def callback_ask_str(self, msg: str=None, initialvalue: str=None, cli_show_initialvalue: bool=True):

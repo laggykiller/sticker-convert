@@ -1,6 +1,6 @@
 {
-    "apngasm": ["-o", "./resources/testing_apngasm.png", "./resources/testing.png"],
-    "apngdis": ["./resources/testing.png", "-S"],
+    "apngasm": ["-o", "{tempdir}/testing_apngasm.png", "{tempdir}/testing.png"],
+    "apngdis": ["{tempdir}/testing.png", "-S"],
     "magick": ["-version"],
     "pngnq-s9": ["-V"],
     "pngquant": ["-h"],
