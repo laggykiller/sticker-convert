@@ -59,6 +59,7 @@ jobs:
                 chmod +x ./appimage-builder
                 ./appimage-builder
                 chmod +x sticker-convert-latest-x86_64.AppImage
+                mkdir dist
                 mv ./sticker-convert-latest-x86_64.AppImage ./dist/sticker-convert-latest-x86_64.AppImage
             OUT_FILE_NAME: sticker-convert-latest-x86_64.AppImage
             ASSET_MIME: application/zip
