@@ -5,7 +5,7 @@ WORKDIR /app
 # Install dependency
 RUN apt update -y && \
     apt install --no-install-recommends -y python3 python3-pip python3-opencv python3-tk \
-    curl wget gpg zip unzip cmake tar sed build-essential pkg-config locales binutils psmisc git \
+    curl wget gpg zip unzip cmake tar sed build-essential pkg-config locales binutils psmisc git rsync \
     libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev \
     libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig \
     ffmpeg optipng pngquant apngdis
@@ -86,7 +86,8 @@ COPY ./sticker_convert /app/
 
 RUN chmod -R 777 /app
 
-RUN apt clean autoclean && \
+RUN apt purge -y curl wget gpg cmake git rsync && \
+    apt clean autoclean && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 

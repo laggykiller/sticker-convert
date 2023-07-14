@@ -1,5 +1,5 @@
 # appimage-builder recipe see https://appimage-builder.readthedocs.io for details
-# Works on ubuntu20
+# Builds on ubuntu20
 version: 1
 script:
   # Remove any previous build
@@ -96,6 +96,8 @@ AppDir:
       - python3-certifi
       - python3-distutils
       - python3-apt
+      - binutils
+      - psmisc
       - zip
       - unzip
       - optipng
