@@ -15,11 +15,14 @@ script:
   # Copy appicon
   - cp ./sticker_convert/resources/appicon.png AppDir/usr/share/icons/hicolor/256x256/apps/sticker-convert.png
 
+  # Install ttkbootstrap v1.5.1 instead to avoid _tkinter.TclError: invalid command name "::msgcat::mcmset"
+  - cp requirements.txt requirements-appimage.txt
+  - sed -i 's/ttkbootstrap.git/ttkbootstrap.git@v1.5.1-patched/g' requirements-appimage.txt
   # Install application dependencies
-  - python3 -m pip install --system --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
+  - python3 -m pip install --system --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
 
   # Download ImageMagick AppImage
-  - curl -O -L https://imagemagick.org/archive/binaries/magick
+  - curl -o magick -L https://github.com/ImageMagick/ImageMagick/releases/latest/download/ImageMagick--gcc-x86_64.AppImage
   # Copy ImageMagick
   - chmod +x ./magick
   - ./magick --appimage-extract
@@ -111,7 +114,7 @@ AppDir:
       # SSL Certificates are placed in a different location for every system therefore we ship our own copy
       # SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.8/site-packages/certifi/cacert.pem'
       # Tcl library has to be specified or else cannot find init.tcl
-      TCL_LIBRARY: '${APPDIR}/usr/share/tcl8.6'
+      TCL_LIBRARY: '${APPDIR}/usr/share/tcltk/tcl8.6'
 
   files:
     include:

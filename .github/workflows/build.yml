@@ -52,9 +52,7 @@ jobs:
                 wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
                 chmod +x ./appimage-builder
                 ./appimage-builder
-                mv ./sticker-convert-latest-x86_64.AppImage ./sticker-convert
-                zip -r9 ./sticker-convert-linux.zip ./sticker-convert
-            OUT_FILE_NAME: sticker-convert-linux.zip
+            OUT_FILE_NAME: sticker-convert-latest-x86_64.AppImage
             ASSET_MIME: application/zip
     steps:
     - uses: actions/checkout@v2

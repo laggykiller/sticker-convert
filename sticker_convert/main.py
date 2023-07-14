@@ -23,6 +23,9 @@ elif sys.platform == 'darwin':
         os.environ["MAGICK_CODER_MODULE_PATH"] = os.path.abspath('./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders')
         os.environ["MAGICK_CONFIGURE_PATH"] = os.path.abspath('./ImageMagick/etc/ImageMagick-7')
         os.environ["DYLD_LIBRARY_PATH"] += os.pathsep + os.path.abspath("./ImageMagick/lib")
+elif os.getenv('APPIMAGE') != '':
+    # /usr/etc/ImageMagick-7
+    os.environ['MAGICK_CONFIGURE_PATH'] = os.path.abspath(os.path.join(script_path, '../etc/ImageMagick-7'))
 
 os.environ["PATH"] += os.pathsep + os.path.abspath('./bin') + os.sep
 

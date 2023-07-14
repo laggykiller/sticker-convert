@@ -197,8 +197,10 @@ class GUI:
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
         
-        if os.path.isfile('creds.json'):
-            self.creds = JsonManager.load_json('creds.json')
+        appimage_path = os.getenv('APPIMAGE')
+        creds_path = 'creds.json' if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+        if os.path.isfile(creds_path):
+            self.creds = JsonManager.load_json(creds_path)
         else:
             self.creds = {
             'signal': {

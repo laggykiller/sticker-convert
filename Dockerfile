@@ -52,7 +52,7 @@ RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > s
 RUN curl -o magick -L https://github.com/ImageMagick/ImageMagick/releases/latest/download/ImageMagick--gcc-x86_64.AppImage && \
     chmod +x ./magick && \
     ./magick --appimage-extract && \
-    cp -r ./squashfs-root/* / && \
+    rsync -av squashfs-root/ / --exclude AppRun --exclude imagemagick.desktop --exclude imagemagick.png --exclude share --exclude usr/include --exclude usr/share && \
     rm ./magick && \
     rm -rf ./squashfs-root
 
