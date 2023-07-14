@@ -58,6 +58,8 @@ jobs:
                 wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
                 chmod +x ./appimage-builder
                 ./appimage-builder
+                chmod +x sticker-convert-latest-x86_64.AppImage
+                mv ./sticker-convert-latest-x86_64.AppImage ./dist/sticker-convert-latest-x86_64.AppImage
             OUT_FILE_NAME: sticker-convert-latest-x86_64.AppImage
             ASSET_MIME: application/zip
     steps:
