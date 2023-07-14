@@ -40,7 +40,7 @@ if sys.platform == 'win32':
     apngasm_path = shutil.which("apngasm")
     if apngasm_path:
         apngasm_dir = os.path.split(apngasm_path)[0]
-        binaries += [(f'{apngasm_dir}/*', './bin')]
+        datas += [(f'{apngasm_dir}/*', './bin')]
     
     magick_dir = get_magick_dir()
     datas += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.xml', './ImageMagick')]
@@ -72,10 +72,10 @@ for bin in bin_list:
 
 # Add local binaries at last so they are not overwritten by those found in system
 if os.path.isdir('./sticker_convert/bin') and len(os.listdir('./sticker_convert/bin')) > 0:
-    binaries += [('./sticker_convert/bin/*', './bin')]
+    datas += [('./sticker_convert/bin/*', './bin')]
 
 if os.path.isdir('./sticker_convert/lib') and len(os.listdir('./sticker_convert/lib')) > 0:
-    binaries += [('./sticker_convert/lib/*', './lib')]
+    datas += [('./sticker_convert/lib/*', './lib')]
 
 # signalstickers_client needs a custom cacert.pem
 # https://stackoverflow.com/a/48068640
