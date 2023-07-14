@@ -223,7 +223,7 @@ class CLI:
 
     def get_opt_cred(self, args):
         appimage_path = os.getenv('APPIMAGE')
-        creds_path = 'creds.json' if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+        creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
         creds = JsonManager.load_json(creds_path)
         if creds:
             self.callback_msg('Loaded credentials from creds.json')
@@ -273,7 +273,7 @@ class CLI:
         
         if args.save_cred:
             appimage_path = os.getenv('APPIMAGE')
-            creds_path = 'creds.json' if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+            creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
             JsonManager.save_json(creds_path, self.creds)
             self.callback_msg('Saved credentials to creds.json')
     

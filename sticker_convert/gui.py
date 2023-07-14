@@ -94,7 +94,7 @@ class GUI:
 
         self.input_option_var.set(self.input_presets[self.default_input_mode]['full_name'])
         appimage_path = os.getenv('APPIMAGE')
-        stickers_input_dir = os.path.abspath('./stickers_input') if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'stickers_input')
+        stickers_input_dir = os.path.abspath('./stickers_input') if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'stickers_input')
         self.input_setdir_var.set(stickers_input_dir)
 
         # Compression
@@ -140,7 +140,7 @@ class GUI:
 
         self.output_option_var.set(self.output_presets[self.default_output_mode]['full_name'])
         appimage_path = os.getenv('APPIMAGE')
-        stickers_output_dir = os.path.abspath('./stickers_output') if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'stickers_output')
+        stickers_output_dir = os.path.abspath('./stickers_output') if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'stickers_output')
         self.output_setdir_var.set(stickers_output_dir)
 
         # Credentials
@@ -198,7 +198,7 @@ class GUI:
             sys.exit()
         
         appimage_path = os.getenv('APPIMAGE')
-        creds_path = 'creds.json' if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+        creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
         if os.path.isfile(creds_path):
             self.creds = JsonManager.load_json(creds_path)
         else:
@@ -240,7 +240,7 @@ class GUI:
         }
 
         appimage_path = os.getenv('APPIMAGE')
-        creds_path = 'creds.json' if appimage_path == '' else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+        creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
         JsonManager.save_json(creds_path, self.creds)
     
     def set_creds(self):
@@ -465,7 +465,7 @@ class InputFrame:
         orig_input_dir = self.gui.input_setdir_var.get()
         if not os.path.isdir(orig_input_dir):
             appimage_path = os.getenv('APPIMAGE')
-            orig_input_dir = os.getcwd() if appimage_path == '' else os.path.split(appimage_path)[0]
+            orig_input_dir = os.getcwd() if appimage_path == None else os.path.split(appimage_path)[0]
         input_dir = filedialog.askdirectory(initialdir=orig_input_dir)
         if input_dir:
             self.gui.input_setdir_var.set(input_dir)
@@ -608,7 +608,7 @@ class OutputFrame:
         orig_output_dir = self.gui.output_setdir_var.get()
         if not os.path.isdir(orig_output_dir):
             appimage_path = os.getenv('APPIMAGE')
-            orig_output_dir = os.getcwd() if appimage_path == '' else os.path.split(appimage_path)[0]
+            orig_output_dir = os.getcwd() if appimage_path == None else os.path.split(appimage_path)[0]
         output_dir = filedialog.askdirectory(initialdir=orig_output_dir)
         if output_dir:
             self.gui.output_setdir_var.set(output_dir)
