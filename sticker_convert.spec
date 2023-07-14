@@ -33,29 +33,28 @@ def get_magick_dir():
                 print('You may run get-deps-macos.sh to get ImageMagick automagically')
             sys.exit()
 
-binaries = []
 datas = [('./sticker_convert/resources/*', './resources')]
 
 if sys.platform == 'win32':
     apngasm_path = shutil.which("apngasm")
     if apngasm_path:
         apngasm_dir = os.path.split(apngasm_path)[0]
-        binaries += [(f'{apngasm_dir}/*', './bin')]
+        datas += [(f'{apngasm_dir}/*', './bin')]
     
     magick_dir = get_magick_dir()
-    binaries += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.xml', './ImageMagick')]
+    datas += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.xml', './ImageMagick')]
 
     # Portable version does not have coders directory
     if os.path.isdir(f'{magick_dir}/modules/coders'):
-        binaries += [(f'{magick_dir}/modules/coders', './ImageMagick/coders')]
+        datas += [(f'{magick_dir}/modules/coders', './ImageMagick/coders')]
     
     # Portable version does not have dll
     if [i for i in os.listdir(magick_dir) if os.path.splitext(i)[-1].lower() == '.dll'] != []:
-        binaries += [(f'{magick_dir}/*.dll', './ImageMagick')]
+        datas += [(f'{magick_dir}/*.dll', './ImageMagick')]
 
     
 elif sys.platform == 'darwin':
-    binaries += [
+    datas += [
         (f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'),
         (f'./sticker_convert/ImageMagick/lib/*.dylib', f'./ImageMagick/lib'),
         (f'./sticker_convert/ImageMagick/lib/*.a', f'./ImageMagick/lib'),
@@ -68,14 +67,14 @@ bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', '
 for bin in bin_list:
     bin_path = get_bin(bin)
     if bin_path:
-        binaries.append((bin_path, './bin'))
+        datas.append((bin_path, './bin'))
 
 # Add local binaries at last so they are not overwritten by those found in system
 if os.path.isdir('./sticker_convert/bin') and len(os.listdir('./sticker_convert/bin')) > 0:
-    binaries += [('./sticker_convert/bin/*', './bin')]
+    datas += [('./sticker_convert/bin/*', './bin')]
 
 if os.path.isdir('./sticker_convert/lib') and len(os.listdir('./sticker_convert/lib')) > 0:
-    binaries += [('./sticker_convert/lib/*', './lib')]
+    datas += [('./sticker_convert/lib/*', './lib')]
 
 # signalstickers_client needs a custom cacert.pem
 # https://stackoverflow.com/a/48068640
@@ -111,7 +110,7 @@ else:
 a = Analysis(
     ['sticker_convert/main.py'],
     pathex=['sticker_convert'],
-    binaries=binaries,
+    binaries=[],
     datas=datas,
     hiddenimports=['tkinter', 'Pillow', 'CairoSVG', 'opencv-python'],
     hookspath=[],
