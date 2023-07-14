@@ -30,6 +30,9 @@ jobs:
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: |
+                python -m pip install --upgrade pip
+                pip install wheel
+                pip install -r requirements-build.txt
                 python3 get_deps.py
                 $env:Path += ";C:\Program Files\UniConvertor-2.0rc5\dlls"
                 pyinstaller sticker_convert.spec
@@ -40,6 +43,9 @@ jobs:
           - os: macos-latest
             TARGET: macos
             CMD_BUILD: |
+                python -m pip install --upgrade pip
+                pip install wheel
+                pip install -r requirements-build.txt
                 python3 get_deps.py
                 pyinstaller sticker_convert.spec
                 cd dist/
@@ -62,12 +68,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: 3.11
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install wheel
-        pip install -r requirements-build.txt
-    - name: Build with pyinstaller for ${{matrix.TARGET}}
+    - name: Build for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
     - name: Get release
       id: get_release
