@@ -65,6 +65,8 @@ jobs:
                 # Due to https://github.com/AppImage/appimage.github.io/blob/master/code/worker.sh
                 # runtime-fuse2-x86_64 unable to handle xz compression
                 ./appimage-builder --skip-appimage
+                # Add .desktop comment
+                sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage/g' ./AppDir/*.desktop
                 ARCH=x86_64 ./appimagetool ./AppDir
                 chmod +x sticker-convert-x86_64.AppImage
                 mkdir dist
