@@ -65,7 +65,7 @@ jobs:
                 # Due to https://github.com/AppImage/appimage.github.io/blob/master/code/worker.sh
                 # runtime-fuse2-x86_64 unable to handle xz compression
                 ./appimage-builder --skip-appimage
-                ./appimagetool ./squashfs-root
+                ./appimagetool ./AppDir
                 chmod +x sticker-convert-x86_64.AppImage
                 mkdir dist
                 mv ./sticker-convert-x86_64.AppImage ./dist/sticker-convert-x86_64.AppImage
