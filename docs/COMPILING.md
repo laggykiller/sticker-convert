@@ -147,7 +147,7 @@ This repository uses `pyinstaller` for compiling. Install with `pip3 install pyi
 3. Compilation result in `dist` directory
 
 ## Creating AppImage on Linux
-1. Use Ubuntu 18.04 (May work on newer version if you change `sourceline` in `AppImageBuilder.yml`)
+1. Use Ubuntu 20.04 (May work on newer version if you change `sourceline` in `AppImageBuilder.yml`)
 2. Install [appimage-builder](https://appimage-builder.readthedocs.io/en/latest/intro/install.html)
 ```
 wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage

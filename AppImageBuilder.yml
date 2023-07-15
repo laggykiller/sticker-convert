@@ -1,5 +1,5 @@
 # appimage-builder recipe see https://appimage-builder.readthedocs.io for details
-# Builds on ubuntu 18.04
+# Builds on ubuntu 20.04
 version: 1
 script:
   # Remove any previous build
@@ -89,16 +89,6 @@ script:
   - rm -rf ./pngnq-s9-2.0.2
   - rm ./2.0.2.tar.gz
 
-  # Compile apngdis
-  - mkdir apngdis
-  - cd apngdis
-  - curl -O -L https://sourceforge.net/projects/apngdis/files/2.9/apngdis-2.9-src.zip
-  - unzip apngdis-2.9-src.zip
-  - make
-  - cd ../
-  - cp ./apngdis/apngdis AppDir/usr/bin
-  - rm -rf ./apngdis
-
   # Compile pngquant as current version does not have '--strip' option
   - rm -rf pngquant  | true
   - git clone --recursive --branch 2.17.0 https://github.com/kornelski/pngquant.git
@@ -154,7 +144,8 @@ AppDir:
       - zip
       - unzip
       - optipng
-      - apngasm=3.1.9~134~ubuntu18.04.1
+      - apngdis
+      - apngasm=3.1.10~139~ubuntu20.04.1
     exclude: []
 
   runtime:
