@@ -27,7 +27,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: windows-latest
+          - os: windows-2019
             TARGET: windows
             CMD_BUILD: |
                 python -m pip install --upgrade pip
@@ -40,7 +40,7 @@ jobs:
                 ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert-windows
             OUT_FILE_NAME: sticker-convert-windows.zip
             ASSET_MIME: application/zip
-          - os: macos-latest
+          - os: macos-11
             TARGET: macos
             CMD_BUILD: |
                 python -m pip install --upgrade pip

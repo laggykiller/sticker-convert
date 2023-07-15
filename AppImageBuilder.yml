@@ -10,54 +10,6 @@ script:
   - mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps/
   - mkdir -p AppDir/usr/bin
 
-  # # Download python appimage
-  # - curl -o python.appimage -L https://github.com/niess/python-appimage/releases/download/python3.11/python3.11.4-cp311-cp311-manylinux2014_x86_64.AppImage
-  # - chmod +x ./python.appimage
-  # - ./python.appimage --appimage-extract
-  # - mv ./squashfs-root/opt/python3.11/* ./AppDir/usr
-  # - mv ./squashfs-root/usr/lib/* ./AppDir/usr/lib
-  # - rm -rf ./squashfs-root/usr/share/icons
-  # - mv ./squashfs-root/usr/share/* ./AppDir/usr/share
-  # - rm -rf ./squashfs-root
-  # - rm ./python.appimage
-
-  # # Create python3 symlink
-  # - cd ./AppDir/usr/bin
-  # - ln -s ./python3.11 ./python3
-  # - ln -s ./python3.11 ./python
-  # - cd ../../../
-
-  # # appimage's libtk not built against freetype, causing font in ttkbootstrap not work
-  # # Hence need to replace libtk8.6.so that is compiled against freetype
-  # # Run `apt-get install libxft-dev libfontconfig1-dev libfreetype6-dev` before creating appimage!
-  # # libtk version should match the version provided in appimage
-  # # Reference 1: https://stackoverflow.com/a/47787749
-  # # Reference 2: https://github.com/ContinuumIO/anaconda-issues/issues/776#issuecomment-351359489
-  # - curl -o tcl-src.zip -L http://prdownloads.sourceforge.net/tcl/tcl8613-src.zip
-  # - curl -o tk-src.zip -L http://prdownloads.sourceforge.net/tcl/tk8613-src.zip
-  # - mkdir libtcl
-  # - unzip tcl-src.zip
-  # - cd tcl8.6.13/unix
-  # - ./configure --prefix=$(pwd)/../../libtcl
-  # - make
-  # - make install
-  # - cd ../../
-  # - mkdir libtk
-  # - unzip tk-src.zip
-  # - cd tk8.6.13/unix
-  # - ./configure --prefix=$(pwd)/../../libtk --with-tcl=$(pwd)/../../tcl8.6.13/unix
-  # - make
-  # - make install
-  # - cd ../../
-  # - rm AppDir/usr/lib/libtk8.6.so
-  # - cp libtk/lib/libtk8.6.so AppDir/usr/lib
-  # - rm -rf ./libtk
-  # - rm -rf ./libtcl
-  # - rm -rf ./tcl8.6.13
-  # - rm -rf ./tk8.6.13
-  # - rm ./tcl-src.zip
-  # - rm ./tk-src.zip
-
   # Download ImageMagick AppImage
   - curl -o magick -L https://github.com/ImageMagick/ImageMagick/releases/latest/download/ImageMagick--gcc-x86_64.AppImage
   # Copy ImageMagick
@@ -107,13 +59,6 @@ script:
   - cp requirements.txt requirements-appimage.txt
   - sed -i 's/ttkbootstrap.git/ttkbootstrap.git@v1.5.1-patched/g' requirements-appimage.txt
 
-  # Install pip packages
-  # - export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(pwd)/AppDir/usr/lib:$(pwd)/AppDir/lib"
-  # - AppDir/usr/bin/python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
-  # - AppDir/usr/bin/python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
-  - python3.8 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
-  - python3.8 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
-
 AppDir:
   path: ./AppDir
 
@@ -122,13 +67,14 @@ AppDir:
     name: sticker-convert
     icon: sticker-convert
     version: latest
-    exec: usr/bin/python3.8
+    exec: usr/bin/python3.11
     exec_args: "$APPDIR/usr/src/main.py $@"
 
   apt:
     arch: amd64
     allow_unauthenticated: true
     sources:
+    - sourceline: deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu focal main 
     - sourceline: deb https://ppa.launchpadcontent.net/zero-tsuki/ppa/ubuntu focal main
     - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal main restricted
     - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted
@@ -142,8 +88,9 @@ AppDir:
     - sourceline: deb http://security.ubuntu.com/ubuntu focal-security multiverse
 
     include:
-      - python3
-      - python3-tk
+      - python3.11
+      - python3.11-tk
+      - python3.11-distutils
       - binutils
       - psmisc
       - zip
@@ -152,6 +99,16 @@ AppDir:
       - apngdis
       - apngasm=3.1.10~139~ubuntu20.04.1
     exclude: []
+  
+  after_bundle: |
+    export PYTHONHOME=$(pwd)/AppDir/usr
+    export PYTHONPATH=$(pwd)/AppDir/usr/lib/python3.11/site-packages:$(pwd)/AppDir/usr/lib/python3.11
+    export PATH=$(pwd)/AppDir/usr/bin:$PATH
+    # Install pip
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
+    # Install pip packages
+    AppDir/usr/bin/python3.11 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
+    AppDir/usr/bin/python3.11 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
 
   runtime:
     env:
@@ -160,9 +117,9 @@ AppDir:
       PYTHONHOME: '${APPDIR}/usr'
       # Path to the site-packages dir or other modules dirs
       # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
-      PYTHONPATH: '${APPDIR}/usr/lib/python3.8/site-packages'
+      PYTHONPATH: '${APPDIR}/usr/lib/python3.11/site-packages'
       # SSL Certificates are placed in a different location for every system therefore we ship our own copy
-      SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.8/site-packages/certifi/cacert.pem'
+      SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.11/site-packages/certifi/cacert.pem'
       # Tcl library has to be specified or else cannot find init.tcl
       TCL_LIBRARY: '${APPDIR}/usr/share/tcltk/tcl8.6'
 

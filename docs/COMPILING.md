@@ -154,7 +154,7 @@ wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/app
 chmod +x appimage-builder-x86_64.AppImage
 sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
 ```
-3. Install dependencies: `sudo apt install curl libpng-dev build-essential pkg-config git cargo libxft-dev libfontconfig1-dev libfreetype6-dev`
+3. Install dependencies: `sudo apt install curl libpng-dev build-essential pkg-config git cargo`
 4. Clone this repository
 5. Run `appimage-builder` inside the directory containing `AppImageBuilder.yml`
 6. If successful, `sticker-convert-latest-x86_64.AppImage` should be created
