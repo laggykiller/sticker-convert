@@ -55,7 +55,7 @@ jobs:
           - os: ubuntu-20.04
             TARGET: linux
             CMD_BUILD: |
-                sudo apt install -y libpng-dev libxft-dev libfontconfig1-dev libfreetype6-dev
+                sudo apt install -y libpng-dev libxft-dev libfontconfig1-dev libfreetype6-dev libffi
                 wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
                 chmod +x ./appimage-builder
                 ./appimage-builder
