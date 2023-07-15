@@ -111,8 +111,8 @@ script:
   # - export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(pwd)/AppDir/usr/lib:$(pwd)/AppDir/lib"
   # - AppDir/usr/bin/python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
   # - AppDir/usr/bin/python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
-  - python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
-  - python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
+  - python3.8 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
+  - python3.8 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
 
 AppDir:
   path: ./AppDir
@@ -122,7 +122,7 @@ AppDir:
     name: sticker-convert
     icon: sticker-convert
     version: latest
-    exec: usr/bin/python3
+    exec: usr/bin/python3.8
     exec_args: "$APPDIR/usr/src/main.py $@"
 
   apt:
@@ -160,9 +160,9 @@ AppDir:
       PYTHONHOME: '${APPDIR}/usr'
       # Path to the site-packages dir or other modules dirs
       # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
-      PYTHONPATH: '${APPDIR}/usr/lib/python3.11/site-packages'
+      PYTHONPATH: '${APPDIR}/usr/lib/python3.8/site-packages'
       # SSL Certificates are placed in a different location for every system therefore we ship our own copy
-      SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.11/site-packages/certifi/cacert.pem'
+      SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.8/site-packages/certifi/cacert.pem'
       # Tcl library has to be specified or else cannot find init.tcl
       TCL_LIBRARY: '${APPDIR}/usr/share/tcltk/tcl8.6'
 
