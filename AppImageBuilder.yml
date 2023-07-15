@@ -108,6 +108,7 @@ script:
   - sed -i 's/ttkbootstrap.git/ttkbootstrap.git@v1.5.1-patched/g' requirements-appimage.txt
 
   # Install pip packages
+  - export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:$(pwd)/AppDir/usr/lib:$(pwd)/AppDir/lib"
   - AppDir/usr/bin/python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
   - AppDir/usr/bin/python3 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
 
