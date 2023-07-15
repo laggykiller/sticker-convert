@@ -1,4 +1,5 @@
 AppDir/**
+appimage-build/**
 build/**
 dist/**
 magick-src/**

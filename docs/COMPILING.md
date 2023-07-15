@@ -74,7 +74,7 @@ For MacOS, the following binaries are required:
     - Easiest method is download from Homebrew `brew install apngasm`
     - Note that version 3 is required. Sourceforge only provides up to version 2.
 
-## 3.3 Executables / Binaries (Linux) (Tested with Ubuntu 20.04)
+## 3.3 Execute script directly (Linux) (Tested with Ubuntu 20.04)
 Some packages are usually not available in repo. To compile them, install these packages:
 
 `sudo apt install gcc make cmake libpng-dev libboost-program-options-dev libboost-regex-dev libboost-system-dev libboost-filesystem-dev build-essential curl unzip pkg-config python3-tkinter python3-opencv binutils psmisc`
@@ -145,3 +145,16 @@ This repository uses `pyinstaller` for compiling. Install with `pip3 install pyi
 1. Run `python3 get_deps.py` to get dependencies automatically. Please run with sudo.
 2. Run `pyinstaller sticker_convert.spec`
 3. Compilation result in `dist` directory
+
+## Creating AppImage on Linux
+1. Use Ubuntu 18.04 (May work on newer version if you change `sourceline` in `AppImageBuilder.yml`)
+2. Install [appimage-builder](https://appimage-builder.readthedocs.io/en/latest/intro/install.html)
+```
+wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+chmod +x appimage-builder-x86_64.AppImage
+sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
+```
+3. Install dependencies: `sudo apt install curl libpng-dev build-essential pkg-config git cargo libxft-dev libfontconfig1-dev libfreetype6-dev`
+4. Clone this repository
+5. Run `appimage-builder` inside the directory containing `AppImageBuilder.yml`
+6. If successful, `sticker-convert-latest-x86_64.AppImage` should be created
