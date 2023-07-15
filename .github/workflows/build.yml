@@ -57,12 +57,19 @@ jobs:
             CMD_BUILD: |
                 sudo apt install -y libpng-dev libxft-dev libfontconfig1-dev libfreetype6-dev
                 wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+                wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
                 chmod +x ./appimage-builder
-                ./appimage-builder
-                chmod +x sticker-convert-latest-x86_64.AppImage
+                chmod +x ./appimagetool
+                # Creating appimage directly with appimage-builder result in xz compression
+                # That would be not possible to be verified by https://appimage.github.io/apps/
+                # Due to https://github.com/AppImage/appimage.github.io/blob/master/code/worker.sh
+                # runtime-fuse2-x86_64 unable to handle xz compression
+                ./appimage-builder --skip-appimage
+                ./appimagetool ./squashfs-root
+                chmod +x sticker-convert-x86_64.AppImage
                 mkdir dist
-                mv ./sticker-convert-latest-x86_64.AppImage ./dist/sticker-convert-latest-x86_64.AppImage
-            OUT_FILE_NAME: sticker-convert-latest-x86_64.AppImage
+                mv ./sticker-convert-x86_64.AppImage ./dist/sticker-convert-x86_64.AppImage
+            OUT_FILE_NAME: sticker-convert-x86_64.AppImage
             ASSET_MIME: application/zip
     steps:
     - uses: actions/checkout@v2
