@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>sticker-convert</id>
+	<metadata_license>GPL-2.0</metadata_license>
+	<project_license>GPL-2.0+</project_license>
+	<name>sticker-convert</name>
+	<summary>Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage</summary>
+	<description>
+		<p>Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage, with ability to download stickers from some of the messaging platforms. Written in Python. Able to run in CLI and GUI mode.</p>
+	</description>
+	<launchable type="desktop-id">sticker-convert.desktop</launchable>
+	<url type="homepage">https://github.com/laggykiller/sticker-convert</url>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://github.com/laggykiller/sticker-convert/blob/master/imgs/screenshot.png?raw=true</image>
+		</screenshot>
+	</screenshots>
+	<provides>
+		<id>sticker-convert.desktop</id>
+	</provides>
+</component>

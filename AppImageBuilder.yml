@@ -59,6 +59,10 @@ script:
   - cp requirements.txt requirements-appimage.txt
   - sed -i 's/ttkbootstrap.git/ttkbootstrap.git@v1.5.1-patched/g' requirements-appimage.txt
 
+  # Copy appstream metadata
+  - mkdir -p AppData/usr/share/metainfo
+  - cp ./sticker-convert.appdata.xml AppData/usr/share/metainfo
+
 AppDir:
   path: ./AppDir
 
