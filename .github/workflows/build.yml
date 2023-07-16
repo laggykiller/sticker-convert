@@ -67,6 +67,10 @@ jobs:
                 ./appimage-builder --skip-appimage
                 # Add .desktop comment
                 sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage/g' ./AppDir/*.desktop
+                # Add appdata.xml
+                - mkdir -p AppData/usr/share/metainfo
+                cp ./sticker-convert.appdata.xml AppData/usr/share/metainfo
+                # Bundling into appimage
                 ARCH=x86_64 ./appimagetool ./AppDir
                 chmod +x sticker-convert-x86_64.AppImage
                 mkdir dist
