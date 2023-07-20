@@ -11,6 +11,7 @@ from utils.run_bin import RunBin
 from utils.json_manager import JsonManager
 from utils.get_kakao_auth import GetKakaoAuth
 from utils.get_signal_auth import GetSignalAuth
+from utils.curr_dir import CurrDir
 
 # Only download from a source
 # sticker_convert_cli.py --download-signal <url> --no-compress
@@ -222,8 +223,7 @@ class CLI:
         }
 
     def get_opt_cred(self, args):
-        appimage_path = os.getenv('APPIMAGE')
-        creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+        creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
         creds = JsonManager.load_json(creds_path)
         if creds:
             self.callback_msg('Loaded credentials from creds.json')
@@ -272,8 +272,7 @@ class CLI:
                     break
         
         if args.save_cred:
-            appimage_path = os.getenv('APPIMAGE')
-            creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+            creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
             JsonManager.save_json(creds_path, self.creds)
             self.callback_msg('Saved credentials to creds.json')
     

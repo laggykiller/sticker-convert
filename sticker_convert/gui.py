@@ -20,6 +20,7 @@ from utils.run_bin import RunBin
 from utils.json_manager import JsonManager
 from utils.get_kakao_auth import GetKakaoAuth
 from utils.get_signal_auth import GetSignalAuth
+from utils.curr_dir import CurrDir
 
 class GUI:
     default_input_mode = 'telegram'
@@ -93,8 +94,7 @@ class GUI:
         self.input_address_var = StringVar(self.root)
 
         self.input_option_var.set(self.input_presets[self.default_input_mode]['full_name'])
-        appimage_path = os.getenv('APPIMAGE')
-        stickers_input_dir = os.path.abspath('./stickers_input') if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'stickers_input')
+        stickers_input_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
         self.input_setdir_var.set(stickers_input_dir)
 
         # Compression
@@ -139,8 +139,7 @@ class GUI:
         self.author_var = StringVar(self.root)
 
         self.output_option_var.set(self.output_presets[self.default_output_mode]['full_name'])
-        appimage_path = os.getenv('APPIMAGE')
-        stickers_output_dir = os.path.abspath('./stickers_output') if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'stickers_output')
+        stickers_output_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_output')
         self.output_setdir_var.set(stickers_output_dir)
 
         # Credentials
@@ -197,8 +196,7 @@ class GUI:
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
         
-        appimage_path = os.getenv('APPIMAGE')
-        creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+        creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
         if os.path.isfile(creds_path):
             self.creds = JsonManager.load_json(creds_path)
         else:
@@ -239,8 +237,7 @@ class GUI:
             }
         }
 
-        appimage_path = os.getenv('APPIMAGE')
-        creds_path = 'creds.json' if appimage_path == None else os.path.join(os.path.split(appimage_path)[0], 'creds.json')
+        creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
         JsonManager.save_json(creds_path, self.creds)
     
     def set_creds(self):
@@ -464,8 +461,7 @@ class InputFrame:
     def callback_set_indir(self, *args):
         orig_input_dir = self.gui.input_setdir_var.get()
         if not os.path.isdir(orig_input_dir):
-            appimage_path = os.getenv('APPIMAGE')
-            orig_input_dir = os.getcwd() if appimage_path == None else os.path.split(appimage_path)[0]
+            orig_input_dir = CurrDir.get_curr_dir()
         input_dir = filedialog.askdirectory(initialdir=orig_input_dir)
         if input_dir:
             self.gui.input_setdir_var.set(input_dir)
@@ -607,8 +603,7 @@ class OutputFrame:
     def callback_set_outdir(self, *args):
         orig_output_dir = self.gui.output_setdir_var.get()
         if not os.path.isdir(orig_output_dir):
-            appimage_path = os.getenv('APPIMAGE')
-            orig_output_dir = os.getcwd() if appimage_path == None else os.path.split(appimage_path)[0]
+            orig_output_dir = CurrDir.get_curr_dir()
         output_dir = filedialog.askdirectory(initialdir=orig_output_dir)
         if output_dir:
             self.gui.output_setdir_var.set(output_dir)

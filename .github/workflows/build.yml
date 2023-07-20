@@ -49,7 +49,7 @@ jobs:
                 python3 get_deps.py
                 pyinstaller sticker_convert.spec
                 cd dist/
-                zip -r9 sticker-convert-macos.zip sticker-convert-macos/
+                zip -r9 sticker-convert-macos.zip sticker-convert-macos.app
             OUT_FILE_NAME: sticker-convert-macos.zip
             ASSET_MIME: application/zip
           - os: ubuntu-20.04

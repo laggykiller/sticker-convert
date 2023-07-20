@@ -207,9 +207,11 @@ def mac_brew():
     # packages = ['pkg-config', 'apngasm', 'pngquant', 'optipng', 'libwebm']
     for package in packages:
         os.system(f'brew install {package}')
+    os.remove('install.sh')
 
 def mac_apngasm():
     shutil.copy('/usr/local/bin/apngasm', './')
+    os.system('chmod +x ./apngasm')
 
     assert os.path.isfile('apngasm')
 
@@ -221,6 +223,7 @@ def mac_apngdis():
     unzip(file)
     os.remove(file)
     os.remove('readme.txt')
+    os.system('chmod +x ./apngdis')
 
     assert os.path.isfile('apngdis')
 
@@ -246,17 +249,20 @@ def mac_pngnqs9():
     os.chdir('../../')
     shutil.move(f'pngnq-s9-dl/pngnq-s9-{version}/src/pngnq-s9', '.')
     shutil.rmtree('pngnq-s9-dl')
+    os.system('chmod +x ./pngnq-s9')
 
     assert os.path.isfile('pngnq-s9')
 
 def mac_pngquant():
     print('Getting pngquant', flush=True)
     shutil.copy('/usr/local/bin/pngquant', './')
+    os.system('chmod +x ./pngquant')
 
     assert os.path.isfile('pngquant')
 
 def mac_optipng():
     cp_files_in_dir('/usr/local/opt/optipng/bin')
+    os.system('chmod +x ./optipng')
 
     assert os.path.isfile('optipng')
 
@@ -267,6 +273,7 @@ def mac_ffmpeg():
     download(url, file)
     unzip(file)
     os.remove(file)
+    os.system('chmod +x ./ffmpeg')
 
     assert os.path.isfile('ffmpeg')
 
@@ -277,6 +284,7 @@ def mac_ffprobe():
     download(url, file)
     unzip(file)
     os.remove(file)
+    os.system('chmod +x ./ffprobe')
 
     assert os.path.isfile('ffprobe')
 
@@ -292,6 +300,8 @@ def mac_magick():
     shutil.copytree('/usr/local/opt/imagemagick/bin', './bin')
     shutil.copytree('/usr/local/opt/imagemagick/lib', './lib')
     shutil.copytree('/usr/local/opt/imagemagick/etc', './etc')
+
+    os.system('chmod +x bin//magick')
 
     assert os.path.isfile('bin/magick')
 

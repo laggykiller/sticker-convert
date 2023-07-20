@@ -154,3 +154,7 @@ coll = COLLECT(
     upx_exclude=[],
     name=f'sticker-convert-{suffix}',
 )
+app = BUNDLE(coll,
+    name=f'sticker-convert-{suffix}.app',
+    icon='./sticker_convert/resources/appicon.icns',
+    bundle_identifier=None)
