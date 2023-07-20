@@ -13,6 +13,6 @@ class CurrDir:
         if appimage_path == None:
             return os.path.abspath('')
         elif sys.platform == 'darwin' and getattr(sys, 'frozen', False):
-            return os.path.abspath('../../')
+            return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../../'))
         else:
             return os.path.split(appimage_path)[0]
