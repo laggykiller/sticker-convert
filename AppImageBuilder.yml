@@ -72,7 +72,6 @@ AppDir:
 
   apt:
     arch: amd64
-    allow_unauthenticated: true
     sources:
     - sourceline: deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu focal main
       key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776
