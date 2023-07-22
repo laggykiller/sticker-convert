@@ -333,6 +333,15 @@ CLI: Run with `--no-compress --export-xxxxx`
 
 GUI: Select `From local directory` for Input source, tick `No compression` box and select `Upload to xxxxx` for Output options
 
+### Where are credentials stored?
+Credentials are stored in creds.json
+
+By default, it should be in the same directory you run the program.
+
+However, if the directory is not writable (e.g. Installed it to `/Applications` in macOS, or `/usr/local/bin` in Linux), then `creds.json` is stored in...
+- Windows: `%APPDATA%/sticker-convert/creds.json`
+- Other: `~/.local/config/creds.json`
+
 ## Future plans
 See [docs/TODO.md](docs/TODO.md)
 
