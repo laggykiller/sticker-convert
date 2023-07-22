@@ -80,7 +80,7 @@ class CLI:
                     'color_min', 'color_max',
                     'duration_min', 'duration_max',
                     'vid_size_max', 'img_size_max')
-        flags_str = ('vid_format', 'img_format')
+        flags_str = ('vid_format', 'img_format', 'cache_dir')
         flags_bool = ('fake_vid')
         for k, v in self.help['comp'].items():
             if k in flags_int:
