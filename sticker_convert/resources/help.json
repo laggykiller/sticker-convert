@@ -14,7 +14,7 @@
         "no_compress": "Do not compress files. Useful for only downloading stickers.",
         "preset": "Apply preset for compression.",
         "steps": "Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit.",
-        "processes": "Set number of processes. Default to half the number of logical processors in system.\nProcesses higher = Compress faster but consume more resources.",
+        "processes": "Set number of processes. Default to the number of logical processors in system.\nProcesses higher = Compress faster but consume more resources.",
         "fps": "FPS Higher = Smoother but larger size.",
         "fps_min": "Set minimum output fps.",
         "fps_max": "Set maximum output fps.",

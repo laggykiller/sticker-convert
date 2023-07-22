@@ -307,8 +307,7 @@ See [docs/COMPILING.md](docs/COMPILING.md)
 ### Conversion is slow
 Try the following tips:
 - Increase number of processes (`--processes`)
-    - Increasing too much can actually be slower though
-    - Default should be mostly optimal though
+    - Increasing over default value can actually be slower though
 - Decrease number of steps (`--steps`)
     - Decreasing too much can result in poor quality though
 - Using RAM disk as cache directory (`--cache-dir`)

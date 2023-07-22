@@ -132,7 +132,7 @@ class GUI:
         self.processes_var = IntVar(self.root)
 
         self.comp_preset_var.set(self.default_comp_preset)
-        self.processes_var.set(math.ceil(cpu_count()/2))
+        self.processes_var.set(cpu_count())
 
         # Output
         self.output_option_var = StringVar(self.root)
