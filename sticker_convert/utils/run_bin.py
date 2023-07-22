@@ -3,7 +3,8 @@ import subprocess
 import os
 import shutil
 import sys
-import tempfile
+
+from utils.cache_store import CacheStore
 
 class RunBin:
     @staticmethod
@@ -70,7 +71,7 @@ class RunBin:
         if sys.platform == 'darwin':
             RunBin.run_cmd(['xattr', '-d', 'com.apple.quarantine', bin_path], silence=True, cb_msg=cb_msg)
 
-        with tempfile.TemporaryDirectory() as tempdir:
+        with CacheStore.get_cache_store() as tempdir:
             if bin == 'apngasm' or bin == 'apngdis':
                 shutil.copy('./resources/testing.png', os.path.join(tempdir, 'testing.png'))
                 check_cmd_replaced = []

@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 import os
 import copy
-import tempfile
 
 from utils.metadata_handler import MetadataHandler
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from utils.codec_info import CodecInfo
+from utils.cache_store import CacheStore
 
 import anyio
 from signalstickers_client import StickersClient
@@ -80,7 +80,7 @@ class UploadSignal:
             pack.author = author
             pack.title = pack_title
 
-            with tempfile.TemporaryDirectory() as tempdir:
+            with CacheStore.get_cache_store(path=opt_comp.get('cache_dir')) as tempdir:
                 for src in stickers:
                     cb_msg(f'Verifying {src} for uploading to signal')
 

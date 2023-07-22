@@ -9,6 +9,7 @@ from utils.format_verify import FormatVerify
 from utils.metadata_handler import MetadataHandler
 from utils.codec_info import CodecInfo
 from utils.run_bin import RunBin
+from utils.cache_store import CacheStore
 
 from mergedeep import merge
 
@@ -62,7 +63,7 @@ class CompressWastickers:
 
         for pack_title, stickers in packs.items():
             num = 0 # Originally the Sticker Maker application name the files with int(time.time())
-            with tempfile.TemporaryDirectory() as tempdir:
+            with CacheStore.get_cache_store(path=opt_comp.get('cache_dir')) as tempdir:
                 for src in stickers:
                     cb_msg(f'Verifying {src} for compressing into .wastickers')
 

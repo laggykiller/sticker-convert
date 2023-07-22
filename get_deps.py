@@ -384,7 +384,6 @@ if sys.platform == 'win32':
     win_magick()
     # win_magick_55()
 elif sys.platform == 'darwin':
-    print('Notice: You should run this script with sudo!', flush=True)
     clean_dir('lib')
     os.chdir('bin')
     mac_brew()

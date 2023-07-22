@@ -99,15 +99,6 @@ datas.append((os.path.join(proot, rlottie_dll), 'rlottie_python/'))
 #     if os.path.isdir(tcl_path):
 #         break
 
-if sys.platform == 'win32':
-    suffix = 'windows'
-elif sys.platform == 'darwin':
-    suffix = 'macos'
-elif sys.platform == 'linux':
-    suffix = 'linux'
-else:
-    suffix = 'unknown'
-
 a = Analysis(
     ['sticker_convert/main.py'],
     pathex=['sticker_convert'],
@@ -152,9 +143,9 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name=f'sticker-convert-{suffix}',
+    name=f'sticker-convert',
 )
 app = BUNDLE(coll,
-    name=f'sticker-convert-{suffix}.app',
+    name=f'sticker-convert.app',
     icon='./sticker_convert/resources/appicon.icns',
     bundle_identifier=None)

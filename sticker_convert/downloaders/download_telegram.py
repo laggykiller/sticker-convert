@@ -5,6 +5,7 @@ import shutil
 import tempfile
 
 from utils.metadata_handler import MetadataHandler
+from utils.cache_store import CacheStore
 
 from telegram import Bot
 
@@ -44,7 +45,7 @@ class DownloadTelegram:
 
         emoji_dict = {}
         num = 0
-        with tempfile.TemporaryDirectory() as tempdir:
+        with CacheStore.get_cache_store() as tempdir:
             for i in sticker_set.stickers:
                 with cwd(tempdir):
                     f_name_orig = i.get_file().download()

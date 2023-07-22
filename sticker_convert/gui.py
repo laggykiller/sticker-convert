@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import math
 from multiprocessing import cpu_count
 from threading import Thread, Lock, current_thread, main_thread
 from queue import Queue
@@ -125,12 +126,13 @@ class GUI:
         self.img_format_var = StringVar(self.root)
         self.vid_format_var = StringVar(self.root)
         self.fake_vid_var = BooleanVar()
+        self.cache_dir_var = StringVar(self.root)
         self.default_emoji_var = StringVar(self.root)
         self.steps_var = IntVar(self.root) 
         self.processes_var = IntVar(self.root)
 
         self.comp_preset_var.set(self.default_comp_preset)
-        self.processes_var.set(cpu_count())
+        self.processes_var.set(math.ceil(cpu_count()/2))
 
         # Output
         self.output_option_var = StringVar(self.root)
@@ -196,7 +198,7 @@ class GUI:
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
         
-        creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
+        creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
         if os.path.isfile(creds_path):
             self.creds = JsonManager.load_json(creds_path)
         else:
@@ -237,7 +239,7 @@ class GUI:
             }
         }
 
-        creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
+        creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
         JsonManager.save_json(creds_path, self.creds)
     
     def set_creds(self):
@@ -313,6 +315,7 @@ class GUI:
             },
             'steps': self.steps_var.get(),
             'fake_vid': self.fake_vid_var.get(),
+            'cache_dir': self.cache_dir_var.get() if self.cache_dir_var.get() != '' else None,
             'default_emoji': self.default_emoji_var.get(),
             'no_compress': self.no_compress_var.get(),
             'processes': self.processes_var.get()
@@ -1098,6 +1101,10 @@ class AdvancedCompressionWindow:
         self.fake_vid_lbl = Label(self.frame_advcomp, text='Convert (faking) image to video')
         self.fake_vid_cbox = Checkbutton(self.frame_advcomp, variable=self.gui.fake_vid_var, onvalue=True, offvalue=False, bootstyle='success-round-toggle')
 
+        self.cache_dir_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['cache_dir']), bootstyle='secondary')
+        self.cache_dir_lbl = Label(self.frame_advcomp, text='Custom cache directory')
+        self.cache_dir_entry = Entry(self.frame_advcomp, textvariable=self.gui.cache_dir_var, width=30)
+
         self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['default_emoji']), bootstyle='secondary')
         self.default_emoji_lbl = Label(self.frame_advcomp, text='Default emoji')
         self.im = Image.new("RGBA", (32, 32), (255,255,255,0))
@@ -1171,9 +1178,13 @@ class AdvancedCompressionWindow:
         self.fake_vid_lbl.grid(column=1, row=10, sticky='w', padx=3, pady=3)
         self.fake_vid_cbox.grid(column=6, row=10, sticky='nes', padx=3, pady=3)
 
-        self.default_emoji_help_btn.grid(column=0, row=11, sticky='w', padx=3, pady=3)
-        self.default_emoji_lbl.grid(column=1, row=11, sticky='w', padx=3, pady=3)
-        self.default_emoji_dsp.grid(column=6, row=11, sticky='nes', padx=3, pady=3)
+        self.cache_dir_help_btn.grid(column=0, row=11, sticky='w', padx=3, pady=3)
+        self.cache_dir_lbl.grid(column=1, row=11, sticky='w', padx=3, pady=3)
+        self.cache_dir_entry.grid(column=2, row=11, columnspan=4, sticky='nes', padx=3, pady=3)
+
+        self.default_emoji_help_btn.grid(column=0, row=12, sticky='w', padx=3, pady=3)
+        self.default_emoji_lbl.grid(column=1, row=12, sticky='w', padx=3, pady=3)
+        self.default_emoji_dsp.grid(column=6, row=12, sticky='nes', padx=3, pady=3)
 
         # https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
         # Create a frame for the canvas with non-zero row&column weights

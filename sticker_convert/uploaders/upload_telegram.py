@@ -2,12 +2,12 @@
 import os
 import copy
 import re
-import tempfile
 
 from utils.converter import StickerConvert
 from utils.metadata_handler import MetadataHandler
 from utils.format_verify import FormatVerify
 from utils.codec_info import CodecInfo
+from utils.cache_store import CacheStore
 
 from telegram import Bot
 from telegram.error import TelegramError
@@ -95,7 +95,7 @@ class UploadTelegram:
             except TelegramError:
                 pack_exists = False
 
-            with tempfile.TemporaryDirectory() as tempdir:
+            with CacheStore.get_cache_store(path=opt_comp.get('cache_dir')) as tempdir:
                 for src in stickers:
                     cb_msg(f'Verifying {src} for uploading to telegram')
 

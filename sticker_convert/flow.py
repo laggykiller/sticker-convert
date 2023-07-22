@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import shutil
+import time
 from threading import Thread
 
 from downloaders.download_line import DownloadLine
@@ -300,19 +301,26 @@ class Flow:
 
             out_f = os.path.join(output_dir, os.path.splitext(i)[0] + extension)
 
-            threads.append(
-                Thread(
+            thread = Thread(
                     target=self.compress_thread, 
                     args=(in_f, out_f, self.opt_comp),
                     daemon=True
                     )
-                )
-                
-        for thread in threads:
+
+            threads.append(thread)
+        
             while True:
                 if sum((t.is_alive() for t in threads)) < self.opt_comp['processes']:
                     thread.start()
                     break
+                else:
+                    time.sleep(1)
+                
+        # for thread in threads:
+        #     while True:
+        #         if sum((t.is_alive() for t in threads)) < self.opt_comp['processes']:
+        #             thread.start()
+        #             break
 
         for thread in threads:
             thread.join()

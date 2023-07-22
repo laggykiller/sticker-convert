@@ -8,7 +8,10 @@
 - Supports static and animated stickers, with transparency support
 
 ## Downloads
-- [Pre-compiled releases](https://github.com/laggykiller/sticker-convert/releases) for Windows, MacOS and Linux (As AppImage). (Unzip the downloaded file and run `sticker-convert`)
+- [Pre-compiled releases](https://github.com/laggykiller/sticker-convert/releases) for Windows, MacOS and Linux (As AppImage).
+    - Windows: Unzip the downloaded file and run `sticker-convert.exe`
+    - MacOS: Unzip the downloaded file and run `run_me_first.command` for the first time, then `sticker-convert.app` in the future
+    - Linux: `chmod +x` the downloaded AppImage and run it
 - [Docker image](https://hub.docker.com/r/laggykiller/sticker-convert) for running on Linux.
 - [Try in Google Colab without downloading](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which runs the code on Google server and get the result from Google Drive. However, it maybe slower than running on your computer. (~50 seconds per file if not converting to .apng, ~4 minute per file if you convert to .apng)
 
@@ -20,6 +23,7 @@
 - [Running python script directly & Compiling](#running-python-script-directly--compiling)
 - [FAQ](#faq)
     - [Platform-specific guides (e.g. Getting credentials)](#platform-specific-guides-eg-getting-credentials)
+    - [Conversion is slow](#conversion-is-slow)
     - [MacOS complains that program from unidentified developer](#macos-complains-that-program-from-unidentified-developer)
     - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
 - [Future plans](#future-plans)
@@ -65,7 +69,7 @@
     - Upload: The program can create Xcode project for iMessage sticker pack, which could then be compiled and sideloaded using Xcode.
 
 ## How to use (GUI)
-1. Run `sticker-convert.exe`, `sticker-convert` or `python3 main.py`
+1. Run `sticker-convert.exe`, `sticker-convert.app` or `python3 main.py`
 2. Choose input source.
     - If you are downloading, enter URL address if you want to download from (If applicable)
     - If you are using local files, choose input directory. Defaults to a folder named 'stickers_input' in the same directory as the program. Put files you want to convert into that directory
@@ -220,7 +224,9 @@ Credentials options:
                         Save Signal and Telegram credentials.
 ```
 
-Note: If you are running python script directly, run with `main.py`
+If you are running python script directly, run with `main.py`
+
+If you are running macOS, run with `sticker-convert.app/Contents/MacOS/sticker-convert`
 
 Examples:
 
@@ -297,6 +303,20 @@ See [docs/COMPILING.md](docs/COMPILING.md)
 - [Line](docs/guide_line.md)
 - [Kakao](docs/guide_kakao.md)
 - [iMessage](docs/guide_imessage.md)
+
+### Conversion is slow
+Try the following tips:
+- Increase number of processes (`--processes`)
+    - Increasing too much can actually be slower though
+    - Default should be mostly optimal though
+- Decrease number of steps (`--steps`)
+    - Decreasing too much can result in poor quality though
+- Using RAM disk as cache directory (`--cache-dir`)
+    - Create a RAM disk and set the directory as custom cache directory
+    - Windows: https://github.com/remileduc/windows-persistent-ramdisk
+    - MacOS: https://github.com/imothee/tmpdisk
+    - Linux: Program will automatically use directory that is `tmpfs` and accessible
+- Avoid compressing to .apng if possible
 
 ### MacOS complains that program from unidentified developer
 To become an identified developer, I have to pay USD$99 to Apple every year.

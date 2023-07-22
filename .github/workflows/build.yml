@@ -37,7 +37,7 @@ jobs:
                 $env:Path += ";C:\Program Files\UniConvertor-2.0rc5\dlls"
                 pyinstaller sticker_convert.spec
                 cd dist
-                ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert-windows
+                ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert
             OUT_FILE_NAME: sticker-convert-windows.zip
             ASSET_MIME: application/zip
           - os: macos-11
@@ -48,8 +48,9 @@ jobs:
                 pip install -r requirements-build.txt
                 python3 get_deps.py
                 pyinstaller sticker_convert.spec
+                mv first_launch.command ./dist
                 cd dist/
-                zip -r9 sticker-convert-macos.zip sticker-convert-macos.app
+                zip -r9 sticker-convert-macos.zip sticker-convert.app run_me_first.command
             OUT_FILE_NAME: sticker-convert-macos.zip
             ASSET_MIME: application/zip
           - os: ubuntu-20.04

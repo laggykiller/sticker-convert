@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import math
 import multiprocessing
 import argparse
 
@@ -217,13 +218,14 @@ class CLI:
             },
             'steps': self.compression_presets[preset]['steps'] if args.steps == None else args.steps,
             'fake_vid': self.compression_presets[preset]['fake_vid'] if args.fake_vid == None else args.fake_vid,
+            'cache_dir': args.cache_dir,
             'default_emoji': args.default_emoji,
             'no_compress': args.no_compress,
-            'processes': args.processes if args.processes else multiprocessing.cpu_count()
+            'processes': args.processes if args.processes else math.ceil(multiprocessing.cpu_count()/2)
         }
 
     def get_opt_cred(self, args):
-        creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
+        creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
         creds = JsonManager.load_json(creds_path)
         if creds:
             self.callback_msg('Loaded credentials from creds.json')
@@ -272,7 +274,7 @@ class CLI:
                     break
         
         if args.save_cred:
-            creds_path = os.path.join(CurrDir.get_curr_dir(), 'creds.json')
+            creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
             JsonManager.save_json(creds_path, self.creds)
             self.callback_msg('Saved credentials to creds.json')
     

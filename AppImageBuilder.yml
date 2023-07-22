@@ -74,9 +74,12 @@ AppDir:
     arch: amd64
     allow_unauthenticated: true
     sources:
-    - sourceline: deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu focal main 
+    - sourceline: deb https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu focal main
+      key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776
     - sourceline: deb https://ppa.launchpadcontent.net/zero-tsuki/ppa/ubuntu focal main
+      key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xFCD369E9E05BF0D135BF774B5EC619F932943F78
     - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal main restricted
+      key_url: http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32
     - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates main restricted
     - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal universe
     - sourceline: deb http://archive.ubuntu.com/ubuntu/ focal-updates universe

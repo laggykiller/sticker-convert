@@ -14,7 +14,7 @@
         "no_compress": "Do not compress files. Useful for only downloading stickers.",
         "preset": "Apply preset for compression.",
         "steps": "Set number of divisions between min and max settings.\nSteps higher = Slower but yields file more closer to the specified file size limit.",
-        "processes": "Set number of processes. Default to number of logical processors in system.\nProcesses higher = Compress faster but consume more resources.",
+        "processes": "Set number of processes. Default to half the number of logical processors in system.\nProcesses higher = Compress faster but consume more resources.",
         "fps": "FPS Higher = Smoother but larger size.",
         "fps_min": "Set minimum output fps.",
         "fps_max": "Set maximum output fps.",
@@ -41,6 +41,7 @@
         "vid_format": "Set file format if input is animated.",
         "img_format": "Set file format if input is static.",
         "fake_vid": "Convert (faking) image to video.\nUseful if:\n(1) Size limit for video is larger than image;\n(2) Mix image and video into same pack.",
+        "cache_dir": "Set custom cache directory.\nUseful for debugging, or speed up conversion if cache_dir is on RAM disk.",
         "default_emoji": "Set the default emoji for uploading Signal and Telegram sticker packs."
     },
     "cred": {

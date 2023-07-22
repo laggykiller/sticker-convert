@@ -11,4 +11,6 @@ services:
     ports:
       - 5800:5800 # Port for Web UI
       # - 5900:5900 # Optional for VNC
+    tmpfs:
+      - /tmp
     # command: /usr/bin/python3 /app/main.py --help # Your command here
