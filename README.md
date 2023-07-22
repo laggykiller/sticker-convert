@@ -340,7 +340,7 @@ By default, it should be in the same directory you run the program.
 
 However, if the directory is not writable (e.g. Installed it to `/Applications` in macOS, or `/usr/local/bin` in Linux), then `creds.json` is stored in...
 - Windows: `%APPDATA%/sticker-convert/creds.json`
-- Other: `~/.local/config/creds.json`
+- Other: `~/.config/sticker-convert/creds.json`
 
 ## Future plans
 See [docs/TODO.md](docs/TODO.md)
