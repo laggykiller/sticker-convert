@@ -48,7 +48,7 @@ jobs:
                 pip install -r requirements-build.txt
                 python3 get_deps.py
                 pyinstaller sticker_convert.spec
-                mv first_launch.command ./dist
+                mv run_me_first.command ./dist
                 cd dist/
                 zip -r9 sticker-convert-macos.zip sticker-convert.app run_me_first.command
             OUT_FILE_NAME: sticker-convert-macos.zip
