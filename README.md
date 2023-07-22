@@ -26,6 +26,7 @@
     - [Conversion is slow](#conversion-is-slow)
     - [MacOS complains that program from unidentified developer](#macos-complains-that-program-from-unidentified-developer)
     - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
+    - [Where are credentials stored?](#where-are-credentials-stored)
 - [Future plans](#future-plans)
 - [Credits](#credits)
 - [DISCLAIMER](#disclaimer)
