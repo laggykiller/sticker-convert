@@ -9,6 +9,3 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
-    ignore:
-      - dependency-name: "anyio" # Conflict with signalstickers_client
-      - dependency-name: "python-telegram-bot"
