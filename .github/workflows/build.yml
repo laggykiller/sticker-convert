@@ -133,7 +133,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            laggykiller/${{ github.repository }}
+            ${{ github.repository }}
             ghcr.io/${{ github.repository }}
     
       - name: Build and push Docker image
