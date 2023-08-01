@@ -133,5 +133,5 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          tags: sticker-convert:latest,sticker-convert${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
