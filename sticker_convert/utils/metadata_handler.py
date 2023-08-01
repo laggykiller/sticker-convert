@@ -18,7 +18,7 @@ class MetadataHandler:
             stickers_present.remove('.DS_Store')
         if '._.DS_Store' in stickers_present:
             stickers_present.remove('._.DS_Store')
-        stickers_present = [i for i in stickers_present if not i.endswith('.txt')]
+        stickers_present = [i for i in stickers_present if not i.endswith(('.txt', '.m4a'))]
 
         return stickers_present
     
