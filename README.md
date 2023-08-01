@@ -258,7 +258,11 @@ Convert local files to a custom format
 
 Downloading
 ```
+# Option 1: From Dockerhub
 docker pull laggykiller/sticker-convert:latest
+
+# Option 2: From ghcr
+docker pull ghcr.io/laggykiller/sticker-convert:latest
 ```
 
 Running (GUI)
