@@ -39,7 +39,6 @@ jobs:
                 cd dist
                 ../sticker_convert/bin/zip.exe -r9 sticker-convert-windows.zip sticker-convert
             OUT_FILE_NAME: sticker-convert-windows.zip
-            ASSET_MIME: application/zip
           - os: macos-11
             TARGET: macos
             CMD_BUILD: |
@@ -52,7 +51,6 @@ jobs:
                 cd dist/
                 zip -r9 sticker-convert-macos.zip sticker-convert.app run_me_first.command
             OUT_FILE_NAME: sticker-convert-macos.zip
-            ASSET_MIME: application/zip
           - os: ubuntu-20.04
             TARGET: linux
             CMD_BUILD: |
@@ -77,32 +75,28 @@ jobs:
                 mkdir dist
                 mv ./sticker-convert-x86_64.AppImage ./dist/sticker-convert-x86_64.AppImage
             OUT_FILE_NAME: sticker-convert-x86_64.AppImage
-            ASSET_MIME: application/zip
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
       with:
         submodules: recursive
     - name: Set up Python 3.11
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v4
       with:
         python-version: 3.11
     - name: Build for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
     - name: Get release
       id: get_release
-      uses: bruceadams/get-release@v1.3.2
+      uses: bruceadams/get-release@v1
       env:
         GITHUB_TOKEN: ${{ github.token }}
     - name: Upload Release Asset
       id: upload-release-asset
-      uses: actions/upload-release-asset@v1
+      uses: softprops/action-gh-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.get_release.outputs.upload_url }}
-        asset_path: ./dist/${{ matrix.OUT_FILE_NAME}}
-        asset_name: ${{ matrix.OUT_FILE_NAME}}
-        asset_content_type: ${{ matrix.ASSET_MIME}}
+        files: dist/${{ matrix.OUT_FILE_NAME}}
 
   build-and-push-image:
     runs-on: ubuntu-latest
