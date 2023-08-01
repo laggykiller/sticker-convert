@@ -290,7 +290,9 @@ class Flow:
         for i in in_fs:
             in_f = os.path.join(input_dir, i)
 
-            if CodecInfo.get_file_ext(i) == '.txt':
+            # .txt: emoji.txt, title.txt
+            # .m4a: line sticker sound effects
+            if CodecInfo.get_file_ext(i) in ('.txt', '.m4a'):
                 shutil.copy(in_f, os.path.join(output_dir, i))
                 continue
 
@@ -315,12 +317,6 @@ class Flow:
                     break
                 else:
                     time.sleep(1)
-                
-        # for thread in threads:
-        #     while True:
-        #         if sum((t.is_alive() for t in threads)) < self.opt_comp['processes']:
-        #             thread.start()
-        #             break
 
         for thread in threads:
             thread.join()

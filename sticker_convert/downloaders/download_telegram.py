@@ -2,11 +2,11 @@
 import os
 from contextlib import contextmanager
 import shutil
-import tempfile
 
 from utils.metadata_handler import MetadataHandler
 from utils.cache_store import CacheStore
 
+import anyio
 from telegram import Bot
 
 @contextmanager
@@ -20,7 +20,7 @@ def cwd(path):
 
 class DownloadTelegram:
     @staticmethod
-    def download_stickers_telegram(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+    async def download_stickers_telegram_async(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
         token = opt_cred.get('telegram', {}).get('token')
         if token == None:
             cb_msg('Download failed: Token required for downloading from telegram')
@@ -38,7 +38,7 @@ class DownloadTelegram:
         except IndexError:
             title = url.split("eu/stickers/")[1]
         
-        sticker_set = bot.getStickerSet(title)
+        sticker_set = await bot.get_sticker_set(title, read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
 
         if cb_bar:
             cb_bar(set_progress_mode='determinate', steps=len(sticker_set.stickers))
@@ -48,7 +48,8 @@ class DownloadTelegram:
         with CacheStore.get_cache_store() as tempdir:
             for i in sticker_set.stickers:
                 with cwd(tempdir):
-                    f_name_orig = i.get_file().download()
+                    f_name_orig = await i.get_file(read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
+                    await f_name_orig.download_to_drive(read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
                 f_path_orig = os.path.join(tempdir, f_name_orig)
                 f_id = str(num).zfill(3)
                 f_name = f_id + os.path.splitext(f_name_orig)[-1]
@@ -63,3 +64,7 @@ class DownloadTelegram:
         MetadataHandler.set_metadata(out_dir, title=title, emoji_dict=emoji_dict)
 
         return True
+
+    @staticmethod
+    def download_stickers_telegram(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+        anyio.run(DownloadTelegram.download_stickers_telegram_async, url, out_dir, opt_cred, cb_msg, cb_bar)

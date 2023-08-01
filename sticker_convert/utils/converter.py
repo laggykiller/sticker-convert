@@ -253,7 +253,7 @@ class StickerConvert:
         
         if extraction_fps:
             if extraction_fps < 1:
-                extraction_fps = f'1/{math.ceil(1 / extraction_fps)}'
+                extraction_fps = 1 / math.ceil(1 / extraction_fps)
             else:
                 extraction_fps = math.ceil(extraction_fps)
 

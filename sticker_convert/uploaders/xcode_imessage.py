@@ -71,9 +71,6 @@ class XcodeImessage:
                     'max': 300
                 }
             },
-            'duration': {
-                'max': 3000
-            },
             'format': ('.png', '.apng', '.gif', '.jpeg', 'jpg'),
             'square': True
         }
