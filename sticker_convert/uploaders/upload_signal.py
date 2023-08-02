@@ -15,7 +15,7 @@ from mergedeep import merge
 
 class UploadSignal:
     @staticmethod
-    async def upload_stickers_signal_async(opt_output, opt_comp, opt_cred, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
+    async def upload_stickers_signal_async(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
         if not opt_cred.get('signal', {}).get('uuid'):
             msg = 'uuid required for uploading to signal'
             return [msg]
@@ -66,13 +66,15 @@ class UploadSignal:
         if author == None:
             raise TypeError(f'author cannot be {author}')
         if emoji_dict == None:
-            msg = 'emoji.txt is required for uploading signal stickers\n'
-            msg += f'emoji.txt generated for you in {in_dir}\n'
-            msg += f'Default emoji is set to {opt_comp.get("default_emoji")}.\n'
-            msg += f'If you just want to use this emoji on all stickers in this pack,\n'
-            msg += f'run script again with --no-compress or tick the "No compression" box.'
+            msg_block = 'emoji.txt is required for uploading signal stickers\n'
+            msg_block += f'emoji.txt generated for you in {in_dir}\n'
+            msg_block += f'Default emoji is set to {opt_comp.get("default_emoji")}.\n'
+            msg_block += f'Please edit emoji.txt now, then continue'
             MetadataHandler.generate_emoji_file(dir=in_dir, default_emoji=opt_comp.get("default_emoji"))
-            return [msg]
+
+            cb_msg_block(msg_block)
+
+            title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=opt_output.get('title'), author=opt_output.get('author'))
         
         packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=200, separate_image_anim=False)
         for pack_title, stickers in packs.items():

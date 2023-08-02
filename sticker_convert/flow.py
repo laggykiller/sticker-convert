@@ -20,7 +20,7 @@ from utils.codec_info import CodecInfo
 class Flow:
     def __init__(self,
         opt_input, opt_comp, opt_output, opt_cred, 
-        input_presets, output_presets, cb_msg, cb_bar, cb_ask_bool):
+        input_presets, output_presets, cb_msg, cb_msg_block, cb_bar, cb_ask_bool):
 
         self.opt_input = opt_input
         self.opt_comp = opt_comp
@@ -29,6 +29,7 @@ class Flow:
         self.input_presets = input_presets
         self.output_presets = output_presets
         self.cb_msg = cb_msg
+        self.cb_msg_block = cb_msg_block
         self.cb_bar = cb_bar
         self.cb_ask_bool = cb_ask_bool
 
@@ -351,7 +352,7 @@ class Flow:
         for exporter in exporters:
             self.out_urls += exporter(
                 opt_output=self.opt_output, opt_comp=self.opt_comp, opt_cred=self.opt_cred, 
-                cb_msg=self.cb_msg, cb_bar=self.cb_bar)
+                cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_bar=self.cb_bar)
         
         return True
     

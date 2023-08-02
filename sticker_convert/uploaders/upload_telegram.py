@@ -15,7 +15,7 @@ from mergedeep import merge
 
 class UploadTelegram:
     @staticmethod
-    def upload_stickers_telegram(opt_output, opt_comp, opt_cred, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
+    def upload_stickers_telegram(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
         if not opt_cred.get('telegram', {}).get('token'):
             msg = 'Token required for uploading to telegram'
             return [msg]
@@ -69,13 +69,15 @@ class UploadTelegram:
         if title == None:
             raise TypeError('title cannot be', title)
         if emoji_dict == None:
-            msg = 'emoji.txt is required for uploading signal stickers\n'
-            msg += f'emoji.txt generated for you in {in_dir}\n'
-            msg += f'Default emoji is set to {opt_comp.get("default_emoji")}.\n'
-            msg += f'If you just want to use this emoji on all stickers in this pack,\n'
-            msg += f'run script again with --no-compress or tick the "No compression" box.'
+            msg_block = 'emoji.txt is required for uploading signal stickers\n'
+            msg_block += f'emoji.txt generated for you in {in_dir}\n'
+            msg_block += f'Default emoji is set to {opt_comp.get("default_emoji")}.\n'
+            msg_block += f'Please edit emoji.txt now, then continue'
             MetadataHandler.generate_emoji_file(dir=in_dir, default_emoji=opt_comp.get("default_emoji"))
-            return [msg]
+
+            cb_msg_block(msg_block)
+
+            title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=opt_output.get('title'), author=opt_output.get('author'))
 
         bot = Bot(opt_cred['telegram']['token'])
         userid = opt_cred['telegram']['userid']

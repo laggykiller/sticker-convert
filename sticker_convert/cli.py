@@ -116,7 +116,7 @@ class CLI:
         flow = Flow(
             self.opt_input, self.opt_comp, self.opt_output, self.opt_cred, 
             self.input_presets, self.output_presets,
-            self.callback_msg, self.callback_bar, self.callback_ask_bool
+            self.callback_msg, self.callback_msg_block, self.callback_bar, self.callback_ask_bool
         )
 
         success = flow.start()
@@ -310,16 +310,9 @@ class CLI:
     
     def callback_msg(self, *args, **kwargs):
         msg = kwargs.get('msg')
-        # cls = kwargs.get('cls')
 
         if not msg and len(args) == 1:
             msg = str(args[0])
-
-        # if cls:
-        #     if sys.platform == 'win32':
-        #         os.system('cls')
-        #     else:
-        #         os.system('clear')
 
         if msg:
             if self.progress_bar:
@@ -327,10 +320,8 @@ class CLI:
             else:
                 print(msg)
 
-    def callback_msg_block(self, msg: str=None, cls: bool=True, *args):
-        if msg:
-            self.callback_msg(msg)
-        elif len(args) > 0:
+    def callback_msg_block(self, *args, **kwargs):
+        if len(args) > 0:
             msg = ' '.join(str(i) for i in args)
             self.callback_msg(msg)
         if not self.no_confirm:

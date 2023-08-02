@@ -19,7 +19,7 @@ def clean_dir(dir):
 
 class CompressWastickers:
     @staticmethod
-    def compress_wastickers(opt_output={}, opt_comp={}, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
+    def compress_wastickers(opt_output={}, opt_comp={}, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
         fake_vid = opt_comp.get('fake_vid', False)
         in_dir = opt_output['dir']
         if not out_dir:

@@ -342,7 +342,7 @@ class GUI:
         flow = Flow(
             opt_input, opt_comp, opt_output, opt_cred, 
             self.input_presets, self.output_presets,
-            self.callback_msg, self.callback_bar, self.callback_ask_bool
+            self.callback_msg, self.callback_msg_block, self.callback_bar, self.callback_ask_bool
             )
         
         success = flow.start()
@@ -417,8 +417,10 @@ class GUI:
         with self.msg_lock:
             self.progress_frame.update_message_box(*args, **kwargs)
     
-    def callback_msg_block(self, message='', parent=None, *args):
-        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
+    def callback_msg_block(self, parent=None, *args, **kwargs):
+        if len(args) > 0:
+            msg = ' '.join(str(i) for i in args)
+            self.exec_in_main(partial(Messagebox.show_info, msg, title='sticker-convert', parent=parent))
     
     def callback_bar(self, *args, **kwargs):
         with self.bar_lock:
