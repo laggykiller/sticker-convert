@@ -14,7 +14,7 @@
     "line": {
         "full_name": "Download from Line",
         "help": "Download line stickers from a URL / ID as input",
-        "example": "Example: https://store.line.me/stickershop/product/1234/en OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234",
+        "example": "Example: https://store.line.me/stickershop/product/1234/en\n OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234",
         "address_lbls": "URL address / ID"
     },
     "kakao": {

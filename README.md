@@ -128,8 +128,7 @@ Input options:
   --download-line DOWNLOAD_LINE
                         Download line stickers from a URL / ID as input
                         (Example: https://store.line.me/stickershop/product/1234/en
-                        OR https://line.me/S/sticker/1234/?lang=en
-                        OR line://shop/detail/1234 OR 1234)
+                        OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234)
   --download-kakao DOWNLOAD_KAKAO
                         Download kakao stickers from a URL / ID as input
                         (Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400
