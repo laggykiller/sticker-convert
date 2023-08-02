@@ -87,7 +87,7 @@ class CLI:
             elif k in flags_str:
                 keyword_args = {'default': None}
             elif k in flags_bool:
-                keyword_args = {'action': 'store_true'}
+                keyword_args = {'action': 'store_true', 'default': None}
             else:
                 continue
             parser_input_src.add_argument(f'--{k.replace("_", "-")}', **keyword_args, dest=k, help=v)
