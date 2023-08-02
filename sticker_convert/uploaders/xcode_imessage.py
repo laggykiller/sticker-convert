@@ -12,10 +12,6 @@ from utils.codec_info import CodecInfo
 
 from mergedeep import merge
 
-def clean_dir(dir):
-    for i in os.listdir(dir):
-        shutil.rmtree(os.path.join(dir, i))
-
 class XcodeImessage:
     def __init__(self):
         self.iconset = {}
@@ -134,7 +130,7 @@ class XcodeImessage:
 
     @staticmethod
     def add_metadata(in_dir, out_dir, author, title):
-        first_image_path = os.path.join(in_dir, [i for i in os.listdir(in_dir) if i.endswith('.png')][0])
+        first_image_path = os.path.join(in_dir, [i for i in os.listdir(in_dir) if os.path.isfile(os.path.join(in_dir, i)) and i.endswith('.png')][0])
         cover_path = os.path.join(in_dir, 'cover.png')
         cover_path_new = os.path.join(out_dir, 'cover.png')
         if os.path.isfile(cover_path) and cover_path_new != cover_path:

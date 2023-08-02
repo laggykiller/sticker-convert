@@ -8,7 +8,7 @@ from utils.codec_info import CodecInfo
 
 class DownloadSignal:
     @staticmethod
-    async def download_stickers_signal_async(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+    async def download_stickers_signal_async(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
         if 'signal.art' not in url:
             cb_msg('Download failed: Unrecognized URL format')
             return False
@@ -54,5 +54,5 @@ class DownloadSignal:
         return True
     
     @staticmethod
-    def download_stickers_signal(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
-        return anyio.run(DownloadSignal.download_stickers_signal_async, url, out_dir, opt_cred, cb_msg, cb_bar)
+    def download_stickers_signal(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
+        return anyio.run(DownloadSignal.download_stickers_signal_async, url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)

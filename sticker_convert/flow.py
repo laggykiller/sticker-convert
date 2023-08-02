@@ -2,6 +2,7 @@
 import os
 import shutil
 import time
+from datetime import datetime
 from threading import Thread
 
 from downloaders.download_line import DownloadLine
@@ -49,6 +50,7 @@ class Flow:
         tasks = (
             self.sanitize,
             self.verify_input,
+            self.cleanup,
             self.download,
             self.compress,
             self.export,
@@ -155,31 +157,6 @@ class Flow:
         if msg != '':
             self.cb_msg(msg)
             return False
-
-
-        # Check if input and ouput directories have files and prompt for deletion
-        # It is possible to help the user to delete files but this is dangerous
-        if self.opt_input['option'] != 'local' and os.listdir(self.opt_input['dir']) != []:
-            msg = 'Input directory is not empty (e.g. Files from previous run?)\n'
-            msg += f'Input directory is set to {self.opt_input["dir"]}\n'
-            msg += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
-
-            response = self.cb_ask_bool(msg)
-
-            if response == False:
-                return False
-
-        if self.opt_output['option'] != 'local' and self.opt_comp['no_compress'] == False and os.listdir(self.opt_output['dir']) != []:
-            msg = 'Output directory is not empty (e.g. Files from previous run?)\n'
-            msg += f'Output directory is set to {self.opt_output["dir"]}\n'
-            msg += 'Hint: If you just want to upload files that you had compressed before,\n'
-            msg += 'please choose "No compression" or --no-compression\n'
-            msg += 'You may continue at risk of contaminating the resulting sticker pack. Continue?'
-
-            response = self.cb_ask_bool(msg)
-
-            if response == False:
-                return False
         
         # Check if preset not equal to export option
         # Only warn if the compression option is available in export preset
@@ -229,6 +206,45 @@ class Flow:
         
         return True
 
+    def cleanup(self):
+        # If input is 'From local directory', then we should keep files in input/output directory as it maybe edited by user
+        # If input is not 'From local directory', then we should move files in input/output directory as new files will be downloaded
+        # Output directory should be cleanup unless no_compress is true (meaning files in output directory might be edited by user)
+
+        timestamp = datetime.now().strftime('%Y-%d-%m_%H-%M-%S')
+        dir_name = 'archive_' + timestamp
+
+        in_dir_files = [i for i in os.listdir(self.opt_input['dir']) if not i.startswith('archive_')]
+        out_dir_files = [i for i in os.listdir(self.opt_output['dir']) if not i.startswith('archive_')]
+
+        if self.opt_input['option'] == 'local':
+            self.cb_msg('Skip moving old files in input directory as input source is local')
+        elif len(in_dir_files) == 0:
+            self.cb_msg('Skip moving old files in input directory as input source is empty')
+        else:
+            archive_dir = os.path.join(self.opt_input['dir'], dir_name)
+            self.cb_msg(f"Moving old files in input directory to {archive_dir} as input source is not local")
+            os.makedirs(archive_dir)
+            for i in in_dir_files:
+                old_path = os.path.join(self.opt_input['dir'], i)
+                new_path = os.path.join(archive_dir, i)
+                shutil.move(old_path, new_path)
+
+        if self.opt_comp['no_compress']:
+            self.cb_msg('Skip moving old files in output directory as no_compress is True')
+        elif len(out_dir_files) == 0:
+            self.cb_msg('Skip moving old files in output directory as output source is empty')
+        else:
+            archive_dir = os.path.join(self.opt_output['dir'], dir_name)
+            self.cb_msg(f"Moving old files in output directory to {archive_dir}")
+            os.makedirs(archive_dir)
+            for i in out_dir_files:
+                old_path = os.path.join(self.opt_output['dir'], i)
+                new_path = os.path.join(archive_dir, i)
+                shutil.move(old_path, new_path)
+        
+        return True
+
     def download(self):
         downloaders = []
 
@@ -255,7 +271,7 @@ class Flow:
                 url=self.opt_input['url'], 
                 out_dir=self.opt_input['dir'], 
                 opt_cred=self.opt_cred,
-                cb_msg=self.cb_msg, cb_bar=self.cb_bar)
+                cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_bar=self.cb_bar)
             self.cb_bar(set_progress_mode='indeterminate')
             if success == False:
                 return False
@@ -265,12 +281,18 @@ class Flow:
     def compress(self):
         if self.opt_comp['no_compress'] == True:
             self.cb_msg('no_compress is set to True, skip compression')
-            if len(os.listdir(self.opt_output['dir'])) == 0 and not len(os.listdir(self.opt_input['dir'])) == 0:
-                for i in os.listdir(self.opt_input['dir']):
+            in_dir_files = [i for i in os.listdir(self.opt_input['dir']) if os.path.isfile(os.path.join(self.opt_input['dir'], i))]
+            out_dir_files = [i for i in os.listdir(self.opt_output['dir']) if os.path.isfile(os.path.join(self.opt_output['dir'], i))]
+            if len(in_dir_files) == 0:
+                self.cb_msg('Input directory is empty, nothing to copy to output directory')
+            elif len(out_dir_files) != 0:
+                self.cb_msg('Output directory is not empty, not copying files from input directory')
+            else:
+                self.cb_msg('Output directory is empty, copying files from input directory')
+                for i in in_dir_files:
                     src_f = os.path.join(self.opt_input['dir'], i)
                     dst_f = os.path.join(self.opt_output['dir'], i)
-                    if os.path.isfile(src_f):
-                        shutil.copy(src_f, dst_f)
+                    shutil.copy(src_f, dst_f)
             return True
         msg = 'Compressing...'
 
@@ -287,8 +309,10 @@ class Flow:
         # .m4a: line sticker sound effects
         for i in os.listdir(input_dir):
             in_f = os.path.join(input_dir, i)
-
-            if CodecInfo.get_file_ext(i) in ('.txt', '.m4a'):
+            
+            if not os.path.isfile(in_f):
+                continue
+            elif CodecInfo.get_file_ext(i) in ('.txt', '.m4a'):
                 shutil.copy(in_f, os.path.join(output_dir, i))
             else:
                 in_fs.append(i)
@@ -359,6 +383,10 @@ class Flow:
                 opt_output=self.opt_output, opt_comp=self.opt_comp, opt_cred=self.opt_cred, 
                 cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_bar=self.cb_bar)
         
+        if self.out_urls != []:
+            with open(os.path.join(self.opt_output['dir'], 'export-result.txt'), 'w+') as f:
+                f.writelines(self.out_urls)
+                
         return True
     
     def report(self):

@@ -137,7 +137,7 @@ def get_title_from_id(item_code, auth_token):
     return title
 
 class DownloadKakao:
-    def __init__(self, url, out_dir, auth_token=None, cb_msg=print, cb_bar=None):
+    def __init__(self, url, out_dir, auth_token=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
         self.url = url
         self.out_dir = out_dir
         self.auth_token = auth_token
@@ -270,8 +270,8 @@ class DownloadKakao:
         return True
 
     @staticmethod
-    def download_stickers_kakao(url, out_dir, opt_cred, cb_msg=print, cb_bar=None):
+    def download_stickers_kakao(url, out_dir, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None):
         auth_token = opt_cred['kakao']['auth_token']
 
-        k = DownloadKakao(url, out_dir, auth_token, cb_msg, cb_bar)
+        k = DownloadKakao(url, out_dir, auth_token, cb_msg, cb_msg_block, cb_bar)
         return k.start()

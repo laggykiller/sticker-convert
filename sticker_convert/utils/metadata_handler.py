@@ -18,7 +18,7 @@ class MetadataHandler:
             stickers_present.remove('.DS_Store')
         if '._.DS_Store' in stickers_present:
             stickers_present.remove('._.DS_Store')
-        stickers_present = [i for i in stickers_present if not i.endswith(('.txt', '.m4a'))]
+        stickers_present = [i for i in stickers_present if os.path.isfile(os.path.join(dir, i)) and not i.endswith(('.txt', '.m4a'))]
 
         return stickers_present
     
@@ -68,7 +68,7 @@ class MetadataHandler:
 
         emoji_dict_new = {}
         for file in os.listdir(dir):
-            if CodecInfo.get_file_ext(file) == '.txt':
+            if not os.path.isfile(os.path.join(dir, file)) and CodecInfo.get_file_ext(file) in ('.txt', '.m4a'):
                 continue
             file_name = os.path.splitext(file)[0]
             if emoji_dict and file_name in emoji_dict:

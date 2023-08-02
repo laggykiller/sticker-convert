@@ -13,10 +13,6 @@ from utils.cache_store import CacheStore
 
 from mergedeep import merge
 
-def clean_dir(dir):
-    for i in os.listdir(dir):
-        shutil.rmtree(os.path.join(dir, i))
-
 class CompressWastickers:
     @staticmethod
     def compress_wastickers(opt_output={}, opt_comp={}, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
@@ -119,7 +115,7 @@ class CompressWastickers:
                 StickerConvert.convert_and_compress_to_size(os.path.join(in_dir, f'cover.png'), cover_path, opt_comp_merged, cb_msg)
         else:
             # First image in the directory, extracting first frame
-            first_image = [i for i in os.listdir(in_dir) if not i.endswith('.txt') and not i.endswith('.wastickers')][0]
+            first_image = [i for i in os.listdir(in_dir) if os.path.isfile(os.path.join(in_dir, i)) and not i.endswith('.txt') and not i.endswith('.wastickers')][0]
             StickerConvert.compress_to_size(StickerConvert.convert_generic_image, os.path.join(in_dir, f'{first_image}[0]'), cover_path, opt_comp_merged, cb_msg)
         
         MetadataHandler.set_metadata(tmp_dir, author=author, title=title)

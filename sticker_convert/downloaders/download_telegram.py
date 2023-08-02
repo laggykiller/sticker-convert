@@ -20,7 +20,7 @@ def cwd(path):
 
 class DownloadTelegram:
     @staticmethod
-    async def download_stickers_telegram_async(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
+    async def download_stickers_telegram_async(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
         token = opt_cred.get('telegram', {}).get('token')
         if token == None:
             cb_msg('Download failed: Token required for downloading from telegram')
@@ -66,5 +66,5 @@ class DownloadTelegram:
         return True
 
     @staticmethod
-    def download_stickers_telegram(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
-        return anyio.run(DownloadTelegram.download_stickers_telegram_async, url, out_dir, opt_cred, cb_msg, cb_bar)
+    def download_stickers_telegram(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
+        return anyio.run(DownloadTelegram.download_stickers_telegram_async, url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)
