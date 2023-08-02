@@ -4,8 +4,12 @@
 import requests
 import json
 import os
+import io
+import zipfile
+import string
 from urllib import parse
 from PIL import Image
+from bs4 import BeautifulSoup
 
 from utils.metadata_handler import MetadataHandler
 
@@ -18,83 +22,186 @@ class DownloadLine:
             }
         
         region = ''
-        if url.isnumeric():
-            pack_id = url
-        elif url.startswith('line://shop/detail/'):
+        is_emoji = False
+        if url.startswith('line://shop/detail/'):
             pack_id = url.replace('line://shop/detail/', '')
+            if len(url) == 24 and all(c in string.hexdigits for c in url):
+                is_emoji = True
         elif url.startswith('https://store.line.me/stickershop/product/'):
             pack_id = url.replace('https://store.line.me/stickershop/product/', '').split('/')[0]
             region = url.replace('https://store.line.me/stickershop/product/', '').split('/')[1]
+        elif url.startswith('https://line.me/S/sticker'):
+            url_parsed = parse.urlparse(url)
+            pack_id = url.replace('https://line.me/S/sticker/', '').split('/')[0]
+            region = parse.parse_qs(url_parsed.query)['lang']
+        elif url.startswith('https://store.line.me/emojishop/product/'):
+            pack_id = url.replace('https://store.line.me/emojishop/product/', '').split('/')[0]
+            region = url.replace('https://store.line.me/emojishop/product/', '').split('/')[1]
+            is_emoji = True
+        elif url.startswith('https://line.me/S/emoji'):
+            url_parsed = parse.urlparse(url)
+            pack_id = parse.parse_qs(url_parsed.query)['id']
+            region = parse.parse_qs(url_parsed.query)['lang']
+            is_emoji = True
+        elif len(url) == 24 and all(c in string.hexdigits for c in url):
+            pack_id = url
+            is_emoji = True
+        elif url.isnumeric():
+            pack_id = url
         else:
             cb_msg('Download failed: Unsupported URL format')
             return False
 
-        pack_meta_r = requests.get(f"http://dl.stickershop.line.naver.jp/products/0/0/1/{pack_id}/android/productInfo.meta")
+        if is_emoji:
+            pack_meta_r = requests.get(f"https://stickershop.line-scdn.net/sticonshop/v1/{pack_id}/sticon/iphone/meta.json")
 
-        if pack_meta_r.status_code == 200:
-            pack_meta = json.loads(pack_meta_r.text)
-        else:
-            return False
-
-        if region == '':
-            if 'en' in pack_meta['title']:
-                # Prefer en release
-                region = 'en'
+            if pack_meta_r.status_code == 200:
+                pack_meta = json.loads(pack_meta_r.text)
             else:
-                # If no en release, use whatever comes first
-                region = pack_meta['title'].keys()[0]
-        
-        if region == 'zh-Hant':
-            region = 'zh_TW'
+                return False
+            
+            if region == '':
+                region = 'en'
 
-        title = pack_meta['title'].get(region)
-        if title == None:
-            title = pack_meta['title']['en']
+            pack_store_page = requests.get(f"https://store.line.me/emojishop/product/{pack_id}/{region}")
 
-        author = pack_meta['author'].get(region)
-        if author == None:
-            author = pack_meta['author']['en']
+            if pack_store_page.status_code != 200:
+                return False
+
+            pack_store_page_soup = BeautifulSoup(pack_store_page.text, 'html.parser')
+            title = pack_store_page_soup.find(class_='mdCMN38Item01Txt').text
+            author = pack_store_page_soup.find(class_='mdCMN38Item01Author').text
+        else:
+            pack_meta_r = requests.get(f"http://dl.stickershop.line.naver.jp/products/0/0/1/{pack_id}/android/productInfo.meta")
+
+            if pack_meta_r.status_code == 200:
+                pack_meta = json.loads(pack_meta_r.text)
+            else:
+                return False
+
+            if region == '':
+                if 'en' in pack_meta['title']:
+                    # Prefer en release
+                    region = 'en'
+                else:
+                    # If no en release, use whatever comes first
+                    region = pack_meta['title'].keys()[0]
+            
+            if region == 'zh-Hant':
+                region = 'zh_TW'
+
+            title = pack_meta['title'].get(region)
+            if title == None:
+                title = pack_meta['title']['en']
+
+            author = pack_meta['author'].get(region)
+            if author == None:
+                author = pack_meta['author']['en']
 
         MetadataHandler.set_metadata(out_dir, title=title, author=author)
 
         num = 0
-        dl_targets = []
         sticker_text_dict = {}
-        for sticker in pack_meta['stickers']:
-            sticker_id = sticker['id']
-            out_path = os.path.join(out_dir, str(num).zfill(3))
 
-            if pack_meta.get('hasSound') == True:
-                # Packs with sound does not necessary have 'stickerResourceType' attribute
-                if pack_meta.get('stickerResourceType') == 'ANIMATION_SOUND':
-                    dl_targets.append((f'https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/iphone/animation/{sticker_id}@2x.png', out_path + '.apng'))
-                elif requests.get(f'https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/iphone/animation/{sticker_id}@2x.png').ok:
-                    dl_targets.append((f'https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/iphone/animation/{sticker_id}@2x.png', out_path + '.apng'))
-                else:
-                    dl_targets.append((f'http://dl.stickershop.line.naver.jp/stickershop/v1/sticker/{sticker_id}/iphone/sticker@2x.png', out_path + '.png'))
-                dl_targets.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/android/sticker_sound.m4a', out_path + '.m4a'))
-
-            elif pack_meta.get('stickerResourceType') == 'POPUP':
-                dl_targets.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/android/sticker_popup.png', out_path + '.apng'))
-
-            elif pack_meta.get('stickerResourceType') in ('ANIMATION', 'ANIMATION_SOUND'):
-                dl_targets.append((f'https://sdl-stickershop.line.naver.jp/products/0/0/1/{pack_id}/iphone/animation/{sticker_id}@2x.png', out_path + '.apng'))
+        # Reference: https://sora.vercel.app/line-sticker-download
+        if is_emoji:
+            if pack_meta.get('sticonResourceType') == 'ANIMATION':
+                pack_url = f'https://stickershop.line-scdn.net/sticonshop/v1/{pack_id}/sticon/iphone/package_animation.zip'
+            else:
+                pack_url = f'https://stickershop.line-scdn.net/sticonshop/v1/{pack_id}/sticon/iphone/package.zip'
+        else:
+            if pack_meta.get('stickerResourceType') in ('ANIMATION', 'ANIMATION_SOUND', 'POPUP') or pack_meta.get('hasSound') == True:
+                pack_url = f'https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/iphone/stickerpack@2x.zip'
             
             elif pack_meta.get('stickerResourceType') == 'PER_STICKER_TEXT':
-                dl_targets.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/base/plus/sticker@2x.png', out_path + '-base.png'))
-                sticker_text_dict[num] = {
-                    'sticker_id': sticker_id,
-                    'sticker_text': sticker['customPlus']['defaultText']
-                    }
+                pack_url = f'https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/iphone/sticker_custom_plus_base@2x.zip'
+
             elif pack_meta.get('stickerResourceType') == 'NAME_TEXT':
-                dl_targets.append(f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/base/sticker@2x.png', out_path + '.png')
+                pack_url = f'https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/iphone/sticker_name_base@2x.zip'
                 # Customizing the text requires Line account
 
             else:
-                dl_targets.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/sticker@2x.png', out_path + '.png'))
-            
-            num += 1
+                pack_url = f'https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/iphone/stickers@2x.zip'
+
+        response = requests.get(pack_url, stream=True)
+        total_length = int(response.headers.get('content-length'))
+        zip_file = b''
+        chunk_size = 102400
+
+        if response.status_code != 200:
+            cb_msg(f'Download failed: Cannot download {pack_url}')
+            return False
+        else:
+            cb_msg(f'Downloading {pack_url}')
+
+        if cb_bar:
+            cb_bar(set_progress_mode='determinate', steps=(total_length/chunk_size) + 1)
+
+        for chunk in response.iter_content(chunk_size=chunk_size):
+            if chunk:
+                zip_file += chunk
+                if cb_bar:
+                    cb_bar(update_bar=True)
         
+        num = 0
+        with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
+            cb_msg(f'Unzipping...')
+            if is_emoji:
+                cb_bar(set_progress_mode='determinate', steps=len(pack_meta['orders']))
+                for sticker in pack_meta['orders']:
+                    if pack_meta.get('sticonResourceType') == 'ANIMATION':
+                        f_path = str(sticker) + '_animation.png'
+                    else:
+                        f_path = str(sticker) + '.png'
+                    data = zf.read(f_path)
+                    cb_msg(f'Read {f_path}')
+                    
+                    out_path = os.path.join(out_dir, str(num).zfill(3) + '.png')
+                    with open(out_path, 'wb') as f:
+                        f.write(data)
+                    
+                    if cb_bar:
+                        cb_bar(update_bar=True)
+
+                    num += 1
+            
+            else:
+                cb_bar(set_progress_mode='determinate', steps=len(pack_meta['stickers']))
+                for sticker in pack_meta['stickers']:
+                    if pack_meta.get('stickerResourceType') in ('ANIMATION', 'ANIMATION_SOUND'):
+                        f_path = 'animation@2x/' + str(sticker['id']) + '@2x.png'
+                    elif pack_meta.get('stickerResourceType') == 'POPUP':
+                        f_path = 'popup/' + str(sticker['id']) + '.png'
+                    else:
+                        f_path = str(sticker['id']) + '@2x.png'
+                    data = zf.read(f_path)
+                    cb_msg(f'Read {f_path}')
+                    
+                    out_path = os.path.join(out_dir, str(num).zfill(3) + '.png')
+                    with open(out_path, 'wb') as f:
+                        f.write(data)
+                    
+                    if pack_meta.get('stickerResourceType') == 'PER_STICKER_TEXT':
+                        sticker_text_dict[num] = {
+                            'sticker_id': sticker['id'],
+                            'sticker_text': sticker['customPlus']['defaultText']
+                            }
+                    
+                    if pack_meta.get('hasSound'):
+                        f_path = 'sound/' + str(sticker['id']) + '.m4a'
+                        data = zf.read(f_path)
+                        cb_msg(f'Read {f_path}')
+                        
+                        out_path = os.path.join(out_dir, str(num).zfill(3) + '.m4a')
+                        with open(out_path, 'wb') as f:
+                            f.write(data)
+                    
+                    if cb_bar:
+                        cb_bar(update_bar=True)
+
+                    num += 1
+        
+        dl_targets = []
         if sticker_text_dict != {}:
             line_sticker_text_path = os.path.join(out_dir, 'line-sticker-text.txt')
 
@@ -142,19 +249,17 @@ class DownloadLine:
                 cb_msg(f'Cannot download {i[0]} (tried 3 times)')
         
         for i in os.listdir(out_dir):
-            if i.endswith('-base.png'):
-                base_path = os.path.join(out_dir, i)
-                text_path = os.path.join(out_dir, i.replace('-base.png', '-text.png'))
-                combined_path = os.path.join(out_dir, i.replace('-base.png', '.png'))
+            if i.endswith('-text.png'):
+                base_path = os.path.join(out_dir, i.replace('-text.png', '.png'))
+                text_path = os.path.join(out_dir, i)
 
                 base_img = Image.open(base_path).convert('RGBA')
                 text_img = Image.open(text_path).convert('RGBA')
 
-                Image.alpha_composite(base_img, text_img).save(combined_path)
+                Image.alpha_composite(base_img, text_img).save(base_path)
 
-                os.remove(base_path)
                 os.remove(text_path)
 
-                cb_msg(f"Combined {i.replace('-base.png', '.png')}")
+                cb_msg(f"Combined {i.replace('-text.png', '.png')}")
         
         return True

@@ -31,6 +31,7 @@ class DownloadTelegram:
             return False
 
         bot= Bot(token)
+        await bot.initialize()
 
         title = ""
         try:
@@ -47,14 +48,12 @@ class DownloadTelegram:
         num = 0
         with CacheStore.get_cache_store() as tempdir:
             for i in sticker_set.stickers:
-                with cwd(tempdir):
-                    f_name_orig = await i.get_file(read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
-                    await f_name_orig.download_to_drive(read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
-                f_path_orig = os.path.join(tempdir, f_name_orig)
+                file = await i.get_file(read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
+                ext = os.path.splitext(file.file_path)[-1]
                 f_id = str(num).zfill(3)
-                f_name = f_id + os.path.splitext(f_name_orig)[-1]
+                f_name = f_id + ext
                 f_path = os.path.join(out_dir, f_name)
-                shutil.move(f_path_orig, f_path)
+                await file.download_to_drive(custom_path=f_path, read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
                 emoji_dict[f_id] = i.emoji
                 cb_msg(f'Downloaded {f_name}')
                 if cb_bar:
@@ -62,6 +61,8 @@ class DownloadTelegram:
                 num += 1
         
         MetadataHandler.set_metadata(out_dir, title=title, emoji_dict=emoji_dict)
+
+        await bot.shutdown()
 
         return True
 
