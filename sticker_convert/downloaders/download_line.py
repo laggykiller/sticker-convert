@@ -86,9 +86,12 @@ class DownloadLine:
                     'sticker_id': sticker_id,
                     'sticker_text': sticker['customPlus']['defaultText']
                     }
+            elif pack_meta.get('stickerResourceType') == 'NAME_TEXT':
+                dl_targets.append(f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/base/sticker@2x.png', out_path + '.png')
+                # Customizing the text requires Line account
 
             else:
-                dl_targets.append((f'http://dl.stickershop.line.naver.jp/stickershop/v1/sticker/{sticker_id}/iphone/sticker@2x.png', out_path + '.png'))
+                dl_targets.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/sticker@2x.png', out_path + '.png'))
             
             num += 1
         
