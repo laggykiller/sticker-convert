@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import shutil
 import os
-import tempfile
 import copy
 
 from utils.converter import StickerConvert

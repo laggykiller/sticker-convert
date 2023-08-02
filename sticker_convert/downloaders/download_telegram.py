@@ -1,22 +1,11 @@
 #!/usr/bin/env python3
 import os
-from contextlib import contextmanager
-import shutil
 
 from utils.metadata_handler import MetadataHandler
 from utils.cache_store import CacheStore
 
 import anyio
 from telegram import Bot
-
-@contextmanager
-def cwd(path):
-    oldpwd = os.getcwd()
-    os.chdir(path)
-    try:
-        yield
-    finally:
-        os.chdir(oldpwd)
 
 class DownloadTelegram:
     @staticmethod

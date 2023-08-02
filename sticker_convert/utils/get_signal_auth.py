@@ -1,12 +1,11 @@
+#!/usr/bin/env python3
 import os
 import shutil
 import stat
 import sys
 import platform
-import time
 import zipfile
 import string
-import tempfile
 import webbrowser
 
 import requests
@@ -14,6 +13,7 @@ from selenium import webdriver
 from selenium.common.exceptions import JavascriptException
 
 from .run_bin import RunBin
+from .cache_store import CacheStore
 
 # https://stackoverflow.com/a/17197027
 def strings(filename, min=4):
@@ -97,8 +97,8 @@ class GetSignalAuth:
         chromedriver_url = f'https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_{chromedriver_platform}.zip'
         self.cb_msg(f'Downloading chromedriver: {chromedriver_url}')
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            chromedriver_zip_path = os.path.join(tmpdir, 'chromedriver.zip')
+        with CacheStore.get_cache_store() as tempdir:
+            chromedriver_zip_path = os.path.join(tempdir, 'chromedriver.zip')
             with open(chromedriver_zip_path, 'wb+') as f:
                 f.write(requests.get(chromedriver_url).content)
             

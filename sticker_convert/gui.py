@@ -2,7 +2,6 @@
 import os
 import sys
 import time
-import math
 from multiprocessing import cpu_count
 from threading import Thread, Lock, current_thread, main_thread
 from queue import Queue
