@@ -82,7 +82,10 @@ class DownloadLine:
             
             elif pack_meta.get('stickerResourceType') == 'PER_STICKER_TEXT':
                 dl_targets.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/base/plus/sticker@2x.png', out_path + '-base.png'))
-                sticker_text_dict[sticker_id] = sticker['customPlus']['defaultText']
+                sticker_text_dict[num] = {
+                    'sticker_id': sticker_id,
+                    'sticker_text': sticker['customPlus']['defaultText']
+                    }
 
             else:
                 dl_targets.append((f'http://dl.stickershop.line.naver.jp/stickershop/v1/sticker/{sticker_id}/iphone/sticker@2x.png', out_path + '.png'))
@@ -90,23 +93,25 @@ class DownloadLine:
             num += 1
         
         if sticker_text_dict != {}:
-            with open(os.path.join(out_dir, 'line-sticker-text.txt'), 'w+', encoding='utf-8') as f:
-                json.dump(sticker_text_dict, f, indent=4, ensure_ascii=False)
+            line_sticker_text_path = os.path.join(out_dir, 'line-sticker-text.txt')
 
-            msg_block = 'The Line sticker pack you are downloading can have customized text.\n'
-            msg_block += 'line-sticker-text.txt has been created in input directory.\n'
-            msg_block += 'Please edit line-sticker-text.txt, then continue.'
-            cb_msg_block(msg_block)
+            if not os.path.isfile(line_sticker_text_path):
+                with open(line_sticker_text_path, 'w+', encoding='utf-8') as f:
+                    json.dump(sticker_text_dict, f, indent=4, ensure_ascii=False)
 
-            with open(os.path.join(out_dir, 'line-sticker-text.txt') , "r", encoding='utf-8') as f:
+                msg_block = 'The Line sticker pack you are downloading can have customized text.\n'
+                msg_block += 'line-sticker-text.txt has been created in input directory.\n'
+                msg_block += 'Please edit line-sticker-text.txt, then continue.'
+                cb_msg_block(msg_block)
+
+            with open(line_sticker_text_path , "r", encoding='utf-8') as f:
                 sticker_text_dict = json.load(f)
             
-            num = 0
-            for sticker_id, sticker_text in sticker_text_dict.items():
+            for num, data in sticker_text_dict.items():
                 out_path = os.path.join(out_dir, str(num).zfill(3))
+                sticker_id = data['sticker_id']
+                sticker_text = data['sticker_text']
                 dl_targets.append((f'https://store.line.me/overlay/sticker/{pack_id}/{sticker_id}/iPhone/sticker.png?text={parse.quote(sticker_text)}', out_path + '-text.png'))
-                
-                num += 1
         
         if cb_bar:
             cb_bar(set_progress_mode='determinate', steps=len(dl_targets))
