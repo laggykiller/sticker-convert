@@ -159,4 +159,4 @@ class UploadTelegram:
     
     @staticmethod
     def upload_stickers_telegram(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
-        return anyio.run(UploadTelegram.upload_stickers_telegram_async, opt_output, opt_comp, opt_cred, cb_msg, cb_bar, out_dir)
+        return anyio.run(UploadTelegram.upload_stickers_telegram_async, opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)

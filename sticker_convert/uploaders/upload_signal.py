@@ -125,5 +125,5 @@ class UploadSignal:
         return urls
 
     @staticmethod
-    def upload_stickers_signal(opt_output, opt_comp, opt_cred, cb_msg=print, cb_bar=None, out_dir=None, **kwargs):
-        return anyio.run(UploadSignal.upload_stickers_signal_async, opt_output, opt_comp, opt_cred, cb_msg, cb_bar, out_dir)
+    def upload_stickers_signal(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
+        return anyio.run(UploadSignal.upload_stickers_signal_async, opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
