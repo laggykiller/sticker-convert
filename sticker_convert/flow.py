@@ -281,7 +281,18 @@ class Flow:
             msg += '\nTips: Compressing .apng takes long time.'
             msg += '\nConsider using another format or lowering "--steps"'
         
-        in_fs = os.listdir(input_dir)
+        in_fs = []
+
+        # .txt: emoji.txt, title.txt
+        # .m4a: line sticker sound effects
+        for i in os.listdir(input_dir):
+            in_f = os.path.join(input_dir, i)
+
+            if CodecInfo.get_file_ext(i) in ('.txt', '.m4a'):
+                shutil.copy(in_f, os.path.join(output_dir, i))
+            else:
+                in_fs.append(i)
+
         in_fs_count = len(in_fs)
 
         self.cb_msg(msg)
@@ -290,12 +301,6 @@ class Flow:
         threads = []
         for i in in_fs:
             in_f = os.path.join(input_dir, i)
-
-            # .txt: emoji.txt, title.txt
-            # .m4a: line sticker sound effects
-            if CodecInfo.get_file_ext(i) in ('.txt', '.m4a'):
-                shutil.copy(in_f, os.path.join(output_dir, i))
-                continue
 
             if CodecInfo.is_anim(in_f) or self.opt_comp['fake_vid']:
                 extension = self.opt_comp['format']['vid']
