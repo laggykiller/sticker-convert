@@ -417,10 +417,10 @@ class GUI:
         with self.msg_lock:
             self.progress_frame.update_message_box(*args, **kwargs)
     
-    def callback_msg_block(self, parent=None, *args, **kwargs):
-        if len(args) > 0:
-            msg = ' '.join(str(i) for i in args)
-            self.exec_in_main(partial(Messagebox.show_info, msg, title='sticker-convert', parent=parent))
+    def callback_msg_block(self, message=None, parent=None, *args, **kwargs):
+        if message == None and len(args) > 0:
+            message = ' '.join(str(i) for i in args)
+        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
     
     def callback_bar(self, *args, **kwargs):
         with self.bar_lock:
