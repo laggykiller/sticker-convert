@@ -13,4 +13,6 @@ services:
       # - 5900:5900 # Optional for VNC
     tmpfs:
       - /tmp
+    dns:
+      - 1.1.1.1 # Or else download/upload to telegram fails in Docker
     # command: /usr/bin/python3 /app/main.py --help # Your command here

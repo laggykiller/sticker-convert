@@ -67,4 +67,4 @@ class DownloadTelegram:
 
     @staticmethod
     def download_stickers_telegram(url, out_dir, opt_cred=None, cb_msg=print, cb_bar=None):
-        anyio.run(DownloadTelegram.download_stickers_telegram_async, url, out_dir, opt_cred, cb_msg, cb_bar)
+        return anyio.run(DownloadTelegram.download_stickers_telegram_async, url, out_dir, opt_cred, cb_msg, cb_bar)

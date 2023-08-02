@@ -9,13 +9,14 @@ from utils.format_verify import FormatVerify
 from utils.codec_info import CodecInfo
 from utils.cache_store import CacheStore
 
+import anyio
 from telegram import Bot
 from telegram.error import TelegramError
 from mergedeep import merge
 
 class UploadTelegram:
     @staticmethod
-    def upload_stickers_telegram(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
+    async def upload_stickers_telegram_async(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
         if not opt_cred.get('telegram', {}).get('token'):
             msg = 'Token required for uploading to telegram'
             return [msg]
@@ -80,6 +81,7 @@ class UploadTelegram:
             title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=opt_output.get('title'), author=opt_output.get('author'))
 
         bot = Bot(opt_cred['telegram']['token'])
+        await bot.initialize()
         userid = opt_cred['telegram']['userid']
 
         packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_anim_pack=50, file_per_image_pack=120, separate_image_anim=not fake_vid)
@@ -93,7 +95,7 @@ class UploadTelegram:
             name = re.sub('[^0-9a-zA-Z]+', '_', name) # name used in url, only alphanum and underscore only
 
             try:
-                pack_exists = True if bot.getStickerSet(name) else False
+                pack_exists = True if await bot.get_sticker_set(name) else False
             except TelegramError:
                 pack_exists = False
 
@@ -130,14 +132,14 @@ class UploadTelegram:
                     
                     try:
                         if pack_exists == False:
-                            bot.create_new_sticker_set(
+                            await bot.create_new_sticker_set(
                                 userid, name, pack_title, emoji,
                                 png_sticker=open(png_sticker, 'rb') if png_sticker else None,
                                 tgs_sticker=open(tgs_sticker, 'rb') if tgs_sticker else None,
                                 webm_sticker=open(webm_sticker, 'rb') if webm_sticker else None)
                             pack_exists = True
                         else:
-                            bot.add_sticker_to_set(
+                            await bot.add_sticker_to_set(
                                 userid, name, emoji,
                                 png_sticker=open(png_sticker, 'rb') if png_sticker else None,
                                 tgs_sticker=open(tgs_sticker, 'rb') if tgs_sticker else None,
@@ -150,5 +152,11 @@ class UploadTelegram:
             result = f'https://t.me/addstickers/{name}'
             cb_msg(result)
             urls.append(result)
+        
+        await bot.shutdown()
 
         return urls
+    
+    @staticmethod
+    def upload_stickers_telegram(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
+        return anyio.run(UploadTelegram.upload_stickers_telegram_async, opt_output, opt_comp, opt_cred, cb_msg, cb_bar, out_dir)
