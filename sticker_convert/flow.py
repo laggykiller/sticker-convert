@@ -17,7 +17,6 @@ from uploaders.xcode_imessage import XcodeImessage
 
 from utils.converter import StickerConvert
 from utils.codec_info import CodecInfo
-from utils.curr_dir import CurrDir
 
 class Flow:
     def __init__(self,
@@ -37,12 +36,6 @@ class Flow:
 
         self.compress_fails = []
         self.out_urls = []
-
-        if self.opt_input['dir'] == None:
-            self.opt_input['dir'] = os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
-
-        if self.opt_output['dir'] == None:
-            self.opt_output['dir'] = os.path.join(CurrDir.get_curr_dir(), 'stickers_output')
 
         if os.path.isdir(self.opt_input['dir']) == False:
             os.makedirs(self.opt_input['dir'])

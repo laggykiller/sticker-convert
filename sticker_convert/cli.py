@@ -142,7 +142,7 @@ class CLI:
         self.opt_input = {
             'option': download_option,
             'url': url,
-            'dir': args.input_dir
+            'dir': args.input_dir if args.input_dir else os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
         }
 
     def get_opt_output(self, args):
@@ -159,7 +159,7 @@ class CLI:
         
         self.opt_output = {
             'option': export_option,
-            'dir': args.output_dir,
+            'dir': args.output_dir if args.output_dir else os.path.join(CurrDir.get_curr_dir(), 'stickers_output'),
             'title': args.title,
             'author': args.author
         }
