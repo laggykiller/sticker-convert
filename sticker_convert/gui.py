@@ -11,7 +11,7 @@ from uuid import uuid4
 
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from tkinter import filedialog
-from ttkbootstrap import Window, Toplevel, LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar, Canvas, PhotoImage, StringVar, BooleanVar, IntVar
+from ttkbootstrap import Window, Toplevel, LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar, Menu, Canvas, PhotoImage, StringVar, BooleanVar, IntVar
 from ttkbootstrap.scrolled import ScrolledText
 from ttkbootstrap.dialogs import Messagebox, Querybox
 
@@ -21,6 +21,21 @@ from utils.json_manager import JsonManager
 from utils.get_kakao_auth import GetKakaoAuth
 from utils.get_signal_auth import GetSignalAuth
 from utils.curr_dir import CurrDir
+
+# Reference: https://stackoverflow.com/a/57704013
+class RightClicker:
+    def __init__(self, event):
+        right_click_menu = Menu(None, tearoff=0, takefocus=0)
+
+        for txt in ['Cut', 'Copy', 'Paste']:
+            right_click_menu.add_command(
+                label=txt, command=lambda event=event, text=txt:
+                self.right_click_command(event, text))
+
+        right_click_menu.tk_popup(event.x_root, event.y_root, entry='0')
+
+    def right_click_command(self, event, cmd):
+        event.widget.event_generate(f'<<{cmd}>>')
 
 class GUI:
     default_input_mode = 'telegram'
@@ -447,10 +462,12 @@ class InputFrame:
 
         self.input_setdir_lbl = Label(self.frame, text='Input directory', width=35, justify='left', anchor='w')
         self.input_setdir_entry = Entry(self.frame, textvariable=self.gui.input_setdir_var, width=60)
+        self.input_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.setdir_btn = Button(self.frame, text='Choose directory...', command=self.callback_set_indir, width=16, bootstyle='secondary')
 
         self.address_lbl = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['address_lbls'], width=18, justify='left', anchor='w')
         self.address_entry = Entry(self.frame, textvariable=self.gui.input_address_var, width=80)
+        self.address_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.address_tip = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['example'], justify='left', anchor='w')
 
         self.input_option_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
@@ -505,10 +522,12 @@ class CompFrame:
         self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block(self.gui.help['comp']['steps']), bootstyle='secondary')
         self.steps_lbl = Label(self.frame, text='Number of steps')       
         self.steps_entry = Entry(self.frame, textvariable=self.gui.steps_var, width=8)
+        self.steps_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.callback_msg_block(self.gui.help['comp']['processes']), bootstyle='secondary')
         self.processes_lbl = Label(self.frame, text='Number of processes')
         self.processes_entry = Entry(self.frame, textvariable=self.gui.processes_var, width=8)
+        self.processes_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.comp_advanced_btn = Button(self.frame, text='Advanced...', command=self.callback_compress_advanced, bootstyle='secondary')
 
@@ -586,13 +605,17 @@ class OutputFrame:
 
         self.output_setdir_lbl = Label(self.frame, text='Output directory', justify='left', anchor='w')
         self.output_setdir_entry = Entry(self.frame, textvariable=self.gui.output_setdir_var, width=60)
+        self.output_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
+        
         self.output_setdir_btn = Button(self.frame, text='Choose directory...', command=self.callback_set_outdir, width=16, bootstyle='secondary')
 
         self.title_lbl = Label(self.frame, text='Title')
         self.title_entry = Entry(self.frame, textvariable=self.gui.title_var, width=80)
+        self.title_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         
         self.author_lbl = Label(self.frame, text='Author')
         self.author_entry = Entry(self.frame, textvariable=self.gui.author_var, width=80)
+        self.author_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.output_option_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.output_option_opt.grid(column=1, row=0, columnspan=2, sticky='w', padx=3, pady=3)
@@ -628,20 +651,25 @@ class CredFrame:
 
         self.signal_uuid_lbl = Label(self.frame, text='Signal uuid', width=18, justify='left', anchor='w')
         self.signal_uuid_entry = Entry(self.frame, textvariable=self.gui.signal_uuid_var, width=50)
+        self.signal_uuid_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.signal_password_lbl = Label(self.frame, text='Signal password', justify='left', anchor='w')
         self.signal_password_entry = Entry(self.frame, textvariable=self.gui.signal_password_var, width=50)
+        self.signal_password_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.signal_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_signal_get_auth, bootstyle='secondary')
 
         self.telegram_token_lbl = Label(self.frame, text='Telegram token', justify='left', anchor='w')
         self.telegram_token_entry = Entry(self.frame, textvariable=self.gui.telegram_token_var, width=50)
+        self.telegram_token_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.telegram_userid_lbl = Label(self.frame, text='Telegram user_id', justify='left', anchor='w')
         self.telegram_userid_entry = Entry(self.frame, textvariable=self.gui.telegram_userid_var, width=50)
+        self.telegram_userid_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.kakao_auth_token_lbl = Label(self.frame, text='Kakao auth_token', justify='left', anchor='w')
         self.kakao_auth_token_entry = Entry(self.frame, textvariable=self.gui.kakao_auth_token_var, width=35)
+        self.kakao_auth_token_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.kakao_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_kakao_get_auth, bootstyle='secondary')
 
         self.help_btn = Button(self.frame, text='Get help', command=self.callback_cred_help, bootstyle='secondary')
@@ -690,6 +718,7 @@ class ProgressFrame:
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Progress')
 
         self.message_box = ScrolledText(self.frame, height=15, wrap='word')
+        self.message_box._text.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.message_box._text.config(state='disabled')
         self.progress_bar = Progressbar(self.frame, orient='horizontal', mode='determinate')
 
@@ -795,18 +824,22 @@ class KakaoGetAuthWindow:
         self.kakao_username_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_username']), bootstyle='secondary')
         self.kakao_username_lbl = Label(self.frame_login_info, text='Username', width=18, justify='left', anchor='w')
         self.kakao_username_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_username_var, width=30)
+        self.kakao_username_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.kakao_password_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_password']), bootstyle='secondary')
         self.kakao_password_lbl = Label(self.frame_login_info, text='Password', justify='left', anchor='w')
         self.kakao_password_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_password_var, width=30)
+        self.kakao_password_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.kakao_country_code_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_country_code']), bootstyle='secondary')
         self.kakao_country_code_lbl = Label(self.frame_login_info, text='Country code', justify='left', anchor='w')
         self.kakao_country_code_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_country_code_var, width=30)
+        self.kakao_country_code_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.kakao_phone_number_help_btn = Button(self.frame_login_info, text='?', width=1, command=lambda: self.callback_msg_block_kakao(self.gui.help['cred']['kakao_phone_number']), bootstyle='secondary')
         self.kakao_phone_number_lbl = Label(self.frame_login_info, text='Phone number', justify='left', anchor='w')
         self.kakao_phone_number_entry = Entry(self.frame_login_info, textvariable=self.gui.kakao_phone_number_var, width=30)
+        self.kakao_phone_number_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.explanation1_lbl.grid(column=0, row=0, columnspan=3, sticky='w', padx=3, pady=3)
         self.explanation2_lbl.grid(column=0, row=1, columnspan=3, sticky='w', padx=3, pady=3)
@@ -1039,64 +1072,80 @@ class AdvancedCompressionWindow:
         self.fps_lbl = Label(self.frame_advcomp, text='Output FPS')
         self.fps_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.fps_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.fps_min_var, width=8)
+        self.fps_min_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.fps_max_lbl = Label(self.frame_advcomp, text='Max:')
         self.fps_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.fps_max_var, width=8)
+        self.fps_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.fps_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.fps_disable_var, command=self.callback_disable_fps, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
         self.res_w_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['res']), bootstyle='secondary')
         self.res_w_lbl = Label(self.frame_advcomp, text='Output resolution (Width)')
         self.res_w_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.res_w_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_w_min_var, width=8)
+        self.res_w_min_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.res_w_max_lbl = Label(self.frame_advcomp, text='Max:')
         self.res_w_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_w_max_var, width=8)
+        self.res_w_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.res_w_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.res_w_disable_var, command=self.callback_disable_res_w, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
         
         self.res_h_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['res']), bootstyle='secondary')
         self.res_h_lbl = Label(self.frame_advcomp, text='Output resolution (Height)')
         self.res_h_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.res_h_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_h_min_var, width=8)
+        self.res_h_min_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.res_h_max_lbl = Label(self.frame_advcomp, text='Max:')
         self.res_h_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_h_max_var, width=8)
+        self.res_h_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.res_h_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.res_h_disable_var, command=self.callback_disable_res_h, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
         self.quality_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['quality']), bootstyle='secondary')
         self.quality_lbl = Label(self.frame_advcomp, text='Output quality (0-100)')
         self.quality_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.quality_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.quality_min_var, width=8)
+        self.quality_min_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.quality_max_lbl = Label(self.frame_advcomp, text='Max:')
         self.quality_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.quality_max_var, width=8)
+        self.quality_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.quality_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.quality_disable_var, command=self.callback_disable_quality, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
         self.color_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['color']), bootstyle='secondary')
         self.color_lbl = Label(self.frame_advcomp, text='Colors (0-256)')
         self.color_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.color_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.color_min_var, width=8)
+        self.color_min_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.color_max_lbl = Label(self.frame_advcomp, text='Max:')
         self.color_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.color_max_var, width=8)
+        self.color_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.color_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.color_disable_var, command=self.callback_disable_color, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
         self.duration_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['duration']), bootstyle='secondary')
         self.duration_lbl = Label(self.frame_advcomp, text='Duration (Miliseconds)')
         self.duration_min_lbl = Label(self.frame_advcomp, text='Min:')
         self.duration_min_entry = Entry(self.frame_advcomp, textvariable=self.gui.duration_min_var, width=8)
+        self.duration_min_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.duration_max_lbl = Label(self.frame_advcomp, text='Max:')
         self.duration_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.duration_max_var, width=8)
+        self.duration_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.duration_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.duration_disable_var, command=self.callback_disable_duration, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
         self.size_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['size']), bootstyle='secondary')
         self.size_lbl = Label(self.frame_advcomp, text='Maximum file size (bytes)')
         self.img_size_max_lbl = Label(self.frame_advcomp, text='Img:')
         self.img_size_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.img_size_max_var, width=8)
+        self.img_size_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.vid_size_max_lbl = Label(self.frame_advcomp, text='Vid:')
         self.vid_size_max_entry = Entry(self.frame_advcomp, textvariable=self.gui.vid_size_max_var, width=8)
+        self.vid_size_max_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.size_disable_cbox = Checkbutton(self.frame_advcomp, text="X", variable=self.gui.size_disable_var, command=self.callback_disable_size, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
         self.format_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['format']), bootstyle='secondary')
         self.format_lbl = Label(self.frame_advcomp, text='File format')
         self.img_format_lbl = Label(self.frame_advcomp, text='Img:')
         self.img_format_entry = Entry(self.frame_advcomp, textvariable=self.gui.img_format_var, width=8)
+        self.img_format_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.vid_format_lbl = Label(self.frame_advcomp, text='Vid:')
         self.vid_format_entry = Entry(self.frame_advcomp, textvariable=self.gui.vid_format_var, width=8)
+        self.vid_format_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['fake_vid']), bootstyle='secondary')
         self.fake_vid_lbl = Label(self.frame_advcomp, text='Convert (faking) image to video')
@@ -1105,6 +1154,7 @@ class AdvancedCompressionWindow:
         self.cache_dir_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['cache_dir']), bootstyle='secondary')
         self.cache_dir_lbl = Label(self.frame_advcomp, text='Custom cache directory')
         self.cache_dir_entry = Entry(self.frame_advcomp, textvariable=self.gui.cache_dir_var, width=30)
+        self.cache_dir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.default_emoji_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: callback_msg_block_adv_comp_win(self.gui.help['comp']['default_emoji']), bootstyle='secondary')
         self.default_emoji_lbl = Label(self.frame_advcomp, text='Default emoji')
@@ -1208,6 +1258,7 @@ class AdvancedCompressionWindow:
         self.search_var = StringVar(self.frame_emoji_search)
         self.search_var.trace("w", self.render_emoji_list)
         self.search_entry = Entry(self.frame_emoji_search, textvariable=self.search_var)
+        self.search_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.categories_lbl.grid(column=0, row=0, sticky='nsw', padx=3, pady=3)
         self.categories_opt.grid(column=1, row=0, sticky='news', padx=3, pady=3)
