@@ -115,7 +115,7 @@ class CompressWastickers:
                 StickerConvert.convert_and_compress_to_size(os.path.join(in_dir, f'cover.png'), cover_path, opt_comp_merged, cb_msg)
         else:
             # First image in the directory, extracting first frame
-            first_image = [i for i in os.listdir(in_dir) if os.path.isfile(os.path.join(in_dir, i)) and not i.endswith('.txt') and not i.endswith('.m4a') and not i.endswith('.wastickers')][0]
+            first_image = [i for i in sorted(os.listdir(in_dir)) if os.path.isfile(os.path.join(in_dir, i)) and not i.endswith('.txt') and not i.endswith('.m4a') and not i.endswith('.wastickers')][0]
             StickerConvert.compress_to_size(StickerConvert.convert_generic_image, os.path.join(in_dir, f'{first_image}[0]'), cover_path, opt_comp_merged, cb_msg)
         
         MetadataHandler.set_metadata(tmp_dir, author=author, title=title)

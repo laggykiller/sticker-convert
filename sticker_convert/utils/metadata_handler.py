@@ -8,7 +8,7 @@ class MetadataHandler:
     def get_stickers_present(dir):
         from uploaders.xcode_imessage import XcodeImessage
 
-        stickers_present = os.listdir(dir)
+        stickers_present = sorted(os.listdir(dir))
         if 'cover.png' in stickers_present:
             stickers_present.remove('cover.png')
         for icon in XcodeImessage().iconset:
@@ -25,17 +25,17 @@ class MetadataHandler:
     @staticmethod
     def get_metadata(dir, title=None, author=None, emoji_dict=None):
         title_path = os.path.join(dir, 'title.txt')
-        if title == None and os.path.isfile(title_path):
+        if not title and os.path.isfile(title_path):
             with open(title_path, encoding='utf-8') as f:
                 title = f.read().strip()
 
         author_path = os.path.join(dir, 'author.txt')
-        if author == None and os.path.isfile(author_path):
+        if not author and os.path.isfile(author_path):
             with open(author_path, encoding='utf-8') as f:
                 author = f.read().strip()
         
         emoji_path = os.path.join(dir, 'emoji.txt')
-        if emoji_dict == None and os.path.isfile(emoji_path):
+        if not emoji_dict and os.path.isfile(emoji_path):
             with open(emoji_path , "r", encoding='utf-8') as f:
                 emoji_dict = json.load(f)
         
@@ -67,7 +67,7 @@ class MetadataHandler:
                 emoji_dict = json.load(f)
 
         emoji_dict_new = {}
-        for file in os.listdir(dir):
+        for file in sorted(os.listdir(dir)):
             if not os.path.isfile(os.path.join(dir, file)) and CodecInfo.get_file_ext(file) in ('.txt', '.m4a'):
                 continue
             file_name = os.path.splitext(file)[0]

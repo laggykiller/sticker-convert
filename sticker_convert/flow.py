@@ -129,29 +129,56 @@ class Flow:
             msg += '[X] Uploading to signal requires uuid and password.\n'
             msg += save_to_local_tip
         
+        title_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
+        title_file_present = os.path.isfile(title_file_path)
+        if title_file_present:
+            with open(title_file_path) as f:
+                title_file_present = True if f.read() else False
+        # All except local source will create title.txt
+        title_file_present = True if self.opt_input.get('option') != 'local' else title_file_present
+
+        author_file_path = os.path.join(self.opt_input.get('dir') ,'author.txt')
+        author_file_present = os.path.isfile(author_file_path)
+        if author_file_present:
+            with open(author_file_path) as f:
+                author_file_present = True if f.read() else False
+        # Kakao, Line, Signal input sources will create author.txt
+        author_file_present = True if self.opt_input.get('option') in ('kakao', 'line', 'signal') else author_file_present
 
         if (self.opt_output.get('option') == 'telegram' and 
-            not self.opt_output.get('title')):
+            not self.opt_output.get('title') and
+            not title_file_present):
 
             msg += '[X] Uploading to telegram requires title\n'
+            msg += '    Supply the title by filling in the option, or\n'
+            msg += '    Create title.txt with the title name'
 
         
         if (self.opt_output.get('option') == 'signal' and 
-            not (self.opt_output.get('title') and self.opt_output.get('author'))):
+            (not (self.opt_output.get('title') or title_file_present) or
+            not (self.opt_output.get('author') or author_file_present))):
 
             msg += '[X] Uploading to signal requires title and author\n'
+            msg += '    Supply the title and author by filling in the option, or\n'
+            msg += '    Create title.txt and author.txt with the title and author name'
         
 
         if (self.opt_output.get('option') == 'whatsapp' and 
-            not (self.opt_output.get('title') and self.opt_output.get('author'))):
+            (not (self.opt_output.get('title') or title_file_present) or
+            not (self.opt_output.get('author') or author_file_present))):
 
             msg += '[X] Compressing to .wastickers requires title and author\n'
+            msg += '    Supply the title and author by filling in the option, or\n'
+            msg += '    Create title.txt and author.txt with the title and author name'
         
 
         if (self.opt_output.get('option') == 'imessage' and 
-            not (self.opt_output.get('title') and self.opt_output.get('author'))):
+            (not (self.opt_output.get('title') or title_file_present) or
+            not (self.opt_output.get('author') or author_file_present))):
 
             msg += '[X] Creating Xcode project (for iMessage) requires title and author\n'
+            msg += '    Supply the title and author by filling in the option, or\n'
+            msg += '    Create title.txt and author.txt with the title and author name'
         
 
         if msg != '':
@@ -281,8 +308,8 @@ class Flow:
     def compress(self):
         if self.opt_comp['no_compress'] == True:
             self.cb_msg('no_compress is set to True, skip compression')
-            in_dir_files = [i for i in os.listdir(self.opt_input['dir']) if os.path.isfile(os.path.join(self.opt_input['dir'], i))]
-            out_dir_files = [i for i in os.listdir(self.opt_output['dir']) if os.path.isfile(os.path.join(self.opt_output['dir'], i))]
+            in_dir_files = [i for i in sorted(os.listdir(self.opt_input['dir'])) if os.path.isfile(os.path.join(self.opt_input['dir'], i))]
+            out_dir_files = [i for i in sorted(os.listdir(self.opt_output['dir'])) if os.path.isfile(os.path.join(self.opt_output['dir'], i))]
             if len(in_dir_files) == 0:
                 self.cb_msg('Input directory is empty, nothing to copy to output directory')
             elif len(out_dir_files) != 0:
@@ -307,7 +334,7 @@ class Flow:
 
         # .txt: emoji.txt, title.txt
         # .m4a: line sticker sound effects
-        for i in os.listdir(input_dir):
+        for i in sorted(os.listdir(input_dir)):
             in_f = os.path.join(input_dir, i)
             
             if not os.path.isfile(in_f):

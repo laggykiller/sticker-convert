@@ -300,7 +300,7 @@ class DownloadLine:
             if not success:
                 cb_msg(f'Cannot download {i[0]} (tried 3 times)')
         
-        for i in os.listdir(out_dir):
+        for i in sorted(os.listdir(out_dir)):
             if i.endswith('-text.png'):
                 base_path = os.path.join(out_dir, i.replace('-text.png', '.png'))
                 text_path = os.path.join(out_dir, i)

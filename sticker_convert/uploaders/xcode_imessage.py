@@ -130,7 +130,7 @@ class XcodeImessage:
 
     @staticmethod
     def add_metadata(in_dir, out_dir, author, title):
-        first_image_path = os.path.join(in_dir, [i for i in os.listdir(in_dir) if os.path.isfile(os.path.join(in_dir, i)) and i.endswith('.png')][0])
+        first_image_path = os.path.join(in_dir, [i for i in sorted(os.listdir(in_dir)) if os.path.isfile(os.path.join(in_dir, i)) and i.endswith('.png')][0])
         cover_path = os.path.join(in_dir, 'cover.png')
         cover_path_new = os.path.join(out_dir, 'cover.png')
         if os.path.isfile(cover_path) and cover_path_new != cover_path:
@@ -199,7 +199,7 @@ class XcodeImessage:
                 shutil.rmtree(os.path.join(stickers_path, i))
         
         stickers_lst = []
-        for i in os.listdir(in_dir):
+        for i in sorted(os.listdir(in_dir)):
             if CodecInfo.get_file_ext(i) == '.png' and i != 'cover.png' and i not in iconset:
                 sticker_dir = f'{os.path.splitext(i)[0]}.sticker' # 0.sticker
                 stickers_lst.append(sticker_dir)

@@ -79,7 +79,7 @@ def get_info_from_share_link(url):
     response = requests.get(url, headers=headers)
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    pack_title = soup.find('title').string.split(' | ', 1)[1]
+    pack_title = soup.find('title').string
 
     data_url = soup.find('a', id='app_scheme_link')['data-url']
     item_code = data_url.replace('kakaotalk://store/emoticon/', '').split('?')[0]
