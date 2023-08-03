@@ -34,8 +34,6 @@ class GetLineAuth:
             headers=headers,
         )
 
-        print(cookies)
-
         response_dict = json.loads(response.text)
 
         if response_dict['errorMessage']:
