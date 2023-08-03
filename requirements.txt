@@ -12,3 +12,4 @@ tqdm~=4.65.0
 git+https://github.com/laggykiller/ttkbootstrap.git
 Wand~=0.6.11
 memory-tempfile~=2.2.3
+browser-cookie3~=0.19.1

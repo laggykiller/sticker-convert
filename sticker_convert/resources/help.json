@@ -56,6 +56,8 @@
         "kakao_password": "Set Kakao password (Password of Kakao account).\nRequired for generating Kakao auth_token.",
         "kakao_country_code": "Set Kakao country code of phone.\nExample: 82 (For korea), 44 (For UK), 1 (For USA).\nRequired for generating Kakao auth_token.",
         "kakao_phone_number": "Set Kakao phone number (Phone number associated with your Kakao account)\nDo NOT enter country code\nExample: 7700900142\nUsed for send / receive verification code via SMS.\nRequired for generating Kakao auth_token.",
+        "line_get_auth": "Get Line cookies from browser, which is required to create custom message stickers.",
+        "line_cookies": "Set Line cookies, which is required to create custom message stickers.",
         "save_cred": "Save Signal and Telegram credentials."
     }
 }

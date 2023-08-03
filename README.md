@@ -85,30 +85,20 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR]
-                       [--download-signal DOWNLOAD_SIGNAL]
-                       [--download-telegram DOWNLOAD_TELEGRAM]
-                       [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO]
-                       [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
-                       [--export-signal | --export-telegram | --export-whatsapp | --export-imessage]
-                       [--no-compress]
+usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
+                       [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--output-dir OUTPUT_DIR] [--author AUTHOR]
+                       [--title TITLE] [--export-signal | --export-telegram | --export-whatsapp | --export-imessage] [--no-compress]
                        [--preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                       [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN]
-                       [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
-                       [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
-                       [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                       [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
-                       [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                       [--duration-min DURATION_MIN] [--duration-max DURATION_MAX]
-                       [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                       [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
-                       [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
-                       [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
-                       [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
-                       [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                       [--kakao-country-code KAKAO_COUNTRY_CODE]
-                       [--kakao-phone-number KAKAO_PHONE_NUMBER] [--save-cred SAVE_CRED]
+                       [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
+                       [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
+                       [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
+                       [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                       [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--cache-dir CACHE_DIR]
+                       [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
+                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN]
+                       [--kakao-get-auth] [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
+                       [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]
+                       [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
@@ -128,7 +118,7 @@ Input options:
   --download-line DOWNLOAD_LINE
                         Download line stickers from a URL / ID as input
                         (Example: https://store.line.me/stickershop/product/1234/en
-                        OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234)
+                         OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234)
   --download-kakao DOWNLOAD_KAKAO
                         Download kakao stickers from a URL / ID as input
                         (Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400
@@ -136,7 +126,7 @@ Input options:
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
   --processes PROCESSES
-                        Set number of processes. Default to number of logical processors in system.
+                        Set number of processes. Default to the number of logical processors in system.
                         Processes higher = Compress faster but consume more resources.
   --fps-min FPS_MIN     Set minimum output fps.
   --fps-max FPS_MAX     Set maximum output fps.
@@ -174,6 +164,9 @@ Input options:
                         Useful if:
                         (1) Size limit for video is larger than image;
                         (2) Mix image and video into same pack.
+  --cache-dir CACHE_DIR
+                        Set custom cache directory.
+                        Useful for debugging, or speed up conversion if cache_dir is on RAM disk.
 
 Output options:
   --output-dir OUTPUT_DIR
@@ -222,6 +215,9 @@ Credentials options:
                         Example: 7700900142
                         Used for send / receive verification code via SMS.
                         Required for generating Kakao auth_token.
+  --line-get-auth       Get Line cookies from browser, which is required to create custom message stickers.
+  --line-cookies LINE_COOKIES
+                        Set Line cookies, which is required to create custom message stickers.
   --save-cred SAVE_CRED
                         Save Signal and Telegram credentials.
 ```

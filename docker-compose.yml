@@ -5,8 +5,8 @@ services:
     # build: . # Uncomment for building locally
     image: laggykiller/sticker-convert:latest # Comment out for building locally
     volumes:
-      - ./sticker_input:/app/stickers_input
-      - ./sticker_output:/app/stickers_output
+      - ./stickers_input:/app/stickers_input
+      - ./stickers_output:/app/stickers_output
       # - ./creds.json:/app/creds.json
     ports:
       - 5800:5800 # Port for Web UI

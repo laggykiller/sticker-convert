@@ -73,9 +73,8 @@ ENV DISPLAY_HEIGHT=1080
 RUN mkdir /etc/openbox && \
     printf '<Type>normal</Type>\n<Name>sticker-convert</Name>' >> /etc/openbox/main-window-selection.xml
 
-RUN mkdir '/root/.config' && \
-    mkdir '/root/.config/Signal' && \
-    mkdir '/root/.config/Signal Beta' && \
+RUN mkdir -p '/root/.config/Signal' && \
+    mkdir -p '/root/.config/Signal Beta' && \
     chmod 777 '/root/.config/Signal' && \
     chmod 777 '/root/.config/Signal Beta'
 

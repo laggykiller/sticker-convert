@@ -11,6 +11,7 @@ from utils.run_bin import RunBin
 from utils.json_manager import JsonManager
 from utils.get_kakao_auth import GetKakaoAuth
 from utils.get_signal_auth import GetSignalAuth
+from utils.get_line_auth import GetLineAuth
 from utils.curr_dir import CurrDir
 
 # Only download from a source
@@ -94,7 +95,7 @@ class CLI:
         parser_comp.add_argument('--default-emoji', dest='default_emoji', default=self.compression_presets['custom']['default_emoji'], help=self.help['comp']['default_emoji'])
 
         parser_cred = parser.add_argument_group('Credentials options')
-        flags_bool = ('signal_get_auth', 'kakao_get_auth')
+        flags_bool = ('signal_get_auth', 'kakao_get_auth', 'line_get_auth')
         for k, v in self.help['cred'].items():
             keyword_args = {}
             if k in flags_bool:
@@ -246,6 +247,9 @@ class CLI:
                 'password': args.kakao_password if args.kakao_password else creds.get('kakao', {}).get('password'),
                 'country_code': args.kakao_country_code if args.kakao_country_code else creds.get('kakao', {}).get('country_code'),
                 'phone_number': args.kakao_phone_number if args.kakao_phone_number else creds.get('kakao', {}).get('phone_number')
+            },
+            'line': {
+                'cookies': args.line_cookies if args.line_cookies else creds.get('line', {}).get('cookies')
             }
         }
 
@@ -272,9 +276,21 @@ class CLI:
                     self.callback_msg(f'Got uuid and password successfully: {uuid}, {password}')
                     break
         
+        if args.line_get_auth:
+            m = GetLineAuth(cb_msg=self.callback_msg, cb_ask_str=self.callback_ask_str)
+
+            line_cookies = m.get_cred()
+
+            if line_cookies:
+                self.opt_cred['line']['cookies'] = line_cookies
+            
+                self.callback_msg(f'Got Line cookies successfully')
+            else:
+                self.callback_msg(f'Failed to get Line cookies. Have you logged in the web browser?')
+        
         if args.save_cred:
             creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
-            JsonManager.save_json(creds_path, self.creds)
+            JsonManager.save_json(creds_path, self.opt_cred)
             self.callback_msg('Saved credentials to creds.json')
     
     def callback_ask_str(self, msg: str=None, initialvalue: str=None, cli_show_initialvalue: bool=True):
@@ -336,7 +352,8 @@ class CLI:
                 self.progress_bar.close()
                 self.progress_bar = None
         elif set_progress_mode == 'clear':
-            self.progress_bar.reset()
+            if self.progress_bar:
+                self.progress_bar.reset()
 
     def check_bin(self):
         for bin, check_cmd in self.bins.items():

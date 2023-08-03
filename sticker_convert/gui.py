@@ -14,12 +14,14 @@ from tkinter import filedialog
 from ttkbootstrap import Window, Toplevel, LabelFrame, Frame, OptionMenu, Button, Progressbar, Entry, Label, Checkbutton, Scrollbar, Menu, Canvas, PhotoImage, StringVar, BooleanVar, IntVar
 from ttkbootstrap.scrolled import ScrolledText
 from ttkbootstrap.dialogs import Messagebox, Querybox
+from tqdm import tqdm
 
 from flow import Flow
 from utils.run_bin import RunBin
 from utils.json_manager import JsonManager
 from utils.get_kakao_auth import GetKakaoAuth
 from utils.get_signal_auth import GetSignalAuth
+from utils.get_line_auth import GetLineAuth
 from utils.curr_dir import CurrDir
 
 # Reference: https://stackoverflow.com/a/57704013
@@ -168,6 +170,7 @@ class GUI:
         self.kakao_password_var = StringVar(self.root)
         self.kakao_country_code_var = StringVar(self.root)
         self.kakao_phone_number_var = StringVar(self.root)
+        self.line_cookies_var = StringVar(self.root)
 
     def init_frames(self):
         self.input_frame = InputFrame(self)
@@ -231,6 +234,9 @@ class GUI:
                 'password': '',
                 'country_code': '',
                 'phone_number': ''
+            },
+            'line': {
+                'cookies': ''
             }
         }
         
@@ -250,6 +256,9 @@ class GUI:
                 'password': self.kakao_password_var.get(),
                 'country_code': self.kakao_country_code_var.get(),
                 'phone_number': self.kakao_phone_number_var.get()
+            },
+            'line': {
+                'cookies': self.line_cookies_var.get()
             }
         }
 
@@ -269,6 +278,7 @@ class GUI:
         self.kakao_password_var.set(self.creds.get('kakao', {}).get('password'))
         self.kakao_country_code_var.set(self.creds.get('kakao', {}).get('country_code'))
         self.kakao_phone_number_var.set(self.creds.get('kakao', {}).get('phone_number'))
+        self.line_cookies_var.set(self.creds.get('line', {}). get('cookies'))
 
     def start(self):
         Thread(target=self.start_process, daemon=True).start()
@@ -350,6 +360,9 @@ class GUI:
                 'password': self.kakao_password_var.get(),
                 'country_code': self.kakao_country_code_var.get(),
                 'phone_number': self.kakao_phone_number_var.get()
+            },
+            'line': {
+                'cookies': self.line_cookies_var.get()
             }
         }
         
@@ -672,6 +685,11 @@ class CredFrame:
         self.kakao_auth_token_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.kakao_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_kakao_get_auth, bootstyle='secondary')
 
+        self.line_cookies_lbl = Label(self.frame, text='Line cookies', width=18, justify='left', anchor='w')
+        self.line_cookies_entry = Entry(self.frame, textvariable=self.gui.line_cookies_var, width=35)
+        self.line_cookies_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
+        self.line_get_auth_btn = Button(self.frame, text='Generate', command=self.callback_line_get_auth, bootstyle='secondary')
+
         self.help_btn = Button(self.frame, text='Get help', command=self.callback_cred_help, bootstyle='secondary')
 
         self.signal_uuid_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
@@ -686,7 +704,10 @@ class CredFrame:
         self.kakao_auth_token_lbl.grid(column=0, row=5, sticky='w', padx=3, pady=3)
         self.kakao_auth_token_entry.grid(column=1, row=5, sticky='w', padx=3, pady=3)
         self.kakao_get_auth_btn.grid(column=2, row=5, sticky='e', padx=3, pady=3)
-        self.help_btn.grid(column=2, row=6, sticky='e', padx=3, pady=3)
+        self.line_cookies_lbl.grid(column=0, row=6, sticky='w', padx=3, pady=3)
+        self.line_cookies_entry.grid(column=1, row=6, sticky='w', padx=3, pady=3)
+        self.line_get_auth_btn.grid(column=2, row=6, sticky='e', padx=3, pady=3)
+        self.help_btn.grid(column=2, row=7, sticky='e', padx=3, pady=3)
     
     def callback_cred_help(self, *args):
         faq_site = 'https://github.com/laggykiller/sticker-convert#faq'
@@ -700,6 +721,9 @@ class CredFrame:
     def callback_signal_get_auth(self, *args):
         SignalGetAuthWindow(self.gui)
     
+    def callback_line_get_auth(self, *args):
+        LineGetAuthWindow(self.gui)
+    
     def set_states(self, state):
         self.signal_uuid_entry.config(state=state)
         self.signal_password_entry.config(state=state)
@@ -708,8 +732,11 @@ class CredFrame:
         self.telegram_userid_entry.config(state=state)
         self.kakao_auth_token_entry.config(state=state)
         self.kakao_get_auth_btn.config(state=state)
+        self.line_cookies_entry.config(state=state)
+        self.line_get_auth_btn.config(state=state)
 
 class ProgressFrame:
+    progress_bar_cli = None
     progress_bar_steps = 0
     auto_scroll = True
 
@@ -730,17 +757,24 @@ class ProgressFrame:
     
     def update_progress_bar(self, set_progress_mode='', steps=0, update_bar=False):
         if update_bar:
+            self.progress_bar_cli.update()
             self.progress_bar['value'] += 100 / self.progress_bar_steps
         elif set_progress_mode == 'determinate':
+            self.progress_bar_cli = tqdm(total=steps)
             self.progress_bar.config(mode='determinate')
             self.progress_bar_steps = steps
             self.progress_bar.stop()
             self.progress_bar['value'] = 0
         elif set_progress_mode == 'indeterminate':
+            if self.progress_bar_cli:
+                self.progress_bar_cli.close()
+                self.progress_bar_cli = None
             self.progress_bar['value'] = 0
             self.progress_bar.config(mode='indeterminate')
             self.progress_bar.start(50)
         elif set_progress_mode == 'clear':
+            if self.progress_bar_cli:
+                self.progress_bar_cli.reset()
             self.progress_bar.config(mode='determinate')
             self.progress_bar.stop()
             self.progress_bar['value'] = 0
@@ -755,7 +789,10 @@ class ProgressFrame:
             msg = str(args[0])
         
         if msg:
-            print(msg)
+            if self.progress_bar_cli:
+                self.progress_bar_cli.write(msg)
+            else:
+                print(msg)
             msg += '\n'
 
         self.message_box._text.config(state='normal')
@@ -921,6 +958,8 @@ class KakaoGetAuthWindow:
         
             self.callback_msg_block_kakao(f'Got auth_token successfully: {auth_token}')
             self.gui.save_creds()
+        else:
+            self.callback_msg_block_kakao('Failed to get auth_token')
 
 class SignalGetAuthWindow:
     def __init__(self, gui):
@@ -1024,7 +1063,115 @@ class SignalGetAuthWindow:
                 self.gui.save_creds()
                 return
             
-        self.gui.callback_msg_block('Failed to get uuid and password')
+        self.callback_msg_block_signal('Failed to get uuid and password')
+
+class LineGetAuthWindow:
+    def __init__(self, gui):
+        self.gui = gui
+
+        self.get_line_auth_win = Toplevel(self.gui.root)
+        self.get_line_auth_win.title('Get Line cookie')
+        
+        self.icon = PhotoImage(file='resources/appicon.png')
+        self.get_line_auth_win.iconphoto(1, self.icon)
+        if sys.platform == 'darwin':
+            self.get_line_auth_win.iconbitmap(bitmap='resources/appicon.icns')
+        elif sys.platform == 'win32':
+            self.get_line_auth_win.iconbitmap(bitmap='resources/appicon.ico')
+        self.get_line_auth_win.tk.call('wm', 'iconphoto', self.get_line_auth_win._w, self.icon)
+        
+        self.get_line_auth_win.focus_force()
+
+        self.callback_msg_block_line = partial(self.gui.callback_msg_block, parent=self.get_line_auth_win)
+
+        self.create_scrollable_frame()
+
+        self.frame_info = Frame(self.scrollable_frame)
+        self.frame_btn = Frame(self.scrollable_frame)
+
+        self.frame_info.grid(column=0, row=0, sticky='news', padx=3, pady=3)
+        self.frame_btn.grid(column=0, row=1, sticky='news', padx=3, pady=3)
+
+        # Info frame
+        self.explanation1_lbl = Label(self.frame_info, text='Line cookies are required to create custom message stickers', justify='left', anchor='w')
+        self.explanation2_lbl = Label(self.frame_info, text='Please open web browser and login to Line', justify='left', anchor='w')
+        self.explanation3_lbl = Label(self.frame_info, text='After that, press "Get cookies"', justify='left', anchor='w')
+
+        self.explanation1_lbl.grid(column=0, row=0, columnspan=3, sticky='w', padx=3, pady=3)
+        self.explanation2_lbl.grid(column=0, row=1, columnspan=3, sticky='w', padx=3, pady=3)
+        self.explanation3_lbl.grid(column=0, row=2, columnspan=3, sticky='w', padx=3, pady=3)
+
+        # Buttons frame
+        self.open_browser_btn = Button(self.frame_btn, text='Open browser', command=self.callback_open_browser)
+        self.get_cookies_btn = Button(self.frame_btn, text='Get cookies', command=self.callback_get_cookies)
+
+        self.open_browser_btn.pack()
+        self.get_cookies_btn.pack()
+
+        self.resize_window()
+    
+    def create_scrollable_frame(self):
+        self.main_frame = Frame(self.get_line_auth_win)
+        self.main_frame.pack(fill='both', expand=1)
+
+        self.horizontal_scrollbar_frame = Frame(self.main_frame)
+        self.horizontal_scrollbar_frame.pack(fill='x', side='bottom')
+
+        self.canvas = Canvas(self.main_frame)
+        self.canvas.pack(side='left', fill='both', expand=1)
+
+        self.x_scrollbar = Scrollbar(self.horizontal_scrollbar_frame, orient='horizontal', command=self.canvas.xview)
+        self.x_scrollbar.pack(side='bottom', fill='x')
+
+        self.y_scrollbar = Scrollbar(self.main_frame, orient='vertical', command=self.canvas.yview)
+        self.y_scrollbar.pack(side='right', fill='y')
+
+        self.canvas.configure(xscrollcommand=self.x_scrollbar.set)
+        self.canvas.configure(yscrollcommand=self.y_scrollbar.set)
+        self.canvas.bind("<Configure>",lambda e: self.canvas.config(scrollregion= self.canvas.bbox('all'))) 
+
+        self.scrollable_frame = Frame(self.canvas)
+        self.canvas.create_window((0,0),window= self.scrollable_frame, anchor="nw")
+
+    def resize_window(self):
+        self.scrollable_frame.update_idletasks()
+        width = self.scrollable_frame.winfo_width()
+        height = self.scrollable_frame.winfo_height()
+
+        screen_width = self.gui.root.winfo_screenwidth()
+        screen_height = self.gui.root.winfo_screenwidth()
+
+        if width > screen_width * 0.8:
+            width = int(screen_width * 0.8)
+        if height > screen_height * 0.8:
+            height = int(screen_height * 0.8)
+
+        self.canvas.configure(width=width, height=height)
+    
+    def callback_open_browser(self):
+        line_login_site = 'https://store.line.me/login'
+        success = webbrowser.open(line_login_site)
+        if not success:
+            self.gui.callback_ask_str('Cannot open web browser for you. Install web browser and open:', initialvalue=line_login_site)
+    
+    def callback_get_cookies(self):
+        Thread(target=self.callback_get_cookies_thread, daemon=True).start()
+    
+    def callback_get_cookies_thread(self, *args):
+        m = GetLineAuth()
+
+        line_cookies = None
+        line_cookies = m.get_cred()
+
+        if line_cookies:
+            self.gui.creds['line']['cookies'] = line_cookies
+            self.gui.line_cookies_var.set(line_cookies)
+            
+            self.callback_msg_block_line(f'Got Line cookies successfully')
+            self.gui.save_creds()
+            return
+            
+        self.callback_msg_block_line('Failed to get Line cookies. Have you logged in the web browser?')
 
 class AdvancedCompressionWindow:
     emoji_column_per_row = 10

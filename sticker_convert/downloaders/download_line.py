@@ -12,6 +12,7 @@ from PIL import Image
 from bs4 import BeautifulSoup
 
 from utils.metadata_handler import MetadataHandler
+from utils.get_line_auth import GetLineAuth
 
 class DownloadLine:
     @staticmethod
@@ -19,7 +20,20 @@ class DownloadLine:
         headers = {
                 'referer': 'https://store.line.me',
                 'user-agent': 'Android',
+                'x-requested-with': 'XMLHttpRequest',
             }
+        
+        cookies = {}
+        if opt_cred.get('line', {}).get('cookies'):
+            try:
+                for i in opt_cred['line']['cookies'].split(';'):
+                    c_key, c_value = i.split('=')
+                    cookies[c_key] = c_value
+                if not GetLineAuth.validate_cookies(cookies):
+                    cb_msg('Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"')
+                    cookies = {}
+            except ValueError:
+                cb_msg('Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"')
         
         region = ''
         is_emoji = False
@@ -118,7 +132,6 @@ class DownloadLine:
 
             elif pack_meta.get('stickerResourceType') == 'NAME_TEXT':
                 pack_url = f'https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/iphone/sticker_name_base@2x.zip'
-                # Customizing the text requires Line account
 
             else:
                 pack_url = f'https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/iphone/stickers@2x.zip'
@@ -187,6 +200,12 @@ class DownloadLine:
                             'sticker_text': sticker['customPlus']['defaultText']
                             }
                     
+                    elif pack_meta.get('stickerResourceType') == 'NAME_TEXT':
+                        sticker_text_dict[num] = {
+                            'sticker_id': sticker['id'],
+                            'sticker_text': ''
+                            }
+                    
                     if pack_meta.get('hasSound'):
                         f_path = 'sound/' + str(sticker['id']) + '.m4a'
                         data = zf.read(f_path)
@@ -202,7 +221,8 @@ class DownloadLine:
                     num += 1
         
         dl_targets = []
-        if sticker_text_dict != {}:
+        name_text_key_cache = {}
+        if sticker_text_dict != {} and (pack_meta.get('stickerResourceType') == 'PER_STICKER_TEXT' or (pack_meta.get('stickerResourceType') == 'NAME_TEXT' and cookies != {})):
             line_sticker_text_path = os.path.join(out_dir, 'line-sticker-text.txt')
 
             if not os.path.isfile(line_sticker_text_path):
@@ -221,7 +241,39 @@ class DownloadLine:
                 out_path = os.path.join(out_dir, str(num).zfill(3))
                 sticker_id = data['sticker_id']
                 sticker_text = data['sticker_text']
-                dl_targets.append((f'https://store.line.me/overlay/sticker/{pack_id}/{sticker_id}/iPhone/sticker.png?text={parse.quote(sticker_text)}', out_path + '-text.png'))
+
+                if pack_meta.get('stickerResourceType') == 'PER_STICKER_TEXT':
+                    dl_targets.append((f'https://store.line.me/overlay/sticker/{pack_id}/{sticker_id}/iPhone/sticker.png?text={parse.quote(sticker_text)}', out_path + '-text.png'))
+
+                elif pack_meta.get('stickerResourceType') == 'NAME_TEXT' and sticker_text:
+                    name_text_key = name_text_key_cache.get(sticker_text, None)
+                    if not name_text_key:
+                        params = {
+                            'text': sticker_text
+                        }
+
+                        response = requests.get(
+                            f'https://store.line.me/api/custom-sticker/preview/{pack_id}/{region}',
+                            params=params,
+                            cookies=cookies,
+                            headers=headers,
+                        )
+
+                        response_dict = json.loads(response.text)
+
+                        if response_dict['errorMessage']:
+                            cb_msg(f"Failed to generate customized text {sticker_text} for sticker {sticker_id} due to: {response_dict['errorMessage']}")
+                            continue
+
+                        name_text_key = response_dict['productPayload']['customOverlayUrl'].split('name/')[-1].split('/main.png')[0]
+                        name_text_key_cache[sticker_text] = name_text_key
+
+                    dl_targets.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/overlay/name/{name_text_key}/sticker@2x.png', out_path + '-text.png'))
+        
+        elif pack_meta.get('stickerResourceType') == 'NAME_TEXT' and cookies == {}:
+            cb_msg('Warning: Line "Custom stickers" is supplied as input')
+            cb_msg('However, adding custom message requires Line cookies, and it is not supplied')
+            cb_msg('Continuing without adding custom text to stickers')
         
         if cb_bar:
             cb_bar(set_progress_mode='determinate', steps=len(dl_targets))
