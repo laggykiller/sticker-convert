@@ -17,6 +17,7 @@ from uploaders.xcode_imessage import XcodeImessage
 
 from utils.converter import StickerConvert
 from utils.codec_info import CodecInfo
+from utils.json_manager import JsonManager
 
 class Flow:
     def __init__(self,
@@ -92,7 +93,8 @@ class Flow:
         return True
 
     def verify_input(self):
-        msg = ''
+        info_msg = ''
+        error_msg = ''
 
         save_to_local_tip = ''
         save_to_local_tip += '    If you want to upload the results by yourself,\n'
@@ -101,88 +103,84 @@ class Flow:
         if (self.opt_input['option'] != 'local' and 
             not self.opt_input.get('url')):
 
-            msg += '\n'
-            msg += '[X] URL address cannot be empty.\n'
-            msg += '    If you only want to use local files,\n'
-            msg += '    choose "Save to local directory only"\n'
-            msg += '    in "Input source"\n'
+            error_msg += '\n'
+            error_msg += '[X] URL address cannot be empty.\n'
+            error_msg += '    If you only want to use local files,\n'
+            error_msg += '    choose "Save to local directory only"\n'
+            error_msg += '    in "Input source"\n'
         
 
         if ((self.opt_input.get('option') == 'telegram' or 
             self.opt_output.get('option') == 'telegram') and 
             not self.opt_cred.get('telegram', {}).get('token')):
 
-            msg += '[X] Downloading from and uploading to telegram requires bot token.\n'
-            msg += save_to_local_tip
+            error_msg += '[X] Downloading from and uploading to telegram requires bot token.\n'
+            error_msg += save_to_local_tip
 
         if (self.opt_output.get('option') == 'telegram' and 
             not self.opt_cred.get('telegram', {}).get('userid')):
 
-            msg += '[X] Uploading to telegram requires user_id \n'
-            msg += '    (From real account, not bot account).\n'
-            msg += save_to_local_tip
+            error_msg += '[X] Uploading to telegram requires user_id \n'
+            error_msg += '    (From real account, not bot account).\n'
+            error_msg += save_to_local_tip
         
 
         if (self.opt_output.get('option') == 'signal' and 
             not (self.opt_cred.get('signal', {}).get('uuid') and self.opt_cred.get('signal', {}).get('password'))):
 
-            msg += '[X] Uploading to signal requires uuid and password.\n'
-            msg += save_to_local_tip
+            error_msg += '[X] Uploading to signal requires uuid and password.\n'
+            error_msg += save_to_local_tip
         
-        title_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
-        title_file_present = os.path.isfile(title_file_path)
-        if title_file_present:
-            with open(title_file_path) as f:
-                title_file_present = True if f.read() else False
-        # All except local source will create title.txt
-        title_file_present = True if self.opt_input.get('option') != 'local' else title_file_present
-
-        author_file_path = os.path.join(self.opt_input.get('dir') ,'author.txt')
-        author_file_present = os.path.isfile(author_file_path)
-        if author_file_present:
-            with open(author_file_path) as f:
-                author_file_present = True if f.read() else False
-        # Kakao, Line, Signal input sources will create author.txt
-        author_file_present = True if self.opt_input.get('option') in ('kakao', 'line', 'signal') else author_file_present
-
-        if (self.opt_output.get('option') == 'telegram' and 
-            not self.opt_output.get('title') and
-            not title_file_present):
-
-            msg += '[X] Uploading to telegram requires title\n'
-            msg += '    Supply the title by filling in the option, or\n'
-            msg += '    Create title.txt with the title name'
-
+        title_file_present = False
+        if self.opt_input.get('option') in ('signal', 'telegram', 'line', 'kakao'):
+            title_file_present = True
+        elif self.opt_input.get('option') == 'local':
+            title_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
+            title_file_present = os.path.isfile(title_file_path)
+            if title_file_present:
+                with open(title_file_path) as f:
+                    title_file_present = True if f.read() else False
         
-        if (self.opt_output.get('option') == 'signal' and 
-            (not (self.opt_output.get('title') or title_file_present) or
-            not (self.opt_output.get('author') or author_file_present))):
+        author_file_present = False
+        if self.opt_input.get('option') in ('kakao', 'line', 'signal'):
+            author_file_present = True
+        elif self.opt_input.get('option') == 'local':
+            author_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
+            author_file_present = os.path.isfile(author_file_path)
+            if author_file_present:
+                with open(title_file_path) as f:
+                    author_file_present = True if f.read() else False
 
-            msg += '[X] Uploading to signal requires title and author\n'
-            msg += '    Supply the title and author by filling in the option, or\n'
-            msg += '    Create title.txt and author.txt with the title and author name'
+        metadata_requirements = {
+            'title': ('telegram', 'signal', 'whatsapp', 'imessage'),
+            'author': ('signal', 'whatsapp', 'imessage')
+        }
+        output_presets = JsonManager.load_json('resources/output.json')
+        for metadata, options_required in metadata_requirements.items():
+            output_option = self.opt_output.get("option")
+            if output_option in options_required and not self.opt_output.get(metadata): 
+                if not title_file_present:
+                    error_msg += f'[X] {output_presets[output_option]["full_name"]} requires {metadata}\n'
+                    if self.opt_input.get('option') == 'local':
+                        error_msg += f'    {metadata} was not supplied and {metadata}.txt is absent\n'
+                    else:
+                        error_msg += f'    {metadata} was not supplied and input source will not provide {metadata}\n'
+                    error_msg += f'    Supply the {metadata} by filling in the option, or\n'
+                    error_msg += f'    Create {metadata}.txt with the {metadata} name\n'
+                else:
+                    info_msg += f'[!] {output_presets[output_option]["full_name"]} requires {metadata}\n'
+                    if self.opt_input.get('option') == 'local':
+                        info_msg += f'    {metadata} was not supplied but {metadata}.txt is present\n'
+                        info_msg += f'    Using {metadata} name in {metadata}.txt\n'
+                    else:
+                        info_msg += f'    {metadata} was not supplied but input source will provide {metadata}\n'
+                        info_msg += f'    Using {metadata} provided by input source\n'
         
+        if info_msg != '':
+            self.cb_msg(info_msg)
 
-        if (self.opt_output.get('option') == 'whatsapp' and 
-            (not (self.opt_output.get('title') or title_file_present) or
-            not (self.opt_output.get('author') or author_file_present))):
-
-            msg += '[X] Compressing to .wastickers requires title and author\n'
-            msg += '    Supply the title and author by filling in the option, or\n'
-            msg += '    Create title.txt and author.txt with the title and author name'
-        
-
-        if (self.opt_output.get('option') == 'imessage' and 
-            (not (self.opt_output.get('title') or title_file_present) or
-            not (self.opt_output.get('author') or author_file_present))):
-
-            msg += '[X] Creating Xcode project (for iMessage) requires title and author\n'
-            msg += '    Supply the title and author by filling in the option, or\n'
-            msg += '    Create title.txt and author.txt with the title and author name'
-        
-
-        if msg != '':
-            self.cb_msg(msg)
+        if error_msg != '':
+            self.cb_msg(error_msg)
             return False
         
         # Check if preset not equal to export option

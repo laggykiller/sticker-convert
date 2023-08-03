@@ -80,14 +80,15 @@ RUN mkdir -p '/root/.config/Signal' && \
 
 COPY ./requirements.txt /app/
 RUN pip3 install --no-cache-dir -r requirements.txt
-COPY startapp.sh /startapp.sh
-COPY ./sticker_convert /app/
-
-RUN chmod -R 777 /app
 
 RUN apt purge -y curl wget gpg cmake git rsync && \
     apt clean autoclean && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+COPY startapp.sh /startapp.sh
+COPY ./sticker_convert /app/
+
+RUN chmod -R 777 /app
 
 VOLUME ["/app/stickers_input", "/app/stickers_output"]
