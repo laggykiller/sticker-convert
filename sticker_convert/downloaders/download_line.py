@@ -104,13 +104,13 @@ class DownloadLine:
             if region == 'zh-Hant':
                 region = 'zh_TW'
 
-            title = pack_meta['title'].get(region)
+            title = pack_meta['title'].get('en')
             if title == None:
-                title = pack_meta['title']['en']
+                title = pack_meta['title'][region]
 
-            author = pack_meta['author'].get(region)
+            author = pack_meta['author'].get('en')
             if author == None:
-                author = pack_meta['author']['en']
+                author = pack_meta['author'][region]
 
         MetadataHandler.set_metadata(out_dir, title=title, author=author)
 
