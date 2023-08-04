@@ -138,7 +138,7 @@ class Flow:
             title_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
             title_file_present = os.path.isfile(title_file_path)
             if title_file_present:
-                with open(title_file_path) as f:
+                with open(title_file_path, encoding='utf-8') as f:
                     title_file_present = True if f.read() else False
         
         author_file_present = False
@@ -148,7 +148,7 @@ class Flow:
             author_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
             author_file_present = os.path.isfile(author_file_path)
             if author_file_present:
-                with open(title_file_path) as f:
+                with open(author_file_path, encoding='utf-8') as f:
                     author_file_present = True if f.read() else False
 
         metadata_requirements = {

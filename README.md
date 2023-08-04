@@ -254,13 +254,13 @@ Tip: Use the CLI for converting multiple stickers all at once without interventi
 
 The following example converts two Line sticker packs into Signal, Telegram and WhatsApp all at once
 ```
-sticker-convert --no-confirm --download-line https://store.line.me/stickershop/product/1/en --preset signal --author laggykiller --title "Moon and James" --export-signal
-sticker-convert --no-confirm --preset telegram --author laggykiller --title "Moon and James" --export-telegram
-sticker-convert --no-confirm --preset whatsapp --author laggykiller --title "Moon and James" --export-whatsapp
+sticker-convert --no-confirm --download-line https://store.line.me/stickershop/product/1/en --preset signal --export-signal
+sticker-convert --no-confirm --preset telegram --export-telegram
+sticker-convert --no-confirm --preset whatsapp --export-whatsapp
 
-sticker-convert --no-confirm --download-line https://store.line.me/stickershop/product/2/en --preset signal --author laggykiller --title "Brown and Cony" --export-signal
-sticker-convert --no-confirm --preset telegram --author laggykiller --title "Brown and Cony" --export-telegram
-sticker-convert --no-confirm --preset whatsapp --author laggykiller --title "Brown and Cony" --export-whatsapp
+sticker-convert --no-confirm --download-line https://store.line.me/stickershop/product/2/en --preset signal --export-signal
+sticker-convert --no-confirm --preset telegram --export-telegram
+sticker-convert --no-confirm --preset whatsapp --export-whatsapp
 ```
 
 Note that you can see the conversion result in export-result.txt
