@@ -1,22 +1,42 @@
 {
     "signal": {
         "full_name": "Upload to Signal",
-        "help": "Upload to Signal"
+        "help": "Upload to Signal",
+        "metadata_requirements": {
+            "title": true,
+            "author": true
+        }
     },
     "telegram": {
         "full_name": "Upload to Telegram",
-        "help": "Upload to Telegram"
+        "help": "Upload to Telegram",
+        "metadata_requirements": {
+            "title": true,
+            "author": false
+        }
     },
     "whatsapp": {
         "full_name": "Compress to .wastickers (WhatsApp)",
-        "help": "Create a .wastickers file for uploading to WhatsApp"
+        "help": "Create a .wastickers file for uploading to WhatsApp",
+        "metadata_requirements": {
+            "title": true,
+            "author": true
+        }
     },
     "imessage": {
         "full_name": "Create Xcode project (iMessage)",
-        "help": "Create Xcode project for importing to iMessage"
+        "help": "Create Xcode project for importing to iMessage",
+        "metadata_requirements": {
+            "title": true,
+            "author": true
+        }
     },
     "local": {
         "full_name": "Save to local directory only",
-        "help": "Save to local directory only"
+        "help": "Save to local directory only",
+        "metadata_requirements": {
+            "title": false,
+            "author": false
+        }
     }
 }

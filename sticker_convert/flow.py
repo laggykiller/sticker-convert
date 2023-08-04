@@ -18,6 +18,7 @@ from uploaders.xcode_imessage import XcodeImessage
 from utils.converter import StickerConvert
 from utils.codec_info import CodecInfo
 from utils.json_manager import JsonManager
+from utils.metadata_handler import MetadataHandler
 
 class Flow:
     def __init__(self,
@@ -131,35 +132,14 @@ class Flow:
             error_msg += '[X] Uploading to signal requires uuid and password.\n'
             error_msg += save_to_local_tip
         
-        title_file_present = False
-        if self.opt_input.get('option') in ('signal', 'telegram', 'line', 'kakao'):
-            title_file_present = True
-        elif self.opt_input.get('option') == 'local':
-            title_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
-            title_file_present = os.path.isfile(title_file_path)
-            if title_file_present:
-                with open(title_file_path, encoding='utf-8') as f:
-                    title_file_present = True if f.read() else False
-        
-        author_file_present = False
-        if self.opt_input.get('option') in ('kakao', 'line', 'signal'):
-            author_file_present = True
-        elif self.opt_input.get('option') == 'local':
-            author_file_path = os.path.join(self.opt_input.get('dir') ,'author.txt')
-            author_file_present = os.path.isfile(author_file_path)
-            if author_file_present:
-                with open(author_file_path, encoding='utf-8') as f:
-                    author_file_present = True if f.read() else False
-
-        metadata_requirements = {
-            'title': ('telegram', 'signal', 'whatsapp', 'imessage'),
-            'author': ('signal', 'whatsapp', 'imessage')
-        }
         output_presets = JsonManager.load_json('resources/output.json')
-        for metadata, options_required in metadata_requirements.items():
-            output_option = self.opt_output.get("option")
-            if output_option in options_required and not self.opt_output.get(metadata): 
-                if not title_file_present:
+
+        input_option = self.opt_input.get('option')
+        output_option = self.opt_output.get("option")
+        
+        for metadata in ('title', 'author'):
+            if MetadataHandler.check_metadata_required(output_option, metadata) and not self.opt_output.get(metadata): 
+                if not MetadataHandler.check_metadata_provided(self.opt_input['dir'], input_option, metadata):
                     error_msg += f'[X] {output_presets[output_option]["full_name"]} requires {metadata}\n'
                     if self.opt_input.get('option') == 'local':
                         error_msg += f'    {metadata} was not supplied and {metadata}.txt is absent\n'
@@ -274,16 +254,16 @@ class Flow:
         downloaders = []
 
         if self.opt_input['option'] == 'signal':
-            downloaders.append(DownloadSignal.download_stickers_signal)
+            downloaders.append(DownloadSignal.start)
 
         if self.opt_input['option'] == 'line':
-            downloaders.append(DownloadLine.download_stickers_line)
+            downloaders.append(DownloadLine.start)
             
         if self.opt_input['option'] == 'telegram':
-            downloaders.append(DownloadTelegram.download_stickers_telegram)
+            downloaders.append(DownloadTelegram.start)
 
         if self.opt_input['option'] == 'kakao':
-            downloaders.append(DownloadKakao.download_stickers_kakao)
+            downloaders.append(DownloadKakao.start)
         
         if len(downloaders) > 0:
             self.cb_msg('Downloading...')
@@ -386,31 +366,39 @@ class Flow:
         self.cb_bar(update_bar=True)
 
     def export(self):
-        self.cb_msg('Exporting...')
         self.cb_bar(set_progress_mode='indeterminate')
+
+        if self.opt_output['option'] == 'local':
+            self.cb_msg('Saving to local directory only, nothing to export')
+            return True
+        
+        self.cb_msg('Exporting...')
 
         exporters = []
 
         if self.opt_output['option'] == 'whatsapp':
-            exporters.append(CompressWastickers.compress_wastickers)
+            exporters.append(CompressWastickers.start)
 
         if self.opt_output['option'] == 'signal':
-            exporters.append(UploadSignal.upload_stickers_signal)
+            exporters.append(UploadSignal.start)
 
         if self.opt_output['option'] == 'telegram':
-            exporters.append(UploadTelegram.upload_stickers_telegram)
+            exporters.append(UploadTelegram.start)
 
         if self.opt_output['option'] == 'imessage':
-            exporters.append(XcodeImessage.create_imessage_xcode)
+            exporters.append(XcodeImessage.start)
         
         for exporter in exporters:
             self.out_urls += exporter(
                 opt_output=self.opt_output, opt_comp=self.opt_comp, opt_cred=self.opt_cred, 
                 cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_bar=self.cb_bar)
         
-        if self.out_urls != []:
+        if self.out_urls:
             with open(os.path.join(self.opt_output['dir'], 'export-result.txt'), 'w+') as f:
                 f.writelines(self.out_urls)
+        else:
+            self.cb_msg('An error occured while exporting stickers')
+            return False
                 
         return True
     

@@ -32,14 +32,14 @@
 - [DISCLAIMER](#disclaimer)
 
 ## Compatibility
-| Application                           | ⬇️ Download                            | ⬆️ Upload                                          |
-| ------------------------------------- | -------------------------------------- | --------------------------------------------------- |
-| [Signal](docs/guide_signal.md)        | ✅                                     | ✅ (Require `uuid` & `password` or manually)       |
-| [Telegram](docs/guide_telegram.md)    | ✅ (Require `uuid` & `password`)       | ✅ (Require `token` & `user_id` or manually)       |
-| [WhatsApp](docs/guide_whatsapp.md)    | ⭕ (By Android or WhatsApp Web)        | ⭕ (Create `.wastickers`, import by Sticker Maker) |
-| [Line](docs/guide_line.md)            | ✅                                     | 🚫 (Need to submit for manual approval)            |
-| [Kakao](docs/guide_kakao.md)          | ✅ (Need 'share link' for animated)    | 🚫 (Need to submit for manual approval)            |
-| [iMessage](docs/guide_imessage.md)    | 🚫                                     | ⭕ (Create Xcode stickerpack project for sideload) |
+| Application                           | ⬇️ Download                         | ⬆️ Upload                                          |
+| ------------------------------------- | ------------------------------------| --------------------------------------------------- |
+| [Signal](docs/guide_signal.md)        | ✅                                  | ✅ (Require `uuid` & `password` or manually)       |
+| [Telegram](docs/guide_telegram.md)    | ✅ (Require `token`)                | ✅ (Require `token` & `user_id` or manually)       |
+| [WhatsApp](docs/guide_whatsapp.md)    | ⭕ (By Android or WhatsApp Web)     | ⭕ (Create `.wastickers`, import by Sticker Maker) |
+| [Line](docs/guide_line.md)            | ✅                                  | 🚫 (Need to submit for manual approval)            |
+| [Kakao](docs/guide_kakao.md)          | ✅ (Need 'share link' for animated) | 🚫 (Need to submit for manual approval)            |
+| [iMessage](docs/guide_imessage.md)    | 🚫                                  | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
 

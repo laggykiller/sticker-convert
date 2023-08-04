@@ -5,6 +5,7 @@ import copy
 import json
 import plistlib
 
+from .upload_base import UploadBase
 from utils.converter import StickerConvert
 from utils.format_verify import FormatVerify
 from utils.metadata_handler import MetadataHandler
@@ -12,7 +13,7 @@ from utils.codec_info import CodecInfo
 
 from mergedeep import merge
 
-class XcodeImessage:
+class XcodeImessageIconset:
     def __init__(self):
         self.iconset = {}
 
@@ -29,7 +30,7 @@ class XcodeImessage:
             size_h_scaled = size_h * scale
 
             self.iconset[filename] = (size_w_scaled, size_h_scaled)
-
+        
         # self.iconset = {
         #     'App-Store-1024x1024pt.png': (1024, 1024),
         #     'iPad-Settings-29pt@2x.png': (58, 58),
@@ -44,13 +45,13 @@ class XcodeImessage:
         #     'Messages-iPad-Pro-74x55pt@2x.png': (148, 110),
         #     'Messages-iPhone-60x45pt@2x.png': (120, 90),
         #     'Messages-iPhone-60x45pt@3x.png': (180, 135)
-        # }
 
-    @staticmethod
-    def create_imessage_xcode(opt_output, opt_comp, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
-        in_dir = opt_output['dir']
-        if not out_dir:
-            out_dir = opt_output['dir']
+
+
+class XcodeImessage(UploadBase):
+    def __init__(self, *args, **kwargs):
+        super(XcodeImessage, self).__init__(*args, **kwargs)
+        self.iconset = XcodeImessageIconset().iconset
 
         base_spec = {
             "size_max": {
@@ -71,23 +72,24 @@ class XcodeImessage:
             'square': True
         }
 
-        small_spec = copy.deepcopy(base_spec)
+        self.small_spec = copy.deepcopy(base_spec)
 
-        medium_spec = copy.deepcopy(base_spec)
-        medium_spec['res']['w']['min'] = 408
-        medium_spec['res']['w']['max'] = 408
-        medium_spec['res']['h']['min'] = 408
-        medium_spec['res']['h']['max'] = 408
+        self.medium_spec = copy.deepcopy(base_spec)
+        self.medium_spec['res']['w']['min'] = 408
+        self.medium_spec['res']['w']['max'] = 408
+        self.medium_spec['res']['h']['min'] = 408
+        self.medium_spec['res']['h']['max'] = 408
 
-        large_spec = copy.deepcopy(base_spec)
-        large_spec['res']['w']['min'] = 618
-        large_spec['res']['w']['max'] = 618
-        large_spec['res']['h']['min'] = 618
-        large_spec['res']['h']['max'] = 618
-
+        self.large_spec = copy.deepcopy(base_spec)
+        self.large_spec['res']['w']['min'] = 618
+        self.large_spec['res']['w']['max'] = 618
+        self.large_spec['res']['h']['min'] = 618
+        self.large_spec['res']['h']['max'] = 618
+    
+    def create_imessage_xcode(self):
         urls = []
-        title, author, emoji_dict = MetadataHandler.get_metadata(in_dir, title=opt_output.get('title'), author=opt_output.get('author'))
-        packs = MetadataHandler.split_sticker_packs(in_dir, title=title, file_per_pack=100, separate_image_anim=False)
+        title, author, emoji_dict = MetadataHandler.get_metadata(self.in_dir, title=self.opt_output.get('title'), author=self.opt_output.get('author'))
+        packs = MetadataHandler.split_sticker_packs(self.in_dir, title=title, file_per_pack=100, separate_image_anim=False)
 
         res_choice = None
 
@@ -95,44 +97,43 @@ class XcodeImessage:
             pack_title = FormatVerify.sanitize_filename(pack_title)
 
             for src in stickers:
-                cb_msg('Verifying', src, 'for creating Xcode iMessage sticker pack')
+                self.cb_msg(f'Verifying {src} for creating Xcode iMessage sticker pack')
 
-                src_path = os.path.join(in_dir, src)
-                dst_path = os.path.join(out_dir, src)
+                src_path = os.path.join(self.in_dir, src)
+                dst_path = os.path.join(self.out_dir, src)
 
                 if res_choice == None:
                     res_choice, _ = CodecInfo.get_file_res(src_path)
                     res_choice = res_choice if res_choice != None else 300
 
                     if res_choice == 300:
-                        spec_choice = small_spec
+                        spec_choice = self.small_spec
                     elif res_choice == 408:
-                        spec_choice = medium_spec
+                        spec_choice = self.medium_spec
                     elif res_choice == 618:
-                        spec_choice = large_spec
+                        spec_choice = self.large_spec
                     
-                    opt_comp_merged = merge({}, opt_comp, spec_choice)
+                    opt_comp_merged = merge({}, self.opt_comp, spec_choice)
 
                 if FormatVerify.check_file(src, spec=spec_choice):
                     if src_path != dst_path:
                         shutil.copy(src_path, dst_path)
                 else:
-                    StickerConvert.convert_and_compress_to_size(src_path, dst_path, opt_comp_merged, cb_msg)
+                    StickerConvert.convert_and_compress_to_size(src_path, dst_path, opt_comp_merged, self.cb_msg)
 
-            XcodeImessage.add_metadata(out_dir, out_dir, author, pack_title)
-            XcodeImessage.create_xcode_proj(in_dir, out_dir, author, pack_title)
+            self.add_metadata(author, pack_title)
+            self.create_xcode_proj(author, pack_title)
 
-            result = os.path.join(out_dir, pack_title)
-            cb_msg(result)
+            result = os.path.join(self.out_dir, pack_title)
+            self.cb_msg(result)
             urls.append(result)
         
         return urls
 
-    @staticmethod
-    def add_metadata(in_dir, out_dir, author, title):
-        first_image_path = os.path.join(in_dir, [i for i in sorted(os.listdir(in_dir)) if os.path.isfile(os.path.join(in_dir, i)) and i.endswith('.png')][0])
-        cover_path = os.path.join(in_dir, 'cover.png')
-        cover_path_new = os.path.join(out_dir, 'cover.png')
+    def add_metadata(self, author, title):
+        first_image_path = os.path.join(self.in_dir, [i for i in sorted(os.listdir(self.in_dir)) if os.path.isfile(os.path.join(self.in_dir, i)) and i.endswith('.png')][0])
+        cover_path = os.path.join(self.in_dir, 'cover.png')
+        cover_path_new = os.path.join(self.out_dir, 'cover.png')
         if os.path.isfile(cover_path) and cover_path_new != cover_path:
             shutil.copy(cover_path, cover_path_new)
 
@@ -141,7 +142,7 @@ class XcodeImessage:
         else:
             icon_source = first_image_path
 
-        for icon, res in XcodeImessage().iconset.items():
+        for icon, res in self.iconset.items():
             spec_cover = {
                 "res": {
                     "w": {
@@ -155,19 +156,17 @@ class XcodeImessage:
                 }
             }
 
-            icon_old_path = os.path.join(in_dir, icon)
-            icon_new_path = os.path.join(out_dir, icon)
-            if icon in os.listdir(in_dir) and not FormatVerify.check_file(icon_old_path, spec=spec_cover):
+            icon_old_path = os.path.join(self.in_dir, icon)
+            icon_new_path = os.path.join(self.out_dir, icon)
+            if icon in os.listdir(self.in_dir) and not FormatVerify.check_file(icon_old_path, spec=spec_cover):
                 StickerConvert.convert_generic_image(icon_old_path, icon_new_path, res_w=res[0], res_h=res[1], quality=100)
             else:
                 StickerConvert.convert_generic_image(icon_source, icon_new_path, res_w=res[0], res_h=res[1], quality=100)
                 
-        MetadataHandler.set_metadata(out_dir, author=author, title=title)
+        MetadataHandler.set_metadata(self.out_dir, author=author, title=title)
 
-    @staticmethod
-    def create_xcode_proj(in_dir, out_dir, author, title):
-        iconset = XcodeImessage().iconset
-        pack_path = os.path.join(out_dir, title)
+    def create_xcode_proj(self, author, title):
+        pack_path = os.path.join(self.out_dir, title)
         shutil.copytree('ios-message-stickers-template', pack_path)
 
         os.remove(os.path.join(pack_path, 'README.md'))
@@ -199,15 +198,15 @@ class XcodeImessage:
                 shutil.rmtree(os.path.join(stickers_path, i))
         
         stickers_lst = []
-        for i in sorted(os.listdir(in_dir)):
-            if CodecInfo.get_file_ext(i) == '.png' and i != 'cover.png' and i not in iconset:
+        for i in sorted(os.listdir(self.in_dir)):
+            if CodecInfo.get_file_ext(i) == '.png' and i != 'cover.png' and i not in self.iconset:
                 sticker_dir = f'{os.path.splitext(i)[0]}.sticker' # 0.sticker
                 stickers_lst.append(sticker_dir)
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker
                 sticker_path = os.path.join(stickers_path, sticker_dir)
                 os.mkdir(sticker_path)
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/0.png
-                shutil.copy(os.path.join(in_dir, i), os.path.join(sticker_path, i))
+                shutil.copy(os.path.join(self.in_dir, i), os.path.join(sticker_path, i))
 
                 dict = {
                     'info': {
@@ -242,8 +241,8 @@ class XcodeImessage:
                 os.remove(os.path.join(iconset_path, i))
 
         icons_lst = []
-        for i in iconset:
-            shutil.copy(os.path.join(in_dir, i), os.path.join(iconset_path, i))
+        for i in self.iconset:
+            shutil.copy(os.path.join(self.in_dir, i), os.path.join(iconset_path, i))
             icons_lst.append(i)
         
         # packname/Info.plist
@@ -258,3 +257,8 @@ class XcodeImessage:
         os.rename(os.path.join(pack_path, 'stickers'), os.path.join(pack_path, f'{title}'))
         os.rename(os.path.join(pack_path, 'stickers StickerPackExtension'), os.path.join(pack_path, f'{title} StickerPackExtension'))
         os.rename(os.path.join(pack_path, 'stickers.xcodeproj'), os.path.join(pack_path, f'{title}.xcodeproj'))
+    
+    @staticmethod
+    def start(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
+        exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
+        return exporter.create_imessage_xcode()

@@ -40,8 +40,8 @@
     },
     "telegram": {
         "size_max": {
-            "img": 256000,
-            "vid": 512000
+            "img": 512000,
+            "vid": 256000
         },
         "format": {
             "img": ".png",
@@ -74,7 +74,7 @@
             "max": 3000
         },
         "steps": 16,
-        "fake_vid": true,
+        "fake_vid": false,
         "default_emoji": "😀"
     },
     "telegram_vector": {

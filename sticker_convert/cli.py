@@ -43,7 +43,7 @@ class CLI:
         self.output_presets = JsonManager.load_json('resources/output.json')
 
         if not (self.help and self.compression_presets and self.input_presets and self.output_presets):
-            self.callback_msg('Warning: preset json(s) cannot be found')
+            self.cb_msg('Warning: preset json(s) cannot be found')
             return
 
         parser = argparse.ArgumentParser(description='CLI for stickers-convert', formatter_class=argparse.RawTextHelpFormatter)
@@ -116,13 +116,13 @@ class CLI:
         flow = Flow(
             self.opt_input, self.opt_comp, self.opt_output, self.opt_cred, 
             self.input_presets, self.output_presets,
-            self.callback_msg, self.callback_msg_block, self.callback_bar, self.callback_ask_bool
+            self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
         )
 
         success = flow.start()
 
         if not success:
-            self.callback_msg(msg='An error occured during this run.')
+            self.cb_msg(msg='An error occured during this run.')
 
     def get_opt_input(self, args):
         download_options = {
@@ -228,7 +228,7 @@ class CLI:
         creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
         creds = JsonManager.load_json(creds_path)
         if creds:
-            self.callback_msg('Loaded credentials from creds.json')
+            self.cb_msg('Loaded credentials from creds.json')
         else:
             creds = {}
 
@@ -254,16 +254,16 @@ class CLI:
         }
 
         if args.kakao_get_auth:
-            m = GetKakaoAuth(opt_cred=creds, cb_msg=self.callback_msg, cb_msg_block=self.callback_msg_block, cb_ask_str=self.callback_ask_str)
+            m = GetKakaoAuth(opt_cred=creds, cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_ask_str=self.cb_ask_str)
             auth_token = m.get_cred()
 
             if auth_token:
                 self.opt_cred['kakao']['auth_token'] = auth_token
                 
-                self.callback_msg(f'Got auth_token successfully: {auth_token}')
+                self.cb_msg(f'Got auth_token successfully: {auth_token}')
         
         if args.signal_get_auth:
-            m = GetSignalAuth(cb_msg=self.callback_msg, cb_ask_str=self.callback_ask_str)
+            m = GetSignalAuth(cb_msg=self.cb_msg, cb_ask_str=self.cb_ask_str)
 
             uuid, password = None, None
             while True:
@@ -273,28 +273,28 @@ class CLI:
                     self.opt_cred['signal']['uuid'] = uuid
                     self.opt_cred['signal']['password'] = password
                 
-                    self.callback_msg(f'Got uuid and password successfully: {uuid}, {password}')
+                    self.cb_msg(f'Got uuid and password successfully: {uuid}, {password}')
                     break
         
         if args.line_get_auth:
-            m = GetLineAuth(cb_msg=self.callback_msg, cb_ask_str=self.callback_ask_str)
+            m = GetLineAuth(cb_msg=self.cb_msg, cb_ask_str=self.cb_ask_str)
 
             line_cookies = m.get_cred()
 
             if line_cookies:
                 self.opt_cred['line']['cookies'] = line_cookies
             
-                self.callback_msg(f'Got Line cookies successfully')
+                self.cb_msg(f'Got Line cookies successfully')
             else:
-                self.callback_msg(f'Failed to get Line cookies. Have you logged in the web browser?')
+                self.cb_msg(f'Failed to get Line cookies. Have you logged in the web browser?')
         
         if args.save_cred:
             creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
             JsonManager.save_json(creds_path, self.opt_cred)
-            self.callback_msg('Saved credentials to creds.json')
+            self.cb_msg('Saved credentials to creds.json')
     
-    def callback_ask_str(self, msg: str=None, initialvalue: str=None, cli_show_initialvalue: bool=True):
-        self.callback_msg(msg)
+    def cb_ask_str(self, msg: str=None, initialvalue: str=None, cli_show_initialvalue: bool=True):
+        self.cb_msg(msg)
 
         hint = ''
         if cli_show_initialvalue and initialvalue:
@@ -307,23 +307,23 @@ class CLI:
         
         return response
 
-    def callback_ask_bool(self, question, parent=None):
-        self.callback_msg(question)
+    def cb_ask_bool(self, question, parent=None):
+        self.cb_msg(question)
 
         if self.no_confirm:
-            self.callback_msg('"--no-confirm" flag is set. Continue with this run without asking questions')
+            self.cb_msg('"--no-confirm" flag is set. Continue with this run without asking questions')
             return True
         else:
-            self.callback_msg('If you do not want to get asked by this question, add "--no-confirm" flag')
-            self.callback_msg()
+            self.cb_msg('If you do not want to get asked by this question, add "--no-confirm" flag')
+            self.cb_msg()
             result = input('Continue? [y/N] > ')
             if result.lower() != 'y':
-                self.callback_msg('Cancelling this run')
+                self.cb_msg('Cancelling this run')
                 return False
             else:
                 return True
     
-    def callback_msg(self, *args, **kwargs):
+    def cb_msg(self, *args, **kwargs):
         msg = kwargs.get('msg')
 
         if not msg and len(args) == 1:
@@ -335,14 +335,14 @@ class CLI:
             else:
                 print(msg)
 
-    def callback_msg_block(self, *args, **kwargs):
+    def cb_msg_block(self, *args, **kwargs):
         if len(args) > 0:
             msg = ' '.join(str(i) for i in args)
-            self.callback_msg(msg)
+            self.cb_msg(msg)
         if not self.no_confirm:
             input('Press Enter to continue...')
     
-    def callback_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
+    def cb_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
         if update_bar:
             self.progress_bar.update()
         elif set_progress_mode == 'determinate':
@@ -357,6 +357,6 @@ class CLI:
 
     def check_bin(self):
         for bin, check_cmd in self.bins.items():
-            result = RunBin.check_bin(bin, check_cmd, self.callback_ask_bool, self.callback_msg)
+            result = RunBin.check_bin(bin, check_cmd, self.cb_ask_bool, self.cb_msg)
             if result == False:
                 sys.exit()

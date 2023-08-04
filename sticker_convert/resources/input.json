@@ -3,30 +3,50 @@
         "full_name": "Download from Signal",
         "help": "Download signal stickers from a URL as input",
         "example": "Example: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx",
-        "address_lbls": "URL address"
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": true,
+            "author": false
+        }
     },
     "telegram": {
         "full_name": "Download from Telegram",
         "help": "Download telegram stickers from a URL as input",
         "example": "Example: https://telegram.me/addstickers/xxxxx",
-        "address_lbls": "URL address"
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": true,
+            "author": true
+        }
     },
     "line": {
         "full_name": "Download from Line",
         "help": "Download line stickers from a URL / ID as input",
         "example": "Example: https://store.line.me/stickershop/product/1234/en\n OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234",
-        "address_lbls": "URL address / ID"
+        "address_lbls": "URL address / ID",
+        "metadata_provides": {
+            "title": true,
+            "author": true
+        }
     },
     "kakao": {
         "full_name": "Download from Kakao",
         "help": "Download kakao stickers from a URL / ID as input",
         "example": "Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400\nOR https://emoticon.kakao.com/items/xxxxx OR 4404400",
-        "address_lbls": "URL address / ID"
+        "address_lbls": "URL address / ID",
+        "metadata_provides": {
+            "title": true,
+            "author": true
+        }
     },
     "local": {
         "full_name": "From local directory",
         "help": "Load files from local directory on computer",
         "example": "No need to supply any URL",
-        "address_lbls": "URL address (N/A)"
+        "address_lbls": "URL address (N/A)",
+        "metadata_provides": {
+            "title": false,
+            "author": false
+        }
     }
 }
