@@ -145,7 +145,7 @@ class Flow:
         if self.opt_input.get('option') in ('kakao', 'line', 'signal'):
             author_file_present = True
         elif self.opt_input.get('option') == 'local':
-            author_file_path = os.path.join(self.opt_input.get('dir') ,'title.txt')
+            author_file_path = os.path.join(self.opt_input.get('dir') ,'author.txt')
             author_file_present = os.path.isfile(author_file_path)
             if author_file_present:
                 with open(author_file_path, encoding='utf-8') as f:
