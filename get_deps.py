@@ -69,13 +69,17 @@ def win_cairo():
 
 def win_apngasm():
     print('Getting apngasm', flush=True)
-    url = 'https://github.com/laggykiller/apngasm/releases/download/3.1.3/apngasm_3.1-3_AMD64.zip'
+    url = 'https://github.com/laggykiller/apngasm/releases/download/v3.1.10/apngasm_v3.1.10_windows_AMD64.zip'
     file = 'apngasm.zip'
+    os.mkdir('apngasm')
+    os.chdir('apngasm')
     download(url, file)
     unzip(file)
-    cp_files_in_dir('bin')
+    os.chdir('../')
+    cp_files_in_dir('apngasm/bin')
+    cp_files_in_dir('apngasm/lib')
     os.remove(file)
-    shutil.rmtree('bin')
+    shutil.rmtree('apngasm')
 
     assert os.path.isfile('apngasm.exe')
 
