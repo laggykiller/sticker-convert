@@ -1,0 +1,353 @@
+{
+    "signal": {
+        "size_max": {
+            "img": 300000,
+            "vid": 300000
+        },
+        "format": {
+            "img": ".webp",
+            "vid": ".apng"
+        },
+        "fps": {
+            "min": 1,
+            "max": 30
+        },
+        "res": {
+            "w": {
+                "min": 256,
+                "max": 512
+            },
+            "h": {
+                "min": 256,
+                "max": 512
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 3000
+        },
+        "steps": 16,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
+    "telegram": {
+        "size_max": {
+            "img": 512000,
+            "vid": 256000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".webm"
+        },
+        "fps": {
+            "min": 1,
+            "max": 30
+        },
+        "res": {
+            "w": {
+                "min": 512,
+                "max": 512
+            },
+            "h": {
+                "min": 512,
+                "max": 512
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 3000
+        },
+        "steps": 16,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
+    "whatsapp": {
+        "size_max": {
+            "img": 100000,
+            "vid": 500000
+        },
+        "format": {
+            "img": ".webp",
+            "vid": ".webp"
+        },
+        "fps": {
+            "min": 1,
+            "max": 30
+        },
+        "res": {
+            "w": {
+                "min": 512,
+                "max": 512
+            },
+            "h": {
+                "min": 512,
+                "max": 512
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 8,
+            "max": 10000
+        },
+        "steps": 16,
+        "fake_vid": true,
+        "default_emoji": "😀"
+    },
+    "line": {
+        "size_max": {
+            "img": 1000000,
+            "vid": 300000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".apng"
+        },
+        "fps": {
+            "min": 1,
+            "max": 60
+        },
+        "res": {
+            "w": {
+                "min": 100,
+                "max": 370
+            },
+            "h": {
+                "min": 100,
+                "max": 320
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 83,
+            "max": 4000
+        },
+        "steps": 16,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
+    "kakao": {
+        "size_max": {
+            "img": 150000,
+            "vid": 2000000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".gif"
+        },
+        "fps": {
+            "min": 1,
+            "max": 60
+        },
+        "res": {
+            "w": {
+                "min": 360,
+                "max": 360
+            },
+            "h": {
+                "min": 360,
+                "max": 360
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 0
+        },
+        "steps": 16,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
+    "imessage_small": {
+        "size_max": {
+            "img": 500000,
+            "vid": 500000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".png"
+        },
+        "fps": {
+            "min": 1,
+            "max": 60
+        },
+        "res": {
+            "w": {
+                "min": 300,
+                "max": 300
+            },
+            "h": {
+                "min": 300,
+                "max": 300
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 0
+        },
+        "steps": 8,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
+    "imessage_medium": {
+        "size_max": {
+            "img": 500000,
+            "vid": 500000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".png"
+        },
+        "fps": {
+            "min": 1,
+            "max": 60
+        },
+        "res": {
+            "w": {
+                "min": 408,
+                "max": 408
+            },
+            "h": {
+                "min": 408,
+                "max": 408
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 0
+        },
+        "steps": 8,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
+    "imessage_large": {
+        "size_max": {
+            "img": 500000,
+            "vid": 500000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".png"
+        },
+        "fps": {
+            "min": 1,
+            "max": 60
+        },
+        "res": {
+            "w": {
+                "min": 618,
+                "max": 618
+            },
+            "h": {
+                "min": 618,
+                "max": 618
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 0
+        },
+        "steps": 8,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
+    "custom": {
+        "size_max": {
+            "img": 500000,
+            "vid": 500000
+        },
+        "format": {
+            "img": ".webm",
+            "vid": ".png"
+        },
+        "fps": {
+            "min": 1,
+            "max": 30
+        },
+        "res": {
+            "w": {
+                "min": 512,
+                "max": 512
+            },
+            "h": {
+                "min": 512,
+                "max": 512
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 10000
+        },
+        "steps": 16,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    }
+}

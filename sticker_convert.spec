@@ -1,81 +1,11 @@
 # -*- mode: python ; coding: utf-8 -*-
 import os
-import shutil
 import sys
 import importlib
 
 block_cipher = None
 
-def get_bin(bin):
-    # Prioritize local binaries
-    if sys.platform == 'win32' and os.path.isfile(f'./sticker_convert/bin/{bin}.exe'):
-        return os.path.abspath(f'./sticker_convert/bin/{bin}.exe')
-    elif os.path.isfile(f'./sticker_convert/bin/{bin}'):
-        return os.path.abspath(f'./sticker_convert/bin/{bin}')
-
-    which_result = shutil.which(bin)
-    if which_result != None:
-        return os.path.abspath(which_result)
-
-def get_magick_dir():
-    # Prioritize local binaries
-    if os.path.isdir('./sticker_convert/ImageMagick') and len(os.listdir('./sticker_convert/ImageMagick')) > 0:
-        return os.path.abspath(f'./sticker_convert/ImageMagick')
-    else:
-        magick_path = shutil.which("magick")
-        if magick_path:
-            return os.path.split(magick_path)[0]
-        else:
-            print('Error: ImageMagick directory not found.')
-            if sys.platform == 'win32':
-                print('You may run get-deps-windows.bat to get ImageMagick automagically')
-            elif sys.platform == 'darwin':
-                print('You may run get-deps-macos.sh to get ImageMagick automagically')
-            sys.exit()
-
-binaries = []
-datas = [('./sticker_convert/resources/*', './resources')]
-
-if sys.platform == 'win32':
-    apngasm_path = shutil.which("apngasm")
-    if apngasm_path:
-        apngasm_dir = os.path.split(apngasm_path)[0]
-        datas += [(f'{apngasm_dir}/*', './bin')]
-    
-    magick_dir = get_magick_dir()
-    datas += [(f'{magick_dir}/*.exe', './ImageMagick'), (f'{magick_dir}/*.xml', './ImageMagick')]
-
-    # Portable version does not have coders directory
-    if os.path.isdir(f'{magick_dir}/modules/coders'):
-        datas += [(f'{magick_dir}/modules/coders', './ImageMagick/coders')]
-    
-    # Portable version does not have dll
-    if [i for i in os.listdir(magick_dir) if os.path.splitext(i)[-1].lower() == '.dll'] != []:
-        datas += [(f'{magick_dir}/*.dll', './ImageMagick')]
-
-    
-elif sys.platform == 'darwin':
-    datas += [
-        (f'./sticker_convert/ImageMagick/bin/*', f'./ImageMagick/bin'),
-        (f'./sticker_convert/ImageMagick/lib/*.dylib', f'./ImageMagick/lib'),
-        (f'./sticker_convert/ImageMagick/lib/*.a', f'./ImageMagick/lib'),
-        (f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.la', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders'),
-        (f'./sticker_convert/ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders/*.so', f'./ImageMagick/lib/ImageMagick/modules-Q16HDRI/coders'),
-        (f'./sticker_convert/ImageMagick/etc/ImageMagick-7/*.xml', f'./ImageMagick/etc/ImageMagick-7')
-        ]
-
-bin_list = ['optipng', 'pngnq-s9', 'pngquant', 'apngdis', 'apngasm', 'ffmpeg', 'ffprobe', 'zip']
-for bin in bin_list:
-    bin_path = get_bin(bin)
-    if bin_path:
-        binaries.append((bin_path, './bin'))
-
-# Add local binaries at last so they are not overwritten by those found in system
-if os.path.isdir('./sticker_convert/bin') and len(os.listdir('./sticker_convert/bin')) > 0:
-    datas += [('./sticker_convert/bin/*', './bin')]
-
-if os.path.isdir('./sticker_convert/lib') and len(os.listdir('./sticker_convert/lib')) > 0:
-    datas += [('./sticker_convert/lib/*', './lib')]
+datas = [('./src/sticker_convert/resources/*', './resources')]
 
 # signalstickers_client needs a custom cacert.pem
 # https://stackoverflow.com/a/48068640
@@ -92,19 +22,12 @@ else:
 proot = os.path.dirname(importlib.import_module('rlottie_python').__file__)
 datas.append((os.path.join(proot, rlottie_dll), 'rlottie_python/'))
 
-# Tkinter tix
-# Example directory: %appdatalocal%/Programs/Python/Python310/tcl/tix8.4.3
-# for path in sys.path:
-#     tcl_path = os.path.join(path, 'tcl')
-#     if os.path.isdir(tcl_path):
-#         break
-
 a = Analysis(
-    ['sticker_convert/main.py'],
+    ['src/sticker_convert/main.py'],
     pathex=['sticker_convert'],
-    binaries=binaries,
+    binaries=None,
     datas=datas,
-    hiddenimports=['tkinter', 'Pillow', 'CairoSVG', 'opencv-python'],
+    hiddenimports=['tkinter', 'Pillow', 'opencv-python'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -132,14 +55,14 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='./sticker_convert/resources/appicon.ico'
+    icon='./src/sticker_convert/resources/appicon.ico'
 )
 coll = COLLECT(
     exe,
     a.binaries,
     a.zipfiles,
     a.datas,
-    Tree('./sticker_convert/ios-message-stickers-template', prefix='ios-message-stickers-template'),
+    Tree('./src/sticker_convert/ios-message-stickers-template', prefix='ios-message-stickers-template'),
     strip=False,
     upx=True,
     upx_exclude=[],
@@ -147,5 +70,5 @@ coll = COLLECT(
 )
 app = BUNDLE(coll,
     name=f'sticker-convert.app',
-    icon='./sticker_convert/resources/appicon.icns',
+    icon='./src/sticker_convert/resources/appicon.icns',
     bundle_identifier=None)

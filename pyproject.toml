@@ -1,0 +1,51 @@
+[project]
+name = "sticker-convert"
+description = "Convert (animated) stickers to/from WhatsApp, Telegram, Signal, Line, Kakao, iMessage. Written in Python."
+readme = "README.md"
+requires-python = ">=3.7"
+license = {file = "LICENSE"}
+keywords = ["telegram", "line", "tgs", "whatsapp", "kakao", "signal", "imessage", "wastickers"]
+authors = [
+  {name = "laggykiller", email = "chaudominic2@gmail.com" } # Optional
+]
+maintainers = [
+  {name = "laggykiller", email = "chaudominic2@gmail.com" } # Optional
+]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: End Users/Desktop",
+  "Topic :: Multimedia :: Graphics :: Graphics Conversion",
+  "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3 :: Only",
+]
+dynamic = ["version", "dependencies"]
+
+[options]
+include_package_data = true
+
+[project.urls]  # Optional
+Homepage = "https://github.com/laggykiller/sticker-convert"
+Source = "https://github.com/laggykiller/sticker-convert"
+Documentation = "https://github.com/laggykiller/sticker-convert"
+Tracker = "https://github.com/laggykiller/sticker-convert/issues"
+Repository = "https://github.com/laggykiller/sticker-convert"
+
+[project.scripts]
+sticker-convert = "sticker_convert.main:main"
+
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.dynamic]
+version = {attr = "sticker_convert.__version__"}
+dependencies = {file = ["requirements.txt"]}

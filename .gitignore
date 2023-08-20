@@ -49,10 +49,13 @@ coverage.xml
 # Sphinx documentation
 docs/_build/
 
+# venv
+pyvenv.cfg
+**/lib64
+.version_full
+
 **/stickers_input
 **/stickers_output
-magick-src/**
-**/ImageMagick
 *.exe
 *.dll
 AppDir/**

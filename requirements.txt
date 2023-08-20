@@ -1,15 +1,18 @@
 beautifulsoup4~=4.12.2
-ffmpeg-python~=0.2.0
 lottie~=0.7.0
 mergedeep~=1.3.4
-Pillow~=10.0.0
 requests~=2.31.0
 rlottie_python~=1.1.3
+apngasm_python~=1.0.1
 selenium~=4.11.2
-git+https://github.com/laggykiller/signalstickers-client.git
+signalstickers-client @ git+https://github.com/signalstickers/signalstickers-client.git
 python-telegram-bot~=20.4
 tqdm~=4.66.1
-git+https://github.com/laggykiller/ttkbootstrap.git
-Wand~=0.6.11
+ttkbootstrap @ git+https://github.com/laggykiller/ttkbootstrap.git
 memory-tempfile~=2.2.3
 browser-cookie3~=0.19.1
+imageio~=2.31.1
+Pillow~=10.0.0
+av~=10.0.0
+webp~=0.1.5
+pyoxipng~=8.0.0

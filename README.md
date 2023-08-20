@@ -12,8 +12,9 @@
     - Windows: Unzip the downloaded file and run `sticker-convert.exe`
     - MacOS: Unzip the downloaded file and run `run_me_first.command` for the first time, then `sticker-convert.app` in the future
     - Linux: `chmod +x` the downloaded AppImage and run it
+- pip package: `pip install sticker-convert`. Launch with `sticker-convert` or `python -m sticker_convert`
 - [Docker image](https://hub.docker.com/r/laggykiller/sticker-convert) for running on Linux.
-- [Try in Google Colab without downloading](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which runs the code on Google server and get the result from Google Drive. However, it maybe slower than running on your computer. (~50 seconds per file if not converting to .apng, ~4 minute per file if you convert to .apng)
+- [Try in Google Colab without downloading](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which runs the code on Google server and get the result from Google Drive. However, it maybe slower than running on your computer.
 
 ## Table of contents
 - [Compatibility](#compatibility)
@@ -85,24 +86,27 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR] [--download-signal DOWNLOAD_SIGNAL] [--download-telegram DOWNLOAD_TELEGRAM]
-                       [--download-line DOWNLOAD_LINE] [--download-kakao DOWNLOAD_KAKAO] [--output-dir OUTPUT_DIR] [--author AUTHOR]
-                       [--title TITLE] [--export-signal | --export-telegram | --export-whatsapp | --export-imessage] [--no-compress]
-                       [--preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                       [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN] [--res-max RES_MAX]
-                       [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                       [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                       [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+usage: sticker-convert [-h] [--no-confirm] [--input-dir INPUT_DIR]
+                       [--download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO]
+                       [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
+                       [--export-signal | --export-telegram | --export-whatsapp | --export-imessage] [--no-compress]
+                       [--preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
+                       [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN]
+                       [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
+                       [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
+                       [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--duration-min DURATION_MIN]
+                       [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
                        [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--cache-dir CACHE_DIR]
-                       [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                       [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN]
-                       [--kakao-get-auth] [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                       [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]
-                       [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
+                       [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                       [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
+                       [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth] [--kakao-username KAKAO_USERNAME]
+                       [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
+                       [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth] [--line-cookies LINE_COOKIES]
+                       [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   --no-confirm          Do not ask any questions.
 
@@ -123,6 +127,21 @@ Input options:
                         Download kakao stickers from a URL / ID as input
                         (Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400
                         OR https://emoticon.kakao.com/items/xxxxx OR 4404400)
+
+Output options:
+  --output-dir OUTPUT_DIR
+                        Specify output directory.
+  --author AUTHOR       Set author of created sticker pack.
+  --title TITLE         Set name of created sticker pack.
+  --export-signal       Upload to Signal
+  --export-telegram     Upload to Telegram
+  --export-whatsapp     Create a .wastickers file for uploading to WhatsApp
+  --export-imessage     Create Xcode project for importing to iMessage
+
+Compression options:
+  --no-compress         Do not compress files. Useful for only downloading stickers.
+  --preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
+                        Apply preset for compression.
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
   --processes PROCESSES
@@ -167,21 +186,6 @@ Input options:
   --cache-dir CACHE_DIR
                         Set custom cache directory.
                         Useful for debugging, or speed up conversion if cache_dir is on RAM disk.
-
-Output options:
-  --output-dir OUTPUT_DIR
-                        Specify output directory.
-  --author AUTHOR       Set author of created sticker pack.
-  --title TITLE         Set name of created sticker pack.
-  --export-signal       Upload to Signal
-  --export-telegram     Upload to Telegram
-  --export-whatsapp     Create a .wastickers file for uploading to WhatsApp
-  --export-imessage     Create Xcode project for importing to iMessage
-
-Compression options:
-  --no-compress         Do not compress files. Useful for only downloading stickers.
-  --preset {signal,telegram,telegram_vector,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
-                        Apply preset for compression.
   --default-emoji DEFAULT_EMOJI
                         Set the default emoji for uploading Signal and Telegram sticker packs.
 
@@ -223,6 +227,8 @@ Credentials options:
 ```
 
 If you are running python script directly, run with `main.py`
+
+If you installed by pip, run with `sticker-convert` or `python -m sticker_convert`
 
 If you are running macOS, run with `sticker-convert.app/Contents/MacOS/sticker-convert`
 
@@ -327,12 +333,6 @@ Try the following tips:
     - Increasing over default value can actually be slower though
 - Decrease number of steps (`--steps`)
     - Decreasing too much can result in poor quality though
-- Using RAM disk as cache directory (`--cache-dir`)
-    - Create a RAM disk and set the directory as custom cache directory
-    - Windows: https://github.com/remileduc/windows-persistent-ramdisk
-    - MacOS: https://github.com/imothee/tmpdisk
-    - Linux: Program will automatically use directory that is `tmpfs` and accessible
-- Avoid compressing to .apng if possible
 
 ### MacOS complains that program from unidentified developer
 To become an identified developer, I have to pay USD$99 to Apple every year.
