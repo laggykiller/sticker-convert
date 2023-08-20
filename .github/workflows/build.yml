@@ -21,7 +21,7 @@ jobs:
         name: Release ${{ github.ref_name }}
   
   build-wheel:
-    name: Create wheel
+    name: Build wheel
     needs: createrelease
     runs-on: ubuntu-20.04
     steps:
@@ -152,10 +152,10 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
   
-  upload_pypi:
+  upload-pypi:
+    name: Upload to pypi
     needs: build-wheel
     runs-on: ubuntu-latest
-    if: github.event_name == 'release' && github.event.action == 'published'
     steps:
       - uses: actions/download-artifact@v3
         with:
