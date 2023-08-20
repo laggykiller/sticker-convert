@@ -47,8 +47,7 @@ RUN apt purge -y curl wget gpg git && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 COPY startapp.sh /startapp.sh
-COPY ./src/main.py /app/
-COPY ./src/sticker_convert /app/
+COPY ./src /app/
 
 RUN chmod -R 777 /app
 
