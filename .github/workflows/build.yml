@@ -20,7 +20,7 @@ jobs:
         token: "${{ secrets.GITHUB_TOKEN }}"
         name: Release ${{ github.ref_name }}
   
-  buildwheel:
+  build-wheel:
     name: Create wheel
     needs: createrelease
     runs-on: ubuntu-20.04
@@ -30,13 +30,13 @@ jobs:
           submodules: recursive
 
       - name: Build SDist and wheel
-        run: python -m build .
+        run: pipx run build
 
       - uses: actions/upload-artifact@v3
         with:
           path: dist/*
 
-  buildbinary:
+  build-binary:
     name: Build packages
     needs: createrelease
     runs-on: ${{ matrix.os }}
@@ -111,7 +111,8 @@ jobs:
       with:
         files: dist/${{ matrix.OUT_FILE_NAME}}
 
-  build-and-push-image:
+  build-docker:
+    name: Build Docker image and push
     runs-on: ubuntu-latest
 
     permissions:
@@ -152,7 +153,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
   
   upload_pypi:
-    needs: buildwheel
+    needs: build-wheel
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
     steps:
