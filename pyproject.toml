@@ -37,7 +37,7 @@ Tracker = "https://github.com/laggykiller/sticker-convert/issues"
 Repository = "https://github.com/laggykiller/sticker-convert"
 
 [project.scripts]
-sticker-convert = "sticker_convert.main:main"
+sticker-convert = "sticker_convert.__main__:main"
 
 [build-system]
 requires = ["setuptools>=61.0.0", "wheel"]

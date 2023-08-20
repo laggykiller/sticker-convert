@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from . import main
+from sticker_convert.__main__ import main
 
 if __name__ == '__main__':
     main()

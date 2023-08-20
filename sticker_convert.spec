@@ -23,8 +23,8 @@ proot = os.path.dirname(importlib.import_module('rlottie_python').__file__)
 datas.append((os.path.join(proot, rlottie_dll), 'rlottie_python/'))
 
 a = Analysis(
-    ['src/sticker_convert/main.py'],
-    pathex=['sticker_convert'],
+    ['src/sticker_convert/__main__.py'],
+    pathex=['src/sticker_convert'],
     binaries=None,
     datas=datas,
     hiddenimports=['tkinter', 'Pillow', 'opencv-python'],
