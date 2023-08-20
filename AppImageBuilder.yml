@@ -15,10 +15,6 @@ script:
   # Copy appicon
   - cp ./src/sticker_convert/resources/appicon.png AppDir/usr/share/icons/hicolor/256x256/apps/sticker-convert.png
 
-  # Install ttkbootstrap v1.5.1 instead to avoid _tkinter.TclError: invalid command name "::msgcat::mcmset"
-  - cp requirements.txt requirements-appimage.txt
-  - sed -i 's/ttkbootstrap.git/ttkbootstrap.git@v1.5.1-patched/g' requirements-appimage.txt
-
 AppDir:
   path: ./AppDir
 
@@ -64,7 +60,7 @@ AppDir:
     # Install pip
     curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
     # Install pip packages
-    AppDir/usr/bin/python3.11 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements-appimage.txt
+    AppDir/usr/bin/python3.11 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
     AppDir/usr/bin/python3.11 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
 
   runtime:
