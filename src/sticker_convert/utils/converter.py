@@ -71,7 +71,7 @@ class StickerConvert:
         self.duration_min = opt_comp.get('duration', {}).get('min') if not self.duration else self.duration
         self.duration_max = opt_comp.get('duration', {}).get('max') if not self.duration else self.duration
 
-        self.steps = opt_comp.get('steps') if self.size_max != None else 1
+        self.steps = opt_comp.get('steps') if self.size_max == None else 1
         self.fake_vid = opt_comp.get('fake_vid')
         self.cache_dir = opt_comp.get('cache_dir')
 

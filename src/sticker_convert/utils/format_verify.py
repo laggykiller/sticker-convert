@@ -127,7 +127,6 @@ class FormatVerify:
                 for fmt in formats.copy():
                     if fmt in compat_ext:
                         formats.append(compat_ext.get(fmt))
-            print(format, formats)
             if CodecInfo.get_file_ext(file) not in formats:
                 return False
             
