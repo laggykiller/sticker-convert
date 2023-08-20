@@ -1,4 +1,5 @@
 #!/bin/bash
+# For removing quarantine attribute in downloaded MacOS .app
 
 cd "$(dirname "$0")"
 
@@ -11,4 +12,4 @@ open sticker-convert.app &
 echo Next time you can run sticker-convert.app directly
 
 # Self destruct
-rm $0
+rm "$0"

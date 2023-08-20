@@ -25,6 +25,7 @@
 - [FAQ](#faq)
     - [Platform-specific guides (e.g. Getting credentials)](#platform-specific-guides-eg-getting-credentials)
     - [Conversion is slow](#conversion-is-slow)
+    - [Running out of RAM / System frozen](#running-out-of-ram--system-frozen)
     - [MacOS complains that program from unidentified developer](#macos-complains-that-program-from-unidentified-developer)
     - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
     - [Where are credentials stored?](#where-are-credentials-stored)
@@ -333,6 +334,9 @@ Try the following tips:
     - Increasing over default value can actually be slower though
 - Decrease number of steps (`--steps`)
     - Decreasing too much can result in poor quality though
+
+### Running out of RAM / System frozen
+Try to decrease number of processes (`--processes`)
 
 ### MacOS complains that program from unidentified developer
 To become an identified developer, I have to pay USD$99 to Apple every year.
