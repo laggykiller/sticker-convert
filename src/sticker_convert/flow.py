@@ -4,6 +4,7 @@ import shutil
 import time
 from datetime import datetime
 from threading import Thread
+from urllib.parse import urlparse
 
 from .downloaders.download_line import DownloadLine
 from .downloaders.download_signal import DownloadSignal
@@ -183,7 +184,7 @@ class Flow:
         
         # Warn about unable to download animated Kakao stickers with such link
         if (self.opt_output.get('option') == 'kakao' and 
-            'e.kakao.com' in self.opt_input.get('url') and
+            urlparse(self.opt_input.get('url')).netloc == 'e.kakao.com' and
             not self.opt_cred.get('kakao', {}).get('auth_token')):
 
             msg = 'To download ANIMATED stickers from e.kakao.com,\n'

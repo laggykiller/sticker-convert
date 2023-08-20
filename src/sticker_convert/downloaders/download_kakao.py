@@ -11,6 +11,7 @@ import json
 import os
 import zipfile
 import io
+from urllib.parse import urlparse
 
 from .download_base import DownloadBase
 from ..utils.metadata_handler import MetadataHandler
@@ -152,7 +153,7 @@ class DownloadKakao(DownloadBase):
         self.author = None
 
     def download_stickers_kakao(self):
-        if 'emoticon.kakao.com' in self.url:
+        if urlparse(self.url).netloc == 'emoticon.kakao.com':
             self.pack_title, item_code = MetadataKakao.get_info_from_share_link(self.url)
 
             return self.download_animated(item_code)
@@ -170,7 +171,7 @@ class DownloadKakao(DownloadBase):
 
             return self.download_animated(item_code)
 
-        elif 'e.kakao.com' in self.url:
+        elif urlparse(self.url).netloc == 'e.kakao.com':
             self.pack_title = self.url.replace('https://e.kakao.com/t/', '')
             self.author, title_ko, thumbnail_urls = MetadataKakao.get_info_from_pack_title(self.pack_title)
 
