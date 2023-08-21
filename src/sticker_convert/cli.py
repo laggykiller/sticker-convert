@@ -11,6 +11,7 @@ from .utils.get_kakao_auth import GetKakaoAuth
 from .utils.get_signal_auth import GetSignalAuth
 from .utils.get_line_auth import GetLineAuth
 from .utils.curr_dir import CurrDir
+from .__init__ import __version__
 
 # Only download from a source
 # sticker_convert_cli.py --download-signal <url> --no-compress
@@ -45,6 +46,7 @@ class CLI:
 
         parser = argparse.ArgumentParser(description='CLI for stickers-convert', formatter_class=argparse.RawTextHelpFormatter)
 
+        parser.add_argument('--version', action='version', version=__version__)
         parser.add_argument(f'--no-confirm', dest='no_confirm', action='store_true', help=self.help['global']['no_confirm'])
         
         parser_input = parser.add_argument_group('Input options')

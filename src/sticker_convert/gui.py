@@ -17,13 +17,13 @@ from ttkbootstrap.dialogs import Messagebox, Querybox
 from tqdm import tqdm
 
 from .flow import Flow
-from .utils.run_bin import RunBin
 from .utils.json_manager import JsonManager
 from .utils.get_kakao_auth import GetKakaoAuth
 from .utils.get_signal_auth import GetSignalAuth
 from .utils.get_line_auth import GetLineAuth
 from .utils.curr_dir import CurrDir
 from .utils.metadata_handler import MetadataHandler
+from .__init__ import __version__
 
 # Reference: https://stackoverflow.com/a/57704013
 class RightClicker:
@@ -58,7 +58,7 @@ class GUI:
         elif sys.platform == 'win32':
             self.root.iconbitmap(bitmap='resources/appicon.ico')
         self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
-        self.root.title('sticker-convert')
+        self.root.title(f'sticker-convert {__version__}')
 
         self.create_scrollable_frame()
         self.declare_variables()
