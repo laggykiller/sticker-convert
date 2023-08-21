@@ -8,7 +8,7 @@ from .json_manager import JsonManager
 class MetadataHandler:
     @staticmethod
     def get_stickers_present(dir):
-        from uploaders.xcode_imessage import XcodeImessageIconset
+        from ..uploaders.xcode_imessage import XcodeImessageIconset
         
         stickers_present = sorted(os.listdir(dir))
         if 'cover.png' in stickers_present:
