@@ -22,11 +22,6 @@ else:
 proot = os.path.dirname(importlib.import_module('rlottie_python').__file__)
 datas.append((os.path.join(proot, rlottie_dll), 'rlottie_python/'))
 
-target_arch = None
-if sys.platform.startswith('darwin'):
-    arch = os.environ.get('TARGET_ARCH')
-    target_arch = arch if arch else None
-
 a = Analysis(
     ['src/sticker_convert/__main__.py'],
     pathex=['src/sticker_convert'],
@@ -57,7 +52,7 @@ exe = EXE(
     console=True,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=target_arch,
+    target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
     icon='./src/sticker_convert/resources/appicon.ico'

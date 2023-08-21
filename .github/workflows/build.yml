@@ -59,29 +59,10 @@ jobs:
                 python -m pip install --upgrade pip
                 pip install wheel
                 pip install -r requirements-build.txt
-                # x86_64
-                TARGET_ARCH=x86_64 pyinstaller sticker_convert.spec
+                pyinstaller sticker_convert.spec
                 cp run_me_first.command ./dist
                 cd dist/
                 zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app run_me_first.command
-                rm -rf ./sticker-convert
-                rm -rf ./sticker-convert.app
-
-                # arm64
-                cd ../
-                TARGET_ARCH=arm64 pyinstaller sticker_convert.spec
-                cd dist/
-                zip -r9 sticker-convert-macos-arm64.zip sticker-convert.app run_me_first.command
-                rm -rf ./sticker-convert
-                rm -rf ./sticker-convert.app
-
-                # universal2
-                cd ../
-                TARGET_ARCH=universal2 pyinstaller sticker_convert.spec
-                cd dist/
-                zip -r9 sticker-convert-macos-universal2.zip sticker-convert.app run_me_first.command
-                rm -rf ./sticker-convert
-                rm -rf ./sticker-convert.app
             OUT_FILE_NAME: |
               sticker-convert-macos-x86_64.zip
               sticker-convert-macos-arm64.zip
