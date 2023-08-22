@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import os
+import io
+import json
 import shutil
 import stat
 import sys
@@ -13,7 +15,6 @@ from selenium import webdriver
 from selenium.common.exceptions import JavascriptException
 
 from .run_bin import RunBin
-from .cache_store import CacheStore
 
 # https://stackoverflow.com/a/17197027
 def strings(filename, min=4):
@@ -81,36 +82,59 @@ class GetSignalAuth:
         return chromedriver_path, local_chromedriver_version
     
     def download_chromedriver(self, major_version, chromedriver_download_dir=''):
-        chromedriver_version_url = f'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major_version}'
-        chromedriver_version = requests.get(chromedriver_version_url).text
-
         if sys.platform == 'win32':
             chromedriver_platform = 'win32'
+            if '64' in platform.architecture()[0]:
+                chromedriver_platform_new = 'win64'
+            else:
+                chromedriver_platform_new = 'win32'
         elif sys.platform == 'darwin':
             if platform.processor().lower() == 'arm64':
                 chromedriver_platform = 'mac_arm64'
+                chromedriver_platform_new = 'mac-arm64'
             else:
                 chromedriver_platform = 'mac64'
+                chromedriver_platform_new = 'mac-x64'
         else:
             chromedriver_platform = 'linux64'
-        
-        chromedriver_url = f'https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_{chromedriver_platform}.zip'
-        self.cb_msg(f'Downloading chromedriver: {chromedriver_url}')
+            chromedriver_platform_new = 'linux64'
 
-        with CacheStore.get_cache_store() as tempdir:
-            chromedriver_zip_path = os.path.join(tempdir, 'chromedriver.zip')
-            with open(chromedriver_zip_path, 'wb+') as f:
-                f.write(requests.get(chromedriver_url).content)
-            
-            with zipfile.ZipFile(chromedriver_zip_path, 'r') as zip_ref:
-                zip_ref.extractall(chromedriver_download_dir)
-        
+        chromedriver_url = None
+        chromedriver_version_url = f'https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major_version}'
+        r = requests.get(chromedriver_version_url)
+        if r.ok:
+            new_chrome = False
+            chromedriver_version = r.text
+            chromedriver_url = f'https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_{chromedriver_platform}.zip'
+        else:
+            new_chrome = True
+            r = requests.get('https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json')
+            versions_dict = json.loads(r.text)
+            for channel, channel_info in versions_dict['channels'].items():
+                for i in channel_info['downloads']['chromedriver']:
+                    if i['platform'] == chromedriver_platform_new:
+                        chromedriver_url = i['url']
+                        break
+                if chromedriver_url:
+                    break
+
         if sys.platform == 'win32':
             chromedriver_name = 'chromedriver.exe'
         else:
             chromedriver_name = 'chromedriver'
+
+        if new_chrome:
+            chromedriver_zip_path = f'chromedriver-{chromedriver_platform_new}/{chromedriver_name}'
+        else:
+            chromedriver_zip_path = chromedriver_name
         
         chromedriver_path = os.path.abspath(os.path.join(chromedriver_download_dir, chromedriver_name))
+
+        with io.BytesIO() as f:
+            f.write(requests.get(chromedriver_url).content)
+            with zipfile.ZipFile(f, 'r') as z, open(chromedriver_path, 'wb+') as g:
+                g.write(z.read(chromedriver_zip_path))
+
         if not sys.platform == 'win32':
             st = os.stat(chromedriver_path)
             os.chmod(chromedriver_path, st.st_mode | stat.S_IEXEC)
