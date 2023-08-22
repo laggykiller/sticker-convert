@@ -16,6 +16,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import JavascriptException
 
 from .run_bin import RunBin
+from .cache_store import CacheStore
 
 # https://stackoverflow.com/a/17197027
 def strings(filename, min=4):
@@ -33,6 +34,20 @@ def strings(filename, min=4):
 
 class GetSignalAuth:
     def __init__(self, signal_bin_version='beta', chromedriver_download_dir='./bin', cb_msg=print, cb_ask_str=input):
+        if sys.platform == 'win32':
+            fallback_dir = os.path.expandvars('%APPDATA%\\sticker-convert')
+        else:
+            fallback_dir = os.path.expanduser('~/.config/sticker-convert')
+
+        appimage_path = os.getenv('APPIMAGE')
+        if appimage_path:
+            chromedriver_download_dir = os.path.join(os.path.split(appimage_path)[0], 'bin')
+        
+        os.makedirs(chromedriver_download_dir, exist_ok=True)
+        if not os.access(chromedriver_download_dir, os.W_OK):
+            os.makedirs(fallback_dir, exist_ok=True)
+            chromedriver_download_dir = fallback_dir
+
         self.signal_bin_version = signal_bin_version
         self.chromedriver_download_dir = chromedriver_download_dir
 
@@ -131,9 +146,6 @@ class GetSignalAuth:
         
         chromedriver_path = os.path.abspath(os.path.join(chromedriver_download_dir, chromedriver_name))
 
-        if not os.path.isdir(chromedriver_download_dir):
-            os.makedirs(chromedriver_download_dir)
-
         with io.BytesIO() as f:
             f.write(requests.get(chromedriver_url).content)
             with zipfile.ZipFile(f, 'r') as z, open(chromedriver_path, 'wb+') as g:
@@ -173,7 +185,7 @@ class GetSignalAuth:
                 uuid = self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id')
                 password = self.driver.execute_script('return window.SignalDebug.getReduxState().items.password')
         except JavascriptException as e:
-            pass
+            self.cb_msg(f'Failed to get credentials: {e}')
 
         return uuid, password
 

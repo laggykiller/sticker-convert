@@ -1030,7 +1030,7 @@ class SignalGetAuthWindow:
         self.frame_start_btn.grid(column=0, row=1, sticky='news', padx=3, pady=3)
 
         # Info frame
-        self.explanation1_lbl = Label(self.frame_info, text='You will be guided to install Signal Desktop BETA VERSION', justify='left', anchor='w')
+        self.explanation1_lbl = Label(self.frame_info, text='Please install Signal Desktop BETA VERSION', justify='left', anchor='w')
         self.explanation2_lbl = Label(self.frame_info, text='After installation, you need to login to Signal Desktop', justify='left', anchor='w')
         self.explanation3_lbl = Label(self.frame_info, text='uuid and password will be automatically fetched', justify='left', anchor='w')
 
