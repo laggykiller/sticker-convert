@@ -16,7 +16,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import JavascriptException
 
 from .run_bin import RunBin
-from .cache_store import CacheStore
 
 # https://stackoverflow.com/a/17197027
 def strings(filename, min=4):
