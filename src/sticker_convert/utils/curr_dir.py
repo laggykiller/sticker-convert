@@ -18,7 +18,7 @@ class CurrDir:
             if cwd.startswith('/Applications/'):
                 curr_dir = fallback_dir
             else:
-                curr_dir = '../../../'
+                curr_dir = os.path.abspath('../../../')
         elif appimage_path:
             curr_dir = os.path.split(appimage_path)[0]
         elif (cwd.startswith('/usr/bin/') 
@@ -49,7 +49,7 @@ class CurrDir:
             if cwd.startswith('/Applications/'):
                 creds_dir = fallback_dir
             else:
-                creds_dir = '../../../'
+                creds_dir = os.path.abspath('../../../')
         elif appimage_path:
             creds_dir = os.path.split(appimage_path)[0]
         elif (cwd.startswith('/usr/bin/') 
