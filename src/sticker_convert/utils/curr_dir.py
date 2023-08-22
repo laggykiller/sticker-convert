@@ -8,10 +8,11 @@ class CurrDir:
         appimage_path = os.getenv('APPIMAGE')
 
         cwd = os.getcwd()
-        if os.path.isdir(os.path.expanduser('~/Desktop')):
-            fallback_dir = os.path.expanduser('~/Desktop')
+        home_dir = os.path.expanduser('~')
+        if os.path.isdir(os.path.join(home_dir, 'Desktop')):
+            fallback_dir = os.path.join(home_dir, 'Desktop')
         else:
-            fallback_dir = os.path.expanduser('~')
+            fallback_dir = home_dir
 
         if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and '.app/Contents/MacOS' in cwd:
             if cwd.startswith('/Applications/'):
@@ -40,7 +41,7 @@ class CurrDir:
 
         cwd = os.getcwd()
         if sys.platform == 'win32':
-            fallback_dir = os.path.expandvars('%APPDATA%/sticker-convert')
+            fallback_dir = os.path.expandvars('%APPDATA%\\sticker-convert')
         else:
             fallback_dir = os.path.expanduser('~/.config/sticker-convert')
 
