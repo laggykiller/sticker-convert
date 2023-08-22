@@ -12,6 +12,7 @@ import webbrowser
 
 import requests
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import JavascriptException
 
 from .run_bin import RunBin
@@ -130,6 +131,9 @@ class GetSignalAuth:
         
         chromedriver_path = os.path.abspath(os.path.join(chromedriver_download_dir, chromedriver_name))
 
+        if not os.path.isdir(chromedriver_download_dir):
+            os.makedirs(chromedriver_download_dir)
+
         with io.BytesIO() as f:
             f.write(requests.get(chromedriver_url).content)
             with zipfile.ZipFile(f, 'r') as z, open(chromedriver_path, 'wb+') as g:
@@ -154,8 +158,9 @@ class GetSignalAuth:
         options.binary_location = signal_bin_path
         options.add_argument(f"user-data-dir={signal_user_data_dir}")
         options.add_argument('no-sandbox')
+        service = Service(executable_path=chromedriver_path)
 
-        self.driver = webdriver.Chrome(options=options, executable_path=chromedriver_path)
+        self.driver = webdriver.Chrome(options=options, service=service)
 
     def get_cred(self):
         # https://stackoverflow.com/a/73456344
