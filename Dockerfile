@@ -6,7 +6,7 @@ WORKDIR /app
 RUN apt update -y && \
     apt install --no-install-recommends -y python3 python3-pip python3-opencv python3-tk \
     curl wget gpg zip unzip sed locales binutils psmisc git \
-    libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig
+    libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig libgbm1 libgl1
 
 # Install signal-desktop-beta
 RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
