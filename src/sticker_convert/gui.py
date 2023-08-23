@@ -998,6 +998,7 @@ class KakaoGetAuthWindow:
         
             self.cb_msg_block_kakao(f'Got auth_token successfully: {auth_token}')
             self.gui.save_creds()
+            self.gui.highlight_fields()
         else:
             self.cb_msg_block_kakao('Failed to get auth_token')
 
@@ -1101,6 +1102,7 @@ class SignalGetAuthWindow:
                 
                 self.cb_msg_block_signal(f'Got uuid and password successfully:\nuuid={uuid}\npassword={password}')
                 self.gui.save_creds()
+                self.gui.highlight_fields()
                 return
             
         self.cb_msg_block_signal('Failed to get uuid and password')
@@ -1209,6 +1211,7 @@ class LineGetAuthWindow:
             
             self.cb_msg_block_line(f'Got Line cookies successfully')
             self.gui.save_creds()
+            self.gui.highlight_fields()
             return
             
         self.cb_msg_block_line('Failed to get Line cookies. Have you logged in the web browser?')

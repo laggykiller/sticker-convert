@@ -184,7 +184,7 @@ class GetSignalAuth:
                 uuid = self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id')
                 password = self.driver.execute_script('return window.SignalDebug.getReduxState().items.password')
         except JavascriptException as e:
-            self.cb_msg(f'Failed to get credentials: {e}')
+            pass
 
         return uuid, password
 
