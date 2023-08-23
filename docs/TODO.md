@@ -1,7 +1,8 @@
 ### Todo
 
-- [ ] Run signal-desktop headless, read QR code and display to user (Fixes unable to launch Signal in Docker)
+- [ ] Run signal-desktop headless, read QR code and display to user
 - [ ] Provide arm64 MacOS binary
+- [ ] Docker multistage build, with release of slim version of sticker-convert
 - [ ] Show hint when running GUI, e.g. Next time you may run with `sticker-convert --preset signal --export-telegram`
 - [ ] Add testing
 - [ ] Let user select what to do for stickers that are too long (Skip, fastforward, cut)
