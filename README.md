@@ -60,7 +60,7 @@
     - Upload: The program can create .wastickers file, which could then be imported into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information
 - Line
     - Download: Supported (e.g. `https://store.line.me/stickershop/product/1234/en` OR `line://shop/detail/1234` OR `1234`)
-        - Search on official site: http://www.line-stickers.com/
+        - Search on official site: https://store.line.me/stickershop
         - Search on non-official site (Include region locked and expired packs): http://www.line-stickers.com/
         - For more information: https://github.com/doubleplusc/Line-sticker-downloader
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
