@@ -14,5 +14,5 @@ browser-cookie3~=0.19.1
 imageio~=2.31.2
 Pillow~=10.0.0
 av~=10.0.0
-webp~=0.1.6
+webp~=0.1.7
 pyoxipng~=8.0.0
