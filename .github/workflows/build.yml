@@ -62,8 +62,8 @@ jobs:
                 pyinstaller sticker_convert.spec
                 cp run_me_first.command ./dist
                 cd dist/
-                zip -r9 sticker-convert-macos.zip sticker-convert.app run_me_first.command
-            OUT_FILE_NAME: sticker-convert-macos.zip
+                zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app run_me_first.command
+            OUT_FILE_NAME: sticker-convert-macos-x86_64.zip
           - os: ubuntu-20.04
             TARGET: linux
             CMD_BUILD: |
