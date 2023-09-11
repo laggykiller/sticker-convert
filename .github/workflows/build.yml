@@ -68,21 +68,22 @@ jobs:
                 pip download -r requirements-bin.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64
                 python ./scripts/delocate-fuse-dir.py ./wheel_arm ./wheel_x64 ./wheel_universal2
                 pip install ./wheel_universal2/*.whl
+                mkdir dist
+                cp ./scripts/run_me_first.command ./dist
 
                 SC_TARGET_ARCH=x86_64 pyinstaller sticker_convert.spec
-                cp ./scripts/run_me_first.command ./dist
                 cd dist/
                 zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app run_me_first.command
+                rm -rf ./sticker-convert.app
                 cd ../
 
                 SC_TARGET_ARCH=arm64 pyinstaller sticker_convert.spec
-                cp ./scripts/run_me_first.command ./dist
                 cd dist/
                 zip -r9 sticker-convert-macos-arm64.zip sticker-convert.app run_me_first.command
+                rm -rf ./sticker-convert.app
                 cd ../
 
                 SC_TARGET_ARCH=universal2 pyinstaller sticker_convert.spec
-                cp ./scripts/run_me_first.command ./dist
                 cd dist/
                 zip -r9 sticker-convert-macos-universal2.zip sticker-convert.app run_me_first.command
             OUT_FILE_NAME: |
