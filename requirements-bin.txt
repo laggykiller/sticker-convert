@@ -1,0 +1,17 @@
+apngasm_python~=1.0.7
+av~=10.0.0
+beautifulsoup4~=4.12.2
+browser-cookie3~=0.19.1
+imageio~=2.31.3
+memory-tempfile~=2.2.3
+mergedeep~=1.3.4
+Pillow~=10.0.0
+pyoxipng~=8.0.0
+python-telegram-bot~=20.5
+requests~=2.31.0
+rlottie_python~=1.1.5
+selenium~=4.12.0
+signalstickers-client~=3.3.0
+tqdm~=4.66.1
+ttkbootstrap-fork-laggykiller~=1.5.1
+webp~=0.2.0

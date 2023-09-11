@@ -46,7 +46,7 @@ RUN apt purge -y curl wget gpg git && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-COPY startapp.sh /startapp.sh
+COPY ./scripts/startapp.sh /startapp.sh
 COPY ./src /app/
 
 RUN chmod -R 777 /app

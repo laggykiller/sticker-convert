@@ -2,14 +2,15 @@ name: Build
 
 on:
   push:
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    # tags:
+    #   - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
 
   createrelease:
     name: Create Release
     runs-on: [ubuntu-latest]
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
     - uses: actions/checkout@v3
       with:
@@ -52,18 +53,43 @@ jobs:
                 pyinstaller sticker_convert.spec
                 cd dist
                 Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-windows.zip
-            OUT_FILE_NAME: sticker-convert-windows.zip
+            OUT_FILE_NAME: ./dist/sticker-convert-windows.zip
           - os: macos-11
             TARGET: macos
             CMD_BUILD: |
                 python -m pip install --upgrade pip
-                pip install wheel
-                pip install -r requirements-build.txt
-                pyinstaller sticker_convert.spec
-                cp run_me_first.command ./dist
+                python -m venv venv
+                source ./venv/bin/activate
+                pip install wheel delocate pyinstaller~=5.13.2
+                pip install -r requirements-src.txt
+                mkdir wheel_arm
+                mkdir wheel_x64
+                mkdir wheel_universal2
+                pip download -r requirements-bin.txt --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm
+                pip download -r requirements-bin.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64
+                python ./scripts/delocate-fuse-dir.py ./wheel_arm ./wheel_x64 ./wheel_universal2
+                pip install ./wheel_universal2/*.whl
+
+                SC_TARGET_ARCH=x86_64 pyinstaller sticker_convert.spec
+                cp ./scripts/run_me_first.command ./dist
                 cd dist/
                 zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app run_me_first.command
-            OUT_FILE_NAME: sticker-convert-macos-x86_64.zip
+                cd ../
+
+                SC_TARGET_ARCH=arm64 pyinstaller sticker_convert.spec
+                cp ./scripts/run_me_first.command ./dist
+                cd dist/
+                zip -r9 sticker-convert-macos-arm64.zip sticker-convert.app run_me_first.command
+                cd ../
+
+                SC_TARGET_ARCH=universal2 pyinstaller sticker_convert.spec
+                cp ./scripts/run_me_first.command ./dist
+                cd dist/
+                zip -r9 sticker-convert-macos-universal2.zip sticker-convert.app run_me_first.command
+            OUT_FILE_NAME: |
+              ./dist/sticker-convert-macos-x86_64.zip
+              ./dist/sticker-convert-macos-arm64.zip
+              ./dist/sticker-convert-macos-universal2.zip
           - os: ubuntu-20.04
             TARGET: linux
             CMD_BUILD: |
@@ -87,7 +113,7 @@ jobs:
                 chmod +x sticker-convert-x86_64.AppImage
                 mkdir dist
                 mv ./sticker-convert-x86_64.AppImage ./dist/sticker-convert-x86_64.AppImage
-            OUT_FILE_NAME: sticker-convert-x86_64.AppImage
+            OUT_FILE_NAME: ./dist/sticker-convert-x86_64.AppImage
     steps:
     - uses: actions/checkout@v3
       with:
@@ -106,10 +132,11 @@ jobs:
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/v')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        files: dist/${{ matrix.OUT_FILE_NAME}}
+        files: dist/${{ matrix.OUT_FILE_NAME }}
 
   build-docker:
     name: Build Docker image and push
@@ -146,6 +173,7 @@ jobs:
     
       - name: Build and push Docker image
         uses: docker/build-push-action@v4
+        if: startsWith(github.ref, 'refs/tags/v')
         with:
           context: .
           push: true
@@ -156,6 +184,7 @@ jobs:
     name: Upload to pypi
     needs: [build-wheel, build-binary]
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - uses: actions/download-artifact@v3
         with:
