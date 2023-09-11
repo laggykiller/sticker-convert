@@ -42,3 +42,11 @@ for wheel_name_1 in os.listdir(in_dir1):
     wheel_path_1 = os.path.join(in_dir1, wheel_name_1)
     wheel_path_2 = os.path.join(in_dir2, wheel_name_2)
     subprocess.run(['delocate-fuse', wheel_path_1, wheel_path_2, '-w', out_dir])
+
+for wheel_name in os.listdir(out_dir):
+    wheel_name_new = wheel_name.replace('x86_64', 'universal2').replace('arm64', 'universal2')
+
+    src_path = os.path.join(out_dir, wheel_name)
+    dst_path = os.path.join(out_dir, wheel_name_new)
+
+    os.rename(src_path, dst_path)
