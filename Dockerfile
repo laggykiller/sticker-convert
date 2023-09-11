@@ -38,8 +38,9 @@ RUN mkdir -p '/root/.config/Signal' && \
     chmod 777 '/root/.config/Signal' && \
     chmod 777 '/root/.config/Signal Beta'
 
-COPY ./requirements.txt /app/
-RUN pip3 install --no-cache-dir -r requirements.txt
+COPY ./requirements-bin.txt /app/
+COPY ./requirements-src.txt /app/
+RUN pip3 install --no-cache-dir -r requirements-bin.txt -r requirements-src.txt
 
 RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \
