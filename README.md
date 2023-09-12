@@ -155,11 +155,11 @@ Compression options:
   --res-w-min RES_W_MIN
                         Set minimum width.
   --res-w-max RES_W_MAX
-                        Set maximum height.
+                        Set maximum width.
   --res-h-min RES_H_MIN
                         Set minimum height.
   --res-h-max RES_H_MAX
-                        Set minimum height.
+                        Set maximum height.
   --quality-min QUALITY_MIN
                         Set minimum quality.
   --quality-max QUALITY_MAX
