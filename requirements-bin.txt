@@ -1,4 +1,4 @@
-apngasm_python~=1.0.7
+apngasm_python~=1.0.9
 av~=10.0.0
 beautifulsoup4~=4.12.2
 browser-cookie3~=0.19.1
