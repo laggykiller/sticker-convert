@@ -77,10 +77,10 @@ class UploadSignal(UploadBase):
                     continue
                 sticker.emoji = emoji[:1]
 
-                if ext in ('.png', '.apng'):
-                    spec_choice = self.png_spec
-                elif ext == '.webm':
+                if ext == '.webp':
                     spec_choice = self.webp_spec
+                else:
+                    spec_choice = self.png_spec
                 
                 if not FormatVerify.check_file(src, spec=spec_choice):
                     if self.fake_vid or CodecInfo.is_anim(src):

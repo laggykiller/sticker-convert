@@ -6,6 +6,7 @@ from ..utils.metadata_handler import MetadataHandler
 
 import anyio
 from telegram import Bot
+from telegram.error import TelegramError
 
 class DownloadTelegram(DownloadBase):
     def __init__(self, *args, **kwargs):
@@ -23,17 +24,20 @@ class DownloadTelegram(DownloadBase):
 
         self.title = ""
         try:
-            self.title = self.url.split("/addstickers/")[1]
+            self.title = self.url.split("/addstickers/")[1].split('?')[0]
         except IndexError:
-            self.title = self.url.split("eu/stickers/")[1]
+            self.title = self.url.split("eu/stickers/")[1].split('?')[0]
         
-        anyio.run(self.save_stickers)
-        return True
+        return anyio.run(self.save_stickers)
 
     async def save_stickers(self):
         bot = Bot(self.token)
         async with bot:
-            sticker_set = await bot.get_sticker_set(self.title, read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
+            try:
+                sticker_set = await bot.get_sticker_set(self.title, read_timeout=30, write_timeout=30, connect_timeout=30, pool_timeout=30)
+            except TelegramError as e:
+                self.cb_msg(f'Failed to download telegram sticker set {self.title} due to: {e}')
+                return False
 
             if self.cb_bar:
                 self.cb_bar(set_progress_mode='determinate', steps=len(sticker_set.stickers))
@@ -62,6 +66,7 @@ class DownloadTelegram(DownloadBase):
                 self.cb_msg(f'Downloaded {cover_name}')
 
         MetadataHandler.set_metadata(self.out_dir, title=self.title, emoji_dict=emoji_dict)
+        return True
 
     @staticmethod
     def start(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):

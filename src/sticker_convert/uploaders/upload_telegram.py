@@ -87,12 +87,12 @@ class UploadTelegram(UploadBase):
                         self.cb_msg(f'Warning: Cannot find emoji for file {src_full_name}, skip uploading this file...')
                         continue
 
-                    if ext in ('.png', '.apng'):
-                        spec_choice = self.png_spec
-                    elif ext == '.tgs':
+                    if ext == '.tgs':
                         spec_choice = self.tgs_spec
                     elif ext == '.webm':
                         spec_choice = self.webm_spec
+                    else:
+                        spec_choice = self.png_spec
 
                     if FormatVerify.check_file(src, spec=spec_choice):
                         dst = src

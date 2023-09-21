@@ -105,13 +105,14 @@ class XcodeImessage(UploadBase):
                 if res_choice == None:
                     res_choice, _ = CodecInfo.get_file_res(src_path)
                     res_choice = res_choice if res_choice != None else 300
-
-                    if res_choice == 300:
-                        spec_choice = self.small_spec
+                    
+                    if res_choice == 618:
+                        spec_choice = self.large_spec
                     elif res_choice == 408:
                         spec_choice = self.medium_spec
-                    elif res_choice == 618:
-                        spec_choice = self.large_spec
+                    else:
+                        # res_choice == 300
+                        spec_choice = self.small_spec
                     
                     opt_comp_merged = merge({}, self.opt_comp, spec_choice)
 
