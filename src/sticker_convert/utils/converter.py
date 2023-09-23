@@ -10,7 +10,7 @@ from .format_verify import FormatVerify
 
 import imageio.v3 as iio
 from rlottie_python import LottieAnimation
-from apngasm_python.apngasm import APNGAsm, create_frame_from_rgba
+from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
 import numpy as np
 from PIL import Image
 import av
