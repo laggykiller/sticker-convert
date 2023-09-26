@@ -3,6 +3,7 @@ import os
 import shutil
 import time
 from datetime import datetime
+from multiprocessing import Process, Queue
 from threading import Thread
 from urllib.parse import urlparse
 
@@ -318,7 +319,23 @@ class Flow:
         self.cb_msg(msg)
         self.cb_bar(set_progress_mode='determinate', steps=in_fs_count)
         
-        threads = []
+        jobs_queue = Queue()
+        results_queue = Queue()
+        cb_msg_queue = Queue()
+
+        Thread(target=self.cb_msg_thread, args=(cb_msg_queue,)).start()
+        Thread(target=self.processes_watcher_thread, args=(results_queue,)).start()
+
+        processes = []
+        for i in range(self.opt_comp['processes']):
+            process = Process(
+                target=Flow.compress_worker,
+                args=(jobs_queue, results_queue, cb_msg_queue)
+            )
+
+            process.start()
+            processes.append(process)
+
         for i in in_fs:
             in_f = os.path.join(input_dir, i)
 
@@ -329,32 +346,38 @@ class Flow:
 
             out_f = os.path.join(output_dir, os.path.splitext(i)[0] + extension)
 
-            thread = Thread(
-                    target=self.compress_thread, 
-                    args=(in_f, out_f, self.opt_comp),
-                    daemon=True
-                    )
+            jobs_queue.put((in_f, out_f, self.opt_comp))
 
-            threads.append(thread)
+        jobs_queue.put(None)
+
+        for process in processes:
+            process.join()
         
-            while True:
-                if sum((t.is_alive() for t in threads)) < self.opt_comp['processes']:
-                    thread.start()
-                    break
-                else:
-                    time.sleep(1)
-
-        for thread in threads:
-            thread.join()
+        results_queue.put(None)
+        cb_msg_queue.put(None)
 
         return True
     
-    def compress_thread(self, in_f, out_f, opt_comp):
-        result = StickerConvert(in_f, out_f, opt_comp, self.cb_msg).convert()
-        if result == False:
-            self.compress_fails.append(in_f)
+    def processes_watcher_thread(self, results_queue):
+        for (success, in_f, out_f, size) in iter(results_queue.get, None):
+            if success == False:
+                self.compress_fails.append(in_f)
 
-        self.cb_bar(update_bar=True)
+            self.cb_bar(update_bar=True)
+    
+    def cb_msg_thread(self, cb_msg_queue):
+        for msg in iter(cb_msg_queue.get, None):
+            self.cb_msg(msg)
+
+    @staticmethod
+    def compress_worker(jobs_queue, results_queue, cb_msg_queue):
+        for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None):
+            sticker = StickerConvert(in_f, out_f, opt_comp, cb_msg_queue)
+            success, in_f, out_f, size = sticker.convert()
+            del sticker
+            results_queue.put((success, in_f, out_f, size))
+        
+        jobs_queue.put(None)
 
     def export(self):
         self.cb_bar(set_progress_mode='indeterminate')

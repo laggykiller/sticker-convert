@@ -56,18 +56,8 @@ pyvenv.cfg
 
 **/stickers_input
 **/stickers_output
-*.exe
-*.dll
 AppDir/**
 appimage-build/**
 creds.json
-bzcmp
-bzdiff
-bzegrep
-bzfgrep
-gzgrep
-bzgrep
-bzless
-bzmore
 .DS_Store
 ._.DS_Store

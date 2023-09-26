@@ -2,6 +2,7 @@
 import os
 import sys
 import time
+import math
 from multiprocessing import cpu_count
 from threading import Thread, Lock, current_thread, main_thread
 from queue import Queue
@@ -148,7 +149,7 @@ class GUI:
         self.processes_var = IntVar(self.root)
 
         self.comp_preset_var.set(self.default_comp_preset)
-        self.processes_var.set(cpu_count())
+        self.processes_var.set(math.ceil(cpu_count() / 2))
 
         # Output
         self.output_option_var = StringVar(self.root)

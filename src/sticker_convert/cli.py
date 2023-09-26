@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
-import multiprocessing
+import math
+from multiprocessing import cpu_count
 import argparse
 
 from tqdm import tqdm
@@ -218,7 +219,7 @@ class CLI:
             'cache_dir': args.cache_dir,
             'default_emoji': args.default_emoji,
             'no_compress': args.no_compress,
-            'processes': args.processes if args.processes else multiprocessing.cpu_count()
+            'processes': args.processes if args.processes else math.ceil(cpu_count() / 2)
         }
 
     def get_opt_cred(self, args):
