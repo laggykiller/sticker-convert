@@ -56,6 +56,7 @@ pyvenv.cfg
 
 **/stickers_input
 **/stickers_output
+scripts/opt-comp-result
 AppDir/**
 appimage-build/**
 creds.json
