@@ -310,11 +310,12 @@ class StickerConvert:
                 output.mux(packet)
     
     def frames_export_webp(self):
+        config = webp.WebPConfig.new(quality=self.quality)
         enc = webp.WebPAnimEncoder.new(self.res_w, self.res_h)
         timestamp_ms = 0
         for frame in self.frames_processed:
             pic = webp.WebPPicture.from_numpy(frame)
-            enc.encode_frame(pic, timestamp_ms)
+            enc.encode_frame(pic, timestamp_ms, config=config)
             timestamp_ms += int(1 / self.fps * 1000)
         anim_data = enc.assemble(timestamp_ms)
         self.tmp_f.write(anim_data.buffer())
