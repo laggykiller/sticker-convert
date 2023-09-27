@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
 import shutil
-import time
 from datetime import datetime
 from multiprocessing import Process, Queue
 from threading import Thread
