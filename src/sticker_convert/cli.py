@@ -15,22 +15,6 @@ from .utils.curr_dir import CurrDir
 from .utils.url_detect import UrlDetect
 from .__init__ import __version__
 
-# Only download from a source
-# sticker_convert_cli.py --download-signal <url> --no-compress
-
-# Convert local files to signal compatible stickers
-# sticker_convert_cli.py --input-dir ./custom-input --output-dir ./custom-output --preset signal
-# sticker_convert_cli.py --preset signal
-
-# Convert signal to telegram stickers
-# sticker_convert_cli.py --download-signal <url> --export-telegram
-
-# Convert local files to multiple formats
-# sticker_convert_cli.py --export-telegram --export-signal
-
-# Convert local files to a custom format
-# sticker_convert_cli.py --fps-min 3 --fps-max 30 --quality-min 30 --quality-max 90 --res-min 512 --res-max 512 --steps 10 --vid-size-max 500000 --img-size-max 500000 --vid-format .apng --img-format .png
-
 class CLI:
     def __init__(self):
         self.no_confirm = False
