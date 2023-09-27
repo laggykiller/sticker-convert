@@ -32,6 +32,10 @@ class MetadataLine:
             url_parsed = parse.urlparse(url)
             pack_id = url.replace('https://line.me/S/sticker/', '').split('/')[0]
             region = parse.parse_qs(url_parsed.query)['lang']
+        elif url.startswith('https://store.line.me/officialaccount/event/sticker/'):
+            url_parsed = parse.urlparse(url)
+            pack_id = url.replace('https://store.line.me/officialaccount/event/sticker/', '').split('/')[0]
+            region = url.replace('https://store.line.me/officialaccount/event/sticker/', '').split('/')[1]
         elif url.startswith('https://store.line.me/emojishop/product/'):
             pack_id = url.replace('https://store.line.me/emojishop/product/', '').split('/')[0]
             region = url.replace('https://store.line.me/emojishop/product/', '').split('/')[1]
