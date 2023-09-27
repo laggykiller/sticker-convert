@@ -1,4 +1,14 @@
 {
+    "auto": {
+        "full_name": "Download (Auto detect)",
+        "help": "Auto detect URL type and download",
+        "example": "Supported input sources: Signal, Telegram, Line, Kakao",
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": false,
+            "author": false
+        }
+    },
     "signal": {
         "full_name": "Download from Signal",
         "help": "Download signal stickers from a URL as input",

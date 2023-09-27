@@ -12,6 +12,7 @@ from .utils.get_kakao_auth import GetKakaoAuth
 from .utils.get_signal_auth import GetSignalAuth
 from .utils.get_line_auth import GetLineAuth
 from .utils.curr_dir import CurrDir
+from .utils.url_detect import UrlDetect
 from .__init__ import __version__
 
 # Only download from a source
@@ -70,7 +71,7 @@ class CLI:
 
         parser_comp = parser.add_argument_group('Compression options')
         parser_comp.add_argument('--no-compress', dest='no_compress', action='store_true', help=self.help['comp']['no_compress'])
-        parser_comp.add_argument('--preset', dest='preset', default='custom', choices=self.compression_presets.keys(), help=self.help['comp']['preset'])
+        parser_comp.add_argument('--preset', dest='preset', default='auto', choices=self.compression_presets.keys(), help=self.help['comp']['preset'])
         flags_int = ('steps', 'processes', 
                     'fps_min', 'fps_max', 
                     'res_min', 'res_max', 
@@ -124,6 +125,7 @@ class CLI:
 
     def get_opt_input(self, args):
         download_options = {
+            'auto': args.download_auto,
             'signal': args.download_signal, 
             'line': args.download_line, 
             'telegram': args.download_telegram, 
@@ -137,6 +139,13 @@ class CLI:
                 download_option = k
                 url = v
                 break
+        
+        if download_option == 'auto':
+            download_option = UrlDetect.detect(url)
+            self.cb_msg(f'Detected URL input source: {download_option}')
+            if not download_option:
+                self.cb_msg(f'Error: Unrecognied URL input source for url: {url}')
+                exit()
 
         self.opt_input = {
             'option': download_option,
@@ -177,6 +186,18 @@ class CLI:
                 preset = 'telegram'
             elif args.export_imessage:
                 preset = 'imessage_small'
+        elif args.preset == 'auto':
+            output_option = self.opt_output['option']
+            if output_option == 'local':
+                preset = 'custom'
+                args.no_compress = True
+                self.cb_msg(f'Auto compression option set to no_compress (Reason: Export to local directory only)')
+            elif output_option == 'imessage':
+                preset = 'imessage_small'
+                self.cb_msg(f'Auto compression option set to {preset}')
+            else:
+                preset = output_option
+                self.cb_msg(f'Auto compression option set to {preset}')
 
         self.opt_comp = {
             'preset': preset,

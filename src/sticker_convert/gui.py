@@ -3,12 +3,14 @@ import os
 import sys
 import time
 import math
+import string
 from multiprocessing import cpu_count
 from threading import Thread, Lock, current_thread, main_thread
 from queue import Queue
 import webbrowser
 from functools import partial
 from uuid import uuid4
+from urllib.parse import urlparse
 
 from PIL import Image, ImageTk, ImageDraw, ImageFont
 from tkinter import filedialog
@@ -24,6 +26,7 @@ from .utils.get_signal_auth import GetSignalAuth
 from .utils.get_line_auth import GetLineAuth
 from .utils.curr_dir import CurrDir
 from .utils.metadata_handler import MetadataHandler
+from .utils.url_detect import UrlDetect
 from .__init__ import __version__
 
 # Reference: https://stackoverflow.com/a/57704013
@@ -42,7 +45,7 @@ class RightClicker:
         event.widget.event_generate(f'<<{cmd}>>')
 
 class GUI:
-    default_input_mode = 'telegram'
+    default_input_mode = 'auto'
     default_output_mode = 'signal'
 
     def __init__(self):
@@ -107,11 +110,13 @@ class GUI:
     
     def declare_variables(self):
         # Input
-        self.input_option_var = StringVar(self.root)
+        self.input_option_display_var = StringVar(self.root)
+        self.input_option_true_var = StringVar(self.root)
         self.input_setdir_var = StringVar(self.root)
         self.input_address_var = StringVar(self.root)
 
-        self.input_option_var.set(self.input_presets[self.default_input_mode]['full_name'])
+        self.input_option_display_var.set(self.input_presets[self.default_input_mode]['full_name'])
+        self.input_option_true_var.set(self.input_presets[self.default_input_mode]['full_name'])
         stickers_input_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
         self.input_setdir_var.set(stickers_input_dir)
 
@@ -152,12 +157,14 @@ class GUI:
         self.processes_var.set(math.ceil(cpu_count() / 2))
 
         # Output
-        self.output_option_var = StringVar(self.root)
+        self.output_option_display_var = StringVar(self.root)
+        self.output_option_true_var = StringVar(self.root)
         self.output_setdir_var = StringVar(self.root)
         self.title_var = StringVar(self.root)
         self.author_var = StringVar(self.root)
 
-        self.output_option_var.set(self.output_presets[self.default_output_mode]['full_name'])
+        self.output_option_display_var.set(self.output_presets[self.default_output_mode]['full_name'])
+        self.output_option_true_var.set(self.output_presets[self.default_output_mode]['full_name'])
         stickers_output_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_output')
         self.output_setdir_var.set(stickers_output_dir)
 
@@ -282,6 +289,12 @@ class GUI:
 
     def start(self):
         Thread(target=self.start_process, daemon=True).start()
+    
+    def get_input_name(self):
+        return [k for k, v in self.input_presets.items() if v['full_name'] == self.input_option_true_var.get()][0]
+
+    def get_output_name(self):
+        return [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_true_var.get()][0]
 
     def start_process(self):
         self.save_creds()
@@ -289,13 +302,13 @@ class GUI:
         self.control_frame.start_btn.config(state='disabled')
     
         opt_input = {
-            'option': [k for k, v in self.input_presets.items() if v['full_name'] == self.input_option_var.get()][0],
+            'option': self.get_input_name(),
             'url': self.input_address_var.get(),
             'dir': self.input_setdir_var.get()
         }
 
         opt_output = {
-            'option': [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_var.get()][0],
+            'option': self.get_output_name(),
             'dir': self.output_setdir_var.get(),
             'title': self.title_var.get(),
             'author': self.author_var.get()
@@ -454,13 +467,16 @@ class GUI:
             self.progress_frame.update_progress_bar(*args, **kwargs)
         
     def highlight_fields(self):
-        input_option = [k for k, v in self.input_presets.items() if v['full_name'] == self.input_option_var.get()][0]
-        output_option = [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_var.get()][0]
+        input_option = self.get_input_name()
+        output_option = self.get_output_name()
+        url = self.input_address_var.get()
 
-        if input_option != 'local' and not self.input_address_var.get():
-            self.input_frame.address_entry.config(bootstyle='warning')
-        else:
-            self.input_frame.address_entry.config(bootstyle='default')
+        self.input_frame.address_entry.config(bootstyle='default')
+        if input_option != 'local':
+            if not url:
+                self.input_frame.address_entry.config(bootstyle='warning')
+            elif UrlDetect.detect(url) == None:
+                self.input_frame.address_entry.config(bootstyle='danger')
 
         if (MetadataHandler.check_metadata_required(output_option, 'title') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'title') and
@@ -496,6 +512,11 @@ class GUI:
         else:
             self.cred_frame.telegram_userid_entry.config(bootstyle='default')
         
+        if urlparse(url).netloc == 'e.kakao.com' and not self.kakao_auth_token_var.get():
+            self.cred_frame.kakao_auth_token_entry.config(bootstyle='warning')
+        else:
+            self.cred_frame.kakao_auth_token_entry.config(bootstyle='default')
+        
         return True
 
 class InputFrame:
@@ -506,7 +527,7 @@ class InputFrame:
         self.input_option_lbl = Label(self.frame, text='Input source', width=15, justify='left', anchor='w')
         input_full_names = [i['full_name'] for i in self.gui.input_presets.values()]
         default_input_full_name = self.gui.input_presets[self.gui.default_input_mode]['full_name']
-        self.input_option_opt = OptionMenu(self.frame, self.gui.input_option_var, default_input_full_name, *input_full_names, command=self.cb_input_option, bootstyle='secondary')
+        self.input_option_opt = OptionMenu(self.frame, self.gui.input_option_display_var, default_input_full_name, *input_full_names, command=self.cb_input_option, bootstyle='secondary')
         self.input_option_opt.config(width=32)
 
         self.input_setdir_lbl = Label(self.frame, text='Input directory', width=35, justify='left', anchor='w')
@@ -515,7 +536,7 @@ class InputFrame:
         self.setdir_btn = Button(self.frame, text='Choose directory...', command=self.cb_set_indir, width=16, bootstyle='secondary')
 
         self.address_lbl = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['address_lbls'], width=18, justify='left', anchor='w')
-        self.address_entry = Entry(self.frame, textvariable=self.gui.input_address_var, width=80, validate="focusout", validatecommand=self.gui.highlight_fields)
+        self.address_entry = Entry(self.frame, textvariable=self.gui.input_address_var, width=80, validate="focusout", validatecommand=self.cb_input_option)
         self.address_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.address_tip = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['example'], justify='left', anchor='w')
 
@@ -537,17 +558,33 @@ class InputFrame:
             self.gui.input_setdir_var.set(input_dir)
     
     def cb_input_option(self, *args):
-        for i in self.gui.input_presets.keys():
-            if self.gui.input_option_var.get() == self.gui.input_presets[i]['full_name']:
-                self.address_tip.config(text=self.gui.input_presets[i]['example'])
-                self.address_lbl.config(text=self.gui.input_presets[i]['address_lbls'])
-                if i == 'local':
-                    self.address_entry.config(state='disabled')
-                else:
-                    self.address_entry.config(state='normal')
-                break
+        preset = [k for k, v in self.gui.input_presets.items() if v['full_name'] == self.gui.input_option_display_var.get()][0]
+
+        self.address_tip.config(text=self.gui.input_presets[preset]['example'])
+        self.address_lbl.config(text=self.gui.input_presets[preset]['address_lbls'])
+
+        if preset == 'local':
+            self.address_entry.config(state='disabled')
+        else:
+            self.address_entry.config(state='normal')
+        
+        if preset == 'auto':
+            url = self.gui.input_address_var.get()
+            download_option = UrlDetect.detect(url)
+
+            if download_option == None:
+                self.gui.input_option_true_var.set(self.gui.input_presets['auto']['full_name'])
+                self.address_tip.config(text=f"Input URL not valid. {self.gui.input_presets['auto']['example']}")
+            else:
+                self.gui.input_option_true_var.set(self.gui.input_presets[download_option]['full_name'])
+                self.address_tip.config(text=f'Detected URL: {download_option}')
+
+        else:
+            self.gui.input_option_true_var.set(self.gui.input_option_display_var.get())
         
         self.gui.highlight_fields()
+
+        return True
     
     def set_states(self, state):
         self.input_option_opt.config(state=state)
@@ -604,6 +641,18 @@ class CompFrame:
     
     def cb_comp_apply_preset(self, *args):
         selection = self.gui.comp_preset_var.get()
+        if selection == 'auto':
+            output_option = self.gui.get_output_name()
+            if output_option == 'local':
+                self.gui.no_compress_var.set(True)
+            elif output_option == 'imessage':
+                selection = 'imessage_small'
+                self.gui.no_compress_var.set(False)
+            else:
+                selection = output_option
+                self.gui.no_compress_var.set(False)
+            self.cb_nocompress()
+
         self.gui.fps_min_var.set(self.gui.compression_presets[selection]['fps']['min'])
         self.gui.fps_max_var.set(self.gui.compression_presets[selection]['fps']['max'])
         self.gui.res_w_min_var.set(self.gui.compression_presets[selection]['res']['w']['min'])
@@ -629,9 +678,13 @@ class CompFrame:
     
     def cb_nocompress(self, *args):
         if self.gui.no_compress_var.get() == True:
-            self.set_inputs_comp(state='disabled')
+            state = 'disabled'
         else:
-            self.set_inputs_comp(state='normal')
+            state = 'normal'
+        
+        self.comp_advanced_btn.config(state=state)
+        self.steps_entry.config(state=state)
+        self.processes_entry.config(state=state)
     
     def set_inputs_comp(self, state):
         self.comp_preset_opt.config(state=state)
@@ -651,7 +704,7 @@ class OutputFrame:
         self.output_option_lbl = Label(self.frame, text='Output options', width=18, justify='left', anchor='w')
         output_full_names = [i['full_name'] for i in self.gui.output_presets.values()]
         defult_output_full_name = self.gui.output_presets[self.gui.default_output_mode]['full_name']
-        self.output_option_opt = OptionMenu(self.frame, self.gui.output_option_var, defult_output_full_name, *output_full_names, command=self.cb_output_option, bootstyle='secondary')
+        self.output_option_opt = OptionMenu(self.frame, self.gui.output_option_display_var, defult_output_full_name, *output_full_names, command=self.cb_output_option, bootstyle='secondary')
         self.output_option_opt.config(width=32)
 
         self.output_setdir_lbl = Label(self.frame, text='Output directory', justify='left', anchor='w')
@@ -687,6 +740,8 @@ class OutputFrame:
             self.gui.output_setdir_var.set(output_dir)
     
     def cb_output_option(self, *args):
+        self.gui.output_option_true_var.set(self.gui.output_option_display_var.get())
+        self.gui.comp_frame.cb_comp_apply_preset()
         self.gui.highlight_fields()
     
     def set_states(self, state):
@@ -1478,6 +1533,8 @@ class AdvancedCompressionWindow:
         self.cb_disable_color()
         self.cb_disable_duration()
         self.cb_disable_size()
+        self.cb_disable_format()
+        self.cb_disable_fake_vid()
         self.resize_window()
     
     def create_scrollable_frame(self):
@@ -1564,7 +1621,7 @@ class AdvancedCompressionWindow:
         self.color_max_entry.config(state=state)
 
     def cb_disable_duration(self, *args):
-        if self.gui.duration_disable_var.get() == True:
+        if self.gui.duration_disable_var.get() == True or self.gui.comp_preset_var.get() == 'auto':
             state = 'disabled'
         else:
             state = 'normal'
@@ -1573,13 +1630,30 @@ class AdvancedCompressionWindow:
         self.duration_max_entry.config(state=state)
 
     def cb_disable_size(self, *args):
-        if self.gui.size_disable_var.get() == True:
+        if self.gui.size_disable_var.get() == True or self.gui.comp_preset_var.get() == 'auto':
             state = 'disabled'
         else:
             state = 'normal'
 
         self.img_size_max_entry.config(state=state)
         self.vid_size_max_entry.config(state=state)
+    
+    def cb_disable_format(self, *args):
+        if self.gui.comp_preset_var.get() == 'auto':
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.img_format_entry.config(state=state)
+        self.vid_format_entry.config(state=state)
+    
+    def cb_disable_fake_vid(self, *args):
+        if self.gui.comp_preset_var.get() == 'auto':
+            state = 'disabled'
+        else:
+            state = 'normal'
+
+        self.fake_vid_cbox.config(state=state)
     
     def set_emoji_btn(self):
         self.im = Image.new("RGBA", (128, 128), (255,255,255,0))

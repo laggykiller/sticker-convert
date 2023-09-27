@@ -4,6 +4,7 @@ import platform
 import shutil
 import math
 import io
+from multiprocessing.queues import Queue as QueueType
 
 from .codec_info import CodecInfo
 from .cache_store import CacheStore
@@ -26,7 +27,10 @@ def get_step_value(max, min, step, steps):
         return
 
 class StickerConvert:
-    def __init__(self, in_f, out_f, opt_comp, cb_msg_queue=FakeCbMsg()):
+    def __init__(self, in_f, out_f, opt_comp, cb_msg=print):
+        if type(cb_msg) != QueueType:
+            cb_msg = FakeCbMsg(cb_msg)
+
         self.in_f = in_f
         self.in_f_name = os.path.split(self.in_f)[1]
         self.in_f_ext = CodecInfo.get_file_ext(self.in_f)
@@ -43,7 +47,7 @@ class StickerConvert:
             self.out_f_name = os.path.split(self.out_f)[1]
             self.out_f_ext = CodecInfo.get_file_ext(self.out_f)
 
-        self.cb_msg_queue = cb_msg_queue
+        self.cb_msg = cb_msg
         self.frames_raw = []
         self.frames_processed = []
         self.opt_comp = opt_comp
@@ -96,12 +100,12 @@ class StickerConvert:
             FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.get('fps')) and
             FormatVerify.check_file_size(self.in_f, size=self.opt_comp.get('size_max')) and
             FormatVerify.check_duration(self.in_f, duration=self.opt_comp.get('duration'))):
-            self.cb_msg_queue.put(f'[S] Compatible file found, skip compress and just copy {self.in_f_name} -> {self.out_f_name}')
+            self.cb_msg.put(f'[S] Compatible file found, skip compress and just copy {self.in_f_name} -> {self.out_f_name}')
 
             shutil.copyfile(self.in_f, self.out_f)
             return True, self.in_f, self.out_f, os.path.getsize(self.in_f)
 
-        self.cb_msg_queue.put(f'[I] Start compressing {self.in_f_name} -> {self.out_f_name}')
+        self.cb_msg.put(f'[I] Start compressing {self.in_f_name} -> {self.out_f_name}')
 
         steps_list = []
         for step in range(self.steps, -1, -1):
@@ -133,7 +137,7 @@ class StickerConvert:
             self.color = param[4]
 
             self.tmp_f = io.BytesIO()
-            self.cb_msg_queue.put(f'[C] Compressing {self.in_f_name} -> {self.out_f_name} res={self.res_w}x{self.res_h}, quality={self.quality}, fps={self.fps}, color={self.color} (step {step_lower}-{step_current}-{step_upper})')
+            self.cb_msg.put(f'[C] Compressing {self.in_f_name} -> {self.out_f_name} res={self.res_w}x{self.res_h}, quality={self.quality}, fps={self.fps}, color={self.color} (step {step_lower}-{step_current}-{step_upper})')
             
             self.frames_processed = self.frames_drop(self.frames_raw)
             self.frames_processed = self.frames_resize(self.frames_processed)
@@ -157,32 +161,32 @@ class StickerConvert:
             if not size_max:
                 with open(self.out_f, 'wb+') as f:
                     f.write(self.tmp_fs[step_current])
-                self.cb_msg_queue.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+                self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
                 return True, self.in_f, self.out_f, size
 
             if size < size_max:
                 if step_upper - step_lower > 1:
                     step_upper = step_current
                     step_current = int((step_lower + step_upper) / 2)
-                    self.cb_msg_queue.put(f'[<] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} < limit {size_max}, recompressing')
+                    self.cb_msg.put(f'[<] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} < limit {size_max}, recompressing')
                 else:
                     with open(self.out_f, 'wb+') as f:
                         f.write(self.tmp_fs[step_current])
-                    self.cb_msg_queue.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+                    self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
                     return True, self.in_f, self.out_f, size
             else:
                 if step_upper - step_lower > 1:
                     step_lower = step_current
                     step_current = round((step_lower + step_upper) / 2)
-                    self.cb_msg_queue.put(f'[>] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} > limit {size_max}, recompressing')
+                    self.cb_msg.put(f'[>] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} > limit {size_max}, recompressing')
                 else:
                     if self.steps - step_current > 1:
                         with open(self.out_f, 'wb+') as f:
                             f.write(self.tmp_fs[step_current + 1])
-                        self.cb_msg_queue.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+                        self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
                         return True, self.in_f, self.out_f, size
                     else:
-                        self.cb_msg_queue.put(f'[F] Failed Compression {self.in_f_name} -> {self.out_f_name}, cannot get below limit {size_max} with lowest quality under current settings')
+                        self.cb_msg.put(f'[F] Failed Compression {self.in_f_name} -> {self.out_f_name}, cannot get below limit {size_max} with lowest quality under current settings')
                         return False, self.in_f, self.out_f, size
     
     def frames_import(self):

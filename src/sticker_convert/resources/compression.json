@@ -1,4 +1,43 @@
 {
+    "auto": {
+        "size_max": {
+            "img": 500000,
+            "vid": 500000
+        },
+        "format": {
+            "img": ".webm",
+            "vid": ".png"
+        },
+        "fps": {
+            "min": 1,
+            "max": 30
+        },
+        "res": {
+            "w": {
+                "min": 512,
+                "max": 512
+            },
+            "h": {
+                "min": 512,
+                "max": 512
+            }
+        },
+        "quality": {
+            "min": 50,
+            "max": 95
+        },
+        "color": {
+            "min": 50,
+            "max": 257
+        },
+        "duration": {
+            "min": 0,
+            "max": 10000
+        },
+        "steps": 16,
+        "fake_vid": false,
+        "default_emoji": "😀"
+    },
     "signal": {
         "size_max": {
             "img": 300000,

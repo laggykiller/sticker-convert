@@ -103,6 +103,10 @@ class Flow:
         save_to_local_tip += '    If you want to upload the results by yourself,\n'
         save_to_local_tip += '    select "Save to local directory only" for output\n'
 
+        if self.opt_input['option'] == 'auto':
+            error_msg += '\n'
+            error_msg += '[X] Unrecognized URL input source\n'
+
         if (self.opt_input['option'] != 'local' and 
             not self.opt_input.get('url')):
 
