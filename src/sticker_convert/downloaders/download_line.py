@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from .download_base import DownloadBase
 from ..utils.metadata_handler import MetadataHandler
 from ..utils.get_line_auth import GetLineAuth
+from ..utils.apple_png_normalize import ApplePngNormalize
 
 class MetadataLine:
     @staticmethod
@@ -80,7 +81,7 @@ class MetadataLine:
     
     @staticmethod
     def get_metadata_stickers(pack_id, region):
-        pack_meta_r = requests.get(f"http://dl.stickershop.line.naver.jp/products/0/0/1/{pack_id}/android/productInfo.meta")
+        pack_meta_r = requests.get(f"https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/android/productInfo.meta")
 
         if pack_meta_r.status_code == 200:
             pack_meta = json.loads(pack_meta_r.text)
@@ -196,6 +197,8 @@ class DownloadLine(DownloadBase):
                 else:
                     f_path = str(sticker['id']) + '@2x.png'
                 data = zf.read(f_path)
+                if int(self.pack_id) < 775:
+                    data = ApplePngNormalize.normalize(data)
                 self.cb_msg(f'Read {f_path}')
                 
                 out_path = os.path.join(self.out_dir, str(num).zfill(3) + '.png')
