@@ -592,6 +592,11 @@ class GUI:
                 self.input_frame.address_entry.config(bootstyle='warning')
             elif UrlDetect.detect(url) == None:
                 self.input_frame.address_entry.config(bootstyle='danger')
+            elif (self.get_input_name() != 'auto' and
+                  UrlDetect.detect(url) != self.get_input_name() and
+                  not (self.get_input_name() == 'kakao' and url.isnumeric())):
+                
+                self.input_frame.address_entry.config(bootstyle='danger')
 
         if (MetadataHandler.check_metadata_required(output_option, 'title') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'title') and
