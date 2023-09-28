@@ -88,10 +88,10 @@ To run in CLI mode, pass on any arguments
 
 ```
 usage: main.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR]
-               [--download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO]
+               [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO]
                [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                [--export-signal | --export-telegram | --export-whatsapp | --export-imessage] [--no-compress]
-               [--preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
+               [--preset {auto,signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
                [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN]
                [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
                [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN]
@@ -114,6 +114,9 @@ options:
 Input options:
   --input-dir INPUT_DIR
                         Specify input directory.
+  --download-auto DOWNLOAD_AUTO
+                        Auto detect URL type and download
+                        (Supported input sources: Signal, Telegram, Line, Kakao)
   --download-signal DOWNLOAD_SIGNAL
                         Download signal stickers from a URL as input
                         (Example: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
@@ -141,12 +144,12 @@ Output options:
 
 Compression options:
   --no-compress         Do not compress files. Useful for only downloading stickers.
-  --preset {signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {auto,signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
                         Apply preset for compression.
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
   --processes PROCESSES
-                        Set number of processes. Default to the number of logical processors in system.
+                        Set number of processes. Default to half of logical processors in system.
                         Processes higher = Compress faster but consume more resources.
   --fps-min FPS_MIN     Set minimum output fps.
   --fps-max FPS_MAX     Set maximum output fps.
@@ -279,9 +282,13 @@ Downloading
 ```
 # Option 1: From Dockerhub
 docker pull laggykiller/sticker-convert:latest
+docker pull laggykiller/sticker-convert:latest-min-gui # No signal-desktop
+docker pull laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
 
 # Option 2: From ghcr
 docker pull ghcr.io/laggykiller/sticker-convert:latest
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui # No signal-desktop
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
 ```
 
 Running (GUI)
@@ -310,10 +317,14 @@ docker compose up
 
 Building
 ```
-docker build . -t sticker-convert
+docker build --tag sticker-convert:latest --target full .
+docker build --tag sticker-convert:latest-min-cli --target min-cli .
+docker build --tag sticker-convert:latest-min-gui --target min-gui .
 ```
 
-Note that the GUI version is based on https://github.com/jlesage/docker-baseimage-gui. Visit that repo for more information.
+Note that the GUI version is based on https://github.com/jlesage/docker-baseimage-gui.
+To open the GUI, go to `localhost:5800` with browser on the machine running the docker image.
+Alternatively, go to `localhost:5900` with VNC viewer.
 
 ## Running python script directly & Compiling
 See [docs/COMPILING.md](docs/COMPILING.md)

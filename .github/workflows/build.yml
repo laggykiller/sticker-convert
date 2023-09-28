@@ -164,21 +164,60 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
+      - name: Extract metadata (tags, labels) for Docker (min-cli)
+        id: meta_min_cli
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ github.repository }}
+            ghcr.io/${{ github.repository }}
+          flavor: |
+            suffix=-min-cli,ontlatest=true
+      
+      - name: Extract metadata (tags, labels) for Docker (min-gui)
+        id: meta_min_gui
+        uses: docker/metadata-action@v4
+        with:
+          images: |
+            ${{ github.repository }}
+            ghcr.io/${{ github.repository }}
+          flavor: |
+            suffix=-min-gui,ontlatest=true
+      
+      - name: Extract metadata (tags, labels) for Docker (full)
+        id: meta_full
         uses: docker/metadata-action@v4
         with:
           images: |
             ${{ github.repository }}
             ghcr.io/${{ github.repository }}
     
-      - name: Build and push Docker image
+      - name: Build and push Docker image (min-cli)
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: ${{ steps.meta_min_cli.outputs.tags }}
+          labels: ${{ steps.meta_min_cli.outputs.labels }}
+          target: min-cli
+      
+      - name: Build and push Docker image (min-gui)
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta_min_gui.outputs.tags }}
+          labels: ${{ steps.meta_min_gui.outputs.labels }}
+          target: min-gui
+
+      - name: Build and push Docker image (full)
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta_full.outputs.tags }}
+          labels: ${{ steps.meta_full.outputs.labels }}
+          target: full
   
   upload-pypi:
     name: Upload to pypi
