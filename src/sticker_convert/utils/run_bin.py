@@ -4,7 +4,6 @@ import os
 import shutil
 import sys
 from typing import Union, AnyStr
-from posixpath import abspath
 
 class RunBin:
     @staticmethod

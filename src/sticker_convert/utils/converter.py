@@ -2,10 +2,9 @@
 import os
 import platform
 import shutil
-import math
 import io
 from multiprocessing.queues import Queue as QueueType
-from typing import Optional, Union
+from typing import Optional
 
 import imageio.v3 as iio
 from rlottie_python import LottieAnimation # type: ignore

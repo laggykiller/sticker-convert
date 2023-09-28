@@ -9,7 +9,7 @@ from queue import Queue
 from functools import partial
 from uuid import uuid4
 from urllib.parse import urlparse
-from typing import Optional, Union, Any
+from typing import Optional, Any
 
 from PIL import ImageFont
 from ttkbootstrap import Window, Frame, Scrollbar, Canvas, PhotoImage, StringVar, BooleanVar, IntVar # type: ignore
