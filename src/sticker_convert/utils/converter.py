@@ -197,12 +197,22 @@ class StickerConvert:
             self.frames_import_imageio()
 
     def frames_import_imageio(self):
-        if self.in_f_ext == '.webp':
+        if self.in_f_ext in '.webp':
             # ffmpeg do not support webp decoding (yet)
             for frame in iio.imiter(self.in_f, plugin='pillow', mode='RGBA'):
                 self.frames_raw.append(frame)
         else:
-            for frame in iio.imiter(self.in_f, plugin='pyav', format='rgba'):
+            frame_format = 'rgba'
+            if self.in_f_ext == '.webm':
+                # Crashes when handling some webm in yuv420p and convert to rgba
+                # https://github.com/PyAV-Org/PyAV/issues/1166
+                metadata = iio.immeta(self.in_f, plugin='pyav', exclude_applied=False)
+                if metadata.get('video_format') == 'yuv420p':
+                    frame_format = 'rgb24'
+
+            for frame in iio.imiter(self.in_f, plugin='pyav', format=frame_format):
+                if frame_format == 'rgb24':
+                    frame = np.dstack((frame, np.zeros(frame.shape[:2], dtype=np.uint8)+255))
                 self.frames_raw.append(frame)
 
     def frames_import_lottie(self):
