@@ -1,0 +1,87 @@
+#!/usr/bin/env python3
+from ttkbootstrap import LabelFrame, Progressbar
+from ttkbootstrap.scrolled import ScrolledText
+from tqdm import tqdm
+
+from .right_clicker import RightClicker
+
+class ProgressFrame:
+    progress_bar_cli = None
+    progress_bar_steps = 0
+    auto_scroll = True
+
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Progress')
+
+        self.message_box = ScrolledText(self.frame, height=15, wrap='word')
+        self.message_box._text.bind('<Button-3><ButtonRelease-3>', RightClicker)
+        self.message_box._text.config(state='disabled')
+        self.progress_bar = Progressbar(self.frame, orient='horizontal', mode='determinate')
+
+        self.message_box.bind('<Enter>', self.cb_disable_autoscroll)
+        self.message_box.bind('<Leave>', self.cb_enable_autoscroll)
+
+        self.message_box.pack(expand=True, fill='x')
+        self.progress_bar.pack(expand=True, fill='x')
+    
+    def update_progress_bar(self, set_progress_mode='', steps=0, update_bar=False):
+        if update_bar:
+            self.progress_bar_cli.update()
+            self.progress_bar['value'] += 100 / self.progress_bar_steps
+        elif set_progress_mode == 'determinate':
+            self.progress_bar_cli = tqdm(total=steps)
+            self.progress_bar.config(mode='determinate')
+            self.progress_bar_steps = steps
+            self.progress_bar.stop()
+            self.progress_bar['value'] = 0
+        elif set_progress_mode == 'indeterminate':
+            if self.progress_bar_cli:
+                self.progress_bar_cli.close()
+                self.progress_bar_cli = None
+            self.progress_bar['value'] = 0
+            self.progress_bar.config(mode='indeterminate')
+            self.progress_bar.start(50)
+        elif set_progress_mode == 'clear':
+            if self.progress_bar_cli:
+                self.progress_bar_cli.reset()
+            self.progress_bar.config(mode='determinate')
+            self.progress_bar.stop()
+            self.progress_bar['value'] = 0
+
+    def update_message_box(self, *args, **kwargs):
+        msg = kwargs.get('msg')
+        cls = kwargs.get('cls')
+
+        # scrollbar_prev_loc = self.message_box.yview()[1]
+
+        if not msg and len(args) == 1:
+            msg = str(args[0])
+        
+        if msg:
+            if self.progress_bar_cli:
+                self.progress_bar_cli.write(msg)
+            else:
+                print(msg)
+            msg += '\n'
+
+        self.message_box._text.config(state='normal')
+
+        if cls:
+            self.message_box.delete(1.0, 'end')
+
+        if msg:
+            self.message_box.insert('end', msg)
+
+            # Follow the end of the box if it was at the end
+            # if scrollbar_prev_loc == 1.0:
+            if self.auto_scroll:
+                self.message_box._text.yview_moveto(1.0)
+
+        self.message_box._text.config(state='disabled')
+    
+    def cb_disable_autoscroll(self, *args):
+        self.auto_scroll = False
+        
+    def cb_enable_autoscroll(self, *args):
+        self.auto_scroll = True

@@ -10,7 +10,7 @@ def main():
     if len(sys.argv) == 1:
         print('Launching GUI...')
         from sticker_convert.gui import GUI
-        GUI().root.mainloop()
+        GUI().gui()
     else:
         from sticker_convert.cli import CLI
         CLI().cli()
