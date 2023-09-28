@@ -262,22 +262,22 @@ class StickerConvert:
         fps_orig = CodecInfo.get_file_fps(self.in_f)
         duration_orig = frames_orig / fps_orig * 1000
 
+        # fps_ratio: 1 frame in new anim equal to how many frame in old anim
+        # speed_ratio: How much to speed up / slow down
+        fps_ratio = fps_orig / self.fps
         if self.duration_min and self.duration_min > 0 and duration_orig < self.duration_min:
-            extraction_fps = self.duration_min / duration_orig * self.fps
+            speed_ratio = duration_orig / self.duration_min
         elif self.duration_max and self.duration_max > 0 and duration_orig > self.duration_max:
-            extraction_fps = self.duration_max / duration_orig * self.fps
+            speed_ratio = duration_orig / self.duration_max
         else:
-            extraction_fps = self.fps
-
-        if extraction_fps < 1:
-            extraction_fps = 1 / math.ceil(1 / extraction_fps)
-        else:
-            extraction_fps = math.ceil(extraction_fps)
+            speed_ratio = 1
 
         frame_current = 0
+        frame_current_float = 0
         while frame_current < len(frames_in):
-            frames_out.append(frames_in[int(frame_current)])
-            frame_current += fps_orig / extraction_fps
+            frames_out.append(frames_in[frame_current])
+            frame_current_float += fps_ratio * speed_ratio
+            frame_current = round(frame_current_float)
 
         return frames_out
 
