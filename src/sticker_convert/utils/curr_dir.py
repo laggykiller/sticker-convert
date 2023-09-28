@@ -36,7 +36,7 @@ class CurrDir:
             return fallback_dir
     
     @staticmethod
-    def get_creds_dir():
+    def get_config_dir():
         appimage_path = os.getenv('APPIMAGE')
 
         cwd = os.getcwd()
@@ -47,23 +47,23 @@ class CurrDir:
 
         if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and '.app/Contents/MacOS' in cwd:
             if cwd.startswith('/Applications/'):
-                creds_dir = fallback_dir
+                config_dir = fallback_dir
             else:
-                creds_dir = os.path.abspath('../../../')
+                config_dir = os.path.abspath('../../../')
         elif appimage_path:
-            creds_dir = os.path.split(appimage_path)[0]
+            config_dir = os.path.split(appimage_path)[0]
         elif (cwd.startswith('/usr/bin/') 
               or cwd.startswith('/bin') 
               or cwd.startswith('/usr/local/bin')
               or cwd.startswith('C:\\Program Files')
               or 'site-packages' in __file__):
-            creds_dir = fallback_dir
+            config_dir = fallback_dir
         else:
-            creds_dir = cwd
+            config_dir = cwd
         
-        os.makedirs(creds_dir, exist_ok=True)
-        if os.access(creds_dir, os.W_OK):
-            return creds_dir
+        os.makedirs(config_dir, exist_ok=True)
+        if os.access(config_dir, os.W_OK):
+            return config_dir
         else:
             os.makedirs(fallback_dir, exist_ok=True)
             return fallback_dir

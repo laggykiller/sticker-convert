@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import platform
 import time
 import math
 from multiprocessing import cpu_count
@@ -26,6 +27,7 @@ from .utils.get_line_auth import GetLineAuth
 from .utils.curr_dir import CurrDir
 from .utils.metadata_handler import MetadataHandler
 from .utils.url_detect import UrlDetect
+from .utils.run_bin import RunBin
 from .__init__ import __version__
 
 # Reference: https://stackoverflow.com/a/57704013
@@ -44,10 +46,8 @@ class RightClicker:
         event.widget.event_generate(f'<<{cmd}>>')
 
 class GUI:
-    default_input_mode = 'auto'
-    default_output_mode = 'signal'
-
     def __init__(self):
+        self.init_done = False
         self.load_jsons()
 
         self.emoji_font = ImageFont.truetype("./resources/NotoColorEmoji.ttf", 109)
@@ -62,13 +62,14 @@ class GUI:
             self.root.iconbitmap(bitmap='resources/appicon.ico')
         self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
         self.root.title(f'sticker-convert {__version__}')
+        self.root.protocol('WM_DELETE_WINDOW', self.quit)
 
         self.create_scrollable_frame()
         self.declare_variables()
-        self.set_creds()
+        self.apply_config()
+        self.apply_creds()
         self.init_frames()
         self.pack_frames()
-        self.highlight_fields()
         self.resize_window()
 
         self.msg_lock = Lock()
@@ -76,13 +77,39 @@ class GUI:
         self.response_dict_lock = Lock()
         self.response_dict = {}
         self.action_queue = Queue()
+        self.flow = None
         self.root.after(500, self.poll_actions)
     
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.save_creds()
+    def gui(self):
+        self.init_done = True
+        self.highlight_fields()
+        self.root.mainloop()
+
+    def quit(self):
+        if self.flow:
+            response = self.cb_ask_bool('Job is running, really quit?')
+            if response == False:
+                return
+
+        self.cb_msg(msg='Quitting, please wait...')
+
+        self.save_config()
+        if self.config_save_cred_var.get() == True:
+            self.save_creds()
+        else:
+            self.delete_creds()
+        
+        if self.flow:
+            while not self.flow.jobs_queue.empty():
+                self.flow.jobs_queue.get()
+            for process in self.flow.processes:
+                process.terminate()
+                process.join()
+
+        self.root.destroy()
         
     def create_scrollable_frame(self):
         self.main_frame = Frame(self.root)
@@ -114,15 +141,9 @@ class GUI:
         self.input_setdir_var = StringVar(self.root)
         self.input_address_var = StringVar(self.root)
 
-        self.input_option_display_var.set(self.input_presets[self.default_input_mode]['full_name'])
-        self.input_option_true_var.set(self.input_presets[self.default_input_mode]['full_name'])
-        stickers_input_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
-        self.input_setdir_var.set(stickers_input_dir)
-
         # Compression
         self.no_compress_var = BooleanVar()
         self.comp_preset_var = StringVar(self.root)
-        self.default_comp_preset = list(self.compression_presets.keys())[0]
         self.fps_min_var = IntVar(self.root)
         self.fps_max_var = IntVar(self.root)
         self.fps_disable_var = BooleanVar()
@@ -152,20 +173,12 @@ class GUI:
         self.steps_var = IntVar(self.root) 
         self.processes_var = IntVar(self.root)
 
-        self.comp_preset_var.set(self.default_comp_preset)
-        self.processes_var.set(math.ceil(cpu_count() / 2))
-
         # Output
         self.output_option_display_var = StringVar(self.root)
         self.output_option_true_var = StringVar(self.root)
         self.output_setdir_var = StringVar(self.root)
         self.title_var = StringVar(self.root)
         self.author_var = StringVar(self.root)
-
-        self.output_option_display_var.set(self.output_presets[self.default_output_mode]['full_name'])
-        self.output_option_true_var.set(self.output_presets[self.default_output_mode]['full_name'])
-        stickers_output_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_output')
-        self.output_setdir_var.set(stickers_output_dir)
 
         # Credentials
         self.signal_uuid_var = StringVar(self.root)
@@ -179,11 +192,15 @@ class GUI:
         self.kakao_phone_number_var = StringVar(self.root)
         self.line_cookies_var = StringVar(self.root)
 
+        # Config
+        self.config_save_cred_var = BooleanVar()
+
     def init_frames(self):
         self.input_frame = InputFrame(self)
         self.comp_frame = CompFrame(self)
         self.output_frame = OutputFrame(self)
         self.cred_frame = CredFrame(self)
+        self.config_frame = ConfigFrame(self)
         self.progress_frame = ProgressFrame(self)
         self.control_frame = ControlFrame(self)
     
@@ -191,9 +208,10 @@ class GUI:
         self.input_frame.frame.grid(column=0, row=0, sticky='w', padx=5, pady=5)
         self.comp_frame.frame.grid(column=1, row=0, sticky='news', padx=5, pady=5)
         self.output_frame.frame.grid(column=0, row=1, sticky='w', padx=5, pady=5)
-        self.cred_frame.frame.grid(column=1, row=1, sticky='w', padx=5, pady=5)
-        self.progress_frame.frame.grid(column=0, row=2, columnspan=2, sticky='news', padx=5, pady=5)
-        self.control_frame.frame.grid(column=0, row=3, columnspan=2, sticky='news', padx=5, pady=5)
+        self.cred_frame.frame.grid(column=1, row=1, rowspan=2, sticky='w', padx=5, pady=5)
+        self.config_frame.frame.grid(column=0, row=2, sticky='news', padx=5, pady=5)
+        self.progress_frame.frame.grid(column=0, row=3, columnspan=2, sticky='news', padx=5, pady=5)
+        self.control_frame.frame.grid(column=0, row=4, columnspan=2, sticky='news', padx=5, pady=5)
     
     def resize_window(self):
         self.scrollable_frame.update_idletasks()
@@ -220,31 +238,89 @@ class GUI:
         if not (self.compression_presets and self.input_presets and self.output_presets):
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
-        
-        creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
-        if os.path.isfile(creds_path):
-            self.creds = JsonManager.load_json(creds_path)
+
+        self.config_path = os.path.join(CurrDir.get_config_dir(), 'config.json')
+        if os.path.isfile(self.config_path):
+            self.config = JsonManager.load_json(self.config_path)
         else:
-            self.creds = {
-            'signal': {
-                'uuid': '',
-                'password': ''
+            self.config = {}
+        
+        self.creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')
+        if os.path.isfile(self.creds_path):
+            self.creds = JsonManager.load_json(self.creds_path)
+        else:
+            self.creds = {}
+    
+    def save_config(self):
+        # Only update comp_custom if custom preset is selected
+        if self.comp_preset_var.get() == 'custom':
+            comp_custom = {
+                'size_max': {
+                    'img': self.img_size_max_var.get() if not self.size_disable_var.get() else None,
+                    'vid': self.vid_size_max_var.get() if not self.size_disable_var.get() else None
+                },
+                'format': {
+                    'img': self.img_format_var.get(),
+                    'vid': self.vid_format_var.get()
+                },
+                'fps': {
+                    'min': self.fps_min_var.get() if not self.fps_disable_var.get() else None,
+                    'max': self.fps_max_var.get() if not self.fps_disable_var.get() else None
+                },
+                'res': {
+                    'w': {
+                        'min': self.res_w_min_var.get() if not self.res_w_disable_var.get() else None,
+                        'max': self.res_w_max_var.get() if not self.res_w_disable_var.get() else None
+                    },
+                    'h': {
+                        'min': self.res_h_min_var.get() if not self.res_h_disable_var.get() else None,
+                        'max': self.res_h_max_var.get() if not self.res_h_disable_var.get() else None
+                    }
+                },
+                'quality': {
+                    'min': self.quality_min_var.get() if not self.quality_disable_var.get() else None,
+                    'max': self.quality_max_var.get() if not self.quality_disable_var.get() else None
+                },
+                'color': {
+                    'min': self.color_min_var.get() if not self.color_disable_var.get() else None,
+                    'max': self.color_max_var.get() if not self.color_disable_var.get() else None
+                },
+                'duration': {
+                    'min': self.duration_min_var.get() if not self.duration_disable_var.get() else None,
+                    'max': self.duration_max_var.get() if not self.duration_disable_var.get() else None
+                },
+                'steps': self.steps_var.get(),
+                'fake_vid': self.fake_vid_var.get(),
+                'default_emoji': self.default_emoji_var.get(),
+            }
+        else:
+            comp_custom = self.compression_presets.get('custom')
+
+        self.config = {
+            'input': {
+                'option': self.get_input_name(),
+                'url': self.input_address_var.get(),
+                'dir':  self.input_setdir_var.get()
             },
-            'telegram': {
-                'token': '',
-                'userid': ''
+            'comp': {
+                'no_compress': self.no_compress_var.get(),
+                'preset': self.comp_preset_var.get(),
+                'cache_dir': self.cache_dir_var.get(),
+                'processes': self.processes_var.get()
             },
-            'kakao': {
-                'auth_token': '',
-                'username': '',
-                'password': '',
-                'country_code': '',
-                'phone_number': ''
+            'comp_custom': comp_custom,
+            'output': {
+                'option': self.get_output_name(),
+                'dir': self.output_setdir_var.get(),
+                'title': self.title_var.get(),
+                'author': self.author_var.get()
             },
-            'line': {
-                'cookies': ''
+            'creds': {
+                'save_cred': self.config_save_cred_var.get()
             }
         }
+
+        JsonManager.save_json(self.config_path, self.config)
         
     def save_creds(self):
         self.creds = {
@@ -268,23 +344,63 @@ class GUI:
             }
         }
 
-        creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
-        JsonManager.save_json(creds_path, self.creds)
+        JsonManager.save_json(self.creds_path, self.creds)
     
-    def set_creds(self):
-        if not self.creds:
-            return
+    def delete_creds(self):
+        if os.path.isfile(self.creds_path):
+            os.remove(self.creds_path)
+    
+    def delete_config(self):
+        if os.path.isfile(self.config_path):
+            os.remove(self.config_path)
+    
+    def apply_config(self):
+        self.default_input_mode = self.config.get('input', {}).get('option', 'auto')
+        self.input_address_var.set(self.config.get('input', {}).get('url', ''))
+        
+        default_stickers_input_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
+        self.input_setdir_var.set(self.config.get('input', {}).get('dir', default_stickers_input_dir))
+        if not os.path.isdir(self.input_setdir_var.get()):
+            self.input_setdir_var.set(default_stickers_input_dir)
 
-        self.signal_uuid_var.set(self.creds.get('signal', {}).get('uuid'))
-        self.signal_password_var.set(self.creds.get('signal', {}).get('password'))
-        self.telegram_token_var.set(self.creds.get('telegram', {}).get('token'))
-        self.telegram_userid_var.set(self.creds.get('telegram', {}).get('userid'))
-        self.kakao_auth_token_var.set(self.creds.get('kakao', {}).get('auth_token'))
-        self.kakao_username_var.set(self.creds.get('kakao', {}).get('username'))
-        self.kakao_password_var.set(self.creds.get('kakao', {}).get('password'))
-        self.kakao_country_code_var.set(self.creds.get('kakao', {}).get('country_code'))
-        self.kakao_phone_number_var.set(self.creds.get('kakao', {}).get('phone_number'))
-        self.line_cookies_var.set(self.creds.get('line', {}). get('cookies'))
+        self.no_compress_var.set(self.config.get('comp', {}).get('no_compress', False))
+
+        default_comp_preset = list(self.compression_presets.keys())[0]
+        self.comp_preset_var.set(self.config.get('comp', {}).get('preset', default_comp_preset))
+        
+        self.cache_dir_var.set(self.config.get('comp', {}).get('cache_dir', ''))
+        self.processes_var.set(self.config.get('comp', {}).get('processes', math.ceil(cpu_count() / 2)))
+        self.default_output_mode = self.config.get('output', {}).get('option', 'signal')
+
+        default_stickers_output_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_output')
+        self.output_setdir_var.set(self.config.get('output', {}).get('dir', default_stickers_output_dir))
+        if not os.path.isdir(self.output_setdir_var.get()):
+            self.output_setdir_var.set(default_stickers_output_dir)
+        
+        self.title_var.set(self.config.get('output', {}).get('title', ''))
+        self.author_var.set(self.config.get('output', {}).get('author', ''))
+        self.config_save_cred_var.set(self.config.get('creds', {}).get('save_cred', True))
+
+        if self.config.get('comp_custom'):
+            self.compression_presets['custom'] = self.config.get('comp_custom')
+        
+        self.input_option_display_var.set(self.input_presets[self.default_input_mode]['full_name'])
+        self.input_option_true_var.set(self.input_presets[self.default_input_mode]['full_name'])
+
+        self.output_option_display_var.set(self.output_presets[self.default_output_mode]['full_name'])
+        self.output_option_true_var.set(self.output_presets[self.default_output_mode]['full_name'])
+    
+    def apply_creds(self):
+        self.signal_uuid_var.set(self.creds.get('signal', {}).get('uuid', ''))
+        self.signal_password_var.set(self.creds.get('signal', {}).get('password', ''))
+        self.telegram_token_var.set(self.creds.get('telegram', {}).get('token', ''))
+        self.telegram_userid_var.set(self.creds.get('telegram', {}).get('userid', ''))
+        self.kakao_auth_token_var.set(self.creds.get('kakao', {}).get('auth_token', ''))
+        self.kakao_username_var.set(self.creds.get('kakao', {}).get('username', ''))
+        self.kakao_password_var.set(self.creds.get('kakao', {}).get('password', ''))
+        self.kakao_country_code_var.set(self.creds.get('kakao', {}).get('country_code', ''))
+        self.kakao_phone_number_var.set(self.creds.get('kakao', {}).get('phone_number', ''))
+        self.line_cookies_var.set(self.creds.get('line', {}). get('cookies', ''))
 
     def start(self):
         Thread(target=self.start_process, daemon=True).start()
@@ -296,7 +412,12 @@ class GUI:
         return [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_true_var.get()][0]
 
     def start_process(self):
-        self.save_creds()
+        self.save_config()
+        if self.config_save_cred_var.get() == True:
+            self.save_creds()
+        else:
+            self.delete_creds()
+
         self.set_inputs('disabled')
         self.control_frame.start_btn.config(state='disabled')
     
@@ -378,13 +499,13 @@ class GUI:
             }
         }
         
-        flow = Flow(
+        self.flow = Flow(
             opt_input, opt_comp, opt_output, opt_cred, 
             self.input_presets, self.output_presets,
             self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
             )
         
-        success = flow.start()
+        success = self.flow.start()
 
         if not success:
             self.cb_msg(msg='An error occured during this run.')
@@ -466,9 +587,17 @@ class GUI:
             self.progress_frame.update_progress_bar(*args, **kwargs)
         
     def highlight_fields(self):
+        if not self.init_done:
+            return True
+        
         input_option = self.get_input_name()
         output_option = self.get_output_name()
         url = self.input_address_var.get()
+
+        if os.path.isdir(self.input_setdir_var.get()):
+            self.input_frame.input_setdir_entry.config(bootstyle='default')
+        else:
+            self.input_frame.input_setdir_entry.config(bootstyle='danger')
 
         self.input_frame.address_entry.config(bootstyle='default')
         if input_option != 'local':
@@ -516,6 +645,22 @@ class GUI:
         else:
             self.cred_frame.kakao_auth_token_entry.config(bootstyle='default')
         
+        if os.path.isdir(self.output_setdir_var.get()):
+            self.output_frame.output_setdir_entry.config(bootstyle='default')
+        else:
+            self.output_frame.output_setdir_entry.config(bootstyle='danger')
+        
+        if (not self.no_compress_var.get() and 
+            self.get_output_name() != 'local' and
+            self.comp_preset_var.get() not in ('auto', 'custom') and
+            self.get_output_name() not in self.comp_preset_var.get()):
+
+            self.comp_frame.comp_preset_opt.config(bootstyle='warning')
+            self.output_frame.output_option_opt.config(bootstyle='warning')
+        else:
+            self.comp_frame.comp_preset_opt.config(bootstyle='secondary')
+            self.output_frame.output_option_opt.config(bootstyle='secondary')
+        
         return True
 
 class InputFrame:
@@ -530,7 +675,7 @@ class InputFrame:
         self.input_option_opt.config(width=32)
 
         self.input_setdir_lbl = Label(self.frame, text='Input directory', width=35, justify='left', anchor='w')
-        self.input_setdir_entry = Entry(self.frame, textvariable=self.gui.input_setdir_var, width=60)
+        self.input_setdir_entry = Entry(self.frame, textvariable=self.gui.input_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
         self.input_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.setdir_btn = Button(self.frame, text='Choose directory...', command=self.cb_set_indir, width=16, bootstyle='secondary')
 
@@ -547,6 +692,12 @@ class InputFrame:
         self.address_lbl.grid(column=0, row=2, sticky='w', padx=3, pady=3)
         self.address_entry.grid(column=1, row=2, columnspan=2, sticky='w', padx=3, pady=3)
         self.address_tip.grid(column=0, row=3, columnspan=3, sticky='w', padx=3, pady=3)
+
+        preset = [k for k, v in self.gui.input_presets.items() if v['full_name'] == self.gui.input_option_display_var.get()][0]
+        if preset == 'local':
+            self.address_entry.config(state='disabled')
+        else:
+            self.address_entry.config(state='normal')
     
     def cb_set_indir(self, *args):
         orig_input_dir = self.gui.input_setdir_var.get()
@@ -573,7 +724,10 @@ class InputFrame:
 
             if download_option == None:
                 self.gui.input_option_true_var.set(self.gui.input_presets['auto']['full_name'])
-                self.address_tip.config(text=f"Input URL not valid. {self.gui.input_presets['auto']['example']}")
+                if url == '':
+                    self.address_tip.config(text=self.gui.input_presets['auto']['example'])
+                else:
+                    self.address_tip.config(text=f"Input URL not valid. {self.gui.input_presets['auto']['example']}")
             else:
                 self.gui.input_option_true_var.set(self.gui.input_presets[download_option]['full_name'])
                 self.address_tip.config(text=f'Detected URL: {download_option}')
@@ -603,7 +757,7 @@ class CompFrame:
 
         self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['preset']), bootstyle='secondary')
         self.comp_preset_lbl = Label(self.frame, text='Preset')
-        self.comp_preset_opt = OptionMenu(self.frame, self.gui.comp_preset_var, self.gui.default_comp_preset, *self.gui.compression_presets.keys(), command=self.cb_comp_apply_preset, bootstyle='secondary')
+        self.comp_preset_opt = OptionMenu(self.frame, self.gui.comp_preset_var, self.gui.comp_preset_var.get(), *self.gui.compression_presets.keys(), command=self.cb_comp_apply_preset, bootstyle='secondary')
         self.comp_preset_opt.config(width=15)
 
         self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['steps']), bootstyle='secondary')
@@ -637,6 +791,7 @@ class CompFrame:
         self.comp_advanced_btn.grid(column=2, row=4, sticky='nes', padx=3, pady=3)
 
         self.cb_comp_apply_preset()
+        self.cb_nocompress()
     
     def cb_comp_apply_preset(self, *args):
         selection = self.gui.comp_preset_var.get()
@@ -671,6 +826,8 @@ class CompFrame:
         self.gui.fake_vid_var.set(self.gui.compression_presets[selection]['fake_vid'])
         self.gui.default_emoji_var.set(self.gui.compression_presets[selection]['default_emoji'])
         self.gui.steps_var.set(self.gui.compression_presets[selection]['steps'])
+
+        self.gui.highlight_fields()
     
     def cb_compress_advanced(self, *args):
         AdvancedCompressionWindow(self.gui)
@@ -707,7 +864,7 @@ class OutputFrame:
         self.output_option_opt.config(width=32)
 
         self.output_setdir_lbl = Label(self.frame, text='Output directory', justify='left', anchor='w')
-        self.output_setdir_entry = Entry(self.frame, textvariable=self.gui.output_setdir_var, width=60)
+        self.output_setdir_entry = Entry(self.frame, textvariable=self.gui.output_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
         self.output_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         
         self.output_setdir_btn = Button(self.frame, text='Choose directory...', command=self.cb_set_outdir, width=16, bootstyle='secondary')
@@ -802,7 +959,7 @@ class CredFrame:
         self.line_cookies_lbl.grid(column=0, row=6, sticky='w', padx=3, pady=3)
         self.line_cookies_entry.grid(column=1, row=6, sticky='w', padx=3, pady=3)
         self.line_get_auth_btn.grid(column=2, row=6, sticky='e', padx=3, pady=3)
-        self.help_btn.grid(column=2, row=7, sticky='e', padx=3, pady=3)
+        self.help_btn.grid(column=2, row=8, sticky='e', padx=3, pady=3)
     
     def cb_cred_help(self, *args):
         faq_site = 'https://github.com/laggykiller/sticker-convert#faq'
@@ -829,6 +986,66 @@ class CredFrame:
         self.kakao_get_auth_btn.config(state=state)
         self.line_cookies_entry.config(state=state)
         self.line_get_auth_btn.config(state=state)
+
+class ConfigFrame:
+    def __init__(self, gui):
+        self.gui = gui
+        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Config')
+
+        self.frame.grid_columnconfigure(1, weight=1)
+
+        self.config_save_cred_lbl = Label(self.frame, text='Save credentials', width=18, justify='left', anchor='w')
+        self.config_save_cred_cbox = Checkbutton(self.frame, variable=self.gui.config_save_cred_var, onvalue=True, offvalue=False, bootstyle='success-round-toggle')
+
+        self.config_clear_cred_lbl = Label(self.frame, text='Clear credentials', width=18, justify='left', anchor='w')
+        self.config_clear_cred_btn = Button(self.frame, text='Clear...', command=self.cb_clear_cred, bootstyle='secondary')
+
+        self.config_restore_default_lbl = Label(self.frame, text='Restore default', width=18, justify='left', anchor='w')
+        self.config_restore_default_btn = Button(self.frame, text='Restore...', command=self.cb_restore_default, bootstyle='secondary')
+
+        self.config_open_dir_lbl = Label(self.frame, text='Config directory', width=18, justify='left', anchor='w')
+        self.config_open_dir_btn = Button(self.frame, text='Open...', command=self.cb_open_config_directory, bootstyle='secondary')
+
+        self.config_save_cred_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
+        self.config_save_cred_cbox.grid(column=1, row=0, sticky='w', padx=3, pady=3)
+
+        self.config_clear_cred_lbl.grid(column=0, row=1, sticky='w', padx=3, pady=3)
+        self.config_clear_cred_btn.grid(column=1, row=1, sticky='w', padx=3, pady=3)
+
+        self.config_restore_default_lbl.grid(column=0, row=2, sticky='w', padx=3, pady=3)
+        self.config_restore_default_btn.grid(column=1, row=2, sticky='w', padx=3, pady=3)
+
+        self.config_open_dir_lbl.grid(column=0, row=3, sticky='w', padx=3, pady=3)
+        self.config_open_dir_btn.grid(column=1, row=3, sticky='w', padx=3, pady=3)
+    
+    def cb_clear_cred(self, *args, **kwargs):
+        response = self.gui.cb_ask_bool('Are you sure you want to clear credentials?')
+        if response == True:
+            self.gui.delete_creds()
+            self.gui.load_jsons()
+            self.gui.apply_creds()
+            self.gui.highlight_fields()
+            self.gui.cb_msg_block('Credentials cleared.')
+    
+    def cb_restore_default(self, *args, **kwargs):
+        response = self.gui.cb_ask_bool('Are you sure you want to restore default config? (This will not clear credentials.)')
+        if response == True:
+            self.gui.delete_config()
+            self.gui.load_jsons()
+            self.gui.apply_config()
+            self.gui.highlight_fields()
+            self.gui.cb_msg_block('Restored to default config.')
+    
+    def cb_open_config_directory(self, *args, **kwargs):
+        config_dir = CurrDir.get_config_dir()
+        self.gui.cb_msg(msg=f'Config is located at {config_dir}')
+        if platform.system() == 'Windows':
+            os.startfile(config_dir)
+        elif platform.system() == 'Darwin':
+            RunBin.run_cmd(['open', config_dir], silence=True)
+        else:
+            RunBin.run_cmd(['xdg-open', config_dir], silence=True)
+
 
 class ProgressFrame:
     progress_bar_cli = None

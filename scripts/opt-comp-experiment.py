@@ -77,7 +77,7 @@ def generate_random_apng(res, fps, duration, out_f):
     apngasm = APNGAsm()
     for i in range(int(duration/1000*fps)):
         im = numpy.random.rand(res, res, 4) * 255
-        frame = create_frame_from_rgba(im.flatten(), res, res)
+        frame = create_frame_from_rgba(im, res, res)
         frame.delay_num = int(1000 / fps)
         frame.delay_den = 1000
         apngasm.add_frame(frame)

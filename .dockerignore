@@ -4,6 +4,7 @@ build/**
 dist/**
 **/__pycache__
 **/creds.json
+**/config.json
 **/bin
 **/lib
 **/stickers_input

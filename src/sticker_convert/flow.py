@@ -40,6 +40,11 @@ class Flow:
         self.compress_fails = []
         self.out_urls = []
 
+        self.jobs_queue = Queue()
+        self.results_queue = Queue()
+        self.cb_msg_queue = Queue()
+        self.processes = []
+
         if os.path.isdir(self.opt_input['dir']) == False:
             os.makedirs(self.opt_input['dir'])
 
@@ -173,9 +178,9 @@ class Flow:
         # Only warn if export option is not local or custom
         # Do not warn if no_compress is true
         if (not self.opt_comp['no_compress'] and 
-            self.opt_output['option'] not in ('local', 'custom') and
-            self.opt_comp['preset'] != self.opt_output['option'] and 
-            self.opt_comp['preset'] in self.output_presets):
+            self.opt_output['option'] != 'local' and
+            self.opt_comp['preset'] != 'custom' and
+            self.opt_output['option'] not in self.opt_comp['preset']):
 
             msg = 'Compression preset does not match export option\n'
             msg += 'You may continue, but the files will need to be compressed again before export\n'
@@ -321,23 +326,19 @@ class Flow:
 
         self.cb_msg(msg)
         self.cb_bar(set_progress_mode='determinate', steps=in_fs_count)
-        
-        jobs_queue = Queue()
-        results_queue = Queue()
-        cb_msg_queue = Queue()
 
-        Thread(target=self.cb_msg_thread, args=(cb_msg_queue,)).start()
-        Thread(target=self.processes_watcher_thread, args=(results_queue,)).start()
+        Thread(target=self.cb_msg_thread, args=(self.cb_msg_queue,)).start()
+        Thread(target=self.processes_watcher_thread, args=(self.results_queue,)).start()
 
-        processes = []
-        for i in range(self.opt_comp['processes']):
+        for i in range(min(self.opt_comp['processes'], in_fs_count)):
             process = Process(
                 target=Flow.compress_worker,
-                args=(jobs_queue, results_queue, cb_msg_queue)
+                args=(self.jobs_queue, self.results_queue, self.cb_msg_queue),
+                daemon=True
             )
 
             process.start()
-            processes.append(process)
+            self.processes.append(process)
 
         for i in in_fs:
             in_f = os.path.join(input_dir, i)
@@ -349,15 +350,15 @@ class Flow:
 
             out_f = os.path.join(output_dir, os.path.splitext(i)[0] + extension)
 
-            jobs_queue.put((in_f, out_f, self.opt_comp))
+            self.jobs_queue.put((in_f, out_f, self.opt_comp))
 
-        jobs_queue.put(None)
+        self.jobs_queue.put(None)
 
-        for process in processes:
+        for process in self.processes:
             process.join()
         
-        results_queue.put(None)
-        cb_msg_queue.put(None)
+        self.results_queue.put(None)
+        self.cb_msg_queue.put(None)
 
         return True
     

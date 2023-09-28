@@ -228,7 +228,7 @@ class CLI:
         }
 
     def get_opt_cred(self, args):
-        creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
+        creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')
         creds = JsonManager.load_json(creds_path)
         if creds:
             self.cb_msg('Loaded credentials from creds.json')
@@ -292,7 +292,7 @@ class CLI:
                 self.cb_msg(f'Failed to get Line cookies. Have you logged in the web browser?')
         
         if args.save_cred:
-            creds_path = os.path.join(CurrDir.get_creds_dir(), 'creds.json')
+            creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')
             JsonManager.save_json(creds_path, self.opt_cred)
             self.cb_msg('Saved credentials to creds.json')
     

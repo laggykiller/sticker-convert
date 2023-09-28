@@ -20,7 +20,6 @@ class UrlDetect:
             return 'line'
 
         elif (domain in ('e.kakao.com', 'emoticon.kakao.com') or
-            url.isnumeric() or
             url.startswith('kakaotalk://store/emoticon/')):
 
             return 'kakao'

@@ -350,7 +350,7 @@ class StickerConvert:
                 f.seek(0)
                 frame_optimized = oxipng.optimize_from_memory(f.read(), level=4)
             image_final = Image.open(io.BytesIO(frame_optimized)).convert('RGBA')
-            frame_final = create_frame_from_rgba(np.array(image_final).flatten(), image_final.width, image_final.height)
+            frame_final = create_frame_from_rgba(np.array(image_final), image_final.width, image_final.height)
             frame_final.delay_num = int(1000 / self.fps)
             frame_final.delay_den = 1000
             self.apngasm.add_frame(frame_final)
