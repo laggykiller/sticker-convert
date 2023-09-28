@@ -9,7 +9,7 @@ def main():
     os.chdir(os.path.abspath(script_path))
     if len(sys.argv) == 1:
         print('Launching GUI...')
-        from sticker_convert.gui import GUI
+        from sticker_convert.gui import GUI # type: ignore
         GUI().gui()
     else:
         from sticker_convert.cli import CLI

@@ -2,13 +2,16 @@
 import sys
 from functools import partial
 from threading import Thread
+from typing import TYPE_CHECKING
 
-from ttkbootstrap import Toplevel, Frame, Button, Label, Scrollbar, Canvas, PhotoImage
+from ttkbootstrap import Toplevel, Frame, Button, Label, Scrollbar, Canvas, PhotoImage # type: ignore
 
-from ..utils.get_signal_auth import GetSignalAuth
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from ..auth.get_signal_auth import GetSignalAuth # type: ignore
 
 class SignalGetAuthWindow:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
 
         self.get_signal_auth_win = Toplevel(self.gui.root)

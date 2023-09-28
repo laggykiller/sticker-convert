@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 import webbrowser
+from typing import TYPE_CHECKING
 
-from ttkbootstrap import LabelFrame, Button, Entry, Label
+from ttkbootstrap import LabelFrame, Button, Entry, Label # type: ignore
 
-from .right_clicker import RightClicker
-from ..gui_windows.signal_get_auth_window import SignalGetAuthWindow
-from ..gui_windows.line_get_auth_window import LineGetAuthWindow
-from ..gui_windows.kakao_get_auth_window import KakaoGetAuthWindow
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from ..gui_windows.signal_get_auth_window import SignalGetAuthWindow # type: ignore
+from ..gui_windows.line_get_auth_window import LineGetAuthWindow # type: ignore
+from ..gui_windows.kakao_get_auth_window import KakaoGetAuthWindow # type: ignore
+from .right_clicker import RightClicker # type: ignore
 
 class CredFrame:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Credentials')
 
@@ -77,7 +80,7 @@ class CredFrame:
     def cb_line_get_auth(self, *args):
         LineGetAuthWindow(self.gui)
     
-    def set_states(self, state):
+    def set_states(self, state: str):
         self.signal_uuid_entry.config(state=state)
         self.signal_password_entry.config(state=state)
         self.signal_get_auth_btn.config(state=state)

@@ -5,29 +5,30 @@ import shutil
 import math
 import io
 from multiprocessing.queues import Queue as QueueType
-
-from .codec_info import CodecInfo
-from .cache_store import CacheStore
-from .format_verify import FormatVerify
-from .fake_cb_msg import FakeCbMsg
+from typing import Optional, Union
 
 import imageio.v3 as iio
-from rlottie_python import LottieAnimation
+from rlottie_python import LottieAnimation # type: ignore
 from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
 import numpy as np
 from PIL import Image
-import av
-import webp
+import av # type: ignore
+import webp # type: ignore
 import oxipng
 
-def get_step_value(max, min, step, steps):
+from .codec_info import CodecInfo # type: ignore
+from .cache_store import CacheStore # type: ignore
+from .format_verify import FormatVerify # type: ignore
+from .fake_cb_msg import FakeCbMsg # type: ignore
+
+def get_step_value(max: int, min: int, step: int, steps: int) -> Optional[int]:
     if max and min:
         return round((max - min) * step / steps + min)
     else:
-        return
+        return None
 
 class StickerConvert:
-    def __init__(self, in_f, out_f, opt_comp, cb_msg=print):
+    def __init__(self, in_f: str, out_f: str, opt_comp: dict, cb_msg=print):
         if type(cb_msg) != QueueType:
             cb_msg = FakeCbMsg(cb_msg)
 
@@ -48,8 +49,8 @@ class StickerConvert:
             self.out_f_ext = CodecInfo.get_file_ext(self.out_f)
 
         self.cb_msg = cb_msg
-        self.frames_raw = []
-        self.frames_processed = []
+        self.frames_raw: list[np.ndarray] = []
+        self.frames_processed: list[np.ndarray] = []
         self.opt_comp = opt_comp
         self.preset = opt_comp.get('preset')
 
@@ -90,9 +91,9 @@ class StickerConvert:
         self.cache_dir = opt_comp.get('cache_dir')
 
         self.tmp_f = None
-        self.tmp_fs = []
+        self.tmp_fs: list[bytes] = []
 
-        self.apngasm = APNGAsm()
+        self.apngasm = APNGAsm() # type: ignore[call-arg]
 
     def convert(self):
         if (FormatVerify.check_format(self.in_f, format=self.out_f_ext) and
@@ -216,7 +217,7 @@ class StickerConvert:
         
         anim.lottie_shutdown()
 
-    def frames_resize(self, frames_in):
+    def frames_resize(self, frames_in: list[np.ndarray]) -> list[np.ndarray]:
         frames_out = []
 
         for frame in frames_in:
@@ -241,7 +242,7 @@ class StickerConvert:
         
         return frames_out
     
-    def frames_drop(self, frames_in):
+    def frames_drop(self, frames_in: list[np.ndarray]) -> list[np.ndarray]:
         frames_out = []
 
         if not (self.duration_min or self.duration_max):

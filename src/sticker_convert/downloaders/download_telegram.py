@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 import os
-
-from .download_base import DownloadBase
-from ..utils.metadata_handler import MetadataHandler
+from typing import Optional
 
 import anyio
 from telegram import Bot
 from telegram.error import TelegramError
 
+from .download_base import DownloadBase # type: ignore
+from ..utils.metadata_handler import MetadataHandler # type: ignore
+
 class DownloadTelegram(DownloadBase):
     def __init__(self, *args, **kwargs):
         super(DownloadTelegram, self).__init__(*args, **kwargs)
     
-    def download_stickers_telegram(self):
+    def download_stickers_telegram(self) -> bool:
         self.token = self.opt_cred.get('telegram', {}).get('token')
         if self.token == None:
             self.cb_msg('Download failed: Token required for downloading from telegram')
@@ -30,7 +31,7 @@ class DownloadTelegram(DownloadBase):
         
         return anyio.run(self.save_stickers)
 
-    async def save_stickers(self):
+    async def save_stickers(self) -> bool:
         bot = Bot(self.token)
         async with bot:
             try:
@@ -69,6 +70,6 @@ class DownloadTelegram(DownloadBase):
         return True
 
     @staticmethod
-    def start(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
+    def start(url: str, out_dir: str, opt_cred: Optional[dict] = None, cb_msg=print, cb_msg_block=input, cb_bar=None) -> bool:
         downloader = DownloadTelegram(url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)
         return downloader.download_stickers_telegram()

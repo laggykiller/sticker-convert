@@ -10,15 +10,16 @@ import string
 from urllib import parse
 from PIL import Image
 from bs4 import BeautifulSoup
+from typing import Optional
 
-from .download_base import DownloadBase
-from ..utils.metadata_handler import MetadataHandler
-from ..utils.get_line_auth import GetLineAuth
-from ..utils.apple_png_normalize import ApplePngNormalize
+from .download_base import DownloadBase # type: ignore
+from ..auth.get_line_auth import GetLineAuth # type: ignore
+from ..utils.metadata_handler import MetadataHandler # type: ignore
+from ..utils.apple_png_normalize import ApplePngNormalize # type: ignore
 
 class MetadataLine:
     @staticmethod
-    def analyze_url(url):
+    def analyze_url(url: str) -> Optional[tuple[str, str, bool]]:
         region = ''
         is_emoji = False
         if url.startswith('line://shop/detail/'):
@@ -31,7 +32,7 @@ class MetadataLine:
         elif url.startswith('https://line.me/S/sticker'):
             url_parsed = parse.urlparse(url)
             pack_id = url.replace('https://line.me/S/sticker/', '').split('/')[0]
-            region = parse.parse_qs(url_parsed.query)['lang']
+            region = parse.parse_qs(url_parsed.query)['lang'][0]
         elif url.startswith('https://store.line.me/officialaccount/event/sticker/'):
             url_parsed = parse.urlparse(url)
             pack_id = url.replace('https://store.line.me/officialaccount/event/sticker/', '').split('/')[0]
@@ -42,8 +43,8 @@ class MetadataLine:
             is_emoji = True
         elif url.startswith('https://line.me/S/emoji'):
             url_parsed = parse.urlparse(url)
-            pack_id = parse.parse_qs(url_parsed.query)['id']
-            region = parse.parse_qs(url_parsed.query)['lang']
+            pack_id = parse.parse_qs(url_parsed.query)['id'][0]
+            region = parse.parse_qs(url_parsed.query)['lang'][0]
             is_emoji = True
         elif len(url) == 24 and all(c in string.hexdigits for c in url):
             pack_id = url
@@ -51,18 +52,18 @@ class MetadataLine:
         elif url.isnumeric():
             pack_id = url
         else:
-            return False
+            return None
 
         return pack_id, region, is_emoji
     
     @staticmethod
-    def get_metadata_sticon(pack_id, region):
+    def get_metadata_sticon(pack_id: str, region: str) -> Optional[tuple[str, str, list, str, bool]]:
         pack_meta_r = requests.get(f"https://stickershop.line-scdn.net/sticonshop/v1/{pack_id}/sticon/iphone/meta.json")
 
         if pack_meta_r.status_code == 200:
             pack_meta = json.loads(pack_meta_r.text)
         else:
-            return False
+            return None
         
         if region == '':
             region = 'en'
@@ -70,11 +71,21 @@ class MetadataLine:
         pack_store_page = requests.get(f"https://store.line.me/emojishop/product/{pack_id}/{region}")
 
         if pack_store_page.status_code != 200:
-            return False
+            return None
 
         pack_store_page_soup = BeautifulSoup(pack_store_page.text, 'html.parser')
-        title = pack_store_page_soup.find(class_='mdCMN38Item01Txt').text
-        author = pack_store_page_soup.find(class_='mdCMN38Item01Author').text
+
+        title_tag = pack_store_page_soup.find(class_='mdCMN38Item01Txt')
+        if title_tag:
+            title = title_tag.text
+        else:
+            return None
+        
+        author_tag = pack_store_page_soup.find(class_='mdCMN38Item01Author')
+        if author_tag:
+            author = author_tag.text
+        else:
+            return None
 
         files = pack_meta['orders']
 
@@ -84,13 +95,13 @@ class MetadataLine:
         return title, author, files, resource_type, has_sound
     
     @staticmethod
-    def get_metadata_stickers(pack_id, region):
+    def get_metadata_stickers(pack_id: str, region: str) -> Optional[tuple[str, str, list, str, bool]]:
         pack_meta_r = requests.get(f"https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/android/productInfo.meta")
 
         if pack_meta_r.status_code == 200:
             pack_meta = json.loads(pack_meta_r.text)
         else:
-            return False
+            return None
 
         if region == '':
             if 'en' in pack_meta['title']:
@@ -130,9 +141,9 @@ class DownloadLine(DownloadBase):
         self.cookies = self.load_cookies()
         self.sticker_text_dict = {}
 
-    def load_cookies(self):
+    def load_cookies(self) -> dict[str, str]:
         cookies = {}
-        if self.opt_cred.get('line', {}).get('cookies'):
+        if self.opt_cred and self.opt_cred.get('line', {}).get('cookies'):
             try:
                 for i in self.opt_cred['line']['cookies'].split(';'):
                     c_key, c_value = i.split('=')
@@ -145,7 +156,7 @@ class DownloadLine(DownloadBase):
         
         return cookies
 
-    def get_pack_url(self):
+    def get_pack_url(self) -> str:
         # Reference: https://sora.vercel.app/line-sticker-download
         if self.is_emoji:
             if self.resource_type == 'ANIMATION':
@@ -164,7 +175,7 @@ class DownloadLine(DownloadBase):
         
         return pack_url
     
-    def decompress_emoticon(self, zip_file):
+    def decompress_emoticon(self, zip_file: bytes):
         num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
             self.cb_msg(f'Unzipping...')
@@ -187,7 +198,7 @@ class DownloadLine(DownloadBase):
 
                 num += 1
 
-    def decompress_stickers(self, zip_file):
+    def decompress_stickers(self, zip_file: bytes):
         num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
             self.cb_msg(f'Unzipping...')
@@ -250,9 +261,9 @@ class DownloadLine(DownloadBase):
         with open(line_sticker_text_path , "r", encoding='utf-8') as f:
             self.sticker_text_dict = json.load(f)
     
-    def get_custom_sticker_text_urls(self):
+    def get_custom_sticker_text_urls(self) -> list:
         custom_sticker_text_urls = []
-        name_text_key_cache = {}
+        name_text_key_cache: dict[str, str] = {}
 
         for num, data in self.sticker_text_dict.items():
             out_path = os.path.join(self.out_dir, str(num).zfill(3))
@@ -275,7 +286,7 @@ class DownloadLine(DownloadBase):
         
         return custom_sticker_text_urls
 
-    def get_name_text_key(self, sticker_text):
+    def get_name_text_key(self, sticker_text: str) -> Optional[str]:
         params = {
             'text': sticker_text
         }
@@ -291,7 +302,7 @@ class DownloadLine(DownloadBase):
 
         if response_dict['errorMessage']:
             self.cb_msg(f"Failed to generate customized text {sticker_text} due to: {response_dict['errorMessage']}")
-            return False
+            return None
 
         name_text_key = response_dict['productPayload']['customOverlayUrl'].split('name/')[-1].split('/main.png')[0]
 
@@ -312,7 +323,7 @@ class DownloadLine(DownloadBase):
 
                 self.cb_msg(f"Combined {i.replace('-text.png', '.png')}")
         
-    def download_stickers_line(self):
+    def download_stickers_line(self) -> bool:
         url_data = MetadataLine.analyze_url(self.url)
         if url_data:
             self.pack_id, self.region, self.is_emoji = url_data
@@ -362,6 +373,6 @@ class DownloadLine(DownloadBase):
         return True
 
     @staticmethod
-    def start(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
+    def start(url: str, out_dir: str, opt_cred: Optional[dict] = None, cb_msg=print, cb_msg_block=input, cb_bar=None) -> bool:
         downloader = DownloadLine(url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)
         return downloader.download_stickers_line()

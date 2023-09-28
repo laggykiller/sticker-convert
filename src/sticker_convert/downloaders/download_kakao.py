@@ -12,13 +12,14 @@ import os
 import zipfile
 import io
 from urllib.parse import urlparse
+from typing import Optional
 
-from .download_base import DownloadBase
-from ..utils.metadata_handler import MetadataHandler
+from .download_base import DownloadBase # type: ignore
+from ..utils.metadata_handler import MetadataHandler # type: ignore
 
 class DecryptKakao:
     @staticmethod
-    def generate_lfsr(key):
+    def generate_lfsr(key: str) -> list[int]:
         d = list(key*2)
         seq=[0,0,0]
 
@@ -40,7 +41,7 @@ class DecryptKakao:
         return seq
 
     @staticmethod
-    def xor_byte(b, seq):
+    def xor_byte(b: int, seq: list) -> int:
         flag1=1
         flag2=0
         result=0
@@ -69,7 +70,7 @@ class DecryptKakao:
         return (result ^ b)
 
     @staticmethod
-    def xor_data(data):
+    def xor_data(data: bytes) -> bytes:
         dat = list(data)
         s = DecryptKakao.generate_lfsr("a271730728cbe141e47fd9d677e9006d")
         for i in range(0,128):
@@ -78,29 +79,36 @@ class DecryptKakao:
 
 class MetadataKakao:
     @staticmethod
-    def get_info_from_share_link(url):
+    def get_info_from_share_link(url: str) -> tuple[Optional[str], Optional[str]]:
         headers = {
             'User-Agent': 'Android'
         }
 
         response = requests.get(url, headers=headers)
         soup = BeautifulSoup(response.text, 'html.parser')
+        
+        pack_title_tag = soup.find('title')
+        if not pack_title_tag:
+            return None, None
+        
+        pack_title = pack_title_tag.string # type: ignore[union-attr]
 
-        pack_title = soup.find('title').string
-
-        data_url = soup.find('a', id='app_scheme_link')['data-url']
-        item_code = data_url.replace('kakaotalk://store/emoticon/', '').split('?')[0]
+        data_url = soup.find('a', id='app_scheme_link').get('data-url') # type: ignore[union-attr]
+        if not data_url:
+            return None, None
+        
+        item_code = data_url.replace('kakaotalk://store/emoticon/', '').split('?')[0] # type: ignore[union-attr]
 
         return pack_title, item_code
 
     @staticmethod
-    def get_info_from_pack_title(pack_title):
+    def get_info_from_pack_title(pack_title: str) -> tuple[Optional[str], Optional[str], Optional[str]]:
         pack_meta_r = requests.get(f'https://e.kakao.com/api/v1/items/t/{pack_title}')
 
         if pack_meta_r.status_code == 200:
             pack_meta = json.loads(pack_meta_r.text)
         else:
-            return False
+            return None, None, None
 
         author = pack_meta['result']['artist']
         title_ko = pack_meta['result']['title']
@@ -109,7 +117,7 @@ class MetadataKakao:
         return author, title_ko, thumbnail_urls
 
     @staticmethod
-    def get_item_code(title_ko, auth_token):
+    def get_item_code(title_ko: str, auth_token: str) -> Optional[str]:
         headers = {
             'Authorization': auth_token,
         }
@@ -121,7 +129,7 @@ class MetadataKakao:
         response = requests.post('https://talk-pilsner.kakao.com/emoticon/item_store/instant_search', headers=headers, data=data)
         
         if response.status_code != 200:
-            return
+            return None
 
         response_json = json.loads(response.text)
         item_code = response_json['emoticons'][0]['item_code']
@@ -129,7 +137,7 @@ class MetadataKakao:
         return item_code
 
     @staticmethod
-    def get_title_from_id(item_code, auth_token):
+    def get_title_from_id(item_code: str, auth_token: str) -> Optional[str]:
         headers = {
             'Authorization': auth_token,
         }
@@ -137,7 +145,7 @@ class MetadataKakao:
         response = requests.post(f'https://talk-pilsner.kakao.com/emoticon/api/store/v3/items/{item_code}', headers=headers)
 
         if response.status_code != 200:
-            return
+            return None
         
         response_json = json.loads(response.text)
         title = response_json['itemUnitInfo'][0]['title']
@@ -152,37 +160,51 @@ class DownloadKakao(DownloadBase):
         self.pack_title = None
         self.author = None
 
-    def download_stickers_kakao(self):
+    def download_stickers_kakao(self) -> bool:
+        if self.opt_cred:
+            auth_token = self.opt_cred.get('kakao', {}).get('auth_token')
+
         if urlparse(self.url).netloc == 'emoticon.kakao.com':
             self.pack_title, item_code = MetadataKakao.get_info_from_share_link(self.url)
 
-            return self.download_animated(item_code)
+            if item_code:
+                return self.download_animated(item_code)
+            else:
+                self.cb_msg('Download failed: Cannot download metadata for sticker pack')
+                return False
 
         elif self.url.isnumeric() or self.url.startswith('kakaotalk://store/emoticon/'):
             item_code = self.url.replace('kakaotalk://store/emoticon/', '')
 
             self.pack_title = None
-            if self.opt_cred['kakao']['auth_token']:
-                self.pack_title = MetadataKakao.get_title_from_id(item_code, self.opt_cred['kakao']['auth_token'])
+            if auth_token:
+                self.pack_title = MetadataKakao.get_title_from_id(item_code, auth_token) # type: ignore[arg-type]
                 if not self.pack_title:
                     self.cb_msg('Warning: Cannot get pack_title with auth_token.')
                     self.cb_msg('Is auth_token invalid / expired? Try to regenerate it.')
                     self.cb_msg('Continuing without getting pack_title')
 
-            return self.download_animated(item_code)
+            return self.download_animated(item_code) # type: ignore[arg-type]
 
         elif urlparse(self.url).netloc == 'e.kakao.com':
             self.pack_title = self.url.replace('https://e.kakao.com/t/', '')
             self.author, title_ko, thumbnail_urls = MetadataKakao.get_info_from_pack_title(self.pack_title)
 
-            if self.opt_cred['kakao']['auth_token']:
-                item_code = MetadataKakao.get_item_code(title_ko, self.opt_cred['kakao']['auth_token'])
+            if not thumbnail_urls:
+                self.cb_msg('Download failed: Cannot download metadata for sticker pack')
+                return False
+
+            if auth_token:
+                item_code = MetadataKakao.get_item_code(title_ko, auth_token) # type: ignore[arg-type]
                 if item_code:
                     return self.download_animated(item_code)
                 else:
-                    self.cb_msg('Warning: Cannot get item code.')
-                    self.cb_msg('Is auth_token invalid / expired? Try to regenerate it.')
-                    self.cb_msg('Downloading static stickers instead')
+                    msg = 'Warning: Cannot get item code.\n'
+                    msg += 'Is auth_token invalid / expired? Try to regenerate it.\n'
+                    msg += 'Continue to download static stickers instead?'
+                    response = self.cb_msg_block(msg)
+                    if response == False:
+                        return False
 
             return self.download_static(thumbnail_urls)
 
@@ -190,7 +212,7 @@ class DownloadKakao(DownloadBase):
             self.cb_msg('Download failed: Unrecognized URL')
             return False
 
-    def download_static(self, thumbnail_urls):
+    def download_static(self, thumbnail_urls: str) -> bool:
         MetadataHandler.set_metadata(self.out_dir, title=self.pack_title, author=self.author)
 
         targets = []
@@ -205,7 +227,7 @@ class DownloadKakao(DownloadBase):
         
         return True
     
-    def download_animated(self, item_code):
+    def download_animated(self, item_code: str) -> bool:
         MetadataHandler.set_metadata(self.out_dir, title=self.pack_title, author=self.author)
 
         pack_url = f"http://item.kakaocdn.net/dw/{item_code}.file_pack.zip"
@@ -247,6 +269,6 @@ class DownloadKakao(DownloadBase):
         return True
 
     @staticmethod
-    def start(url, out_dir, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None):
+    def start(url: str, out_dir: str, opt_cred: Optional[dict] = None, cb_msg=print, cb_msg_block=input, cb_bar=None) -> bool:
         downloader = DownloadKakao(url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)
         return downloader.download_stickers_kakao()

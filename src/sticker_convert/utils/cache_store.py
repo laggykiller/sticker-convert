@@ -4,14 +4,15 @@ import sys
 import shutil
 from uuid import uuid4
 if sys.platform == 'linux':
-    import memory_tempfile
+    import memory_tempfile # type: ignore
     tempfile = memory_tempfile.MemoryTempfile(fallback=True)
 else:
     import tempfile
 import contextlib
+from typing import Optional
 
 @contextlib.contextmanager
-def debug_cache_dir(path):
+def debug_cache_dir(path: str):
     path_random = os.path.join(path, str(uuid4()))
     os.mkdir(path_random)
     try:
@@ -20,7 +21,8 @@ def debug_cache_dir(path):
         shutil.rmtree(path_random)
 
 class CacheStore:
-    def get_cache_store(path=None):
+    @staticmethod
+    def get_cache_store(path: Optional[str] = None):
         if path:
             return debug_cache_dir(path)
         else:

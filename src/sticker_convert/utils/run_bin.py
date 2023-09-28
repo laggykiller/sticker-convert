@@ -3,10 +3,12 @@ import subprocess
 import os
 import shutil
 import sys
+from typing import Union, AnyStr
+from posixpath import abspath
 
 class RunBin:
     @staticmethod
-    def get_bin(bin, silent=False, cb_msg=print):
+    def get_bin(bin: str, silent: bool = False, cb_msg=print) -> Union[str, AnyStr, None]:
         if os.path.isfile(bin):
             return bin
 
@@ -15,13 +17,15 @@ class RunBin:
 
         which_result = shutil.which(bin)
         if which_result != None:
-            return os.path.abspath(which_result)
+            return os.path.abspath(which_result) # type: ignore[type-var]
         elif silent == False:
             cb_msg(f'Warning: Cannot find binary file {bin}')
+            
+        return None
     
     @staticmethod
-    def run_cmd(cmd_list, silence=False, cb_msg=print):
-        cmd_list[0] = RunBin.get_bin(cmd_list[0])
+    def run_cmd(cmd_list: list[str], silence: bool = False, cb_msg=print) -> Union[bool, str]:
+        cmd_list[0] = RunBin.get_bin(cmd_list[0]) # type: ignore[assignment]
 
         # sp = subprocess.Popen(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         sp = subprocess.run(cmd_list, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)

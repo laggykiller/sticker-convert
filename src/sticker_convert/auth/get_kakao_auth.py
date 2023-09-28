@@ -4,9 +4,10 @@ import secrets
 import uuid
 import json
 from urllib.parse import urlparse, parse_qs
+from typing import Optional
 
 class GetKakaoAuth:
-    def __init__(self, opt_cred, cb_msg=print, cb_msg_block=input, cb_ask_str=input):
+    def __init__(self, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_ask_str=input):
         self.username = opt_cred['kakao']['username']
         self.password = opt_cred['kakao']['password']
         self.country_code = opt_cred['kakao']['country_code']
@@ -36,7 +37,7 @@ class GetKakaoAuth:
             'Connection': 'close',
         }
 
-    def login(self):
+    def login(self) -> bool:
         self.cb_msg('Logging in')
 
         json_data = {
@@ -57,7 +58,7 @@ class GetKakaoAuth:
 
         return True
 
-    def get_country_iso(self):
+    def get_country_iso(self) -> bool:
         self.country_iso = None
         for country_dict in self.country_dicts:
             if country_dict['code'] == self.country_code:
@@ -69,7 +70,7 @@ class GetKakaoAuth:
 
         return True
 
-    def enter_phone(self):
+    def enter_phone(self) -> bool:
         self.cb_msg('Submitting phone number')
 
         json_data = {
@@ -101,7 +102,7 @@ class GetKakaoAuth:
             self.cb_msg_block(f'Unknown verification method: {response.text}')
             return False
     
-    def verify_send_sms(self, dest_number, msg):
+    def verify_send_sms(self, dest_number: str, msg: str) -> bool:
         self.cb_msg('Verification by sending SMS')
 
         response = requests.post('https://katalk.kakao.com/android/account2/mo-sent', headers=self.headers)
@@ -135,7 +136,7 @@ class GetKakaoAuth:
 
         return True
 
-    def verify_receive_sms(self):
+    def verify_receive_sms(self) -> bool:
         self.cb_msg('Verification by receiving SMS')
 
         passcode = self.cb_ask_str('Enter passcode received from SMS:')
@@ -156,7 +157,7 @@ class GetKakaoAuth:
 
         return True
 
-    def confirm_device_change(self):
+    def confirm_device_change(self) -> bool:
         self.cb_msg('Confirm device change')
 
         confirm_url_parsed = urlparse(self.confirm_url)
@@ -195,7 +196,7 @@ class GetKakaoAuth:
         
         return True
 
-    def passcode_callback(self):
+    def passcode_callback(self) -> bool:
         self.cb_msg('Passcode callback')
 
         response = requests.get('https://katalk.kakao.com/android/account2/passcode/callback', headers=self.headers)
@@ -214,7 +215,7 @@ class GetKakaoAuth:
 
         return True
 
-    def get_profile(self):
+    def get_profile(self) -> bool:
         self.cb_msg('Get profile')
         
         json_data = {
@@ -235,7 +236,7 @@ class GetKakaoAuth:
 
         return True
     
-    def get_cred(self):
+    def get_cred(self) -> Optional[str]:
         self.cb_msg('Get authorization token')
 
         authorization_token = None

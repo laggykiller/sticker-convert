@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
+from typing import Optional
 
 class UploadBase:
-    def __init__(self, opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None):
+    def __init__(self, opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir: Optional[str] = None):
         self.opt_output = opt_output
         self.opt_comp = opt_comp
         self.opt_cred = opt_cred

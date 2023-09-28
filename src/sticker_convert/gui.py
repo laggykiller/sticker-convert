@@ -9,25 +9,26 @@ from queue import Queue
 from functools import partial
 from uuid import uuid4
 from urllib.parse import urlparse
+from typing import Optional, Union, Any
 
 from PIL import ImageFont
-from ttkbootstrap import Window, Frame, Scrollbar, Canvas, PhotoImage, StringVar, BooleanVar, IntVar
-from ttkbootstrap.dialogs import Messagebox, Querybox
+from ttkbootstrap import Window, Frame, Scrollbar, Canvas, PhotoImage, StringVar, BooleanVar, IntVar # type: ignore
+from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 
-from .flow import Flow
-from .utils.json_manager import JsonManager
-from .utils.curr_dir import CurrDir
-from .utils.metadata_handler import MetadataHandler
-from .utils.url_detect import UrlDetect
-from .__init__ import __version__
+from .flow import Flow # type: ignore
+from .utils.json_manager import JsonManager # type: ignore
+from .utils.curr_dir import CurrDir # type: ignore
+from .utils.metadata_handler import MetadataHandler # type: ignore
+from .utils.url_detect import UrlDetect # type: ignore
+from .__init__ import __version__ # type: ignore
 
-from .gui_frames.input_frame import InputFrame
-from .gui_frames.comp_frame import CompFrame
-from .gui_frames.cred_frame import CredFrame
-from .gui_frames.output_frame import OutputFrame
-from .gui_frames.config_frame import ConfigFrame
-from .gui_frames.progress_frame import ProgressFrame
-from .gui_frames.control_frame import ControlFrame
+from .gui_frames.input_frame import InputFrame # type: ignore
+from .gui_frames.comp_frame import CompFrame # type: ignore
+from .gui_frames.cred_frame import CredFrame # type: ignore
+from .gui_frames.output_frame import OutputFrame # type: ignore
+from .gui_frames.config_frame import ConfigFrame # type: ignore
+from .gui_frames.progress_frame import ProgressFrame # type: ignore
+from .gui_frames.control_frame import ControlFrame # type: ignore
 
 class GUI:
     def __init__(self):
@@ -389,10 +390,10 @@ class GUI:
     def start(self):
         Thread(target=self.start_process, daemon=True).start()
     
-    def get_input_name(self):
+    def get_input_name(self) -> str:
         return [k for k, v in self.input_presets.items() if v['full_name'] == self.input_option_true_var.get()][0]
 
-    def get_output_name(self):
+    def get_output_name(self) -> str:
         return [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_true_var.get()][0]
 
     def start_process(self):
@@ -491,6 +492,8 @@ class GUI:
         
         success = self.flow.start()
 
+        self.flow = None
+
         if not success:
             self.cb_msg(msg='An error occured during this run.')
 
@@ -501,7 +504,7 @@ class GUI:
         self.set_inputs('normal')
         self.control_frame.start_btn.config(state='normal')
 
-    def set_inputs(self, state):
+    def set_inputs(self, state: str):
         # state: 'normal', 'disabled'
 
         self.input_frame.set_states(state=state)
@@ -527,7 +530,7 @@ class GUI:
 
         self.root.after(500, self.poll_actions)
     
-    def get_response_from_id(self, response_id):
+    def get_response_from_id(self, response_id: str) -> Any:
         # If executed from main thread, need to poll_actions() manually as it got blocked
         if current_thread() is main_thread():
             self.poll_actions()
@@ -541,16 +544,16 @@ class GUI:
 
         return response
 
-    def exec_in_main(self, action):
+    def exec_in_main(self, action) -> Any:
         response_id = str(uuid4())
         self.action_queue.put([response_id, action])
         response = self.get_response_from_id(response_id)
         return response
     
-    def cb_ask_str(self, question, initialvalue: str=None, cli_show_initialvalue: bool=True, parent=None):
+    def cb_ask_str(self, question: str, initialvalue: Optional[str] = None, cli_show_initialvalue: bool = True, parent: Optional[object] = None) -> str:
         return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent))
 
-    def cb_ask_bool(self, question, parent=None):
+    def cb_ask_bool(self, question, parent=None) -> bool:
         response = self.exec_in_main(partial(Messagebox.yesno, question, title='sticker-convert', parent=parent))
 
         if response == 'Yes':
@@ -561,7 +564,7 @@ class GUI:
         with self.msg_lock:
             self.progress_frame.update_message_box(*args, **kwargs)
     
-    def cb_msg_block(self, message=None, parent=None, *args, **kwargs):
+    def cb_msg_block(self, message: Optional[str] = None, parent: Optional[object] = None, *args, **kwargs):
         if message == None and len(args) > 0:
             message = ' '.join(str(i) for i in args)
         self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
@@ -570,7 +573,7 @@ class GUI:
         with self.bar_lock:
             self.progress_frame.update_progress_bar(*args, **kwargs)
         
-    def highlight_fields(self):
+    def highlight_fields(self) -> bool:
         if not self.init_done:
             return True
         

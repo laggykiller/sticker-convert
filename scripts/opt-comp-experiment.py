@@ -70,10 +70,10 @@ formats = [
 ]
 
 class FakeCbMsg:
-    def put(self, msg):
+    def put(self, msg: str):
         pass
 
-def generate_random_apng(res, fps, duration, out_f):
+def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
     apngasm = APNGAsm()
     for i in range(int(duration/1000*fps)):
         im = numpy.random.rand(res, res, 4) * 255
@@ -83,12 +83,12 @@ def generate_random_apng(res, fps, duration, out_f):
         apngasm.add_frame(frame)
     apngasm.assemble(out_f)
 
-def generate_random_png(res, out_f):
+def generate_random_png(res: int, out_f: str):
     im_numpy = numpy.random.rand(res, res, 4) * 255
     im = Image.fromarray(im_numpy, 'RGBA')
     im.save(out_f)
 
-def compress_worker(jobs_queue, results_queue):
+def compress_worker(jobs_queue: Queue, results_queue: Queue):
     for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None):
         sticker = StickerConvert(in_f=in_f, out_f=out_f, opt_comp=opt_comp, cb_msg_queue=FakeCbMsg())
         success, in_f, out_f, size = sticker.convert()
@@ -97,7 +97,7 @@ def compress_worker(jobs_queue, results_queue):
     
     jobs_queue.put(None)
 
-def write_result(csv_path, results_queue, items):
+def write_result(csv_path: str, results_queue: Queue, items: int):
     with open(csv_path, 'w+', newline='') as f, tqdm(total=items) as progress:
         fieldnames = ['size', 'fps', 'res', 'quality', 'color']
         writer = csv.DictWriter(f, fieldnames=fieldnames)

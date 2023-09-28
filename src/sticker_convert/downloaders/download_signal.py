@@ -1,24 +1,27 @@
 #!/usr/bin/env python3
 import os
-import anyio
-from signalstickers_client import StickersClient
+from typing import Optional
 
-from .download_base import DownloadBase
-from ..utils.metadata_handler import MetadataHandler
-from ..utils.codec_info import CodecInfo
+import anyio
+from signalstickers_client import StickersClient # type: ignore
+from signalstickers_client.models import StickerPack # type: ignore
+
+from .download_base import DownloadBase # type: ignore
+from ..utils.metadata_handler import MetadataHandler # type: ignore
+from ..utils.codec_info import CodecInfo # type: ignore
 
 class DownloadSignal(DownloadBase):
     def __init__(self, *args, **kwargs):
         super(DownloadSignal, self).__init__(*args, **kwargs)
         
     @staticmethod
-    async def get_pack(pack_id, pack_key):
+    async def get_pack(pack_id: str, pack_key: str) -> StickerPack:
         async with StickersClient() as client:
             pack = await client.get_pack(pack_id, pack_key)
         
         return pack
 
-    def save_stickers(self, pack):
+    def save_stickers(self, pack: StickerPack):
         if self.cb_bar:
             self.cb_bar(set_progress_mode='determinate', steps=len(pack.stickers))
 
@@ -51,7 +54,7 @@ class DownloadSignal(DownloadBase):
         
         MetadataHandler.set_metadata(self.out_dir, title=pack.title, author=pack.author, emoji_dict=emoji_dict)
 
-    def download_stickers_signal(self):
+    def download_stickers_signal(self) -> bool:
         if 'signal.art' not in self.url:
             self.cb_msg('Download failed: Unrecognized URL format')
             return False
@@ -65,6 +68,6 @@ class DownloadSignal(DownloadBase):
         return True
     
     @staticmethod
-    def start(url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
+    def start(url: str, out_dir: str, opt_cred: Optional[dict] = None, cb_msg=print, cb_msg_block=input, cb_bar=None) -> bool:
         downloader = DownloadSignal(url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)
         return downloader.download_stickers_signal()

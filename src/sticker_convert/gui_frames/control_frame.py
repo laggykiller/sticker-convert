@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-from ttkbootstrap import Frame, Button
+from typing import TYPE_CHECKING
+
+from ttkbootstrap import Frame, Button # type: ignore
+
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
 
 class ControlFrame:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
         self.frame = Frame(self.gui.scrollable_frame, borderwidth=1)
 

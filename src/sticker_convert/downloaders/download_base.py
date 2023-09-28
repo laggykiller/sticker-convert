@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+from typing import Optional, Union
+
 import requests
 
 class DownloadBase:
-    def __init__(self, url, out_dir, opt_cred=None, cb_msg=print, cb_msg_block=input, cb_bar=None):
+    def __init__(self, url: str, out_dir: str, opt_cred: Optional[dict] = None, cb_msg=print, cb_msg_block=input, cb_bar=None):
         self.url = url
         self.out_dir = out_dir
         self.opt_cred = opt_cred
@@ -10,7 +12,7 @@ class DownloadBase:
         self.cb_msg_block = cb_msg_block
         self.cb_bar = cb_bar
     
-    def download_multiple_files(self, targets, retries=3, **kwargs):
+    def download_multiple_files(self, targets: list[tuple[str, str]], retries: int = 3, **kwargs):
         # targets format: [(url1, dest2), (url2, dest2), ...]
         if self.cb_bar:
             self.cb_bar(set_progress_mode='determinate', steps=len(targets))
@@ -21,14 +23,14 @@ class DownloadBase:
             if self.cb_bar:
                 self.cb_bar(update_bar=True)
 
-    def download_file(self, url, dest=None, retries=3, show_progress=True, **kwargs):
+    def download_file(self, url: str, dest: Optional[str] = None, retries: int = 3, show_progress: bool = True, **kwargs) -> Union[bool, bytes]:
         result = b''
         chunk_size = 102400
 
         for retry in range(retries):
             try:
                 response = requests.get(url, stream=True, **kwargs)
-                total_length = int(response.headers.get('content-length'))
+                total_length = int(response.headers.get('content-length')) # type: ignore[arg-type]
 
                 if response.status_code != 200:
                     return False

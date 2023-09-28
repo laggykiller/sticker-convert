@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 import os
+from typing import TYPE_CHECKING
 
 from tkinter import filedialog
-from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label
+from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label # type: ignore
 
-from ..utils.curr_dir import CurrDir
-from .right_clicker import RightClicker
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from ..utils.curr_dir import CurrDir # type: ignore
+from .right_clicker import RightClicker # type: ignore
 
 class OutputFrame:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Output')
 
@@ -55,7 +58,7 @@ class OutputFrame:
         self.gui.comp_frame.cb_comp_apply_preset()
         self.gui.highlight_fields()
     
-    def set_states(self, state):
+    def set_states(self, state: str):
         self.title_entry.config(state=state)
         self.author_entry.config(state=state)
         self.output_option_opt.config(state=state)

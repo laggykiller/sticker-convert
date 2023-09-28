@@ -3,13 +3,16 @@ import sys
 from functools import partial
 import webbrowser
 from threading import Thread
+from typing import TYPE_CHECKING
 
-from ttkbootstrap import Toplevel, Frame, Button, Label, Scrollbar, Canvas, PhotoImage
+from ttkbootstrap import Toplevel, Frame, Button, Label, Scrollbar, Canvas, PhotoImage # type: ignore
 
-from ..utils.get_line_auth import GetLineAuth
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from ..auth.get_line_auth import GetLineAuth # type: ignore
 
 class LineGetAuthWindow:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
 
         self.get_line_auth_win = Toplevel(self.gui.root)

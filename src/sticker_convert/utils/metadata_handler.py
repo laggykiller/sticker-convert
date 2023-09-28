@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 import os
 import json
+from typing import Optional
 
-from .codec_info import CodecInfo
-from .json_manager import JsonManager
+from .codec_info import CodecInfo # type: ignore
+from .json_manager import JsonManager # type: ignore
 
 class MetadataHandler:
     @staticmethod
-    def get_stickers_present(dir):
-        from ..uploaders.xcode_imessage import XcodeImessageIconset
+    def get_stickers_present(dir: str) -> list[str]:
+        from ..uploaders.xcode_imessage import XcodeImessageIconset # type: ignore
         
         stickers_present = sorted(os.listdir(dir))
         if 'cover.png' in stickers_present:
@@ -25,7 +26,7 @@ class MetadataHandler:
         return stickers_present
     
     @staticmethod
-    def get_metadata(dir, title=None, author=None, emoji_dict=None):
+    def get_metadata(dir: str, title: Optional[str] = None, author: Optional[str] = None, emoji_dict: Optional[dict[str, str]] = None) -> tuple[Optional[str], Optional[str], Optional[dict[str, str]]]:
         title_path = os.path.join(dir, 'title.txt')
         if not title and os.path.isfile(title_path):
             with open(title_path, encoding='utf-8') as f:
@@ -44,16 +45,16 @@ class MetadataHandler:
         return title, author, emoji_dict
     
     @staticmethod
-    def set_metadata(dir, title=None, author=None, emoji_dict=None):
+    def set_metadata(dir: str, title: Optional[str] = None, author: Optional[str] = None, emoji_dict: Optional[dict[str, str]] = None):
         title_path = os.path.join(dir, 'title.txt')
         if title != None:
             with open(title_path, 'w+', encoding='utf-8') as f:
-                f.write(title)
+                f.write(title) # type: ignore[arg-type]
         
         author_path = os.path.join(dir, 'author.txt')
         if author != None:
             with open(author_path, 'w+', encoding='utf-8') as f:
-                f.write(author)
+                f.write(author) # type: ignore[arg-type]
         
         emoji_path = os.path.join(dir, 'emoji.txt')
         if emoji_dict != None:
@@ -61,7 +62,7 @@ class MetadataHandler:
                 json.dump(emoji_dict, f, indent=4, ensure_ascii=False)
     
     @staticmethod
-    def check_metadata_provided(input_dir, input_option, metadata):
+    def check_metadata_provided(input_dir: str, input_option: str, metadata: str) -> bool:
         # Check if metadata provided via .txt file (if from local) or will be provided by input source (if not from local)
         # Does not check if metadata provided via user input in GUI or flag options
         # metadata = 'title' or 'author'
@@ -79,13 +80,13 @@ class MetadataHandler:
         return metadata_provided
 
     @staticmethod
-    def check_metadata_required(output_option, metadata):
+    def check_metadata_required(output_option: str, metadata: str) -> bool:
         # metadata = 'title' or 'author'
         output_presets = JsonManager.load_json('resources/output.json')
         return output_presets[output_option]['metadata_requirements'][metadata]
     
     @staticmethod
-    def generate_emoji_file(dir, default_emoji=''):
+    def generate_emoji_file(dir: str, default_emoji: str = ''):
         emoji_path = os.path.join(dir, 'emoji.txt')
         emoji_dict = None
         if os.path.isfile(emoji_path):
@@ -106,7 +107,7 @@ class MetadataHandler:
             json.dump(emoji_dict_new, f, indent=4, ensure_ascii=False)
     
     @staticmethod
-    def split_sticker_packs(dir, title, file_per_pack=None, file_per_anim_pack=None, file_per_image_pack=None, separate_image_anim=True):
+    def split_sticker_packs(dir: str, title: str, file_per_pack: Optional[int] = None, file_per_anim_pack: Optional[int] = None, file_per_image_pack: Optional[int] = None, separate_image_anim: bool = True) -> dict:
         # {pack_1: [sticker1_path, sticker2_path]}
         packs = {}
 

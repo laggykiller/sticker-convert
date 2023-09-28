@@ -2,18 +2,19 @@
 import os
 import copy
 import re
-
-from .upload_base import UploadBase
-from ..utils.converter import StickerConvert
-from ..utils.metadata_handler import MetadataHandler
-from ..utils.format_verify import FormatVerify
-from ..utils.codec_info import CodecInfo
-from ..utils.cache_store import CacheStore
+from typing import Optional
 
 import anyio
 from telegram import Bot
 from telegram.error import TelegramError
-from mergedeep import merge
+from mergedeep import merge # type: ignore
+
+from .upload_base import UploadBase # type: ignore
+from ..utils.converter import StickerConvert # type: ignore
+from ..utils.metadata_handler import MetadataHandler # type: ignore
+from ..utils.format_verify import FormatVerify # type: ignore
+from ..utils.codec_info import CodecInfo # type: ignore
+from ..utils.cache_store import CacheStore # type: ignore
 
 class UploadTelegram(UploadBase):
     def __init__(self, *args, **kwargs):
@@ -62,7 +63,7 @@ class UploadTelegram(UploadBase):
 
         self.opt_comp_merged = merge({}, self.opt_comp, base_spec)
     
-    async def upload_pack(self, pack_title, stickers, emoji_dict):        
+    async def upload_pack(self, pack_title: str, stickers: list[str], emoji_dict: dict) -> str:
         bot = Bot(self.opt_cred['telegram']['token'])
 
         async with bot:
@@ -129,7 +130,7 @@ class UploadTelegram(UploadBase):
         result = f'https://t.me/addstickers/{pack_short_name}'
         return result
 
-    def upload_stickers_telegram(self):
+    def upload_stickers_telegram(self) -> list[str]:
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(self.in_dir, title=self.opt_output.get('title'), author=self.opt_output.get('author'))
         if title == None:
@@ -154,6 +155,6 @@ class UploadTelegram(UploadBase):
         return urls
     
     @staticmethod
-    def start(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
+    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
         exporter = UploadTelegram(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
         return exporter.upload_stickers_telegram()

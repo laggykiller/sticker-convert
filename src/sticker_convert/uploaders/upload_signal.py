@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 import os
 import copy
-
-from .upload_base import UploadBase
-from ..utils.metadata_handler import MetadataHandler
-from ..utils.converter import StickerConvert
-from ..utils.format_verify import FormatVerify
-from ..utils.codec_info import CodecInfo
-from ..utils.cache_store import CacheStore
+from typing import Optional
 
 import anyio
-from signalstickers_client import StickersClient
-from signalstickers_client.models import LocalStickerPack, Sticker
-from mergedeep import merge
+from signalstickers_client import StickersClient # type: ignore
+from signalstickers_client.models import LocalStickerPack, Sticker # type: ignore
+from mergedeep import merge # type: ignore
+
+from .upload_base import UploadBase # type: ignore
+from ..utils.metadata_handler import MetadataHandler # type: ignore
+from ..utils.converter import StickerConvert # type: ignore
+from ..utils.format_verify import FormatVerify # type: ignore
+from ..utils.codec_info import CodecInfo # type: ignore
+from ..utils.cache_store import CacheStore # type: ignore
 
 class UploadSignal(UploadBase):
     def __init__(self, *args, **kwargs):
@@ -52,14 +53,14 @@ class UploadSignal(UploadBase):
         self.opt_comp_merged = merge({}, self.opt_comp, base_spec)
     
     @staticmethod
-    async def upload_pack(pack, uuid, password):
+    async def upload_pack(pack: LocalStickerPack, uuid: str, password: str):
         async with StickersClient(uuid, password) as client:
             pack_id, pack_key = await client.upload_pack(pack)
 
         result = f"https://signal.art/addstickers/#pack_id={pack_id}&pack_key={pack_key}"
         return result
     
-    def add_stickers_to_pack(self, pack, stickers, emoji_dict):
+    def add_stickers_to_pack(self, pack: LocalStickerPack, stickers: list[str], emoji_dict: dict):
         with CacheStore.get_cache_store(path=self.opt_comp.get('cache_dir')) as tempdir:
             for src in stickers:
                 self.cb_msg(f'Verifying {src} for uploading to signal')
@@ -96,7 +97,7 @@ class UploadSignal(UploadBase):
 
                 pack._addsticker(sticker)
 
-    def upload_stickers_signal(self):
+    def upload_stickers_signal(self) -> list[str]:
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(self.in_dir, title=self.opt_output.get('title'), author=self.opt_output.get('author'))
         if title == None:
@@ -129,6 +130,6 @@ class UploadSignal(UploadBase):
         return urls
 
     @staticmethod
-    def start(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
+    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
         exporter = UploadSignal(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
         return exporter.upload_stickers_signal()

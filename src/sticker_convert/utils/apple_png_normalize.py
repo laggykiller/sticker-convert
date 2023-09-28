@@ -8,7 +8,7 @@ import zlib
 
 class ApplePngNormalize:
     @staticmethod
-    def normalize(oldPNG):
+    def normalize(oldPNG: bytes) -> bytes:
         pngheader = b"\x89PNG\r\n\x1a\n"
 
         if oldPNG[:8] != pngheader:
@@ -28,10 +28,10 @@ class ApplePngNormalize:
             chunkLength = oldPNG[chunkPos:chunkPos+4]
             chunkLength = struct.unpack(">L", chunkLength)[0]
             chunkType = oldPNG[chunkPos+4 : chunkPos+8]
-            chunkData = oldPNG[chunkPos+8:chunkPos+8+chunkLength]
-            chunkCRC = oldPNG[chunkPos+chunkLength+8:chunkPos+chunkLength+12]
+            chunkData = oldPNG[chunkPos+8:chunkPos+8+chunkLength] # type: ignore[operator]
+            chunkCRC = oldPNG[chunkPos+chunkLength+8:chunkPos+chunkLength+12] # type: ignore[operator]
             chunkCRC = struct.unpack(">L", chunkCRC)[0]
-            chunkPos += chunkLength + 12
+            chunkPos += chunkLength + 12 # type: ignore[operator]
 
             # Parsing the header chunk
             if chunkType == b"IHDR":
@@ -63,17 +63,17 @@ class ApplePngNormalize:
                 # Compressing the image chunk
                 #chunkData = newdata
                 chunkData = zlib.compress( chunkData )
-                chunkLength = len( chunkData )
-                chunkCRC = zlib.crc32(b'IDAT')
-                chunkCRC = zlib.crc32(chunkData, chunkCRC)
-                chunkCRC = (chunkCRC + 0x100000000) % 0x100000000
+                chunkLength = len( chunkData ) # type: ignore[assignment]
+                chunkCRC = zlib.crc32(b'IDAT') # type: ignore[assignment]
+                chunkCRC = zlib.crc32(chunkData, chunkCRC) # type: ignore[assignment, arg-type]
+                chunkCRC = (chunkCRC + 0x100000000) % 0x100000000 # type: ignore[operator]
 
                 newPNG += struct.pack(">L", chunkLength)
                 newPNG += b'IDAT'
                 newPNG += chunkData
                 newPNG += struct.pack(">L", chunkCRC)
 
-                chunkCRC = zlib.crc32(chunkType)
+                chunkCRC = zlib.crc32(chunkType) # type: ignore[assignment]
                 newPNG += struct.pack(">L", 0)
                 newPNG += b'IEND'
                 newPNG += struct.pack(">L", chunkCRC)
@@ -85,7 +85,7 @@ class ApplePngNormalize:
             else:
                 newPNG += struct.pack(">L", chunkLength)
                 newPNG += chunkType
-                if chunkLength > 0:
+                if chunkLength > 0: # type: ignore[operator]
                     newPNG += chunkData
                 newPNG += struct.pack(">L", chunkCRC)
 

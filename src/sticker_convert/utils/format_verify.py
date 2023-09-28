@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import os
-from .codec_info import CodecInfo
-from lottie.exporters.tgs_validator import TgsValidator, Severity
+from lottie.exporters.tgs_validator import TgsValidator, Severity # type: ignore
 import unicodedata
 import re
+from typing import Optional, Union
+
+from .codec_info import CodecInfo # type: ignore
 
 '''
 Example of spec
@@ -38,7 +40,7 @@ spec = {
 
 class FormatVerify:
     @staticmethod
-    def check_file(file, spec):
+    def check_file(file: str, spec: dict) -> bool:
         if CodecInfo.get_file_ext(file) == '.tgs':
             validator = TgsValidator(Severity.Error)
             validator.check_file(file)
@@ -55,16 +57,16 @@ class FormatVerify:
                 )
 
     @staticmethod
-    def check_presence(file):
+    def check_presence(file: str) -> bool:
         return os.path.isfile(file)
 
     @staticmethod
-    def check_file_res(file, res=None, square=None):
+    def check_file_res(file: str, res: Optional[dict[dict, int]] = None, square: Optional[bool] = None) -> bool:
         file_width, file_height = CodecInfo.get_file_res(file)
 
-        if res and (res.get('w', {}).get('min') and res.get('w', {}).get('max')) and (file_width < res['w']['min'] or file_width > res['w']['max']):
+        if res and (res.get('w', {}).get('min') and res.get('w', {}).get('max')) and (file_width < res['w']['min'] or file_width > res['w']['max']): # type: ignore[call-overload,index]
             return False
-        if res and (res.get('h', {}).get('min') and res.get('h', {}).get('max')) and (file_height < res['h']['min'] or file_height > res['h']['max']):
+        if res and (res.get('h', {}).get('min') and res.get('h', {}).get('max')) and (file_height < res['h']['min'] or file_height > res['h']['max']): # type: ignore[call-overload,index]
             return False
         if square != None and file_height != file_width:
             return False
@@ -72,7 +74,7 @@ class FormatVerify:
         return True
 
     @staticmethod
-    def check_file_fps(file, fps):
+    def check_file_fps(file: str, fps: Optional[dict[str, float]]) -> bool:
         file_fps = CodecInfo.get_file_fps(file)
 
         if fps and fps.get('min') != None and file_fps < fps['min']:
@@ -83,7 +85,7 @@ class FormatVerify:
         return True
         
     @staticmethod
-    def check_file_size(file, size=None):
+    def check_file_size(file: str, size: Optional[dict[str, int]] = None) -> bool:
         file_size = os.path.getsize(file)
         file_animated = CodecInfo.is_anim(file)
 
@@ -95,14 +97,14 @@ class FormatVerify:
         return True
     
     @staticmethod
-    def check_animated(file, animated=None):
+    def check_animated(file: str, animated: Optional[bool] = None) -> bool:
         if animated != None and CodecInfo.is_anim(file) != animated:
             return False
         
         return True
     
     @staticmethod
-    def check_format(file, format=None, allow_compat_ext=True):
+    def check_format(file: str, format: Union[dict[str, str], str, tuple, list, None] = None, allow_compat_ext: bool = True):
         compat_ext = {
             '.jpg': '.jpeg',
             '.jpeg': '.jpg',
@@ -126,14 +128,14 @@ class FormatVerify:
             if allow_compat_ext:
                 for fmt in formats.copy():
                     if fmt in compat_ext:
-                        formats.append(compat_ext.get(fmt))
+                        formats.append(compat_ext.get(fmt)) # type: ignore[arg-type]
             if CodecInfo.get_file_ext(file) not in formats:
                 return False
             
         return True
     
     @staticmethod
-    def check_duration(file, duration=None):
+    def check_duration(file: str, duration: Optional[dict[str, int]] = None) -> bool:
         file_duration = CodecInfo.get_file_duration(file)
         if duration and duration.get('min') != None and file_duration < duration['min']:
             return False
@@ -143,7 +145,7 @@ class FormatVerify:
         return True
     
     @staticmethod
-    def sanitize_filename(filename):
+    def sanitize_filename(filename: str) -> str:
         # Based on https://gitlab.com/jplusplus/sanitize-filename/-/blob/master/sanitize_filename/sanitize_filename.py
         # Replace illegal character with '_'
         """Return a fairly safe version of the filename.

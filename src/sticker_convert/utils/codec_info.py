@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import os
 import mimetypes
+from typing import Optional
 
 import imageio.v3 as iio
-from rlottie_python import LottieAnimation
+from rlottie_python import LottieAnimation # type: ignore
 from PIL import Image
 import mmap
 
@@ -19,7 +20,7 @@ class CodecInfo:
         self.vid_ext = tuple(vid_ext)
 
     @staticmethod
-    def get_file_fps(file):
+    def get_file_fps(file: str) -> float:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext in '.tgs':
@@ -46,7 +47,7 @@ class CodecInfo:
         return fps
     
     @staticmethod
-    def get_file_codec(file):
+    def get_file_codec(file: str) -> Optional[str]:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == '.webp':
@@ -59,7 +60,7 @@ class CodecInfo:
         return codec
     
     @staticmethod
-    def get_file_res(file):
+    def get_file_res(file: str) -> tuple[int, int]:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == '.tgs':
@@ -76,7 +77,7 @@ class CodecInfo:
         return width, height
     
     @staticmethod
-    def get_file_frames(file):
+    def get_file_frames(file: str) -> int:
         file_ext = CodecInfo.get_file_ext(file)
 
         frames = None
@@ -93,16 +94,16 @@ class CodecInfo:
         return frames
     
     @staticmethod
-    def get_file_duration(file):
+    def get_file_duration(file: str) -> float:
         # Return duration in miliseconds
         return CodecInfo.get_file_frames(file) / CodecInfo.get_file_fps(file) * 1000
     
     @staticmethod
-    def get_file_ext(file):
+    def get_file_ext(file: str) -> str:
         return os.path.splitext(file)[-1].lower()
 
     @staticmethod
-    def is_anim(file):
+    def is_anim(file: str) -> bool:
         if CodecInfo.get_file_frames(file) > 1:
             return True
         else:

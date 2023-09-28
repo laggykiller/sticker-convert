@@ -11,12 +11,12 @@ in_dir1 = sys.argv[1]
 in_dir2 = sys.argv[2]
 out_dir = sys.argv[3]
 
-def search_wheel_in_dir(package, dir):
+def search_wheel_in_dir(package: str, dir: str):
     for i in os.listdir(dir):
         if i.startswith(package):
             return i
 
-def copy_if_universal(wheel_name, in_dir, out_dir):
+def copy_if_universal(wheel_name: str, in_dir: str, out_dir: str):
     if wheel_name.endswith('universal2.whl') or wheel_name.endswith('any.whl'):
         src_path = os.path.join(in_dir, wheel_name)
         dst_path = os.path.join(

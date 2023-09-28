@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import string
 from urllib.parse import urlparse
+from typing import Optional
 
 class UrlDetect:
     @staticmethod
-    def detect(url):
+    def detect(url: str) -> Optional[str]:
         domain = urlparse(url).netloc
 
         if domain == 'signal.art':

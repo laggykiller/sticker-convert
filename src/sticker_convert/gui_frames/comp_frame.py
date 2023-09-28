@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
-from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label, Checkbutton
+from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label, Checkbutton # type: ignore
+from typing import TYPE_CHECKING
 
-from .right_clicker import RightClicker
-from ..gui_windows.advanced_compression_window import AdvancedCompressionWindow
-from ..__init__ import __version__
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from ..gui_windows.advanced_compression_window import AdvancedCompressionWindow # type: ignore
+from .right_clicker import RightClicker # type: ignore
+from ..__init__ import __version__ # type: ignore
 
 class CompFrame:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Compression options')
         self.frame.grid_columnconfigure(2, weight = 1)
@@ -102,12 +105,12 @@ class CompFrame:
         self.steps_entry.config(state=state)
         self.processes_entry.config(state=state)
     
-    def set_inputs_comp(self, state):
+    def set_inputs_comp(self, state: str):
         self.comp_preset_opt.config(state=state)
         self.comp_advanced_btn.config(state=state)
         self.steps_entry.config(state=state)
         self.processes_entry.config(state=state)
             
-    def set_states(self, state):
+    def set_states(self, state: str):
         self.no_compress_cbox.config(state=state)
         self.set_inputs_comp(state=state)

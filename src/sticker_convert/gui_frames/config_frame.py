@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 import os
 import platform
+from typing import TYPE_CHECKING
 
-from ttkbootstrap import LabelFrame, Button, Label, Checkbutton
+from ttkbootstrap import LabelFrame, Button, Label, Checkbutton # type: ignore
 
-from ..utils.curr_dir import CurrDir
-from ..utils.run_bin import RunBin
-from ..__init__ import __version__
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from ..utils.curr_dir import CurrDir # type: ignore
+from ..utils.run_bin import RunBin # type: ignore
+from ..__init__ import __version__ # type: ignore
 
 class ConfigFrame:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Config')
 

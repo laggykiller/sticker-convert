@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-from ttkbootstrap import LabelFrame, Progressbar
-from ttkbootstrap.scrolled import ScrolledText
+from typing import TYPE_CHECKING
+
+from ttkbootstrap import LabelFrame, Progressbar # type: ignore
+from ttkbootstrap.scrolled import ScrolledText # type: ignore
 from tqdm import tqdm
 
-from .right_clicker import RightClicker
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from .right_clicker import RightClicker # type: ignore
 
 class ProgressFrame:
     progress_bar_cli = None
     progress_bar_steps = 0
     auto_scroll = True
 
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Progress')
 
@@ -25,8 +29,8 @@ class ProgressFrame:
         self.message_box.pack(expand=True, fill='x')
         self.progress_bar.pack(expand=True, fill='x')
     
-    def update_progress_bar(self, set_progress_mode='', steps=0, update_bar=False):
-        if update_bar:
+    def update_progress_bar(self, set_progress_mode: str = '', steps: int = 0, update_bar: bool = False):
+        if update_bar and self.progress_bar_cli:
             self.progress_bar_cli.update()
             self.progress_bar['value'] += 100 / self.progress_bar_steps
         elif set_progress_mode == 'determinate':

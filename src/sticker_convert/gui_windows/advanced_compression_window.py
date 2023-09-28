@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 import sys
 from functools import partial
+from typing import TYPE_CHECKING
 
 from PIL import Image, ImageTk, ImageDraw
-from ttkbootstrap import Toplevel, LabelFrame, Frame, OptionMenu, Button, Entry, Label, Checkbutton, Scrollbar, Canvas, PhotoImage, StringVar
+from ttkbootstrap import Toplevel, LabelFrame, Frame, OptionMenu, Button, Entry, Label, Checkbutton, Scrollbar, Canvas, PhotoImage, StringVar # type: ignore
+from tkinter import Event
 
-from ..gui_frames.right_clicker import RightClicker
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
+from ..gui_frames.right_clicker import RightClicker # type: ignore
 
 class AdvancedCompressionWindow:
     emoji_column_per_row = 10
     emoji_visible_rows = 5
-    emoji_btns = []
+    emoji_btns: list[tuple[Button, ImageTk.PhotoImage]] = []
 
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
         self.categories = list({entry['category'] for entry in self.gui.emoji_list})
 
@@ -463,17 +467,17 @@ class AdvancedCompressionWindow:
         self.emoji_canvas.bind('<Enter>', self.cb_bound_to_mousewheel)
         self.emoji_canvas.bind('<Leave>', self.cb_unbound_to_mousewheel)
     
-    def cb_bound_to_mousewheel(self, event):
+    def cb_bound_to_mousewheel(self, event: Event):
         for i in self.mousewheel:
             self.emoji_canvas.bind_all(i, self.cb_on_mousewheel)
     
-    def cb_unbound_to_mousewheel(self, event):
+    def cb_unbound_to_mousewheel(self, event: Event):
         for i in self.mousewheel:
             self.emoji_canvas.unbind_all(i)
     
-    def cb_on_mousewheel(self, event):
+    def cb_on_mousewheel(self, event: Event):
         self.emoji_canvas.yview_scroll(int(-1*(event.delta/self.delta_divide)), "units")
 
-    def cb_set_emoji(self, emoji):
+    def cb_set_emoji(self, emoji: str):
         self.gui.default_emoji_var.set(emoji)
         self.set_emoji_btn()

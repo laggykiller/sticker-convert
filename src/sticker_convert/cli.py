@@ -3,17 +3,18 @@ import os
 import math
 from multiprocessing import cpu_count
 import argparse
+from typing import Optional
 
 from tqdm import tqdm
 
-from .flow import Flow
-from .utils.json_manager import JsonManager
-from .utils.get_kakao_auth import GetKakaoAuth
-from .utils.get_signal_auth import GetSignalAuth
-from .utils.get_line_auth import GetLineAuth
-from .utils.curr_dir import CurrDir
-from .utils.url_detect import UrlDetect
-from .__init__ import __version__
+from .flow import Flow # type: ignore
+from .utils.json_manager import JsonManager # type: ignore
+from .auth.get_kakao_auth import GetKakaoAuth # type: ignore
+from .auth.get_signal_auth import GetSignalAuth # type: ignore
+from .auth.get_line_auth import GetLineAuth # type: ignore
+from .utils.curr_dir import CurrDir # type: ignore
+from .utils.url_detect import UrlDetect # type: ignore
+from .__init__ import __version__ # type: ignore
 
 class CLI:
     def __init__(self):
@@ -296,7 +297,7 @@ class CLI:
             JsonManager.save_json(creds_path, self.opt_cred)
             self.cb_msg('Saved credentials to creds.json')
     
-    def cb_ask_str(self, msg: str=None, initialvalue: str=None, cli_show_initialvalue: bool=True):
+    def cb_ask_str(self, msg: Optional[str] = None, initialvalue: Optional[str] = None, cli_show_initialvalue: bool = True) -> str:
         self.cb_msg(msg)
 
         hint = ''
@@ -310,7 +311,7 @@ class CLI:
         
         return response
 
-    def cb_ask_bool(self, question, parent=None):
+    def cb_ask_bool(self, question: str, parent=None) -> bool:
         self.cb_msg(question)
 
         if self.no_confirm:
@@ -345,7 +346,7 @@ class CLI:
         if not self.no_confirm:
             input('Press Enter to continue...')
     
-    def cb_bar(self, set_progress_mode: str=None, steps: int=None, update_bar: bool=False):
+    def cb_bar(self, set_progress_mode: Optional[str] = None, steps: Optional[int] = None, update_bar: bool = False):
         if update_bar:
             self.progress_bar.update()
         elif set_progress_mode == 'determinate':

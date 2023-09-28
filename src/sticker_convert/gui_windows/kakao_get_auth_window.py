@@ -2,14 +2,17 @@
 import sys
 from functools import partial
 from threading import Thread
+from typing import TYPE_CHECKING
 
-from ttkbootstrap import Toplevel, LabelFrame, Frame, Button, Entry, Label, Scrollbar, Canvas, PhotoImage
+from ttkbootstrap import Toplevel, LabelFrame, Frame, Button, Entry, Label, Scrollbar, Canvas, PhotoImage # type: ignore
 
-from ..utils.get_kakao_auth import GetKakaoAuth
-from ..gui_frames.right_clicker import RightClicker
+from ..auth.get_kakao_auth import GetKakaoAuth # type: ignore
+from ..gui_frames.right_clicker import RightClicker # type: ignore
+if TYPE_CHECKING:
+    from ..gui import GUI # type: ignore
 
 class KakaoGetAuthWindow:
-    def __init__(self, gui):
+    def __init__(self, gui: "GUI"):
         self.gui = gui
 
         self.get_kakao_auth_win = Toplevel(self.gui.root)

@@ -4,14 +4,15 @@ import os
 import copy
 import json
 import plistlib
+from typing import Optional
 
-from .upload_base import UploadBase
-from ..utils.converter import StickerConvert
-from ..utils.format_verify import FormatVerify
-from ..utils.metadata_handler import MetadataHandler
-from ..utils.codec_info import CodecInfo
+from mergedeep import merge # type: ignore
 
-from mergedeep import merge
+from .upload_base import UploadBase # type: ignore
+from ..utils.converter import StickerConvert # type: ignore
+from ..utils.format_verify import FormatVerify # type: ignore
+from ..utils.metadata_handler import MetadataHandler # type: ignore
+from ..utils.codec_info import CodecInfo # type: ignore
 
 class XcodeImessageIconset:
     def __init__(self):
@@ -86,7 +87,7 @@ class XcodeImessage(UploadBase):
         self.large_spec['res']['h']['min'] = 618
         self.large_spec['res']['h']['max'] = 618
     
-    def create_imessage_xcode(self):
+    def create_imessage_xcode(self) -> list[str]:
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(self.in_dir, title=self.opt_output.get('title'), author=self.opt_output.get('author'))
         packs = MetadataHandler.split_sticker_packs(self.in_dir, title=title, file_per_pack=100, separate_image_anim=False)
@@ -131,7 +132,7 @@ class XcodeImessage(UploadBase):
         
         return urls
 
-    def add_metadata(self, author, title):
+    def add_metadata(self, author: str, title: str):
         first_image_path = os.path.join(self.in_dir, [i for i in sorted(os.listdir(self.in_dir)) if os.path.isfile(os.path.join(self.in_dir, i)) and i.endswith('.png')][0])
         cover_path = os.path.join(self.in_dir, 'cover.png')
         cover_path_new = os.path.join(self.out_dir, 'cover.png')
@@ -166,7 +167,7 @@ class XcodeImessage(UploadBase):
                 
         MetadataHandler.set_metadata(self.out_dir, author=author, title=title)
 
-    def create_xcode_proj(self, author, title):
+    def create_xcode_proj(self, author: str, title: str):
         pack_path = os.path.join(self.out_dir, title)
         shutil.copytree('ios-message-stickers-template', pack_path)
 
@@ -229,7 +230,7 @@ class XcodeImessage(UploadBase):
         
         dict['stickers'] = []
         for i in stickers_lst:
-            dict['stickers'].append({'filename': i})
+            dict['stickers'].append({'filename': i}) # type: ignore[attr-defined]
         
         with open(os.path.join(stickers_path, 'Contents.json'), 'w+') as f:
             json.dump(dict, f, indent=2)
@@ -260,6 +261,6 @@ class XcodeImessage(UploadBase):
         os.rename(os.path.join(pack_path, 'stickers.xcodeproj'), os.path.join(pack_path, f'{title}.xcodeproj'))
     
     @staticmethod
-    def start(opt_output, opt_comp, opt_cred, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir=None, **kwargs):
+    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
         exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
         return exporter.create_imessage_xcode()

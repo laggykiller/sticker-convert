@@ -1,0 +1,4 @@
+types-beautifulsoup4
+types-Pillow
+types-requests
+types-tqdm

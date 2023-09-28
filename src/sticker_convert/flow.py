@@ -5,26 +5,27 @@ from datetime import datetime
 from multiprocessing import Process, Queue
 from threading import Thread
 from urllib.parse import urlparse
+from typing import Optional
 
-from .downloaders.download_line import DownloadLine
-from .downloaders.download_signal import DownloadSignal
-from .downloaders.download_telegram import DownloadTelegram
-from .downloaders.download_kakao import DownloadKakao
+from .downloaders.download_line import DownloadLine # type: ignore
+from .downloaders.download_signal import DownloadSignal # type: ignore
+from .downloaders.download_telegram import DownloadTelegram # type: ignore
+from .downloaders.download_kakao import DownloadKakao # type: ignore
 
-from .uploaders.upload_signal import UploadSignal
-from .uploaders.upload_telegram import UploadTelegram
-from .uploaders.compress_wastickers import CompressWastickers
-from .uploaders.xcode_imessage import XcodeImessage
+from .uploaders.upload_signal import UploadSignal # type: ignore
+from .uploaders.upload_telegram import UploadTelegram # type: ignore
+from .uploaders.compress_wastickers import CompressWastickers # type: ignore
+from .uploaders.xcode_imessage import XcodeImessage # type: ignore
 
-from .utils.converter import StickerConvert
-from .utils.codec_info import CodecInfo
-from .utils.json_manager import JsonManager
-from .utils.metadata_handler import MetadataHandler
+from .utils.converter import StickerConvert # type: ignore
+from .utils.codec_info import CodecInfo # type: ignore
+from .utils.json_manager import JsonManager # type: ignore
+from .utils.metadata_handler import MetadataHandler # type: ignore
 
 class Flow:
     def __init__(self,
-        opt_input, opt_comp, opt_output, opt_cred, 
-        input_presets, output_presets, cb_msg, cb_msg_block, cb_bar, cb_ask_bool):
+        opt_input: dict, opt_comp: dict, opt_output: dict, opt_cred: dict, 
+        input_presets: dict, output_presets: dict, cb_msg, cb_msg_block, cb_bar, cb_ask_bool):
 
         self.opt_input = opt_input
         self.opt_comp = opt_comp
@@ -37,13 +38,13 @@ class Flow:
         self.cb_bar = cb_bar
         self.cb_ask_bool = cb_ask_bool
 
-        self.compress_fails = []
-        self.out_urls = []
+        self.compress_fails: list[str] = []
+        self.out_urls: list[str] = []
 
-        self.jobs_queue = Queue()
-        self.results_queue = Queue()
-        self.cb_msg_queue = Queue()
-        self.processes = []
+        self.jobs_queue: Queue[Optional[tuple[str, str, dict]]] = Queue()
+        self.results_queue: Queue[Optional[tuple[bool, str, str, int]]] = Queue()
+        self.cb_msg_queue: Queue[Optional[str]] = Queue()
+        self.processes: list[Process] = []
 
         if os.path.isdir(self.opt_input['dir']) == False:
             os.makedirs(self.opt_input['dir'])
@@ -51,7 +52,7 @@ class Flow:
         if os.path.isdir(self.opt_output['dir']) == False:
             os.makedirs(self.opt_output['dir'])
 
-    def start(self):
+    def start(self) -> bool:
         self.cb_bar(set_progress_mode='indeterminate')
         self.cb_msg(cls=True)
 
@@ -72,7 +73,7 @@ class Flow:
 
         return True
     
-    def sanitize(self):
+    def sanitize(self) -> bool:
         def to_int(i):
             return i if i != None else None
 
@@ -99,7 +100,7 @@ class Flow:
 
         return True
 
-    def verify_input(self):
+    def verify_input(self) -> bool:
         info_msg = ''
         error_msg = ''
 
@@ -215,7 +216,7 @@ class Flow:
         
         return True
 
-    def cleanup(self):
+    def cleanup(self) -> bool:
         # If input is 'From local directory', then we should keep files in input/output directory as it maybe edited by user
         # If input is not 'From local directory', then we should move files in input/output directory as new files will be downloaded
         # Output directory should be cleanup unless no_compress is true (meaning files in output directory might be edited by user)
@@ -254,7 +255,7 @@ class Flow:
         
         return True
 
-    def download(self):
+    def download(self) -> bool:
         downloaders = []
 
         if self.opt_input['option'] == 'signal':
@@ -287,7 +288,7 @@ class Flow:
 
         return True
 
-    def compress(self):
+    def compress(self) -> bool:
         if self.opt_comp['no_compress'] == True:
             self.cb_msg('no_compress is set to True, skip compression')
             in_dir_files = [i for i in sorted(os.listdir(self.opt_input['dir'])) if os.path.isfile(os.path.join(self.opt_input['dir'], i))]
@@ -362,28 +363,28 @@ class Flow:
 
         return True
     
-    def processes_watcher_thread(self, results_queue):
-        for (success, in_f, out_f, size) in iter(results_queue.get, None):
-            if success == False:
-                self.compress_fails.append(in_f)
+    def processes_watcher_thread(self, results_queue: Queue):
+        for (success, in_f, out_f, size) in iter(results_queue.get, None): # type: ignore[misc]
+            if success == False: # type: ignore
+                self.compress_fails.append(in_f) # type: ignore[has-type]
 
             self.cb_bar(update_bar=True)
     
-    def cb_msg_thread(self, cb_msg_queue):
-        for msg in iter(cb_msg_queue.get, None):
+    def cb_msg_thread(self, cb_msg_queue: Queue):
+        for msg in iter(cb_msg_queue.get, None): # type: ignore
             self.cb_msg(msg)
 
     @staticmethod
-    def compress_worker(jobs_queue, results_queue, cb_msg_queue):
-        for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None):
-            sticker = StickerConvert(in_f, out_f, opt_comp, cb_msg_queue)
+    def compress_worker(jobs_queue: Queue, results_queue: Queue, cb_msg_queue: Queue):
+        for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None): # type: ignore[misc]
+            sticker = StickerConvert(in_f, out_f, opt_comp, cb_msg_queue) # type: ignore
             success, in_f, out_f, size = sticker.convert()
             del sticker
             results_queue.put((success, in_f, out_f, size))
         
         jobs_queue.put(None)
 
-    def export(self):
+    def export(self) -> bool:
         self.cb_bar(set_progress_mode='indeterminate')
 
         if self.opt_output['option'] == 'local':
@@ -420,7 +421,7 @@ class Flow:
                 
         return True
     
-    def report(self):
+    def report(self) -> bool:
         msg = '##########\n'
         msg += 'Summary:\n'
         msg += '##########\n'
