@@ -172,7 +172,7 @@ jobs:
             ${{ github.repository }}
             ghcr.io/${{ github.repository }}
           flavor: |
-            suffix=-min-cli,ontlatest=true
+            suffix=-min-cli,onlatest=true
       
       - name: Extract metadata (tags, labels) for Docker (min-gui)
         id: meta_min_gui
@@ -182,7 +182,7 @@ jobs:
             ${{ github.repository }}
             ghcr.io/${{ github.repository }}
           flavor: |
-            suffix=-min-gui,ontlatest=true
+            suffix=-min-gui,onlatest=true
       
       - name: Extract metadata (tags, labels) for Docker (full)
         id: meta_full
