@@ -24,7 +24,14 @@ class RunBin:
     
     @staticmethod
     def run_cmd(cmd_list: list[str], silence: bool = False, cb_msg=print) -> Union[bool, str]:
-        cmd_list[0] = RunBin.get_bin(cmd_list[0]) # type: ignore[assignment]
+        bin_path = RunBin.get_bin(cmd_list[0]) # type: ignore[assignment]
+
+        if bin_path:
+            cmd_list[0] = bin_path
+        else:
+            if silence == False:
+                cb_msg(f"Error while executing {' '.join(cmd_list)} : Command not found")
+            return False
 
         # sp = subprocess.Popen(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         sp = subprocess.run(cmd_list, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
