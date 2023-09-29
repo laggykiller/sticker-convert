@@ -54,6 +54,12 @@ pyvenv.cfg
 **/lib64
 .version_full
 
+# wix
+*.wxs
+*.msi
+*.wixpdb
+**/.wix
+
 **/stickers_input
 **/stickers_output
 scripts/opt-comp-result
@@ -62,3 +68,4 @@ appimage-build/**
 creds.json
 .DS_Store
 ._.DS_Store
+**/sticker-convert

@@ -31,6 +31,14 @@ sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
 4. Run `appimage-builder` inside the directory containing `AppImageBuilder.yml`
 5. If successful, `sticker-convert-latest-x86_64.AppImage` should be created
 
+# Create msi installer
+1. Install [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
+2. Install [Wix](https://wixtoolset.org/docs/intro/): `dotnet tool install --global wix`
+3. `wix extension add WixToolset.UI.wixext`
+4. `pyinstaller sticker_convert.spec`
+5. `mv dist\sticker-convert sticker-convert`
+6. `python msicreator\createmsi.py msicreator.json`
+
 # Build wheel
 1. To build wheel `pip -m build .`
 2. To install wheel `pip install dist/sticker_convert-xxx.whl`

@@ -51,8 +51,16 @@ jobs:
                 pip install -r requirements-build.txt
                 pyinstaller sticker_convert.spec
                 cd dist
-                Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-windows.zip
-            OUT_FILE_NAME: ./dist/sticker-convert-windows.zip
+                Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-windows-x86_64.zip
+                
+                cd ..
+                move dist\sticker-convert sticker-convert
+                wix extension add WixToolset.UI.wixext
+                python .\msicreator\createmsi.py msicreator.json
+                move *.msi dist\sticker-convert-windows-x86_64.msi
+            OUT_FILE_NAME: |
+              ./dist/sticker-convert-windows-x86_64.zip
+              ./dist/sticker-convert-windows-x86_64.msi
           - os: macos-11
             TARGET: macos
             CMD_BUILD: |

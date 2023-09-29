@@ -1,0 +1,28 @@
+{
+    "upgrade_guid": "1279FFE1-5C4A-4354-B0A0-5A3FCF2719E3",
+    "version": "2.1.1",
+    "product_name": "sticker-convert",
+    "manufacturer": "laggykiller",
+    "name": "sticker-convert",
+    "name_base": "sticker-convert",
+    "comments": "Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage",
+    "installdir": "sticker-convert",
+    "license_file": "msi_res/LICENSE.rtf",
+    "startmenu_shortcut": "sticker-convert.exe",
+    "desktop_shortcut": "sticker-convert.exe",
+    "graphics":
+        {
+        "banner": "msi_res/banner.bmp",
+        "background": "msi_res/background.bmp"
+        }
+    ,
+    "parts": [
+        {
+         "id": "StickerConvert",
+         "title": "sticker-convert",
+         "description": "sticker-convert",
+         "absent": "disallow",
+         "staged_dir": "sticker-convert"
+        }
+    ]
+}

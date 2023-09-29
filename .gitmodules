@@ -1,3 +1,6 @@
 [submodule "src/sticker_convert/ios-message-stickers-template"]
 	path = src/sticker_convert/ios-message-stickers-template
 	url = https://github.com/NiklasPeterson/ios-message-stickers-template.git
+[submodule "msicreator"]
+	path = msicreator
+	url = https://github.com/jpakkane/msicreator.git
