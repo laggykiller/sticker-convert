@@ -25,7 +25,7 @@ class InputFrame:
         self.input_setdir_lbl = Label(self.frame, text='Input directory', width=35, justify='left', anchor='w')
         self.input_setdir_entry = Entry(self.frame, textvariable=self.gui.input_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
         self.input_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
-        self.setdir_btn = Button(self.frame, text='Choose directory...', command=self.cb_set_indir, width=16, bootstyle='secondary')
+        self.setdir_btn = Button(self.frame, text='Choose directory', command=self.cb_set_indir, width=16, bootstyle='secondary')
 
         self.address_lbl = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['address_lbls'], width=18, justify='left', anchor='w')
         self.address_entry = Entry(self.frame, textvariable=self.gui.input_address_var, width=80, validate="focusout", validatecommand=self.cb_input_option)
@@ -56,30 +56,16 @@ class InputFrame:
             self.gui.input_setdir_var.set(input_dir)
     
     def cb_input_option(self, *args):
-        preset = [k for k, v in self.gui.input_presets.items() if v['full_name'] == self.gui.input_option_display_var.get()][0]
-
-        self.address_tip.config(text=self.gui.input_presets[preset]['example'])
-        self.address_lbl.config(text=self.gui.input_presets[preset]['address_lbls'])
-
-        if preset == 'local':
-            self.address_entry.config(state='disabled')
-        else:
-            self.address_entry.config(state='normal')
+        input_option_display = self.gui.get_input_display_name()
         
-        if preset == 'auto':
+        if input_option_display == 'auto':
             url = self.gui.input_address_var.get()
             download_option = UrlDetect.detect(url)
 
             if download_option == None:
                 self.gui.input_option_true_var.set(self.gui.input_presets['auto']['full_name'])
-                if url == '':
-                    self.address_tip.config(text=self.gui.input_presets['auto']['example'])
-                else:
-                    self.address_tip.config(text=f"Input URL not valid. {self.gui.input_presets['auto']['example']}")
             else:
                 self.gui.input_option_true_var.set(self.gui.input_presets[download_option]['full_name'])
-                self.address_tip.config(text=f'Detected URL: {download_option}')
-
         else:
             self.gui.input_option_true_var.set(self.gui.input_option_display_var.get())
         

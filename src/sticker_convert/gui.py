@@ -393,8 +393,14 @@ class GUI:
     def get_input_name(self) -> str:
         return [k for k, v in self.input_presets.items() if v['full_name'] == self.input_option_true_var.get()][0]
 
+    def get_input_display_name(self) -> str:
+        return [k for k, v in self.input_presets.items() if v['full_name'] == self.input_option_display_var.get()][0]
+
     def get_output_name(self) -> str:
         return [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_true_var.get()][0]
+
+    def get_output_display_name(self) -> str:
+        return [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_display_var.get()][0]
 
     def start_process(self):
         self.save_config()
@@ -578,29 +584,51 @@ class GUI:
             return True
         
         input_option = self.get_input_name()
+        input_option_display = self.get_input_display_name()
         output_option = self.get_output_name()
+        # output_option_display = self.get_output_display_name()
         url = self.input_address_var.get()
 
+        # Input
         if os.path.isdir(self.input_setdir_var.get()):
             self.input_frame.input_setdir_entry.config(bootstyle='default')
         else:
             self.input_frame.input_setdir_entry.config(bootstyle='danger')
 
+        self.input_frame.address_lbl.config(text=self.input_presets[input_option_display]['address_lbls'])
         self.input_frame.address_entry.config(bootstyle='default')
-        if input_option != 'local':
+
+        if input_option == 'local':
+            self.input_frame.address_entry.config(state='disabled')
+            self.input_frame.address_tip.config(text=self.input_presets[input_option_display]['example'])
+
+        else:
+            self.input_frame.address_entry.config(state='normal')
+            self.input_frame.address_tip.config(text=self.input_presets[input_option_display]['example'])
+            download_option = UrlDetect.detect(url)
+
             if not url:
                 self.input_frame.address_entry.config(bootstyle='warning')
-            elif UrlDetect.detect(url) == None:
-                self.input_frame.address_entry.config(bootstyle='danger')
-            elif (self.get_input_name() != 'auto' and
-                  UrlDetect.detect(url) != self.get_input_name() and
-                  not (self.get_input_name() == 'kakao' and url.isnumeric())):
+
+            elif (download_option != input_option and
+                  not (input_option == 'kakao' and url.isnumeric())):
                 
                 self.input_frame.address_entry.config(bootstyle='danger')
+                self.input_frame.address_tip.config(text=f"Invalid URL. {self.input_presets[input_option_display]['example']}")
+        
+            elif input_option_display == 'auto' and download_option:
+                self.input_frame.address_tip.config(text=f'Detected URL: {download_option}')
+
+        # Output
+        if os.path.isdir(self.output_setdir_var.get()):
+            self.output_frame.output_setdir_entry.config(bootstyle='default')
+        else:
+            self.output_frame.output_setdir_entry.config(bootstyle='danger')
 
         if (MetadataHandler.check_metadata_required(output_option, 'title') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'title') and
             not self.title_var.get()):
+
             self.output_frame.title_entry.config(bootstyle='warning')
         else:
             self.output_frame.title_entry.config(bootstyle='default')
@@ -608,10 +636,12 @@ class GUI:
         if (MetadataHandler.check_metadata_required(output_option, 'author') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'author') and
             not self.author_var.get()):
+            
             self.output_frame.author_entry.config(bootstyle='warning')
         else:
             self.output_frame.author_entry.config(bootstyle='default')
         
+        # Credentials
         if output_option == 'signal' and not self.signal_uuid_var.get():
             self.cred_frame.signal_uuid_entry.config(bootstyle='warning')
         else:
@@ -637,11 +667,7 @@ class GUI:
         else:
             self.cred_frame.kakao_auth_token_entry.config(bootstyle='default')
         
-        if os.path.isdir(self.output_setdir_var.get()):
-            self.output_frame.output_setdir_entry.config(bootstyle='default')
-        else:
-            self.output_frame.output_setdir_entry.config(bootstyle='danger')
-        
+        # Check for Input and Compression mismatch
         if (not self.no_compress_var.get() and 
             self.get_output_name() != 'local' and
             self.comp_preset_var.get() not in ('auto', 'custom') and

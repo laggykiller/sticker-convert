@@ -25,7 +25,7 @@ class OutputFrame:
         self.output_setdir_entry = Entry(self.frame, textvariable=self.gui.output_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
         self.output_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         
-        self.output_setdir_btn = Button(self.frame, text='Choose directory...', command=self.cb_set_outdir, width=16, bootstyle='secondary')
+        self.output_setdir_btn = Button(self.frame, text='Choose directory', command=self.cb_set_outdir, width=16, bootstyle='secondary')
 
         self.title_lbl = Label(self.frame, text='Title')
         self.title_entry = Entry(self.frame, textvariable=self.gui.title_var, width=80, validate="focusout", validatecommand=self.gui.highlight_fields)
