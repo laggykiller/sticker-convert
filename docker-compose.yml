@@ -28,4 +28,6 @@ services:
     dns:
       - 1.1.1.1 # Or else download/upload to telegram fails in Docker
 
-    command: /usr/bin/python3 /app/main.py --help # Your command here
+    # Your command here if you are using CLI
+    # If you are launching GUI, do not comment out!
+    # command: /usr/bin/python3 /app/main.py --help
