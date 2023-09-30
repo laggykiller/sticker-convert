@@ -41,20 +41,15 @@ spec = {
 class FormatVerify:
     @staticmethod
     def check_file(file: str, spec: dict) -> bool:
-        if CodecInfo.get_file_ext(file) == '.tgs':
-            validator = TgsValidator(Severity.Error)
-            validator.check_file(file)
-            return (not validator.errors and FormatVerify.check_file_size(file, size=spec.get('size_max')))
-        else:
-            return (
-                FormatVerify.check_presence(file) and
-                FormatVerify.check_file_res(file, res=spec.get('res'), square=spec.get('square')) and 
-                FormatVerify.check_file_fps(file, fps=spec.get('fps')) and
-                FormatVerify.check_file_size(file, size=spec.get('size_max')) and
-                FormatVerify.check_animated(file, animated=spec.get('animated')) and
-                FormatVerify.check_format(file, format=spec.get('format')) and 
-                FormatVerify.check_duration(file, duration=spec.get('duration'))
-                )
+        return (
+            FormatVerify.check_presence(file) and
+            FormatVerify.check_file_res(file, res=spec.get('res'), square=spec.get('square')) and 
+            FormatVerify.check_file_fps(file, fps=spec.get('fps')) and
+            FormatVerify.check_file_size(file, size=spec.get('size_max')) and
+            FormatVerify.check_animated(file, animated=spec.get('animated')) and
+            FormatVerify.check_format(file, format=spec.get('format')) and 
+            FormatVerify.check_duration(file, duration=spec.get('duration'))
+            )
 
     @staticmethod
     def check_presence(file: str) -> bool:

@@ -50,6 +50,7 @@ coverage.xml
 docs/_build/
 
 # venv
+**/venv
 pyvenv.cfg
 **/lib64
 .version_full
@@ -66,6 +67,7 @@ scripts/opt-comp-result
 AppDir/**
 appimage-build/**
 creds.json
+config.json
 .DS_Store
 ._.DS_Store
 **/sticker-convert

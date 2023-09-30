@@ -12,6 +12,7 @@ from .downloaders.download_signal import DownloadSignal # type: ignore
 from .downloaders.download_telegram import DownloadTelegram # type: ignore
 from .downloaders.download_kakao import DownloadKakao # type: ignore
 
+from .uploaders.upload_base import UploadBase
 from .uploaders.upload_signal import UploadSignal # type: ignore
 from .uploaders.upload_telegram import UploadTelegram # type: ignore
 from .uploaders.compress_wastickers import CompressWastickers # type: ignore
@@ -318,7 +319,9 @@ class Flow:
             
             if not os.path.isfile(in_f):
                 continue
-            elif CodecInfo.get_file_ext(i) in ('.txt', '.m4a'):
+            elif (CodecInfo.get_file_ext(i) in ('.txt', '.m4a') or
+                  os.path.splitext(i)[0] == 'cover'):
+                
                 shutil.copy(in_f, os.path.join(output_dir, i))
             else:
                 in_fs.append(i)
@@ -393,7 +396,7 @@ class Flow:
         
         self.cb_msg('Exporting...')
 
-        exporters = []
+        exporters: list[UploadBase] = []
 
         if self.opt_output['option'] == 'whatsapp':
             exporters.append(CompressWastickers.start)
@@ -410,7 +413,7 @@ class Flow:
         for exporter in exporters:
             self.out_urls += exporter(
                 opt_output=self.opt_output, opt_comp=self.opt_comp, opt_cred=self.opt_cred, 
-                cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_bar=self.cb_bar)
+                cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_ask_bool=self.cb_ask_bool, cb_bar=self.cb_bar)
         
         if self.out_urls:
             with open(os.path.join(self.opt_output['dir'], 'export-result.txt'), 'w+') as f:

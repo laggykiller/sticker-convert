@@ -55,7 +55,8 @@ class CompressWastickers(UploadBase):
                     "max": 96
                 }
             },
-            'format': '.png'
+            'format': '.png',
+            'animated': False
         }
 
         self.webp_spec = copy.deepcopy(base_spec)
@@ -109,20 +110,21 @@ class CompressWastickers(UploadBase):
     def add_metadata(self, pack_dir: str, title: str, author: str):
         opt_comp_merged = merge({}, self.opt_comp, self.spec_cover)
 
-        cover_path = os.path.join(pack_dir, '100.png')
-        if 'cover.png' in os.listdir(self.in_dir):
-            if FormatVerify.check_file(cover_path, spec=self.spec_cover):
-                shutil.copy(os.path.join(self.in_dir, 'cover.png'), cover_path)
+        cover_path_old = MetadataHandler.get_cover(self.in_dir)
+        cover_path_new = os.path.join(pack_dir, '100.png')
+        if cover_path_old:
+            if FormatVerify.check_file(cover_path_old, spec=self.spec_cover):
+                shutil.copy(cover_path_old, cover_path_new)
             else:
-                StickerConvert(os.path.join(self.in_dir, 'cover.png'), cover_path, opt_comp_merged, self.cb_msg).convert()
+                StickerConvert(cover_path_old, cover_path_new, opt_comp_merged, self.cb_msg).convert()
         else:
             # First image in the directory, extracting first frame
             first_image = [i for i in sorted(os.listdir(self.in_dir)) if os.path.isfile(os.path.join(self.in_dir, i)) and not i.endswith(('.txt', '.m4a', '.wastickers'))][0]
-            StickerConvert(os.path.join(self.in_dir, f'{first_image}'), cover_path, opt_comp_merged, self.cb_msg).convert()
+            StickerConvert(os.path.join(self.in_dir, f'{first_image}'), cover_path_new, opt_comp_merged, self.cb_msg).convert()
         
         MetadataHandler.set_metadata(pack_dir, author=author, title=title)
     
     @staticmethod
-    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
-        exporter = CompressWastickers(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
+    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_ask_bool=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
+        exporter = CompressWastickers(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_ask_bool, cb_bar, out_dir)
         return exporter.compress_wastickers()

@@ -134,13 +134,13 @@ class XcodeImessage(UploadBase):
 
     def add_metadata(self, author: str, title: str):
         first_image_path = os.path.join(self.in_dir, [i for i in sorted(os.listdir(self.in_dir)) if os.path.isfile(os.path.join(self.in_dir, i)) and i.endswith('.png')][0])
-        cover_path = os.path.join(self.in_dir, 'cover.png')
+        cover_path_old = MetadataHandler.get_cover(self.in_dir)
         cover_path_new = os.path.join(self.out_dir, 'cover.png')
-        if os.path.isfile(cover_path) and cover_path_new != cover_path:
-            shutil.copy(cover_path, cover_path_new)
+        if os.path.isfile(cover_path_old) and cover_path_new != cover_path_old:
+            shutil.copy(cover_path_old, cover_path_new)
 
-        if os.path.isfile(cover_path):
-            icon_source = cover_path
+        if os.path.isfile(cover_path_old):
+            icon_source = cover_path_old
         else:
             icon_source = first_image_path
 
@@ -201,7 +201,7 @@ class XcodeImessage(UploadBase):
         
         stickers_lst = []
         for i in sorted(os.listdir(self.in_dir)):
-            if CodecInfo.get_file_ext(i) == '.png' and i != 'cover.png' and i not in self.iconset:
+            if CodecInfo.get_file_ext(i) == '.png' and os.path.splitext(i)[0] != 'cover' and i not in self.iconset:
                 sticker_dir = f'{os.path.splitext(i)[0]}.sticker' # 0.sticker
                 stickers_lst.append(sticker_dir)
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker
@@ -261,6 +261,6 @@ class XcodeImessage(UploadBase):
         os.rename(os.path.join(pack_path, 'stickers.xcodeproj'), os.path.join(pack_path, f'{title}.xcodeproj'))
     
     @staticmethod
-    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
-        exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
+    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_ask_bool=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
+        exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_ask_bool, cb_bar, out_dir)
         return exporter.create_imessage_xcode()

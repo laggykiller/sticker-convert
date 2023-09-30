@@ -12,8 +12,9 @@ class MetadataHandler:
         from ..uploaders.xcode_imessage import XcodeImessageIconset # type: ignore
         
         stickers_present = sorted(os.listdir(dir))
-        if 'cover.png' in stickers_present:
-            stickers_present.remove('cover.png')
+        for i in stickers_present:
+            if os.path.splitext(i)[0] == 'cover':
+                stickers_present.remove(os.path.split(i)[1])
         for icon in XcodeImessageIconset().iconset:
             if icon in stickers_present:
                 stickers_present.remove(icon)
@@ -24,6 +25,15 @@ class MetadataHandler:
         stickers_present = [i for i in stickers_present if os.path.isfile(os.path.join(dir, i)) and not i.endswith(('.txt', '.m4a'))]
 
         return stickers_present
+
+    @staticmethod
+    def get_cover(dir: str) -> Optional[str]:
+        stickers_present = sorted(os.listdir(dir))
+        for i in stickers_present:
+            if os.path.splitext(i)[0] == 'cover':
+                return os.path.join(dir, i)
+        
+        return None
     
     @staticmethod
     def get_metadata(dir: str, title: Optional[str] = None, author: Optional[str] = None, emoji_dict: Optional[dict[str, str]] = None) -> tuple[Optional[str], Optional[str], Optional[dict[str, str]]]:

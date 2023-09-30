@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
 import os
-import platform
-import shutil
 import io
 from multiprocessing.queues import Queue as QueueType
-from typing import Optional
+from typing import Optional, Union
 
 import imageio.v3 as iio
 from rlottie_python import LottieAnimation # type: ignore
@@ -12,6 +10,7 @@ from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
 import numpy as np
 from PIL import Image
 import av # type: ignore
+from av.codec.context import CodecContext # type: ignore
 import webp # type: ignore
 import oxipng
 
@@ -27,25 +26,25 @@ def get_step_value(max: int, min: int, step: int, steps: int) -> Optional[int]:
         return None
 
 class StickerConvert:
-    def __init__(self, in_f: str, out_f: str, opt_comp: dict, cb_msg=print):
+    def __init__(self, in_f: Union[str, list[str, io.BytesIO]], out_f: str, opt_comp: dict, cb_msg=print):
         if type(cb_msg) != QueueType:
             cb_msg = FakeCbMsg(cb_msg)
 
-        self.in_f = in_f
-        self.in_f_name = os.path.split(self.in_f)[1]
-        self.in_f_ext = CodecInfo.get_file_ext(self.in_f)
-
-        if out_f.startswith('null'):
-            if platform.platform() == 'Windows':
-                self.out_f = 'NUL'
-            else:
-                self.out_f = '/dev/null'
-            self.out_f_name = os.path.split(self.out_f)[1]
-            self.out_f_ext = os.path.splitext(out_f)[1]
+        if type(in_f) == str:
+            self.in_f = in_f
+            self.in_f_name = os.path.split(self.in_f)[1]
+            self.in_f_ext = CodecInfo.get_file_ext(self.in_f)
         else:
-            self.out_f = out_f
-            self.out_f_name = os.path.split(self.out_f)[1]
+            self.in_f = in_f[1]
+            self.in_f_name = os.path.split(in_f[0])[1]
+            self.in_f_ext = CodecInfo.get_file_ext(in_f[0])
+
+        self.out_f = out_f
+        self.out_f_name = os.path.split(self.out_f)[1]
+        if os.path.splitext(out_f)[0] not in ('null', 'bytes'):
             self.out_f_ext = CodecInfo.get_file_ext(self.out_f)
+        else:
+            self.out_f_ext = os.path.splitext(out_f)[1]
 
         self.cb_msg = cb_msg
         self.frames_raw: list[np.ndarray] = []
@@ -94,7 +93,7 @@ class StickerConvert:
 
         self.apngasm = APNGAsm() # type: ignore[call-arg]
 
-    def convert(self):
+    def convert(self) -> tuple[bool, str, Union[None, bytes, str], int]:
         if (FormatVerify.check_format(self.in_f, format=self.out_f_ext) and
             FormatVerify.check_file_res(self.in_f, res=self.opt_comp.get('res')) and
             FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.get('fps')) and
@@ -102,7 +101,8 @@ class StickerConvert:
             FormatVerify.check_duration(self.in_f, duration=self.opt_comp.get('duration'))):
             self.cb_msg.put(f'[S] Compatible file found, skip compress and just copy {self.in_f_name} -> {self.out_f_name}')
 
-            shutil.copyfile(self.in_f, self.out_f)
+            with open(self.in_f, 'rb') as f:
+                self.write_out(f.read())
             return True, self.in_f, self.out_f, os.path.getsize(self.in_f)
 
         self.cb_msg.put(f'[I] Start compressing {self.in_f_name} -> {self.out_f_name}')
@@ -159,9 +159,7 @@ class StickerConvert:
                         break
             
             if not size_max:
-                with open(self.out_f, 'wb+') as f:
-                    f.write(self.tmp_fs[step_current])
-                self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+                self.write_out(self.tmp_fs[step_current], step_current)
                 return True, self.in_f, self.out_f, size
 
             if size < size_max:
@@ -170,9 +168,7 @@ class StickerConvert:
                     step_current = int((step_lower + step_upper) / 2)
                     self.cb_msg.put(f'[<] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} < limit {size_max}, recompressing')
                 else:
-                    with open(self.out_f, 'wb+') as f:
-                        f.write(self.tmp_fs[step_current])
-                    self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+                    self.write_out(self.tmp_fs[step_current], step_current)
                     return True, self.in_f, self.out_f, size
             else:
                 if step_upper - step_lower > 1:
@@ -181,14 +177,24 @@ class StickerConvert:
                     self.cb_msg.put(f'[>] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} > limit {size_max}, recompressing')
                 else:
                     if self.steps - step_current > 1:
-                        with open(self.out_f, 'wb+') as f:
-                            f.write(self.tmp_fs[step_current + 1])
-                        self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+                        self.write_out(self.tmp_fs[step_current + 1], step_current)
                         return True, self.in_f, self.out_f, size
                     else:
                         self.cb_msg.put(f'[F] Failed Compression {self.in_f_name} -> {self.out_f_name}, cannot get below limit {size_max} with lowest quality under current settings')
                         return False, self.in_f, self.out_f, size
     
+    def write_out(self, data: bytes, step_current: Optional[int] = None):
+        if os.path.splitext(self.out_f)[0] == 'none':
+            self.out_f = None
+        elif os.path.splitext(self.out_f)[0] == 'bytes':
+            self.out_f = data
+        else:
+            with open(self.out_f, 'wb+') as f:
+                f.write(data)
+
+        if step_current:
+            self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+
     def frames_import(self):
         if self.in_f_ext in ('.tgs', '.lottie', '.json'):
             self.frames_import_lottie()
@@ -204,21 +210,34 @@ class StickerConvert:
             frame_format = 'rgba'
             # Crashes when handling some webm in yuv420p and convert to rgba
             # https://github.com/PyAV-Org/PyAV/issues/1166
-            # if self.in_f_ext == '.webm':
             metadata = iio.immeta(self.in_f, plugin='pyav', exclude_applied=False)
+            context = None
             if metadata.get('video_format') == 'yuv420p':
-                frame_format = 'rgb24'
-
-            for frame in iio.imiter(self.in_f, plugin='pyav', format=frame_format):
-                if frame_format == 'rgb24':
-                    frame = np.dstack((frame, np.zeros(frame.shape[:2], dtype=np.uint8)+255))
-                self.frames_raw.append(frame)
+                if metadata.get('alpha_mode') != '1':
+                    frame_format = 'rgb24'
+                if metadata.get('codec') == 'vp8':
+                    context = CodecContext.create('v8', 'r')
+                elif metadata.get('codec') == 'vp9':
+                    context = CodecContext.create('libvpx-vp9', 'r')
+            
+            with av.open(self.in_f) as container:
+                if not context:
+                    context = container.streams.video[0].codec_context
+                for packet in container.demux(video=0):
+                    for frame in context.decode(packet):
+                        frame = frame.to_ndarray(format=frame_format)
+                        if frame_format == 'rgb24':
+                            frame = np.dstack((frame, np.zeros(frame.shape[:2], dtype=np.uint8)+255))
+                        self.frames_raw.append(frame)
 
     def frames_import_lottie(self):
         if self.in_f_ext == '.tgs':
             anim = LottieAnimation.from_tgs(self.in_f)
         else:
-            anim = LottieAnimation.from_file(self.in_f)
+            if type(self.in_f) == str:
+                anim = LottieAnimation.from_file(self.in_f)
+            else:
+                anim = LottieAnimation.from_data(self.in_f.read().decode('utf-8'))
 
         for i in range(anim.lottie_animation_get_totalframe()):
             frame = np.asarray(anim.render_pillow_frame(frame_num=i))

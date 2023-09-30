@@ -13,7 +13,6 @@ from ..utils.metadata_handler import MetadataHandler # type: ignore
 from ..utils.converter import StickerConvert # type: ignore
 from ..utils.format_verify import FormatVerify # type: ignore
 from ..utils.codec_info import CodecInfo # type: ignore
-from ..utils.cache_store import CacheStore # type: ignore
 
 class UploadSignal(UploadBase):
     def __init__(self, *args, **kwargs):
@@ -61,41 +60,38 @@ class UploadSignal(UploadBase):
         return result
     
     def add_stickers_to_pack(self, pack: LocalStickerPack, stickers: list[str], emoji_dict: dict):
-        with CacheStore.get_cache_store(path=self.opt_comp.get('cache_dir')) as tempdir:
-            for src in stickers:
-                self.cb_msg(f'Verifying {src} for uploading to signal')
+        for src in stickers:
+            self.cb_msg(f'Verifying {src} for uploading to signal')
 
-                src_full_name = os.path.split(src)[-1]
-                src_name = os.path.splitext(src_full_name)[0]
-                ext = os.path.splitext(src_full_name)[-1]
+            src_full_name = os.path.split(src)[-1]
+            src_name = os.path.splitext(src_full_name)[0]
+            ext = os.path.splitext(src_full_name)[-1]
 
-                sticker = Sticker()
-                sticker.id = pack.nb_stickers
+            sticker = Sticker()
+            sticker.id = pack.nb_stickers
 
-                emoji = emoji_dict.get(src_name, None)
-                if not emoji:
-                    self.cb_msg(f'Warning: Cannot find emoji for file {src_full_name}, skip uploading this file...')
-                    continue
-                sticker.emoji = emoji[:1]
+            emoji = emoji_dict.get(src_name, None)
+            if not emoji:
+                self.cb_msg(f'Warning: Cannot find emoji for file {src_full_name}, skip uploading this file...')
+                continue
+            sticker.emoji = emoji[:1]
 
-                if ext == '.webp':
-                    spec_choice = self.webp_spec
+            if ext == '.webp':
+                spec_choice = self.webp_spec
+            else:
+                spec_choice = self.png_spec
+            
+            if not FormatVerify.check_file(src, spec=spec_choice):
+                if self.fake_vid or CodecInfo.is_anim(src):
+                    dst = 'bytes.apng'
                 else:
-                    spec_choice = self.png_spec
-                
-                if not FormatVerify.check_file(src, spec=spec_choice):
-                    if self.fake_vid or CodecInfo.is_anim(src):
-                        dst = os.path.join(tempdir, src_name + '.apng')
-                    else:
-                        dst = os.path.join(tempdir, src_name + '.png')
-                    StickerConvert(src, dst, self.opt_comp_merged, self.cb_msg).convert()
-                else:
-                    dst = src
+                    dst = 'bytes.png'
+                _, _, sticker.image_data, _ = StickerConvert(src, dst, self.opt_comp_merged, self.cb_msg).convert()
+            else:
+                with open(src, "rb") as f:
+                    sticker.image_data = f.read()
 
-                with open(dst, "rb") as f_in:
-                    sticker.image_data = f_in.read()
-
-                pack._addsticker(sticker)
+            pack._addsticker(sticker)
 
     def upload_stickers_signal(self) -> list[str]:
         urls = []
@@ -130,6 +126,6 @@ class UploadSignal(UploadBase):
         return urls
 
     @staticmethod
-    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
-        exporter = UploadSignal(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_bar, out_dir)
+    def start(opt_output: dict, opt_comp: dict, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_ask_bool=input, cb_bar=None, out_dir: Optional[str] = None, **kwargs) -> list[str]:
+        exporter = UploadSignal(opt_output, opt_comp, opt_cred, cb_msg, cb_msg_block, cb_ask_bool, cb_bar, out_dir)
         return exporter.upload_stickers_signal()
