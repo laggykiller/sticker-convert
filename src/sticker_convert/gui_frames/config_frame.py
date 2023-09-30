@@ -17,6 +17,7 @@ class ConfigFrame:
         self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Config')
 
         self.frame.grid_columnconfigure(1, weight=1)
+        self.frame.grid_columnconfigure(3, weight=1)
 
         self.config_save_cred_lbl = Label(self.frame, text='Save credentials', width=18, justify='left', anchor='w')
         self.config_save_cred_cbox = Checkbutton(self.frame, variable=self.gui.config_save_cred_var, onvalue=True, offvalue=False, bootstyle='success-round-toggle')
@@ -24,7 +25,7 @@ class ConfigFrame:
         self.config_clear_cred_lbl = Label(self.frame, text='Clear credentials', width=18, justify='left', anchor='w')
         self.config_clear_cred_btn = Button(self.frame, text='Clear...', command=self.cb_clear_cred, bootstyle='secondary')
 
-        self.config_restore_default_lbl = Label(self.frame, text='Restore default', width=18, justify='left', anchor='w')
+        self.config_restore_default_lbl = Label(self.frame, text='Restore default config', width=18, justify='left', anchor='w')
         self.config_restore_default_btn = Button(self.frame, text='Restore...', command=self.cb_restore_default, bootstyle='secondary')
 
         self.config_open_dir_lbl = Label(self.frame, text='Config directory', width=18, justify='left', anchor='w')
@@ -33,14 +34,14 @@ class ConfigFrame:
         self.config_save_cred_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.config_save_cred_cbox.grid(column=1, row=0, sticky='w', padx=3, pady=3)
 
-        self.config_clear_cred_lbl.grid(column=0, row=1, sticky='w', padx=3, pady=3)
-        self.config_clear_cred_btn.grid(column=1, row=1, sticky='w', padx=3, pady=3)
+        self.config_clear_cred_lbl.grid(column=2, row=0, sticky='w', padx=3, pady=3)
+        self.config_clear_cred_btn.grid(column=3, row=0, sticky='w', padx=3, pady=3)
 
-        self.config_restore_default_lbl.grid(column=0, row=2, sticky='w', padx=3, pady=3)
-        self.config_restore_default_btn.grid(column=1, row=2, sticky='w', padx=3, pady=3)
+        self.config_open_dir_lbl.grid(column=0, row=1, sticky='w', padx=3, pady=3)
+        self.config_open_dir_btn.grid(column=1, row=1, sticky='w', padx=3, pady=3)
 
-        self.config_open_dir_lbl.grid(column=0, row=3, sticky='w', padx=3, pady=3)
-        self.config_open_dir_btn.grid(column=1, row=3, sticky='w', padx=3, pady=3)
+        self.config_restore_default_lbl.grid(column=2, row=1, sticky='w', padx=3, pady=3)
+        self.config_restore_default_btn.grid(column=3, row=1, sticky='w', padx=3, pady=3)
     
     def cb_clear_cred(self, *args, **kwargs):
         response = self.gui.cb_ask_bool('Are you sure you want to clear credentials?')
