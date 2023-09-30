@@ -224,7 +224,7 @@ class StickerConvert:
             frame = np.asarray(anim.render_pillow_frame(frame_num=i))
             self.frames_raw.append(frame)
         
-        anim.lottie_shutdown()
+        anim.lottie_animation_destroy()
 
     def frames_resize(self, frames_in: list[np.ndarray]) -> list[np.ndarray]:
         frames_out = []
