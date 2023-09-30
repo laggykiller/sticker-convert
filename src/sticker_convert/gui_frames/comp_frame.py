@@ -24,7 +24,7 @@ class CompFrame:
         self.comp_preset_opt.config(width=15)
 
         self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['steps']), bootstyle='secondary')
-        self.steps_lbl = Label(self.frame, text='Number of steps')       
+        self.steps_lbl = Label(self.frame, text='Number of steps')
         self.steps_entry = Entry(self.frame, textvariable=self.gui.steps_var, width=8)
         self.steps_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
@@ -57,18 +57,11 @@ class CompFrame:
         self.cb_nocompress()
     
     def cb_comp_apply_preset(self, *args):
-        selection = self.gui.comp_preset_var.get()
-        if selection == 'auto':
-            output_option = self.gui.get_output_name()
-            if output_option == 'local':
-                self.gui.no_compress_var.set(True)
-            elif output_option == 'imessage':
-                selection = 'imessage_small'
-                self.gui.no_compress_var.set(False)
-            else:
-                selection = output_option
-                self.gui.no_compress_var.set(False)
-            self.cb_nocompress()
+        selection = self.gui.get_preset()
+        if selection == 'local':
+            self.gui.no_compress_var.set(True)
+        else:
+            self.gui.no_compress_var.set(False)
 
         self.gui.fps_min_var.set(self.gui.compression_presets[selection]['fps']['min'])
         self.gui.fps_max_var.set(self.gui.compression_presets[selection]['fps']['max'])
@@ -90,6 +83,7 @@ class CompFrame:
         self.gui.default_emoji_var.set(self.gui.compression_presets[selection]['default_emoji'])
         self.gui.steps_var.set(self.gui.compression_presets[selection]['steps'])
 
+        self.cb_nocompress()
         self.gui.highlight_fields()
     
     def cb_compress_advanced(self, *args):

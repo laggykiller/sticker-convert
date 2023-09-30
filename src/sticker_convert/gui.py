@@ -402,6 +402,20 @@ class GUI:
     def get_output_display_name(self) -> str:
         return [k for k, v in self.output_presets.items() if v['full_name'] == self.output_option_display_var.get()][0]
 
+    def get_preset(self) -> str:
+        selection = self.comp_preset_var.get()
+        if selection == 'auto':
+            output_option = self.get_output_name()
+            if output_option == 'imessage':
+                return 'imessage_small'
+            elif output_option == 'local':
+                return selection
+            else:
+                return output_option
+            
+        else:
+            return selection
+
     def start_process(self):
         self.save_config()
         if self.config_save_cred_var.get() == True:
@@ -426,7 +440,7 @@ class GUI:
         }
 
         opt_comp = {
-            'preset': self.comp_preset_var.get(),
+            'preset': self.get_preset(),
             'size_max': {
                 'img': self.img_size_max_var.get() if not self.size_disable_var.get() else None,
                 'vid': self.vid_size_max_var.get() if not self.size_disable_var.get() else None
