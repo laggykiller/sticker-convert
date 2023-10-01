@@ -70,3 +70,9 @@ class ConfigFrame:
             RunBin.run_cmd(['open', config_dir], silence=True)
         else:
             RunBin.run_cmd(['xdg-open', config_dir], silence=True)
+
+    def set_states(self, state: str):
+        self.config_save_cred_cbox.config(state=state)
+        self.config_clear_cred_btn.config(state=state)
+        self.config_restore_default_btn.config(state=state)
+        self.config_open_dir_btn.config(state=state)

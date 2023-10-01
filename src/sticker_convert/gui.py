@@ -531,6 +531,7 @@ class GUI:
         self.comp_frame.set_states(state=state)
         self.output_frame.set_states(state=state)
         self.cred_frame.set_states(state=state)
+        self.config_frame.set_states(state=state)
 
         if state == 'normal':
             self.input_frame.cb_input_option()
