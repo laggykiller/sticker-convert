@@ -64,6 +64,7 @@ pyvenv.cfg
 # Nuitka
 **/*.build
 **/*.dist
+**/wheel_*
 
 **/stickers_input
 **/stickers_output
