@@ -75,6 +75,7 @@ shutil.rmtree('venv', ignore_errors=True)
 if platform.system() == 'Darwin':
     subprocess.run(f'{python_bin} -m pip install --upgrade pip delocate'.split(' '))
     subprocess.run(f'{python_bin} -m venv venv'.split(' '))
+    python_bin = 'python'
     osx_run_in_venv('python -m pip install wheel nuitka')
 
     if not arch:
