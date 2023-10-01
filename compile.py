@@ -25,14 +25,9 @@ cmd_list = [
 ]
 
 cmd_list.append('src/sticker-convert.py')
-subprocess.run(cmd_list, shell=True)
+subprocess.call(cmd_list, shell=True)
 
 for i in os.listdir('sticker-convert.dist/av.libs'):
     file_path = os.path.join('sticker-convert.dist', i)
-    if os.path.isfile(file_path):
-        os.remove(file_path)
-
-for i in os.listdir('test.dist/av.libs'):
-    file_path = os.path.join('test.dist', i)
     if os.path.isfile(file_path):
         os.remove(file_path)
