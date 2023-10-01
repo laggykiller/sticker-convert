@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import sys
 import subprocess
 import platform
 import shutil
@@ -66,10 +67,7 @@ if platform.system() == 'Windows':
 else:
     use_shell = False
 
-if shutil.which('python3'):
-    python_bin = 'python3'
-else:
-    python_bin = 'python'
+python_bin = os.path.abspath(sys.executable)
 
 shutil.make_archive('src/sticker_convert/ios-message-stickers-template', 'zip', 'src/sticker_convert/ios-message-stickers-template')
 shutil.rmtree('venv', ignore_errors=True)
@@ -124,9 +122,7 @@ if platform.system() == 'Darwin':
                         os.rename(f_path, f_bak_path)
                         osx_run_in_venv(f'lipo {f_bak_path} {stub_x64} -create -output {f_path}', get_stdout=True)
                         print(f'Created fat library {f}')
-else:
-    subprocess.run(f'{python_bin} -m venv venv'.split(' '), shell=use_shell)
-    subprocess.run(f'venv/Scripts/activate.bat'.split(' '), shell=use_shell)
+elif platform.system() == 'Windows':
     subprocess.run(f'{python_bin} -m pip install --upgrade pip'.split(' '), shell=use_shell)
     subprocess.run(f'{python_bin} -m pip install -r requirements-build.txt'.split(' '), shell=use_shell)
 

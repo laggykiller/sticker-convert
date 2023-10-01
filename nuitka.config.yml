@@ -1,6 +1,11 @@
-- module-name: 'rlottie_python'
+- module-name: 'rlottie_python.rlottie_wrapper'
   dlls:
+    # TODO: The "lib" difference out to be handled automatically.
     - from_filenames:
         prefixes:
-          - 'rlottie*'
-          - 'librlottie*'
+          - 'rlottie'
+      when: 'win32'
+    - from_filenames:
+        prefixes:
+          - 'librlottie'
+      when: 'not win32'
