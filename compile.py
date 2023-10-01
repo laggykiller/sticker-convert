@@ -133,6 +133,7 @@ def nuitka(python_bin, arch):
         cmd_list.append('--windows-icon-from-ico=src/sticker_convert/resources/appicon.ico')
     elif platform.system() == 'Darwin' and arch:
         cmd_list.append(f'--macos-target-arch={arch}')
+        cmd_list.append(f'--disable-console') # Or else macOS complain about not able to open
 
     cmd_list.append('src/sticker-convert.py')
     if platform.system() == 'Darwin':
@@ -152,11 +153,19 @@ def osx_patch():
     pil_dylibs = os.path.join(site, 'PIL/.dylibs')
     for i in os.listdir(pil_dylibs):
         if 'libjpeg' in i and not i.endswith('-arm64.dylib') and not i.endswith('-x86_64.dylib'):
-            libjpeg = os.path.join(pil_dylibs, i)
+            libjpeg_name = i
+            libjpeg_path = os.path.join(pil_dylibs, i)
             break
-    os.makedirs('sticker-convert.app/Contents/MacOS/PIL/.dylibs', exist_ok=True)
-    shutil.copy(libjpeg, 'sticker-convert.app/Contents/MacOS')
-    shutil.copy(libjpeg, 'sticker-convert.app/Contents/MacOS/PIL/.dylibs')
+    os.makedirs('sticker-convert.app/Contents/MacOS/PIL/__dot__dylibs', exist_ok=True)
+    shutil.copy(libjpeg_path, 'sticker-convert.app/Contents/MacOS')
+    shutil.copy(libjpeg_path, f'sticker-convert.app/Contents/MacOS/PIL/__dot__dylibs/{libjpeg_name}')
+    os.symlink(src='__dot__dylibs', dst='.dylibs', target_is_directory=True, dir_fd=os.open('sticker-convert.app/Contents/MacOS/PIL', os.O_RDONLY))
+    os.rename('sticker-convert.app/Contents/MacOS/sticker-convert', 'sticker-convert.app/Contents/MacOS/sticker-convert-cli')
+    with open('sticker-convert.app/Contents/MacOS/sticker-convert', 'w+') as f:
+        f.write('#!/bin/bash\n')
+        f.write('cd "$(dirname "$0")"\n')
+        f.write('./sticker-convert-cli')
+    os.chmod('sticker-convert.app/Contents/MacOS/sticker-convert', 0o744)
     osx_run_in_venv(f'codesign --force --deep -s - sticker-convert.app')
 
 def compile():
