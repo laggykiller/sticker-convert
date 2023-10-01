@@ -23,7 +23,7 @@ AppDir:
     icon: sticker-convert
     version: latest
     exec: usr/bin/python3.11
-    exec_args: "$APPDIR/usr/src/main.py $@"
+    exec_args: "$APPDIR/usr/src/sticker-convert.py $@"
 
   apt:
     arch: amd64

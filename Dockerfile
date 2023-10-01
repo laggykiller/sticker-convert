@@ -22,7 +22,7 @@ RUN apt purge -y python3-pip && \
 
 VOLUME ["/app/stickers_input", "/app/stickers_output"]
 
-ENTRYPOINT ["/app/main.py"]
+ENTRYPOINT ["/app/sticker-convert.py"]
 
 FROM jlesage/baseimage-gui:debian-11-v4 AS base-gui
 

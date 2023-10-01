@@ -5,8 +5,10 @@ def main():
     import os
 
     multiprocessing.freeze_support()
-    script_path = os.path.split(__file__)[0]
-    os.chdir(os.path.abspath(script_path))
+    script_path = os.path.dirname(__file__)
+    if not os.path.isdir(script_path):
+        script_path = os.path.dirname(sys.argv[0])
+    os.chdir(script_path)
     if len(sys.argv) == 1:
         print('Launching GUI...')
         from sticker_convert.gui import GUI # type: ignore

@@ -1,0 +1,6 @@
+- module-name: 'rlottie_python'
+  dlls:
+    - from_filenames:
+        prefixes:
+          - 'rlottie*'
+          - 'librlottie*'

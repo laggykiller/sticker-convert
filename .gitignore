@@ -61,6 +61,10 @@ pyvenv.cfg
 *.wixpdb
 **/.wix
 
+# Nuitka
+**/*.build
+**/*.dist
+
 **/stickers_input
 **/stickers_output
 scripts/opt-comp-result

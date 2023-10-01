@@ -30,4 +30,4 @@ services:
 
     # Your command here if you are using CLI
     # If you are launching GUI, do not comment out!
-    # command: /usr/bin/python3 /app/main.py --help
+    # command: /usr/bin/python3 /app/sticker-convert.py --help

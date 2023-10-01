@@ -72,7 +72,7 @@
     - Upload: The program can create Xcode project for iMessage sticker pack, which could then be compiled and sideloaded using Xcode.
 
 ## How to use (GUI)
-1. Run `sticker-convert.exe`, `sticker-convert.app` or `python3 src/main.py`
+1. Run `sticker-convert.exe`, `sticker-convert.app` or `python3 src/sticker-convert.py`
 2. Choose input source.
     - If you are downloading, enter URL address if you want to download from (If applicable)
     - If you are using local files, choose input directory. Defaults to a folder named 'stickers_input' in the same directory as the program. Put files you want to convert into that directory
@@ -230,7 +230,7 @@ Credentials options:
                         Save Signal and Telegram credentials.
 ```
 
-If you are running python script directly, run with `src/main.py`
+If you are running python script directly, run with `src/sticker-convert.py`
 
 If you installed by pip, run with `sticker-convert` or `python -m sticker_convert`
 
@@ -307,7 +307,7 @@ docker run -d -it --name sticker-convert \
     -v /path/to/your/stickers_input:/app/stickers_input \
     -v /path/to/your/stickers_output:/app/stickers_output \
     laggykiller/sticker-convert:latest \
-    python3 /app/main.py --help
+    python3 /app/sticker-convert.py --help
 ```
 
 Alternative: Use docker-compose.yml
