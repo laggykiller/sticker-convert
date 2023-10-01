@@ -133,7 +133,9 @@ def nuitka(python_bin, arch):
         cmd_list.append('--windows-icon-from-ico=src/sticker_convert/resources/appicon.ico')
     elif platform.system() == 'Darwin' and arch:
         cmd_list.append(f'--macos-target-arch={arch}')
-        cmd_list.append(f'--disable-console') # Or else macOS complain about not able to open
+        # https://github.com/pyinstaller/pyinstaller/issues/5154#issuecomment-1567603461
+        # Or else macOS complain about not able to open
+        cmd_list.append(f'--disable-console')
 
     cmd_list.append('src/sticker-convert.py')
     if platform.system() == 'Darwin':
@@ -160,12 +162,15 @@ def osx_patch():
     shutil.copy(libjpeg_path, 'sticker-convert.app/Contents/MacOS')
     shutil.copy(libjpeg_path, f'sticker-convert.app/Contents/MacOS/PIL/__dot__dylibs/{libjpeg_name}')
     os.symlink(src='__dot__dylibs', dst='.dylibs', target_is_directory=True, dir_fd=os.open('sticker-convert.app/Contents/MacOS/PIL', os.O_RDONLY))
+
+    # https://github.com/pyinstaller/pyinstaller/issues/5154#issuecomment-1567603461
     os.rename('sticker-convert.app/Contents/MacOS/sticker-convert', 'sticker-convert.app/Contents/MacOS/sticker-convert-cli')
     with open('sticker-convert.app/Contents/MacOS/sticker-convert', 'w+') as f:
         f.write('#!/bin/bash\n')
         f.write('cd "$(dirname "$0")"\n')
-        f.write('./sticker-convert-cli')
+        f.write('open ./sticker-convert-cli')
     os.chmod('sticker-convert.app/Contents/MacOS/sticker-convert', 0o744)
+
     osx_run_in_venv(f'codesign --force --deep -s - sticker-convert.app')
 
 def compile():

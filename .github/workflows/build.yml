@@ -53,7 +53,7 @@ jobs:
                 dotnet tool install --global wix
                 wix extension add WixToolset.UI.wixext
                 python .\msicreator\createmsi.py msicreator.json
-                move *.msi dist\sticker-convert-windows-x86_64.msi
+                move *.msi sticker-convert-windows-x86_64.msi
             OUT_FILE_NAME: |
               ./sticker-convert-windows-x86_64.zip
               ./sticker-convert-windows-x86_64.msi
