@@ -5,6 +5,7 @@ import copy
 import json
 import plistlib
 from typing import Optional
+import zipfile
 
 from mergedeep import merge # type: ignore
 
@@ -169,7 +170,13 @@ class XcodeImessage(UploadBase):
 
     def create_xcode_proj(self, author: str, title: str):
         pack_path = os.path.join(self.out_dir, title)
-        shutil.copytree('ios-message-stickers-template', pack_path)
+        if os.path.isfile('ios-message-stickers-template.zip'):
+            with zipfile.ZipFile('ios-message-stickers-template.zip', 'r') as f:
+                f.extractall(pack_path)
+        elif os.path.isdir('ios-message-stickers-template'):
+            shutil.copytree('ios-message-stickers-template', pack_path)
+        else:
+            self.cb_msg('Failed to create Xcode project: ios-message-stickers-template not found')
 
         os.remove(os.path.join(pack_path, 'README.md'))
         shutil.rmtree(os.path.join(pack_path, 'stickers.xcodeproj/project.xcworkspace'), ignore_errors=True)

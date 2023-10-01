@@ -5,6 +5,7 @@ cd "$(dirname "$0")"
 
 # Remove quarantine attribute
 xattr -d com.apple.quarantine sticker-convert.app
+xattr -cr com.apple.quarantine sticker-convert.app
 
 # Launch sticker-convert
 open sticker-convert.app &

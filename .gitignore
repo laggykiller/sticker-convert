@@ -4,6 +4,7 @@
 
 # C extensions
 *.so
+*.dylib
 
 # Distribution / packaging
 bin/
@@ -19,6 +20,8 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.exe
+**/*.app
 
 # Installer logs
 pip-log.txt
@@ -76,3 +79,4 @@ config.json
 .DS_Store
 ._.DS_Store
 **/sticker-convert
+src/sticker_convert/ios-message-stickers-template.zip
