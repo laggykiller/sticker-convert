@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import platform
 import time
 import math
 from multiprocessing import cpu_count
@@ -58,14 +59,9 @@ class GUI(Window):
         self.apply_creds()
         self.init_frames()
         self.pack_frames()
+        self.warn_tkinter_bug()
         GUIUtils.finalize_window(self)
 
-        self.msg_lock = Lock()
-        self.bar_lock = Lock()
-        self.response_dict_lock = Lock()
-        self.response_dict = {}
-        self.action_queue = Queue()
-        self.flow = None
         self.after(500, self.poll_actions)
     
     def __enter__(self):
@@ -155,6 +151,14 @@ class GUI(Window):
         # Config
         self.settings_save_cred_var = BooleanVar()
 
+        # Other
+        self.msg_lock = Lock()
+        self.bar_lock = Lock()
+        self.response_dict_lock = Lock()
+        self.response_dict = {}
+        self.action_queue = Queue()
+        self.flow = None
+
     def init_frames(self):
         self.input_frame = InputFrame(self, self.scrollable_frame, borderwidth=1, text='Input')
         self.comp_frame = CompFrame(self, self.scrollable_frame, borderwidth=1, text='Compression options')
@@ -172,6 +176,16 @@ class GUI(Window):
         self.settings_frame.grid(column=0, row=2, sticky='news', padx=5, pady=5)
         self.progress_frame.grid(column=0, row=3, columnspan=2, sticky='news', padx=5, pady=5)
         self.control_frame.grid(column=0, row=4, columnspan=2, sticky='news', padx=5, pady=5)
+    
+    def warn_tkinter_bug(self):
+        if platform.system() == 'Darwin' and platform.machine() == 'x86_64':
+            msg = 'NOTICE: If buttons are not responsive, try to press '
+            msg += 'on title bar or move mouse cursor away from window for a while.'
+            self.cb_msg(msg)
+            msg = '(This is due to a bug in tkinter specific to x86_64 macOS)'
+            self.cb_msg(msg)
+            msg = '(https://github.com/python/cpython/issues/110218)'
+            self.cb_msg(msg)
     
     def load_jsons(self):
         self.help = JsonManager.load_json('resources/help.json')

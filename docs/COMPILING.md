@@ -9,11 +9,7 @@ Install the required python modules with `pip3 install -r requirements.txt`
 Change directory into `sticker_convert` directory and run `python3 ./sticker-convert.py`
 
 # Compiling on Windows and MacOS
-This repository uses `nuitka` for compiling.
-
-1. Install dependencies with `pip3 install -r requirements.txt` and `pip3 install -r requirements-build.txt`
-2. Run `python compile.py`
-3. Compilation result in `sticker-convert.dist` directory
+This repository uses `nuitka` (factory branch) for compiling. Just run `python compile.py`, compilation result in `sticker-convert.dist` directory.
 
 ## Creating AppImage on Linux
 1. Use Ubuntu 20.04 (May work on newer version if you change `sourceline` in `AppImageBuilder.yml`)
@@ -32,7 +28,7 @@ sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
 2. Install [Wix](https://wixtoolset.org/docs/intro/): `dotnet tool install --global wix`
 3. `wix extension add WixToolset.UI.wixext`
 4. `python compile.py`
-5. `mv dist\sticker-convert sticker-convert`
+5. `mv sticker-convert.dist sticker-convert`
 6. `python msicreator\createmsi.py msicreator.json`
 
 # Build wheel
