@@ -151,9 +151,9 @@ def compile():
 
     nuitka(python_bin, arch)
 
-    # if platform.system() == 'Windows':
-    #     win_patch()
-    if platform.system() == 'Darwin' and arch:
+    if platform.system() == 'Windows':
+        win_patch()
+    elif platform.system() == 'Darwin' and arch:
         osx_patch()
 
 if __name__ == '__main__':
