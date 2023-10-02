@@ -17,10 +17,6 @@ from ..utils.format_verify import FormatVerify # type: ignore
 class UploadTelegram(UploadBase):
     def __init__(self, *args, **kwargs):
         super(UploadTelegram, self).__init__(*args, **kwargs)
-
-        if not self.opt_cred.get('telegram', {}).get('token'):
-            self.cb_msg('Token required for uploading to telegram')
-            return False
         
         base_spec = {
             "size_max": {
@@ -209,6 +205,11 @@ class UploadTelegram(UploadBase):
 
     def upload_stickers_telegram(self) -> list[str]:
         urls = []
+
+        if not self.opt_cred.get('telegram', {}).get('token'):
+            self.cb_msg('Token required for uploading to telegram')
+            return urls
+        
         title, author, emoji_dict = MetadataHandler.get_metadata(self.in_dir, title=self.opt_output.get('title'), author=self.opt_output.get('author'))
         if title == None:
             raise TypeError('title cannot be', title)

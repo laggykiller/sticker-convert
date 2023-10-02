@@ -17,13 +17,6 @@ from ..utils.codec_info import CodecInfo # type: ignore
 class UploadSignal(UploadBase):
     def __init__(self, *args, **kwargs):
         super(UploadSignal, self).__init__(*args, **kwargs)
-
-        if not self.opt_cred.get('signal', {}).get('uuid'):
-            self.cb_msg('uuid required for uploading to Signal')
-            return False
-        if not self.opt_cred.get('signal', {}).get('password'):
-            self.cb_msg('password required for uploading to Signal')
-            return False
         
         base_spec = {
             "size_max": {
@@ -95,6 +88,14 @@ class UploadSignal(UploadBase):
 
     def upload_stickers_signal(self) -> list[str]:
         urls = []
+
+        if not self.opt_cred.get('signal', {}).get('uuid'):
+            self.cb_msg('uuid required for uploading to Signal')
+            return urls
+        if not self.opt_cred.get('signal', {}).get('password'):
+            self.cb_msg('password required for uploading to Signal')
+            return urls
+        
         title, author, emoji_dict = MetadataHandler.get_metadata(self.in_dir, title=self.opt_output.get('title'), author=self.opt_output.get('author'))
         if title == None:
             raise TypeError(f'title cannot be {title}')
