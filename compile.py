@@ -153,8 +153,8 @@ def compile():
 
     if platform.system() == 'Windows':
         win_patch()
-    # elif platform.system() == 'Darwin':
-    #     osx_patch()
+    elif platform.system() == 'Darwin':
+        osx_patch()
 
 if __name__ == '__main__':
     compile()
