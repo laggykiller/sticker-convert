@@ -17,7 +17,7 @@ class CompFrame(LabelFrame):
 
         self.no_compress_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['no_compress']), bootstyle='secondary')
         self.no_compress_lbl = Label(self, text='No compression')
-        self.no_compress_cbox = Checkbutton(self, variable=self.gui.no_compress_var, command=self.cb_nocompress, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
+        self.no_compress_cbox = Checkbutton(self, variable=self.gui.no_compress_var, command=self.cb_no_compress, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
         self.comp_preset_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['preset']), bootstyle='secondary')
         self.comp_preset_lbl = Label(self, text='Preset')
@@ -55,7 +55,7 @@ class CompFrame(LabelFrame):
         self.comp_advanced_btn.grid(column=2, row=4, sticky='nes', padx=3, pady=3)
 
         self.cb_comp_apply_preset()
-        self.cb_nocompress()
+        self.cb_no_compress()
     
     def cb_comp_apply_preset(self, *args):
         selection = self.gui.get_preset()
@@ -85,13 +85,13 @@ class CompFrame(LabelFrame):
         self.gui.default_emoji_var.set(self.gui.compression_presets[selection]['default_emoji'])
         self.gui.steps_var.set(self.gui.compression_presets[selection]['steps'])
 
-        self.cb_nocompress()
+        self.cb_no_compress()
         self.gui.highlight_fields()
     
     def cb_compress_advanced(self, *args):
         AdvancedCompressionWindow(self.gui)
     
-    def cb_nocompress(self, *args):
+    def cb_no_compress(self, *args):
         if self.gui.no_compress_var.get() == True:
             state = 'disabled'
         else:

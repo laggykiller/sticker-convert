@@ -91,12 +91,7 @@ class GUI(Window):
             self.delete_creds()
         
         if self.flow:
-            while not self.flow.jobs_queue.empty():
-                self.flow.jobs_queue.get()
-            for process in self.flow.processes:
-                process.terminate()
-                process.join()
-
+            self.cancel_job()
         self.destroy()
             
     def declare_variables(self):
@@ -351,9 +346,6 @@ class GUI(Window):
         self.kakao_country_code_var.set(self.creds.get('kakao', {}).get('country_code', ''))
         self.kakao_phone_number_var.set(self.creds.get('kakao', {}).get('phone_number', ''))
         self.line_cookies_var.set(self.creds.get('line', {}). get('cookies', ''))
-
-    def start(self):
-        Thread(target=self.start_process, daemon=True).start()
     
     def get_input_name(self) -> str:
         return [k for k, v in self.input_presets.items() if v['full_name'] == self.input_option_true_var.get()][0]
@@ -380,6 +372,9 @@ class GUI(Window):
             
         else:
             return selection
+    
+    def start_job(self):
+        Thread(target=self.start_process, daemon=True).start()
 
     def start_process(self):
         self.save_config()
@@ -388,8 +383,8 @@ class GUI(Window):
         else:
             self.delete_creds()
 
+        self.control_frame.start_btn.config(text='Cancel', bootstyle='danger')
         self.set_inputs('disabled')
-        self.control_frame.start_btn.config(state='disabled')
     
         opt_input = {
             'option': self.get_input_name(),
@@ -475,19 +470,30 @@ class GUI(Window):
             self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
             )
         
-        success = self.flow.start()
+        status = self.flow.start()
 
         self.flow = None
 
-        if not success:
+        if status == 1:
             self.cb_msg(msg='An error occured during this run.')
+        elif status == 2:
+            self.cb_msg(msg='Job cancelled.')
 
-        self.stop()
+        self.stop_job()
     
-    def stop(self):
+    def stop_job(self):
         self.progress_frame.update_progress_bar(set_progress_mode='clear')
         self.set_inputs('normal')
-        self.control_frame.start_btn.config(state='normal')
+        self.control_frame.start_btn.config(text='Start', bootstyle='default')
+    
+    def cancel_job(self):
+        self.cb_msg(msg='Cancelling job...')
+        self.flow.is_cancel_job.value = 1
+        while not self.flow.jobs_queue.empty():
+            self.flow.jobs_queue.get()
+        for process in self.flow.processes:
+            process.terminate()
+            process.join()
 
     def set_inputs(self, state: str):
         # state: 'normal', 'disabled'
@@ -500,7 +506,7 @@ class GUI(Window):
 
         if state == 'normal':
             self.input_frame.cb_input_option()
-            self.comp_frame.cb_nocompress()
+            self.comp_frame.cb_no_compress()
     
     def poll_actions(self):
         if self.action_queue.empty():
@@ -620,6 +626,13 @@ class GUI(Window):
             self.output_frame.author_entry.config(bootstyle='warning')
         else:
             self.output_frame.author_entry.config(bootstyle='default')
+        
+        if self.comp_preset_var.get() == 'auto':
+            if output_option == 'local':
+                self.no_compress_var.set(True)
+            else:
+                self.no_compress_var.set(False)
+            self.comp_frame.cb_no_compress()
         
         # Credentials
         if output_option == 'signal' and not self.signal_uuid_var.get():
