@@ -60,7 +60,7 @@ class LineGetAuthWindow(BaseWindow):
             self.gui.creds['line']['cookies'] = line_cookies
             self.gui.line_cookies_var.set(line_cookies)
             
-            self.cb_msg_block_line(f'Got Line cookies successfully')
+            self.cb_msg_block_line('Got Line cookies successfully')
             self.gui.save_creds()
             self.gui.highlight_fields()
             return

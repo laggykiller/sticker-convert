@@ -60,13 +60,13 @@ RUN chmod -R 777 /app
 
 VOLUME ["/app/stickers_input", "/app/stickers_output"]
 
-FROM base-gui as min-gui
+FROM base-gui AS min-gui
 RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-FROM base-gui as full
+FROM base-gui AS full
 # Install signal-desktop-beta
 RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
     cat signal-desktop-keyring.gpg | tee -a /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null && \

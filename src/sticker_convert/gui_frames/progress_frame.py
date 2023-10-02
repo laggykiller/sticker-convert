@@ -57,8 +57,6 @@ class ProgressFrame(LabelFrame):
         msg = kwargs.get('msg')
         cls = kwargs.get('cls')
 
-        # scrollbar_prev_loc = self.message_box.yview()[1]
-
         if not msg and len(args) == 1:
             msg = str(args[0])
         
@@ -77,8 +75,6 @@ class ProgressFrame(LabelFrame):
         if msg:
             self.message_box.insert('end', msg)
 
-            # Follow the end of the box if it was at the end
-            # if scrollbar_prev_loc == 1.0:
             if self.auto_scroll:
                 self.message_box._text.yview_moveto(1.0)
 

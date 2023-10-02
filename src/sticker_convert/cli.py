@@ -34,7 +34,7 @@ class CLI:
         parser = argparse.ArgumentParser(description='CLI for stickers-convert', formatter_class=argparse.RawTextHelpFormatter)
 
         parser.add_argument('--version', action='version', version=__version__)
-        parser.add_argument(f'--no-confirm', dest='no_confirm', action='store_true', help=self.help['global']['no_confirm'])
+        parser.add_argument('--no-confirm', dest='no_confirm', action='store_true', help=self.help['global']['no_confirm'])
         
         parser_input = parser.add_argument_group('Input options')
         for k, v in self.help['input'].items():
@@ -176,7 +176,7 @@ class CLI:
             if output_option == 'local':
                 preset = 'custom'
                 args.no_compress = True
-                self.cb_msg(f'Auto compression option set to no_compress (Reason: Export to local directory only)')
+                self.cb_msg('Auto compression option set to no_compress (Reason: Export to local directory only)')
             elif output_option == 'imessage':
                 preset = 'imessage_small'
                 self.cb_msg(f'Auto compression option set to {preset}')
@@ -288,9 +288,9 @@ class CLI:
             if line_cookies:
                 self.opt_cred['line']['cookies'] = line_cookies
             
-                self.cb_msg(f'Got Line cookies successfully')
+                self.cb_msg('Got Line cookies successfully')
             else:
-                self.cb_msg(f'Failed to get Line cookies. Have you logged in the web browser?')
+                self.cb_msg('Failed to get Line cookies. Have you logged in the web browser?')
         
         if args.save_cred:
             creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')

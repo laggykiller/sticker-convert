@@ -60,7 +60,9 @@ class GetSignalAuth:
 
         self.cb_msg(download_url)
 
-        prompt = f'Signal Desktop not detected.\nDownload and install Signal Desktop BETA version\nAfter installation, quit Signal Desktop before continuing'
+        prompt = 'Signal Desktop not detected.\n'
+        prompt += 'Download and install Signal Desktop BETA version\n'
+        prompt += 'After installation, quit Signal Desktop before continuing'
         while not (os.path.isfile(signal_bin_path) or shutil.which(signal_bin_path)):
             if self.cb_ask_str != input:
                 self.cb_ask_str(prompt, initialvalue=download_url, cli_show_initialvalue=False)
@@ -154,7 +156,7 @@ class GetSignalAuth:
             with zipfile.ZipFile(f, 'r') as z, open(chromedriver_path, 'wb+') as g:
                 g.write(z.read(chromedriver_zip_path))
 
-        if not platform.system() == 'Windows':
+        if platform.system() != 'Windows':
             st = os.stat(chromedriver_path)
             os.chmod(chromedriver_path, st.st_mode | stat.S_IEXEC)
         
@@ -187,7 +189,7 @@ class GetSignalAuth:
             else:
                 uuid = str(self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id'))
                 password = str(self.driver.execute_script('return window.SignalDebug.getReduxState().items.password'))
-        except JavascriptException as e:
+        except JavascriptException:
             pass
 
         return uuid, password
@@ -241,7 +243,7 @@ class GetSignalAuth:
         if major_version:
             self.cb_msg(f'Signal Desktop is using chrome version {major_version}')
         else:
-            self.cb_msg(f'Unable to determine Signal Desktop chrome version')
+            self.cb_msg('Unable to determine Signal Desktop chrome version')
             return
         
         chromedriver_path, local_chromedriver_version = self.get_local_chromedriver(chromedriver_download_dir=self.chromedriver_download_dir)

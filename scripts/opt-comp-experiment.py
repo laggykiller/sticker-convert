@@ -75,7 +75,7 @@ class FakeCbMsg:
 
 def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
     apngasm = APNGAsm()
-    for i in range(int(duration/1000*fps)):
+    for _ in range(int(duration/1000*fps)):
         im = numpy.random.rand(res, res, 4) * 255
         frame = create_frame_from_rgba(im, res, res)
         frame.delay_num = int(1000 / fps)
@@ -171,7 +171,7 @@ def main():
             Thread(target=write_result, args=(csv_path, results_queue, len(combinations))).start()
 
             processes = []
-            for i in range(processes_max):
+            for _ in range(processes_max):
                 process = Process(
                     target=compress_worker,
                     args=(jobs_queue, results_queue)

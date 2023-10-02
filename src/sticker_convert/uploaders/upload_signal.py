@@ -105,7 +105,7 @@ class UploadSignal(UploadBase):
             msg_block = 'emoji.txt is required for uploading signal stickers\n'
             msg_block += f'emoji.txt generated for you in {self.in_dir}\n'
             msg_block += f'Default emoji is set to {self.opt_comp.get("default_emoji")}.\n'
-            msg_block += f'Please edit emoji.txt now, then continue'
+            msg_block += 'Please edit emoji.txt now, then continue'
             MetadataHandler.generate_emoji_file(dir=self.in_dir, default_emoji=self.opt_comp.get("default_emoji"))
 
             self.cb_msg_block(msg_block)

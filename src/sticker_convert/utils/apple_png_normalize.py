@@ -8,85 +8,85 @@ import zlib
 
 class ApplePngNormalize:
     @staticmethod
-    def normalize(oldPNG: bytes) -> bytes:
-        pngheader = b"\x89PNG\r\n\x1a\n"
+    def normalize(old_png: bytes) -> bytes:
+        png_header = b"\x89PNG\r\n\x1a\n"
 
-        if oldPNG[:8] != pngheader:
-            return oldPNG
+        if old_png[:8] != png_header:
+            return old_png
 
-        newPNG = oldPNG[:8]
+        new_png = old_png[:8]
 
-        chunkPos = len(newPNG)
-        chunkD = bytearray()
+        chunk_pos = len(new_png)
+        chunk_d = bytearray()
 
-        foundCGBi = False
+        found_cgbi = False
 
         # For each chunk in the PNG file
-        while chunkPos < len(oldPNG):
+        while chunk_pos < len(old_png):
 
             # Reading chunk
-            chunkLength = oldPNG[chunkPos:chunkPos+4]
-            chunkLength = struct.unpack(">L", chunkLength)[0]
-            chunkType = oldPNG[chunkPos+4 : chunkPos+8]
-            chunkData = oldPNG[chunkPos+8:chunkPos+8+chunkLength] # type: ignore[operator]
-            chunkCRC = oldPNG[chunkPos+chunkLength+8:chunkPos+chunkLength+12] # type: ignore[operator]
-            chunkCRC = struct.unpack(">L", chunkCRC)[0]
-            chunkPos += chunkLength + 12 # type: ignore[operator]
+            chunk_length = old_png[chunk_pos:chunk_pos+4]
+            chunk_length = struct.unpack(">L", chunk_length)[0]
+            chunk_type = old_png[chunk_pos+4 : chunk_pos+8]
+            chunk_data = old_png[chunk_pos+8:chunk_pos+8+chunk_length] # type: ignore[operator]
+            chunk_crc = old_png[chunk_pos+chunk_length+8:chunk_pos+chunk_length+12] # type: ignore[operator]
+            chunk_crc = struct.unpack(">L", chunk_crc)[0]
+            chunk_pos += chunk_length + 12 # type: ignore[operator]
 
             # Parsing the header chunk
-            if chunkType == b"IHDR":
-                width = struct.unpack(">L", chunkData[0:4])[0]
-                height = struct.unpack(">L", chunkData[4:8])[0]
+            if chunk_type == b"IHDR":
+                width = struct.unpack(">L", chunk_data[0:4])[0]
+                height = struct.unpack(">L", chunk_data[4:8])[0]
 
             # Parsing the image chunk
-            if chunkType == b"IDAT":
+            if chunk_type == b"IDAT":
                 # Concatename all image data chunks
-                chunkD += chunkData
+                chunk_d += chunk_data
                 continue
 
             # Stopping the PNG file parsing
-            if chunkType == b"IEND":
-                if not foundCGBi:
-                    return oldPNG
+            if chunk_type == b"IEND":
+                if not found_cgbi:
+                    return old_png
 
                 bufSize = width * height * 4 + height
-                chunkData = zlib.decompress(chunkD, -8, bufSize)
+                chunk_data = zlib.decompress(chunk_d, -8, bufSize)
 
                 # Swapping red & blue bytes for each pixel
-                chunkData = bytearray(chunkData)
+                chunk_data = bytearray(chunk_data)
                 offset = 1
                 for y in range(height):
                     for x in range(width):
-                        chunkData[offset+4*x],chunkData[offset+4*x+2] = chunkData[offset+4*x+2],chunkData[offset+4*x]
+                        chunk_data[offset+4*x],chunk_data[offset+4*x+2] = chunk_data[offset+4*x+2],chunk_data[offset+4*x]
                     offset += 1+4*width
 
                 # Compressing the image chunk
-                #chunkData = newdata
-                chunkData = zlib.compress( chunkData )
-                chunkLength = len( chunkData ) # type: ignore[assignment]
-                chunkCRC = zlib.crc32(b'IDAT') # type: ignore[assignment]
-                chunkCRC = zlib.crc32(chunkData, chunkCRC) # type: ignore[assignment, arg-type]
-                chunkCRC = (chunkCRC + 0x100000000) % 0x100000000 # type: ignore[operator]
+                #chunk_data = newdata
+                chunk_data = zlib.compress(chunk_data)
+                chunk_length = len(chunk_data) # type: ignore[assignment]
+                chunk_crc = zlib.crc32(b'IDAT') # type: ignore[assignment]
+                chunk_crc = zlib.crc32(chunk_data, chunk_crc) # type: ignore[assignment, arg-type]
+                chunk_crc = (chunk_crc + 0x100000000) % 0x100000000 # type: ignore[operator]
 
-                newPNG += struct.pack(">L", chunkLength)
-                newPNG += b'IDAT'
-                newPNG += chunkData
-                newPNG += struct.pack(">L", chunkCRC)
+                new_png += struct.pack(">L", chunk_length)
+                new_png += b'IDAT'
+                new_png += chunk_data
+                new_png += struct.pack(">L", chunk_crc)
 
-                chunkCRC = zlib.crc32(chunkType) # type: ignore[assignment]
-                newPNG += struct.pack(">L", 0)
-                newPNG += b'IEND'
-                newPNG += struct.pack(">L", chunkCRC)
+                chunk_crc = zlib.crc32(chunk_type) # type: ignore[assignment]
+                new_png += struct.pack(">L", 0)
+                new_png += b'IEND'
+                new_png += struct.pack(">L", chunk_crc)
                 break
 
             # Removing CgBI chunk
-            if chunkType == b"CgBI":
-                foundCGBi = True
+            if chunk_type == b"CgBI":
+                found_cgbi = True
             else:
-                newPNG += struct.pack(">L", chunkLength)
-                newPNG += chunkType
-                if chunkLength > 0: # type: ignore[operator]
-                    newPNG += chunkData
-                newPNG += struct.pack(">L", chunkCRC)
+                new_png += struct.pack(">L", chunk_length)
+                new_png += chunk_type
+                if chunk_length > 0: # type: ignore[operator]
+                    new_png += chunk_data
+                new_png += struct.pack(">L", chunk_crc)
 
-        return newPNG
+        return new_png

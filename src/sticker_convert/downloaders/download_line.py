@@ -34,7 +34,6 @@ class MetadataLine:
             pack_id = url.replace('https://line.me/S/sticker/', '').split('/')[0]
             region = parse.parse_qs(url_parsed.query)['lang'][0]
         elif url.startswith('https://store.line.me/officialaccount/event/sticker/'):
-            url_parsed = parse.urlparse(url)
             pack_id = url.replace('https://store.line.me/officialaccount/event/sticker/', '').split('/')[0]
             region = url.replace('https://store.line.me/officialaccount/event/sticker/', '').split('/')[1]
         elif url.startswith('https://store.line.me/emojishop/product/'):
@@ -178,7 +177,7 @@ class DownloadLine(DownloadBase):
     def decompress_emoticon(self, zip_file: bytes):
         num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
-            self.cb_msg(f'Unzipping...')
+            self.cb_msg('Unzipping...')
 
             self.cb_bar(set_progress_mode='determinate', steps=len(self.pack_files))
             for sticker in self.pack_files:
@@ -201,7 +200,7 @@ class DownloadLine(DownloadBase):
     def decompress_stickers(self, zip_file: bytes):
         num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
-            self.cb_msg(f'Unzipping...')
+            self.cb_msg('Unzipping...')
 
             self.cb_bar(set_progress_mode='determinate', steps=len(self.pack_files))
             for sticker in self.pack_files:

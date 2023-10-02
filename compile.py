@@ -73,7 +73,7 @@ def osx_install_universal2_dep():
     osx_run_in_venv('python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64')
 
     create_universal_wheels('./wheel_arm', './wheel_x64', 'wheel_universal2')
-    osx_run_in_venv(f'python -m pip install --require-virtualenv ./wheel_universal2/*')
+    osx_run_in_venv('python -m pip install --require-virtualenv ./wheel_universal2/*')
 
 def nuitka(python_bin, arch):
     cmd_list = [
@@ -99,7 +99,7 @@ def nuitka(python_bin, arch):
         cmd_list.append('--windows-icon-from-ico=src/sticker_convert/resources/appicon.ico')
     elif platform.system() == 'Darwin' and arch:
         cmd_list.append(f'--macos-target-arch={arch}')
-        cmd_list.append(f'--disable-console')
+        cmd_list.append('--disable-console')
 
     cmd_list.append('src/sticker-convert.py')
     if platform.system() == 'Darwin':
@@ -122,7 +122,7 @@ def osx_patch():
         f.write('open ./sticker-convert-cli')
     os.chmod('sticker-convert.app/Contents/MacOS/sticker-convert', 0o744)
 
-    osx_run_in_venv(f'codesign --force --deep -s - sticker-convert.app')
+    osx_run_in_venv('codesign --force --deep -s - sticker-convert.app')
 
 def compile():
     arch = os.environ.get('SC_COMPILE_ARCH')
@@ -153,8 +153,8 @@ def compile():
 
     if platform.system() == 'Windows':
         win_patch()
-    elif platform.system() == 'Darwin' and arch:
-        osx_patch()
+    # elif platform.system() == 'Darwin':
+    #     osx_patch()
 
 if __name__ == '__main__':
     compile()

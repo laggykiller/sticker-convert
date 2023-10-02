@@ -241,7 +241,7 @@ class DownloadKakao(DownloadBase):
                 
         num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
-            self.cb_msg(f'Unzipping...')
+            self.cb_msg('Unzipping...')
             if self.cb_bar:
                 self.cb_bar(set_progress_mode='determinate', steps=len(zf.namelist()))
 

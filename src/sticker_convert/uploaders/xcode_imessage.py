@@ -217,7 +217,7 @@ class XcodeImessage(UploadBase):
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/0.png
                 shutil.copy(os.path.join(self.in_dir, i), os.path.join(sticker_path, i))
 
-                dict = {
+                json_content = {
                     'info': {
                         'author': 'xcode',
                         'version': 1,
@@ -229,18 +229,18 @@ class XcodeImessage(UploadBase):
 
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/Contents.json
                 with open(os.path.join(sticker_path, 'Contents.json'), 'w+') as f:
-                    json.dump(dict, f, indent=2)
+                    json.dump(json_content, f, indent=2)
         
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/Contents.json
         with open(os.path.join(stickers_path, 'Contents.json')) as f:
-            dict = json.load(f)
+            json_content = json.load(f)
         
-        dict['stickers'] = []
+        json_content['stickers'] = []
         for i in stickers_lst:
-            dict['stickers'].append({'filename': i}) # type: ignore[attr-defined]
+            json_content['stickers'].append({'filename': i}) # type: ignore[attr-defined]
         
         with open(os.path.join(stickers_path, 'Contents.json'), 'w+') as f:
-            json.dump(dict, f, indent=2)
+            json.dump(json_content, f, indent=2)
 
         # packname StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset
         iconset_path = os.path.join(pack_path, 'stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset')
