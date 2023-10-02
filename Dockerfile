@@ -5,11 +5,10 @@ WORKDIR /app
 RUN apt update -y && \
     apt install --no-install-recommends -y python3 python3-pip
 
-COPY ./requirements-bin.txt /app/
-COPY ./requirements-src.txt /app/
-RUN cat requirements-bin.txt | grep -v 'ttkbootstrap' > requirements-bin-cli.txt &&\
-    rm requirements-bin.txt &&\
-    pip3 install --no-cache-dir -r requirements-bin-cli.txt -r requirements-src.txt
+COPY ./requirements.txt /app/
+RUN cat requirements.txt | grep -v 'ttkbootstrap' > requirements-cli.txt &&\
+    rm requirements.txt &&\
+    pip3 install --no-cache-dir -r requirements-cli.txt
 
 COPY ./src /app/
 
@@ -22,7 +21,7 @@ RUN apt purge -y python3-pip && \
 
 VOLUME ["/app/stickers_input", "/app/stickers_output"]
 
-ENTRYPOINT ["/app/main.py"]
+ENTRYPOINT ["/app/sticker-convert.py"]
 
 FROM jlesage/baseimage-gui:debian-11-v4 AS base-gui
 
@@ -51,9 +50,8 @@ ENV DISPLAY_HEIGHT=1080
 RUN mkdir /etc/openbox && \
     printf '<Type>normal</Type>\n<Name>sticker-convert</Name>' >> /etc/openbox/main-window-selection.xml
 
-COPY ./requirements-bin.txt /app/
-COPY ./requirements-src.txt /app/
-RUN pip3 install --no-cache-dir -r requirements-bin.txt -r requirements-src.txt
+COPY ./requirements.txt /app/
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY ./scripts/startapp.sh /startapp.sh
 COPY ./src /app/

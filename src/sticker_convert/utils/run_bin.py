@@ -2,7 +2,7 @@
 import subprocess
 import os
 import shutil
-import sys
+import platform
 from typing import Union, AnyStr
 
 class RunBin:
@@ -11,7 +11,7 @@ class RunBin:
         if os.path.isfile(bin):
             return bin
 
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             bin = bin + '.exe'
 
         which_result = shutil.which(bin)

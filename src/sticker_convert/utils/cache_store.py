@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import os
-import sys
+import platform
 import shutil
 from uuid import uuid4
-if sys.platform == 'linux':
+if platform.system() == 'Linux':
     import memory_tempfile # type: ignore
     tempfile = memory_tempfile.MemoryTempfile(fallback=True)
 else:

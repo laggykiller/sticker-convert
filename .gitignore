@@ -4,6 +4,7 @@
 
 # C extensions
 *.so
+*.dylib
 
 # Distribution / packaging
 bin/
@@ -19,6 +20,8 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.exe
+**/*.app
 
 # Installer logs
 pip-log.txt
@@ -61,6 +64,11 @@ pyvenv.cfg
 *.wixpdb
 **/.wix
 
+# Nuitka
+**/*.build
+**/*.dist
+**/wheel_*
+
 **/stickers_input
 **/stickers_output
 scripts/opt-comp-result
@@ -71,3 +79,4 @@ config.json
 .DS_Store
 ._.DS_Store
 **/sticker-convert
+src/sticker_convert/ios-message-stickers-template.zip

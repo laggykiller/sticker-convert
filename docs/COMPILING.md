@@ -3,21 +3,17 @@
 Install python3 from https://www.python.org/
 
 ## 2. Install python modules
-Install the required python modules with `pip3 install -r requirements-build.txt`
+Install the required python modules with `pip3 install -r requirements.txt`
 
 ## 3. Running the script
-Change directory into `sticker_convert` directory and run `python3 ./main.py`
+Change directory into `sticker_convert` directory and run `python3 ./sticker-convert.py`
 
-# Compiling
-This repository uses `pyinstaller` for compiling. Install with `pip3 install pyinstaller`
+# Compiling on Windows and MacOS
+This repository uses `nuitka` for compiling.
 
-## Compiling on windows
-1. Run `pyinstaller sticker_convert.spec`
-2. Compilation result in `dist` directory
-
-##  Compiling on MacOS
-1. Run `pyinstaller sticker_convert.spec`
-2. Compilation result in `dist` directory
+1. Install dependencies with `pip3 install -r requirements.txt` and `pip3 install -r requirements-build.txt`
+2. Run `python compile.py`
+3. Compilation result in `sticker-convert.dist` directory
 
 ## Creating AppImage on Linux
 1. Use Ubuntu 20.04 (May work on newer version if you change `sourceline` in `AppImageBuilder.yml`)
@@ -35,7 +31,7 @@ sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
 1. Install [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
 2. Install [Wix](https://wixtoolset.org/docs/intro/): `dotnet tool install --global wix`
 3. `wix extension add WixToolset.UI.wixext`
-4. `pyinstaller sticker_convert.spec`
+4. `python compile.py`
 5. `mv dist\sticker-convert sticker-convert`
 6. `python msicreator\createmsi.py msicreator.json`
 

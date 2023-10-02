@@ -11,26 +11,26 @@ from ..utils.url_detect import UrlDetect # type: ignore
 from ..utils.curr_dir import CurrDir # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
-class InputFrame:
-    def __init__(self, gui: "GUI"):
+class InputFrame(LabelFrame):
+    def __init__(self, gui: "GUI", *args, **kwargs):
         self.gui = gui
-        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Input')
+        super(InputFrame, self).__init__(*args, **kwargs)
 
-        self.input_option_lbl = Label(self.frame, text='Input source', width=15, justify='left', anchor='w')
+        self.input_option_lbl = Label(self, text='Input source', width=15, justify='left', anchor='w')
         input_full_names = [i['full_name'] for i in self.gui.input_presets.values()]
         default_input_full_name = self.gui.input_presets[self.gui.default_input_mode]['full_name']
-        self.input_option_opt = OptionMenu(self.frame, self.gui.input_option_display_var, default_input_full_name, *input_full_names, command=self.cb_input_option, bootstyle='secondary')
+        self.input_option_opt = OptionMenu(self, self.gui.input_option_display_var, default_input_full_name, *input_full_names, command=self.cb_input_option, bootstyle='secondary')
         self.input_option_opt.config(width=32)
 
-        self.input_setdir_lbl = Label(self.frame, text='Input directory', width=35, justify='left', anchor='w')
-        self.input_setdir_entry = Entry(self.frame, textvariable=self.gui.input_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
+        self.input_setdir_lbl = Label(self, text='Input directory', width=35, justify='left', anchor='w')
+        self.input_setdir_entry = Entry(self, textvariable=self.gui.input_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
         self.input_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
-        self.setdir_btn = Button(self.frame, text='Choose directory', command=self.cb_set_indir, width=16, bootstyle='secondary')
+        self.setdir_btn = Button(self, text='Choose directory', command=self.cb_set_indir, width=16, bootstyle='secondary')
 
-        self.address_lbl = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['address_lbls'], width=18, justify='left', anchor='w')
-        self.address_entry = Entry(self.frame, textvariable=self.gui.input_address_var, width=80, validate="focusout", validatecommand=self.cb_input_option)
+        self.address_lbl = Label(self, text=self.gui.input_presets[self.gui.default_input_mode]['address_lbls'], width=18, justify='left', anchor='w')
+        self.address_entry = Entry(self, textvariable=self.gui.input_address_var, width=80, validate="focusout", validatecommand=self.cb_input_option)
         self.address_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
-        self.address_tip = Label(self.frame, text=self.gui.input_presets[self.gui.default_input_mode]['example'], justify='left', anchor='w')
+        self.address_tip = Label(self, text=self.gui.input_presets[self.gui.default_input_mode]['example'], justify='left', anchor='w')
 
         self.input_option_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.input_option_opt.grid(column=1, row=0, columnspan=2, sticky='w', padx=3, pady=3)

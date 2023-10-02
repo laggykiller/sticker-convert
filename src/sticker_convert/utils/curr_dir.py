@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import sys
+import platform
 
 class CurrDir:
     @staticmethod
@@ -14,7 +15,7 @@ class CurrDir:
         else:
             fallback_dir = home_dir
 
-        if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and '.app/Contents/MacOS' in cwd:
+        if platform.system() == 'Darwin' and getattr(sys, 'frozen', False) and '.app/Contents/MacOS' in cwd:
             if cwd.startswith('/Applications/'):
                 curr_dir = fallback_dir
             else:
@@ -40,12 +41,12 @@ class CurrDir:
         appimage_path = os.getenv('APPIMAGE')
 
         cwd = os.getcwd()
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             fallback_dir = os.path.expandvars('%APPDATA%\\sticker-convert')
         else:
             fallback_dir = os.path.expanduser('~/.config/sticker-convert')
 
-        if sys.platform == 'darwin' and getattr(sys, 'frozen', False) and '.app/Contents/MacOS' in cwd:
+        if platform.system() == 'Darwin' and getattr(sys, 'frozen', False) and '.app/Contents/MacOS' in cwd:
             if cwd.startswith('/Applications/'):
                 config_dir = fallback_dir
             else:

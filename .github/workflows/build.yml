@@ -20,21 +20,21 @@ jobs:
         token: "${{ secrets.GITHUB_TOKEN }}"
         name: Release ${{ github.ref_name }}
   
-  build-wheel:
-    name: Build wheel
-    needs: createrelease
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+  # build-wheel:
+  #   name: Build wheel
+  #   needs: createrelease
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
 
-      - name: Build SDist and wheel
-        run: pipx run build
+  #     - name: Build SDist and wheel
+  #       run: pipx run build
 
-      - uses: actions/upload-artifact@v3
-        with:
-          path: dist/*
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: dist/*
 
   build-binary:
     name: Build packages
@@ -46,61 +46,31 @@ jobs:
           - os: windows-2019
             TARGET: windows
             CMD_BUILD: |
-                python -m pip install --upgrade pip
-                pip install wheel
-                pip install -r requirements-build.txt
-                pyinstaller sticker_convert.spec
-                cd dist
+                python compile.py
+                move sticker-convert.dist sticker-convert
                 Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-windows-x86_64.zip
                 
-                cd ..
-                move dist\sticker-convert sticker-convert
                 dotnet tool install --global wix
                 wix extension add WixToolset.UI.wixext
                 python .\msicreator\createmsi.py msicreator.json
-                move *.msi dist\sticker-convert-windows-x86_64.msi
+                move *.msi sticker-convert-windows-x86_64.msi
             OUT_FILE_NAME: |
-              ./dist/sticker-convert-windows-x86_64.zip
-              ./dist/sticker-convert-windows-x86_64.msi
+              ./sticker-convert-windows-x86_64.zip
+              ./sticker-convert-windows-x86_64.msi
           - os: macos-11
             TARGET: macos
             CMD_BUILD: |
-                python -m pip install --upgrade pip
-                python -m venv venv
-                source ./venv/bin/activate
-                pip install wheel delocate pyinstaller~=5.13.2
-                pip install -r requirements-src.txt
-                mkdir wheel_arm
-                mkdir wheel_x64
-                mkdir wheel_universal2
-                pip download -r requirements-bin.txt --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm
-                pip download -r requirements-bin.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64
-                python ./scripts/delocate-fuse-dir.py ./wheel_arm ./wheel_x64 ./wheel_universal2
-                pip install ./wheel_universal2/*.whl
-                mkdir dist
-                cp ./scripts/run_me_first.command ./dist
-
-                SC_TARGET_ARCH=x86_64 pyinstaller sticker_convert.spec
-                cd dist/
-                zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app run_me_first.command
-                rm -rf ./sticker-convert
-                rm -rf ./sticker-convert.app
-                cd ../
-
-                SC_TARGET_ARCH=arm64 pyinstaller sticker_convert.spec
-                cd dist/
-                zip -r9 sticker-convert-macos-arm64.zip sticker-convert.app run_me_first.command
-                rm -rf ./sticker-convert
-                rm -rf ./sticker-convert.app
-                cd ../
-
-                SC_TARGET_ARCH=universal2 pyinstaller sticker_convert.spec
-                cd dist/
-                zip -r9 sticker-convert-macos-universal2.zip sticker-convert.app run_me_first.command
-            OUT_FILE_NAME: |
-              ./dist/sticker-convert-macos-x86_64.zip
-              ./dist/sticker-convert-macos-arm64.zip
-              ./dist/sticker-convert-macos-universal2.zip
+                SC_COMPILE_ARCH=x86_64 python ./compile.py
+                cp ./scripts/hold_control_and_click_open_me_first.command ./
+                zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app hold_control_and_click_open_me_first.command
+            OUT_FILE_NAME: ./sticker-convert-macos-x86_64.zip
+          - os: macos-11
+            TARGET: macos
+            CMD_BUILD: |
+                SC_COMPILE_ARCH=arm64 python ./compile.py
+                cp ./scripts/hold_control_and_click_open_me_first.command ./
+                zip -r9 sticker-convert-macos-arm64.zip sticker-convert.app hold_control_and_click_open_me_first.command
+            OUT_FILE_NAME: ./sticker-convert-macos-arm64.zip
           - os: ubuntu-20.04
             TARGET: linux
             CMD_BUILD: |
@@ -122,9 +92,7 @@ jobs:
                 # Bundling into appimage
                 ARCH=x86_64 ./appimagetool ./AppDir
                 chmod +x sticker-convert-x86_64.AppImage
-                mkdir dist
-                mv ./sticker-convert-x86_64.AppImage ./dist/sticker-convert-x86_64.AppImage
-            OUT_FILE_NAME: ./dist/sticker-convert-x86_64.AppImage
+            OUT_FILE_NAME: ./sticker-convert-x86_64.AppImage
     steps:
     - uses: actions/checkout@v3
       with:
@@ -148,99 +116,99 @@ jobs:
       with:
         files: ${{ matrix.OUT_FILE_NAME }}
 
-  build-docker:
-    name: Build Docker image and push
-    runs-on: ubuntu-latest
+  # build-docker:
+  #   name: Build Docker image and push
+  #   runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+  #     - name: Log in to Docker Hub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME }}
+  #         password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Extract metadata (tags, labels) for Docker (min-cli)
-        id: meta_min_cli
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
-          flavor: |
-            suffix=-min-cli,onlatest=true
+  #     - name: Extract metadata (tags, labels) for Docker (min-cli)
+  #       id: meta_min_cli
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: |
+  #           ${{ github.repository }}
+  #           ghcr.io/${{ github.repository }}
+  #         flavor: |
+  #           suffix=-min-cli,onlatest=true
       
-      - name: Extract metadata (tags, labels) for Docker (min-gui)
-        id: meta_min_gui
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
-          flavor: |
-            suffix=-min-gui,onlatest=true
+  #     - name: Extract metadata (tags, labels) for Docker (min-gui)
+  #       id: meta_min_gui
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: |
+  #           ${{ github.repository }}
+  #           ghcr.io/${{ github.repository }}
+  #         flavor: |
+  #           suffix=-min-gui,onlatest=true
       
-      - name: Extract metadata (tags, labels) for Docker (full)
-        id: meta_full
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
+  #     - name: Extract metadata (tags, labels) for Docker (full)
+  #       id: meta_full
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: |
+  #           ${{ github.repository }}
+  #           ghcr.io/${{ github.repository }}
     
-      - name: Build and push Docker image (min-cli)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta_min_cli.outputs.tags }}
-          labels: ${{ steps.meta_min_cli.outputs.labels }}
-          target: min-cli
+  #     - name: Build and push Docker image (min-cli)
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ steps.meta_min_cli.outputs.tags }}
+  #         labels: ${{ steps.meta_min_cli.outputs.labels }}
+  #         target: min-cli
       
-      - name: Build and push Docker image (min-gui)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta_min_gui.outputs.tags }}
-          labels: ${{ steps.meta_min_gui.outputs.labels }}
-          target: min-gui
+  #     - name: Build and push Docker image (min-gui)
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ steps.meta_min_gui.outputs.tags }}
+  #         labels: ${{ steps.meta_min_gui.outputs.labels }}
+  #         target: min-gui
 
-      - name: Build and push Docker image (full)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta_full.outputs.tags }}
-          labels: ${{ steps.meta_full.outputs.labels }}
-          target: full
+  #     - name: Build and push Docker image (full)
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ steps.meta_full.outputs.tags }}
+  #         labels: ${{ steps.meta_full.outputs.labels }}
+  #         target: full
   
-  upload-pypi:
-    name: Upload to pypi
-    needs: [build-wheel, build-binary]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          # unpacks default artifact into dist/
-          # if `name: artifact` is omitted, the action will create extra parent dir
-          name: artifact
-          path: dist
+  # upload-pypi:
+  #   name: Upload to pypi
+  #   needs: [build-wheel, build-binary]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         # unpacks default artifact into dist/
+  #         # if `name: artifact` is omitted, the action will create extra parent dir
+  #         name: artifact
+  #         path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.5.0
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+  #     - uses: pypa/gh-action-pypi-publish@v1.5.0
+  #       with:
+  #         user: __token__
+  #         password: ${{ secrets.PYPI_API_TOKEN }}

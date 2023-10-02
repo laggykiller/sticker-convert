@@ -9,19 +9,19 @@ if TYPE_CHECKING:
     from ..gui import GUI # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
-class ProgressFrame:
+class ProgressFrame(LabelFrame):
     progress_bar_cli = None
     progress_bar_steps = 0
     auto_scroll = True
 
-    def __init__(self, gui: "GUI"):
+    def __init__(self, gui: "GUI", *args, **kwargs):
         self.gui = gui
-        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Progress')
+        super(ProgressFrame, self).__init__(*args, **kwargs)
 
-        self.message_box = ScrolledText(self.frame, height=15, wrap='word')
+        self.message_box = ScrolledText(self, height=15, wrap='word')
         self.message_box._text.bind('<Button-3><ButtonRelease-3>', RightClicker)
         self.message_box._text.config(state='disabled')
-        self.progress_bar = Progressbar(self.frame, orient='horizontal', mode='determinate')
+        self.progress_bar = Progressbar(self, orient='horizontal', mode='determinate')
 
         self.message_box.bind('<Enter>', self.cb_disable_autoscroll)
         self.message_box.bind('<Leave>', self.cb_enable_autoscroll)

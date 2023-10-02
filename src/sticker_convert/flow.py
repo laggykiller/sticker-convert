@@ -2,7 +2,7 @@
 import os
 import shutil
 from datetime import datetime
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, Value
 from threading import Thread
 from urllib.parse import urlparse
 from typing import Optional
@@ -47,6 +47,8 @@ class Flow:
         self.cb_msg_queue: Queue[Optional[str]] = Queue()
         self.processes: list[Process] = []
 
+        self.is_cancel_job = Value('i', 0)
+
         if os.path.isdir(self.opt_input['dir']) == False:
             os.makedirs(self.opt_input['dir'])
 
@@ -69,10 +71,12 @@ class Flow:
 
         for task in tasks:
             success = task()
+            if self.is_cancel_job.value == 1:
+                return 2
             if not success:
-                return False
+                return 1
 
-        return True
+        return 0
     
     def sanitize(self) -> bool:
         def to_int(i):

@@ -11,42 +11,42 @@ from ..gui_windows.line_get_auth_window import LineGetAuthWindow # type: ignore
 from ..gui_windows.kakao_get_auth_window import KakaoGetAuthWindow # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
-class CredFrame:
-    def __init__(self, gui: "GUI"):
+class CredFrame(LabelFrame):
+    def __init__(self, gui: "GUI", *args, **kwargs):
         self.gui = gui
-        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Credentials')
+        super(CredFrame, self).__init__(*args, **kwargs)
 
-        self.frame.grid_columnconfigure(1, weight=1)
+        self.grid_columnconfigure(1, weight=1)
 
-        self.signal_uuid_lbl = Label(self.frame, text='Signal uuid', width=18, justify='left', anchor='w')
-        self.signal_uuid_entry = Entry(self.frame, textvariable=self.gui.signal_uuid_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
+        self.signal_uuid_lbl = Label(self, text='Signal uuid', width=18, justify='left', anchor='w')
+        self.signal_uuid_entry = Entry(self, textvariable=self.gui.signal_uuid_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
         self.signal_uuid_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
-        self.signal_password_lbl = Label(self.frame, text='Signal password', justify='left', anchor='w')
-        self.signal_password_entry = Entry(self.frame, textvariable=self.gui.signal_password_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
+        self.signal_password_lbl = Label(self, text='Signal password', justify='left', anchor='w')
+        self.signal_password_entry = Entry(self, textvariable=self.gui.signal_password_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
         self.signal_password_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
-        self.signal_get_auth_btn = Button(self.frame, text='Generate', command=self.cb_signal_get_auth, bootstyle='secondary')
+        self.signal_get_auth_btn = Button(self, text='Generate', command=self.cb_signal_get_auth, bootstyle='secondary')
 
-        self.telegram_token_lbl = Label(self.frame, text='Telegram token', justify='left', anchor='w')
-        self.telegram_token_entry = Entry(self.frame, textvariable=self.gui.telegram_token_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
+        self.telegram_token_lbl = Label(self, text='Telegram token', justify='left', anchor='w')
+        self.telegram_token_entry = Entry(self, textvariable=self.gui.telegram_token_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
         self.telegram_token_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
-        self.telegram_userid_lbl = Label(self.frame, text='Telegram user_id', justify='left', anchor='w')
-        self.telegram_userid_entry = Entry(self.frame, textvariable=self.gui.telegram_userid_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
+        self.telegram_userid_lbl = Label(self, text='Telegram user_id', justify='left', anchor='w')
+        self.telegram_userid_entry = Entry(self, textvariable=self.gui.telegram_userid_var, width=50, validate="focusout", validatecommand=self.gui.highlight_fields)
         self.telegram_userid_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
-        self.kakao_auth_token_lbl = Label(self.frame, text='Kakao auth_token', justify='left', anchor='w')
-        self.kakao_auth_token_entry = Entry(self.frame, textvariable=self.gui.kakao_auth_token_var, width=35)
+        self.kakao_auth_token_lbl = Label(self, text='Kakao auth_token', justify='left', anchor='w')
+        self.kakao_auth_token_entry = Entry(self, textvariable=self.gui.kakao_auth_token_var, width=35)
         self.kakao_auth_token_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
-        self.kakao_get_auth_btn = Button(self.frame, text='Generate', command=self.cb_kakao_get_auth, bootstyle='secondary')
+        self.kakao_get_auth_btn = Button(self, text='Generate', command=self.cb_kakao_get_auth, bootstyle='secondary')
 
-        self.line_cookies_lbl = Label(self.frame, text='Line cookies', width=18, justify='left', anchor='w')
-        self.line_cookies_entry = Entry(self.frame, textvariable=self.gui.line_cookies_var, width=35)
+        self.line_cookies_lbl = Label(self, text='Line cookies', width=18, justify='left', anchor='w')
+        self.line_cookies_entry = Entry(self, textvariable=self.gui.line_cookies_var, width=35)
         self.line_cookies_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
-        self.line_get_auth_btn = Button(self.frame, text='Generate', command=self.cb_line_get_auth, bootstyle='secondary')
+        self.line_get_auth_btn = Button(self, text='Generate', command=self.cb_line_get_auth, bootstyle='secondary')
 
-        self.help_btn = Button(self.frame, text='Get help', command=self.cb_cred_help, bootstyle='secondary')
+        self.help_btn = Button(self, text='Get help', command=self.cb_cred_help, bootstyle='secondary')
 
         self.signal_uuid_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.signal_uuid_entry.grid(column=1, row=0, columnspan=2, sticky='w', padx=3, pady=3)

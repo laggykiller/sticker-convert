@@ -4,7 +4,6 @@ import io
 import json
 import shutil
 import stat
-import sys
 import platform
 import zipfile
 import string
@@ -34,7 +33,7 @@ def strings(filename: str, min: int = 4) -> Generator[str, None, None]:
 
 class GetSignalAuth:
     def __init__(self, signal_bin_version: str = 'beta', chromedriver_download_dir: str = './bin', cb_msg=print, cb_ask_str=input):
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             fallback_dir = os.path.expandvars('%APPDATA%\\sticker-convert')
         else:
             fallback_dir = os.path.expanduser('~/.config/sticker-convert')
@@ -85,7 +84,7 @@ class GetSignalAuth:
     
     def get_local_chromedriver(self, chromedriver_download_dir: str) -> tuple[Optional[str], Optional[str]]:
         local_chromedriver_version = None
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             chromedriver_name = 'chromedriver.exe'
         else:
             chromedriver_name = 'chromedriver'
@@ -102,13 +101,13 @@ class GetSignalAuth:
         return chromedriver_path, local_chromedriver_version
     
     def download_chromedriver(self, major_version: str, chromedriver_download_dir: str = '') -> str:
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             chromedriver_platform = 'win32'
             if '64' in platform.architecture()[0]:
                 chromedriver_platform_new = 'win64'
             else:
                 chromedriver_platform_new = 'win32'
-        elif sys.platform == 'darwin':
+        elif platform.system() == 'Darwin':
             if platform.processor().lower() == 'arm64':
                 chromedriver_platform = 'mac_arm64'
                 chromedriver_platform_new = 'mac-arm64'
@@ -138,7 +137,7 @@ class GetSignalAuth:
                 if chromedriver_url:
                     break
 
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             chromedriver_name = 'chromedriver.exe'
         else:
             chromedriver_name = 'chromedriver'
@@ -155,14 +154,14 @@ class GetSignalAuth:
             with zipfile.ZipFile(f, 'r') as z, open(chromedriver_path, 'wb+') as g:
                 g.write(z.read(chromedriver_zip_path))
 
-        if not sys.platform == 'win32':
+        if not platform.system() == 'Windows':
             st = os.stat(chromedriver_path)
             os.chmod(chromedriver_path, st.st_mode | stat.S_IEXEC)
         
         return chromedriver_path
     
     def killall_signal(self):
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             os.system('taskkill /F /im "Signal.exe"')
             os.system('taskkill /F /im "Signal Beta.exe"')
         else:
@@ -198,14 +197,14 @@ class GetSignalAuth:
         self.driver.quit()
 
     def launch_signal_desktop(self):
-        if sys.platform == 'win32':
+        if platform.system() == 'Windows':
             signal_bin_path_prod = os.path.expandvars("%localappdata%/Programs/signal-desktop/Signal.exe")
             signal_bin_path_beta = os.path.expandvars("%localappdata%/Programs/signal-desktop-beta/Signal Beta.exe")
             signal_user_data_dir_prod = os.path.abspath(os.path.expandvars('%appdata%/Signal'))
             signal_user_data_dir_beta = os.path.abspath(os.path.expandvars('%appdata%/Signal Beta'))
             electron_bin_path_prod = signal_bin_path_prod
             electron_bin_path_beta = signal_bin_path_beta
-        elif sys.platform == 'darwin':
+        elif platform.system() == 'Darwin':
             signal_bin_path_prod = "/Applications/Signal.app/Contents/MacOS/Signal"
             signal_bin_path_beta = "/Applications/Signal Beta.app/Contents/MacOS/Signal Beta"
             signal_user_data_dir_prod = os.path.expanduser('~/Library/Application Support/Signal')

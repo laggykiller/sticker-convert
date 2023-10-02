@@ -48,4 +48,4 @@ where = ["src"]
 
 [tool.setuptools.dynamic]
 version = {attr = "sticker_convert.__version__"}
-dependencies = {file = ["requirements-src.txt", "requirements-bin.txt"]}
+dependencies = {file = ["requirements.txt"]}
