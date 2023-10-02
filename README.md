@@ -234,7 +234,7 @@ If you are running python script directly, run with `src/sticker-convert.py`
 
 If you installed by pip, run with `sticker-convert` or `python -m sticker_convert`
 
-If you are running macOS, run with `sticker-convert.app/Contents/MacOS/sticker-convert`
+If you are running macOS, run with `sticker-convert.app/Contents/MacOS/sticker-convert-cli`
 
 Examples:
 
