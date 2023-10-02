@@ -8,32 +8,33 @@ from ..gui_windows.advanced_compression_window import AdvancedCompressionWindow 
 from .right_clicker import RightClicker # type: ignore
 from ..__init__ import __version__ # type: ignore
 
-class CompFrame:
-    def __init__(self, gui: "GUI"):
+class CompFrame(LabelFrame):
+    def __init__(self, gui: "GUI", *args, **kwargs):
         self.gui = gui
-        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Compression options')
-        self.frame.grid_columnconfigure(2, weight = 1)
+        super(CompFrame, self).__init__(*args, **kwargs)
+        
+        self.grid_columnconfigure(2, weight = 1)
 
-        self.no_compress_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['no_compress']), bootstyle='secondary')
-        self.no_compress_lbl = Label(self.frame, text='No compression')
-        self.no_compress_cbox = Checkbutton(self.frame, variable=self.gui.no_compress_var, command=self.cb_nocompress, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
+        self.no_compress_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['no_compress']), bootstyle='secondary')
+        self.no_compress_lbl = Label(self, text='No compression')
+        self.no_compress_cbox = Checkbutton(self, variable=self.gui.no_compress_var, command=self.cb_nocompress, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.comp_preset_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['preset']), bootstyle='secondary')
-        self.comp_preset_lbl = Label(self.frame, text='Preset')
-        self.comp_preset_opt = OptionMenu(self.frame, self.gui.comp_preset_var, self.gui.comp_preset_var.get(), *self.gui.compression_presets.keys(), command=self.cb_comp_apply_preset, bootstyle='secondary')
+        self.comp_preset_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['preset']), bootstyle='secondary')
+        self.comp_preset_lbl = Label(self, text='Preset')
+        self.comp_preset_opt = OptionMenu(self, self.gui.comp_preset_var, self.gui.comp_preset_var.get(), *self.gui.compression_presets.keys(), command=self.cb_comp_apply_preset, bootstyle='secondary')
         self.comp_preset_opt.config(width=15)
 
-        self.steps_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['steps']), bootstyle='secondary')
-        self.steps_lbl = Label(self.frame, text='Number of steps')
-        self.steps_entry = Entry(self.frame, textvariable=self.gui.steps_var, width=8)
+        self.steps_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['steps']), bootstyle='secondary')
+        self.steps_lbl = Label(self, text='Number of steps')
+        self.steps_entry = Entry(self, textvariable=self.gui.steps_var, width=8)
         self.steps_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
-        self.processes_help_btn = Button(self.frame, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['processes']), bootstyle='secondary')
-        self.processes_lbl = Label(self.frame, text='Number of processes')
-        self.processes_entry = Entry(self.frame, textvariable=self.gui.processes_var, width=8)
+        self.processes_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['processes']), bootstyle='secondary')
+        self.processes_lbl = Label(self, text='Number of processes')
+        self.processes_entry = Entry(self, textvariable=self.gui.processes_var, width=8)
         self.processes_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
-        self.comp_advanced_btn = Button(self.frame, text='Advanced...', command=self.cb_compress_advanced, bootstyle='secondary')
+        self.comp_advanced_btn = Button(self, text='Advanced...', command=self.cb_compress_advanced, bootstyle='secondary')
 
         self.no_compress_help_btn.grid(column=0, row=0, sticky='w', padx=3, pady=3)
         self.no_compress_lbl.grid(column=1, row=0, sticky='w', padx=3, pady=3)
@@ -58,10 +59,11 @@ class CompFrame:
     
     def cb_comp_apply_preset(self, *args):
         selection = self.gui.get_preset()
-        if selection == 'local':
-            self.gui.no_compress_var.set(True)
-        else:
-            self.gui.no_compress_var.set(False)
+        if selection == 'auto':
+            if self.gui.get_input_name() == 'local':
+                self.gui.no_compress_var.set(True)
+            else:
+                self.gui.no_compress_var.set(False)
 
         self.gui.fps_min_var.set(self.gui.compression_presets[selection]['fps']['min'])
         self.gui.fps_max_var.set(self.gui.compression_presets[selection]['fps']['max'])

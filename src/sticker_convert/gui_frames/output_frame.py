@@ -10,29 +10,29 @@ if TYPE_CHECKING:
 from ..utils.curr_dir import CurrDir # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
-class OutputFrame:
-    def __init__(self, gui: "GUI"):
+class OutputFrame(LabelFrame):
+    def __init__(self, gui: "GUI", *args, **kwargs):
         self.gui = gui
-        self.frame = LabelFrame(self.gui.scrollable_frame, borderwidth=1, text='Output')
+        super(OutputFrame, self).__init__(*args, **kwargs)
 
-        self.output_option_lbl = Label(self.frame, text='Output options', width=18, justify='left', anchor='w')
+        self.output_option_lbl = Label(self, text='Output options', width=18, justify='left', anchor='w')
         output_full_names = [i['full_name'] for i in self.gui.output_presets.values()]
         defult_output_full_name = self.gui.output_presets[self.gui.default_output_mode]['full_name']
-        self.output_option_opt = OptionMenu(self.frame, self.gui.output_option_display_var, defult_output_full_name, *output_full_names, command=self.cb_output_option, bootstyle='secondary')
+        self.output_option_opt = OptionMenu(self, self.gui.output_option_display_var, defult_output_full_name, *output_full_names, command=self.cb_output_option, bootstyle='secondary')
         self.output_option_opt.config(width=32)
 
-        self.output_setdir_lbl = Label(self.frame, text='Output directory', justify='left', anchor='w')
-        self.output_setdir_entry = Entry(self.frame, textvariable=self.gui.output_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
+        self.output_setdir_lbl = Label(self, text='Output directory', justify='left', anchor='w')
+        self.output_setdir_entry = Entry(self, textvariable=self.gui.output_setdir_var, width=60, validatecommand=self.gui.highlight_fields)
         self.output_setdir_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         
-        self.output_setdir_btn = Button(self.frame, text='Choose directory', command=self.cb_set_outdir, width=16, bootstyle='secondary')
+        self.output_setdir_btn = Button(self, text='Choose directory', command=self.cb_set_outdir, width=16, bootstyle='secondary')
 
-        self.title_lbl = Label(self.frame, text='Title')
-        self.title_entry = Entry(self.frame, textvariable=self.gui.title_var, width=80, validate="focusout", validatecommand=self.gui.highlight_fields)
+        self.title_lbl = Label(self, text='Title')
+        self.title_entry = Entry(self, textvariable=self.gui.title_var, width=80, validate="focusout", validatecommand=self.gui.highlight_fields)
         self.title_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
         
-        self.author_lbl = Label(self.frame, text='Author')
-        self.author_entry = Entry(self.frame, textvariable=self.gui.author_var, width=80, validate="focusout", validatecommand=self.gui.highlight_fields)
+        self.author_lbl = Label(self, text='Author')
+        self.author_entry = Entry(self, textvariable=self.gui.author_var, width=80, validate="focusout", validatecommand=self.gui.highlight_fields)
         self.author_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.output_option_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)

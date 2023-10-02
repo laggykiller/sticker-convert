@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 from typing import Optional, Any
 
 from PIL import ImageFont
-from ttkbootstrap import Window, Frame, Scrollbar, Canvas, PhotoImage, StringVar, BooleanVar, IntVar # type: ignore
+from ttkbootstrap import Window, StringVar, BooleanVar, IntVar # type: ignore
 from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 
 from .flow import Flow # type: ignore
@@ -20,6 +20,7 @@ from .utils.json_manager import JsonManager # type: ignore
 from .utils.curr_dir import CurrDir # type: ignore
 from .utils.metadata_handler import MetadataHandler # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
+from .utils.gui_utils import GUIUtils # type: ignore
 from .__init__ import __version__ # type: ignore
 
 from .gui_frames.input_frame import InputFrame # type: ignore
@@ -30,32 +31,34 @@ from .gui_frames.config_frame import ConfigFrame # type: ignore
 from .gui_frames.progress_frame import ProgressFrame # type: ignore
 from .gui_frames.control_frame import ControlFrame # type: ignore
 
-class GUI:
+class GUI(Window):
     def __init__(self):
+        super(GUI, self).__init__(themename='darkly', alpha=0)
         self.init_done = False
         self.load_jsons()
 
         self.emoji_font = ImageFont.truetype("./resources/NotoColorEmoji.ttf", 109)
 
-        self.root = Window(themename='darkly')
+        GUIUtils.set_icon(self)
 
-        self.icon = PhotoImage(file='resources/appicon.png')
-        self.root.iconphoto(1, self.icon)
-        if sys.platform == 'darwin':
-            self.root.iconbitmap(bitmap='resources/appicon.icns')
-        elif sys.platform == 'win32':
-            self.root.iconbitmap(bitmap='resources/appicon.ico')
-        self.root.tk.call('wm', 'iconphoto', self.root._w, self.icon)
-        self.root.title(f'sticker-convert {__version__}')
-        self.root.protocol('WM_DELETE_WINDOW', self.quit)
+        self.title(f'sticker-convert {__version__}')
+        self.protocol('WM_DELETE_WINDOW', self.quit)
 
-        self.create_scrollable_frame()
+        (
+            self.main_frame,
+            self.horizontal_scrollbar_frame,
+            self.canvas,
+            self.x_scrollbar,
+            self.y_scrollbar,
+            self.scrollable_frame
+        ) = GUIUtils.create_scrollable_frame(self)
+
         self.declare_variables()
         self.apply_config()
         self.apply_creds()
         self.init_frames()
         self.pack_frames()
-        self.resize_window()
+        GUIUtils.finalize_window(self)
 
         self.msg_lock = Lock()
         self.bar_lock = Lock()
@@ -63,7 +66,7 @@ class GUI:
         self.response_dict = {}
         self.action_queue = Queue()
         self.flow = None
-        self.root.after(500, self.poll_actions)
+        self.after(500, self.poll_actions)
     
     def __enter__(self):
         return self
@@ -71,7 +74,7 @@ class GUI:
     def gui(self):
         self.init_done = True
         self.highlight_fields()
-        self.root.mainloop()
+        self.mainloop()
 
     def quit(self):
         if self.flow:
@@ -82,7 +85,7 @@ class GUI:
         self.cb_msg(msg='Quitting, please wait...')
 
         self.save_config()
-        if self.config_save_cred_var.get() == True:
+        if self.settings_save_cred_var.get() == True:
             self.save_creds()
         else:
             self.delete_creds()
@@ -94,124 +97,86 @@ class GUI:
                 process.terminate()
                 process.join()
 
-        self.root.destroy()
-        
-    def create_scrollable_frame(self):
-        self.main_frame = Frame(self.root)
-        self.main_frame.pack(fill='both', expand=1)
-
-        self.horizontal_scrollbar_frame = Frame(self.main_frame)
-        self.horizontal_scrollbar_frame.pack(fill='x', side='bottom')
-
-        self.canvas = Canvas(self.main_frame)
-        self.canvas.pack(side='left', fill='both', expand=1)
-
-        self.x_scrollbar = Scrollbar(self.horizontal_scrollbar_frame, orient='horizontal', command=self.canvas.xview)
-        self.x_scrollbar.pack(side='bottom', fill='x')
-
-        self.y_scrollbar = Scrollbar(self.main_frame, orient='vertical', command=self.canvas.yview)
-        self.y_scrollbar.pack(side='right', fill='y')
-
-        self.canvas.configure(xscrollcommand=self.x_scrollbar.set)
-        self.canvas.configure(yscrollcommand=self.y_scrollbar.set)
-        self.canvas.bind("<Configure>",lambda e: self.canvas.config(scrollregion= self.canvas.bbox('all'))) 
-
-        self.scrollable_frame = Frame(self.canvas)
-        self.canvas.create_window((0,0),window= self.scrollable_frame, anchor="nw")
-    
+        self.destroy()
+            
     def declare_variables(self):
         # Input
-        self.input_option_display_var = StringVar(self.root)
-        self.input_option_true_var = StringVar(self.root)
-        self.input_setdir_var = StringVar(self.root)
-        self.input_address_var = StringVar(self.root)
+        self.input_option_display_var = StringVar(self)
+        self.input_option_true_var = StringVar(self)
+        self.input_setdir_var = StringVar(self)
+        self.input_address_var = StringVar(self)
 
         # Compression
         self.no_compress_var = BooleanVar()
-        self.comp_preset_var = StringVar(self.root)
-        self.fps_min_var = IntVar(self.root)
-        self.fps_max_var = IntVar(self.root)
+        self.comp_preset_var = StringVar(self)
+        self.fps_min_var = IntVar(self)
+        self.fps_max_var = IntVar(self)
         self.fps_disable_var = BooleanVar()
-        self.res_w_min_var = IntVar(self.root)
-        self.res_w_max_var = IntVar(self.root)
+        self.res_w_min_var = IntVar(self)
+        self.res_w_max_var = IntVar(self)
         self.res_w_disable_var = BooleanVar()
-        self.res_h_min_var = IntVar(self.root)
-        self.res_h_max_var = IntVar(self.root)
+        self.res_h_min_var = IntVar(self)
+        self.res_h_max_var = IntVar(self)
         self.res_h_disable_var = BooleanVar()
-        self.quality_min_var = IntVar(self.root)
-        self.quality_max_var = IntVar(self.root)
+        self.quality_min_var = IntVar(self)
+        self.quality_max_var = IntVar(self)
         self.quality_disable_var = BooleanVar()
-        self.color_min_var = IntVar(self.root)
-        self.color_max_var = IntVar(self.root)
+        self.color_min_var = IntVar(self)
+        self.color_max_var = IntVar(self)
         self.color_disable_var = BooleanVar()
-        self.duration_min_var = IntVar(self.root)
-        self.duration_max_var = IntVar(self.root)
+        self.duration_min_var = IntVar(self)
+        self.duration_max_var = IntVar(self)
         self.duration_disable_var = BooleanVar()
-        self.img_size_max_var = IntVar(self.root)
-        self.vid_size_max_var = IntVar(self.root)
+        self.img_size_max_var = IntVar(self)
+        self.vid_size_max_var = IntVar(self)
         self.size_disable_var = BooleanVar()
-        self.img_format_var = StringVar(self.root)
-        self.vid_format_var = StringVar(self.root)
+        self.img_format_var = StringVar(self)
+        self.vid_format_var = StringVar(self)
         self.fake_vid_var = BooleanVar()
-        self.cache_dir_var = StringVar(self.root)
-        self.default_emoji_var = StringVar(self.root)
-        self.steps_var = IntVar(self.root) 
-        self.processes_var = IntVar(self.root)
+        self.cache_dir_var = StringVar(self)
+        self.default_emoji_var = StringVar(self)
+        self.steps_var = IntVar(self) 
+        self.processes_var = IntVar(self)
 
         # Output
-        self.output_option_display_var = StringVar(self.root)
-        self.output_option_true_var = StringVar(self.root)
-        self.output_setdir_var = StringVar(self.root)
-        self.title_var = StringVar(self.root)
-        self.author_var = StringVar(self.root)
+        self.output_option_display_var = StringVar(self)
+        self.output_option_true_var = StringVar(self)
+        self.output_setdir_var = StringVar(self)
+        self.title_var = StringVar(self)
+        self.author_var = StringVar(self)
 
         # Credentials
-        self.signal_uuid_var = StringVar(self.root)
-        self.signal_password_var = StringVar(self.root)
-        self.telegram_token_var = StringVar(self.root)
-        self.telegram_userid_var = StringVar(self.root)
-        self.kakao_auth_token_var = StringVar(self.root)
-        self.kakao_username_var = StringVar(self.root)
-        self.kakao_password_var = StringVar(self.root)
-        self.kakao_country_code_var = StringVar(self.root)
-        self.kakao_phone_number_var = StringVar(self.root)
-        self.line_cookies_var = StringVar(self.root)
+        self.signal_uuid_var = StringVar(self)
+        self.signal_password_var = StringVar(self)
+        self.telegram_token_var = StringVar(self)
+        self.telegram_userid_var = StringVar(self)
+        self.kakao_auth_token_var = StringVar(self)
+        self.kakao_username_var = StringVar(self)
+        self.kakao_password_var = StringVar(self)
+        self.kakao_country_code_var = StringVar(self)
+        self.kakao_phone_number_var = StringVar(self)
+        self.line_cookies_var = StringVar(self)
 
         # Config
-        self.config_save_cred_var = BooleanVar()
+        self.settings_save_cred_var = BooleanVar()
 
     def init_frames(self):
-        self.input_frame = InputFrame(self)
-        self.comp_frame = CompFrame(self)
-        self.output_frame = OutputFrame(self)
-        self.cred_frame = CredFrame(self)
-        self.config_frame = ConfigFrame(self)
-        self.progress_frame = ProgressFrame(self)
-        self.control_frame = ControlFrame(self)
+        self.input_frame = InputFrame(self, self.scrollable_frame, borderwidth=1, text='Input')
+        self.comp_frame = CompFrame(self, self.scrollable_frame, borderwidth=1, text='Compression options')
+        self.output_frame = OutputFrame(self, self.scrollable_frame, borderwidth=1, text='Output')
+        self.cred_frame = CredFrame(self, self.scrollable_frame, borderwidth=1, text='Credentials')
+        self.settings_frame = ConfigFrame(self, self.scrollable_frame, borderwidth=1, text='Config')
+        self.progress_frame = ProgressFrame(self, self.scrollable_frame, borderwidth=1, text='Progress')
+        self.control_frame = ControlFrame(self, self.scrollable_frame, borderwidth=1)
     
     def pack_frames(self):
-        self.input_frame.frame.grid(column=0, row=0, sticky='w', padx=5, pady=5)
-        self.comp_frame.frame.grid(column=1, row=0, sticky='news', padx=5, pady=5)
-        self.output_frame.frame.grid(column=0, row=1, sticky='w', padx=5, pady=5)
-        self.cred_frame.frame.grid(column=1, row=1, rowspan=2, sticky='w', padx=5, pady=5)
-        self.config_frame.frame.grid(column=0, row=2, sticky='news', padx=5, pady=5)
-        self.progress_frame.frame.grid(column=0, row=3, columnspan=2, sticky='news', padx=5, pady=5)
-        self.control_frame.frame.grid(column=0, row=4, columnspan=2, sticky='news', padx=5, pady=5)
-    
-    def resize_window(self):
-        self.scrollable_frame.update_idletasks()
-        width = self.scrollable_frame.winfo_width()
-        height = self.scrollable_frame.winfo_height()
-
-        screen_width = self.root.winfo_screenwidth()
-        screen_height = self.root.winfo_screenwidth()
-
-        if width > screen_width * 0.8:
-            width = int(screen_width * 0.8)
-        if height > screen_height * 0.8:
-            height = int(screen_height * 0.8)
-
-        self.canvas.configure(width=width, height=height)
+        self.input_frame.grid(column=0, row=0, sticky='w', padx=5, pady=5)
+        self.comp_frame.grid(column=1, row=0, sticky='news', padx=5, pady=5)
+        self.output_frame.grid(column=0, row=1, sticky='w', padx=5, pady=5)
+        self.cred_frame.grid(column=1, row=1, rowspan=2, sticky='w', padx=5, pady=5)
+        self.settings_frame.grid(column=0, row=2, sticky='news', padx=5, pady=5)
+        self.progress_frame.grid(column=0, row=3, columnspan=2, sticky='news', padx=5, pady=5)
+        self.control_frame.grid(column=0, row=4, columnspan=2, sticky='news', padx=5, pady=5)
     
     def load_jsons(self):
         self.help = JsonManager.load_json('resources/help.json')
@@ -224,11 +189,11 @@ class GUI:
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
 
-        self.config_path = os.path.join(CurrDir.get_config_dir(), 'config.json')
-        if os.path.isfile(self.config_path):
-            self.config = JsonManager.load_json(self.config_path)
+        self.settings_path = os.path.join(CurrDir.get_config_dir(), 'config.json')
+        if os.path.isfile(self.settings_path):
+            self.settings = JsonManager.load_json(self.settings_path)
         else:
-            self.config = {}
+            self.settings = {}
         
         self.creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')
         if os.path.isfile(self.creds_path):
@@ -281,7 +246,7 @@ class GUI:
         else:
             comp_custom = self.compression_presets.get('custom')
 
-        self.config = {
+        self.settings = {
             'input': {
                 'option': self.get_input_name(),
                 'url': self.input_address_var.get(),
@@ -301,11 +266,11 @@ class GUI:
                 'author': self.author_var.get()
             },
             'creds': {
-                'save_cred': self.config_save_cred_var.get()
+                'save_cred': self.settings_save_cred_var.get()
             }
         }
 
-        JsonManager.save_json(self.config_path, self.config)
+        JsonManager.save_json(self.settings_path, self.settings)
         
     def save_creds(self):
         self.creds = {
@@ -336,38 +301,38 @@ class GUI:
             os.remove(self.creds_path)
     
     def delete_config(self):
-        if os.path.isfile(self.config_path):
-            os.remove(self.config_path)
+        if os.path.isfile(self.settings_path):
+            os.remove(self.settings_path)
     
     def apply_config(self):
-        self.default_input_mode = self.config.get('input', {}).get('option', 'auto')
-        self.input_address_var.set(self.config.get('input', {}).get('url', ''))
+        self.default_input_mode = self.settings.get('input', {}).get('option', 'auto')
+        self.input_address_var.set(self.settings.get('input', {}).get('url', ''))
         
         default_stickers_input_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
-        self.input_setdir_var.set(self.config.get('input', {}).get('dir', default_stickers_input_dir))
+        self.input_setdir_var.set(self.settings.get('input', {}).get('dir', default_stickers_input_dir))
         if not os.path.isdir(self.input_setdir_var.get()):
             self.input_setdir_var.set(default_stickers_input_dir)
 
-        self.no_compress_var.set(self.config.get('comp', {}).get('no_compress', False))
+        self.no_compress_var.set(self.settings.get('comp', {}).get('no_compress', False))
 
         default_comp_preset = list(self.compression_presets.keys())[0]
-        self.comp_preset_var.set(self.config.get('comp', {}).get('preset', default_comp_preset))
+        self.comp_preset_var.set(self.settings.get('comp', {}).get('preset', default_comp_preset))
         
-        self.cache_dir_var.set(self.config.get('comp', {}).get('cache_dir', ''))
-        self.processes_var.set(self.config.get('comp', {}).get('processes', math.ceil(cpu_count() / 2)))
-        self.default_output_mode = self.config.get('output', {}).get('option', 'signal')
+        self.cache_dir_var.set(self.settings.get('comp', {}).get('cache_dir', ''))
+        self.processes_var.set(self.settings.get('comp', {}).get('processes', math.ceil(cpu_count() / 2)))
+        self.default_output_mode = self.settings.get('output', {}).get('option', 'signal')
 
         default_stickers_output_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_output')
-        self.output_setdir_var.set(self.config.get('output', {}).get('dir', default_stickers_output_dir))
+        self.output_setdir_var.set(self.settings.get('output', {}).get('dir', default_stickers_output_dir))
         if not os.path.isdir(self.output_setdir_var.get()):
             self.output_setdir_var.set(default_stickers_output_dir)
         
-        self.title_var.set(self.config.get('output', {}).get('title', ''))
-        self.author_var.set(self.config.get('output', {}).get('author', ''))
-        self.config_save_cred_var.set(self.config.get('creds', {}).get('save_cred', True))
+        self.title_var.set(self.settings.get('output', {}).get('title', ''))
+        self.author_var.set(self.settings.get('output', {}).get('author', ''))
+        self.settings_save_cred_var.set(self.settings.get('creds', {}).get('save_cred', True))
 
-        if self.config.get('comp_custom'):
-            self.compression_presets['custom'] = self.config.get('comp_custom')
+        if self.settings.get('comp_custom'):
+            self.compression_presets['custom'] = self.settings.get('comp_custom')
         
         self.input_option_display_var.set(self.input_presets[self.default_input_mode]['full_name'])
         self.input_option_true_var.set(self.input_presets[self.default_input_mode]['full_name'])
@@ -418,7 +383,7 @@ class GUI:
 
     def start_process(self):
         self.save_config()
-        if self.config_save_cred_var.get() == True:
+        if self.settings_save_cred_var.get() == True:
             self.save_creds()
         else:
             self.delete_creds()
@@ -531,7 +496,7 @@ class GUI:
         self.comp_frame.set_states(state=state)
         self.output_frame.set_states(state=state)
         self.cred_frame.set_states(state=state)
-        self.config_frame.set_states(state=state)
+        self.settings_frame.set_states(state=state)
 
         if state == 'normal':
             self.input_frame.cb_input_option()
@@ -539,7 +504,7 @@ class GUI:
     
     def poll_actions(self):
         if self.action_queue.empty():
-            self.root.after(500, self.poll_actions)
+            self.after(500, self.poll_actions)
             return
         
         action = self.action_queue.get_nowait()
@@ -549,7 +514,7 @@ class GUI:
             with self.response_dict_lock:
                 self.response_dict[response_id] = response
 
-        self.root.after(500, self.poll_actions)
+        self.after(500, self.poll_actions)
     
     def get_response_from_id(self, response_id: str) -> Any:
         # If executed from main thread, need to poll_actions() manually as it got blocked

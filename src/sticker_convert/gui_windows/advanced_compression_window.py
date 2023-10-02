@@ -1,49 +1,24 @@
 #!/usr/bin/env python3
-import sys
 from functools import partial
-from typing import TYPE_CHECKING
 
 from PIL import Image, ImageTk, ImageDraw
-from ttkbootstrap import Toplevel, LabelFrame, Frame, OptionMenu, Button, Entry, Label, Checkbutton, Scrollbar, Canvas, PhotoImage, StringVar # type: ignore
+from ttkbootstrap import LabelFrame, Frame, OptionMenu, Button, Entry, Label, Checkbutton, Scrollbar, Canvas, StringVar # type: ignore
 from tkinter import Event
 
-if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
 from ..gui_frames.right_clicker import RightClicker # type: ignore
+from .base_window import BaseWindow # type: ignore
+from ..utils.gui_utils import GUIUtils # type: ignore
 
-class AdvancedCompressionWindow:
+class AdvancedCompressionWindow(BaseWindow):
     emoji_column_per_row = 10
     emoji_visible_rows = 5
     emoji_btns: list[tuple[Button, ImageTk.PhotoImage]] = []
 
-    def __init__(self, gui: "GUI"):
-        self.gui = gui
+    def __init__(self, *args, **kwargs):
+        super(AdvancedCompressionWindow, self).__init__(*args, **kwargs)
         self.categories = list({entry['category'] for entry in self.gui.emoji_list})
 
-        self.adv_comp_win = Toplevel(self.gui.root)
-        self.adv_comp_win.title('Advanced compression options')
-
-        self.icon = PhotoImage(file='resources/appicon.png')
-        self.adv_comp_win.iconphoto(1, self.icon)
-        if sys.platform == 'darwin':
-            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.icns')
-        elif sys.platform == 'win32':
-            self.adv_comp_win.iconbitmap(bitmap='resources/appicon.ico')
-        self.adv_comp_win.tk.call('wm', 'iconphoto', self.adv_comp_win._w, self.icon)
-        
-        self.adv_comp_win.focus_force()
-
-        if sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
-            self.mousewheel = ('<MouseWheel>',)
-            self.delta_divide = 120
-        elif sys.platform.startswith('darwin'):
-            self.mousewheel = ('<MouseWheel>',)
-            self.delta_divide = 1
-        else:
-            self.mousewheel = ('<Button-4>', '<Button-5>')
-            self.delta_divide = 120
-
-        self.create_scrollable_frame()
+        self.title('Advanced compression options')
 
         self.frame_advcomp = LabelFrame(self.scrollable_frame, text='Advanced compression option')
         self.frame_emoji_search = LabelFrame(self.scrollable_frame, text='Setting default emoji')
@@ -51,7 +26,7 @@ class AdvancedCompressionWindow:
 
         self.frame_advcomp.grid_columnconfigure(6, weight=1)
 
-        cb_msg_block_adv_comp_win = partial(self.gui.cb_msg_block, parent=self.adv_comp_win)
+        cb_msg_block_adv_comp_win = partial(self.gui.cb_msg_block, parent=self)
 
         self.fps_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['fps']), bootstyle='secondary')
         self.fps_lbl = Label(self.frame_advcomp, text='Output FPS')
@@ -274,46 +249,9 @@ class AdvancedCompressionWindow:
         self.cb_disable_size()
         self.cb_disable_format()
         self.cb_disable_fake_vid()
-        self.resize_window()
-    
-    def create_scrollable_frame(self):
-        self.main_frame = Frame(self.adv_comp_win)
-        self.main_frame.pack(fill='both', expand=1)
 
-        self.horizontal_scrollbar_frame = Frame(self.main_frame)
-        self.horizontal_scrollbar_frame.pack(fill='x', side='bottom')
-
-        self.canvas = Canvas(self.main_frame)
-        self.canvas.pack(side='left', fill='both', expand=1)
-
-        self.x_scrollbar = Scrollbar(self.horizontal_scrollbar_frame, orient='horizontal', command=self.canvas.xview)
-        self.x_scrollbar.pack(side='bottom', fill='x')
-
-        self.y_scrollbar = Scrollbar(self.main_frame, orient='vertical', command=self.canvas.yview)
-        self.y_scrollbar.pack(side='right', fill='y')
-
-        self.canvas.configure(xscrollcommand=self.x_scrollbar.set)
-        self.canvas.configure(yscrollcommand=self.y_scrollbar.set)
-        self.canvas.bind("<Configure>",lambda e: self.canvas.config(scrollregion= self.canvas.bbox('all'))) 
-
-        self.scrollable_frame = Frame(self.canvas)
-        self.canvas.create_window((0,0),window= self.scrollable_frame, anchor="nw")
-    
-    def resize_window(self):
-        self.scrollable_frame.update_idletasks()
-        width = self.scrollable_frame.winfo_width()
-        height = self.scrollable_frame.winfo_height()
-
-        screen_width = self.gui.root.winfo_screenwidth()
-        screen_height = self.gui.root.winfo_screenwidth()
-
-        if width > screen_width * 0.8:
-            width = int(screen_width * 0.8)
-        if height > screen_height * 0.8:
-            height = int(screen_height * 0.8)
-
-        self.canvas.configure(width=width, height=height)
-    
+        GUIUtils.finalize_window(self)
+        
     def cb_disable_fps(self, *args):
         if self.gui.fps_disable_var.get() == True:
             state = 'disabled'
