@@ -246,7 +246,7 @@ class XcodeImessage(UploadBase):
         iconset_path = os.path.join(pack_path, 'stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset')
 
         for i in os.listdir(iconset_path):
-            if os.path.splitext(i) == '.png':
+            if os.path.splitext(i)[1] == '.png':
                 os.remove(os.path.join(iconset_path, i))
 
         icons_lst = []
