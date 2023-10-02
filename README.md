@@ -10,7 +10,7 @@
 ## Downloads
 - [Pre-compiled releases](https://github.com/laggykiller/sticker-convert/releases) for Windows, MacOS and Linux (As AppImage).
     - Windows: Unzip the downloaded file and run `sticker-convert.exe`
-    - MacOS: Unzip the downloaded file and run `run_me_first.command` for the first time, then `sticker-convert.app` in the future
+    - MacOS: Unzip the downloaded file, hold control and open `hold_control_and_click_open_me.command` for the first time, then `sticker-convert.app` in the future
     - Linux: `chmod +x` the downloaded AppImage and run it
 - [pip package](https://pypi.org/project/sticker-convert/): `pip install sticker-convert`. Launch with `sticker-convert` or `python -m sticker_convert`
 - [Docker image](https://hub.docker.com/r/laggykiller/sticker-convert) for running on Linux.
