@@ -4,6 +4,7 @@ import sys
 import subprocess
 import platform
 import shutil
+from .src.sticker_convert.__init__ import __version__
 
 def osx_run_in_venv(cmd, get_stdout=False):
     if os.path.isfile('/bin/zsh'):
@@ -90,16 +91,19 @@ def nuitka(python_bin, arch):
         '--include-package-data=signalstickers_client',
         '--include-package=imageio',
         '--noinclude-data-file=tcl/opt0.4',
-        '--noinclude-data-file=tcl/http1.0',
-        '--macos-create-app-bundle',
-        '--macos-app-icon=src/sticker_convert/resources/appicon.icns',
+        '--noinclude-data-file=tcl/http1.0'
     ]
 
     if platform.system() == 'Windows':
         cmd_list.append('--windows-icon-from-ico=src/sticker_convert/resources/appicon.ico')
     elif platform.system() == 'Darwin' and arch:
-        cmd_list.append(f'--macos-target-arch={arch}')
         cmd_list.append('--disable-console')
+        cmd_list.append('--macos-create-app-bundle')
+        cmd_list.append('--macos-app-icon=src/sticker_convert/resources/appicon.icns')
+        cmd_list.append(f'--macos-target-arch={arch}')
+        cmd_list.append(f'--macos-app-version={__version__}')
+    else:
+        cmd_list.append('--linux-icon=src/sticker_convert/resources/appicon.png')
 
     cmd_list.append('src/sticker-convert.py')
     if platform.system() == 'Darwin':
