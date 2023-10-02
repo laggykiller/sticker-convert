@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-from lottie.exporters.tgs_validator import TgsValidator, Severity # type: ignore
 import unicodedata
 import re
 from typing import Optional, Union

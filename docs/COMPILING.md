@@ -3,7 +3,7 @@
 Install python3 from https://www.python.org/
 
 ## 2. Install python modules
-Install the required python modules with `pip3 install -r requirements-build.txt`
+Install the required python modules with `pip3 install -r requirements.txt`
 
 ## 3. Running the script
 Change directory into `sticker_convert` directory and run `python3 ./sticker-convert.py`
@@ -11,7 +11,7 @@ Change directory into `sticker_convert` directory and run `python3 ./sticker-con
 # Compiling on Windows and MacOS
 This repository uses `nuitka` for compiling.
 
-1. Install dependencies with `pip3 install -r requirements-build.txt`
+1. Install dependencies with `pip3 install -r requirements.txt` and `pip3 install -r requirements-build.txt`
 2. Run `python compile.py`
 3. Compilation result in `sticker-convert.dist` directory
 
