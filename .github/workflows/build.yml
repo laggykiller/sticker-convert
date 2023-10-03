@@ -45,7 +45,7 @@ jobs:
         include:
           - os: windows-2019
             TARGET: windows
-            PY_VERSION: 3.11
+            PY_VERSION: "3.11"
             CMD_BUILD: |
                 python compile.py
                 move sticker-convert.dist sticker-convert
@@ -60,7 +60,7 @@ jobs:
               ./sticker-convert-windows-x86_64.msi
           - os: macos-11
             TARGET: macos
-            PY_VERSION: 3.10
+            PY_VERSION: "3.10"
             CMD_BUILD: |
                 SC_COMPILE_ARCH=x86_64 python ./compile.py
                 cp ./scripts/hold_control_and_click_open_me_first.command ./
@@ -68,7 +68,7 @@ jobs:
             OUT_FILE_NAME: ./sticker-convert-macos-x86_64.zip
           - os: macos-11
             TARGET: macos
-            PY_VERSION: 3.11
+            PY_VERSION: "3.11"
             CMD_BUILD: |
                 SC_COMPILE_ARCH=arm64 python ./compile.py
                 cp ./scripts/hold_control_and_click_open_me_first.command ./
@@ -76,7 +76,7 @@ jobs:
             OUT_FILE_NAME: ./sticker-convert-macos-arm64.zip
           - os: ubuntu-20.04
             TARGET: linux
-            PY_VERSION: 3.11
+            PY_VERSION: "3.11"
             CMD_BUILD: |
                 sudo apt install -y libpng-dev libxft-dev libfontconfig1-dev libfreetype6-dev
                 wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
