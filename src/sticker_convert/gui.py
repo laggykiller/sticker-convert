@@ -178,11 +178,14 @@ class GUI(Window):
         self.control_frame.grid(column=0, row=4, columnspan=2, sticky='news', padx=5, pady=5)
     
     def warn_tkinter_bug(self):
-        if platform.system() == 'Darwin' and platform.machine() == 'x86_64':
+        if (platform.system() == 'Darwin' and
+            platform.machine() == 'x86_64' and
+            sys.version_info[0] == 3 and
+            sys.version_info[1] == 11):
             msg = 'NOTICE: If buttons are not responsive, try to press '
             msg += 'on title bar or move mouse cursor away from window for a while.'
             self.cb_msg(msg)
-            msg = '(This is due to a bug in tkinter specific to x86_64 macOS)'
+            msg = '(This is due to a bug in tkinter specific to x86_64 macOS python3.11)'
             self.cb_msg(msg)
             msg = '(https://github.com/python/cpython/issues/110218)'
             self.cb_msg(msg)
