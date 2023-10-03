@@ -4,7 +4,9 @@ import sys
 import subprocess
 import platform
 import shutil
-from .src.sticker_convert.__init__ import __version__
+
+sys.path.append('./src')
+from sticker_convert.__init__ import __version__
 
 def osx_run_in_venv(cmd, get_stdout=False):
     if os.path.isfile('/bin/zsh'):
