@@ -62,6 +62,10 @@ jobs:
             TARGET: macos
             PY_VERSION: "3.10"
             CMD_BUILD: |
+                # https://github.com/actions/setup-python/issues/649#issuecomment-1636160793
+                # https://github.com/python/devguide/pull/1058#issuecomment-1479229149
+                brew install pkg-config openssl@1.1 xz gdbm tcl-tk
+                brew link tcl-tk
                 SC_COMPILE_ARCH=x86_64 python ./compile.py
                 cp ./scripts/hold_control_and_click_open_me_first.command ./
                 zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app hold_control_and_click_open_me_first.command
