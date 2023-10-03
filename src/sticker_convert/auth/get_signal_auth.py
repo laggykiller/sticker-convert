@@ -184,11 +184,11 @@ class GetSignalAuth:
         uuid, password = None, None
         try:
             if self.signal_bin_version == 'prod':
-                uuid = str(self.driver.execute_script('return window.reduxStore.getState().items.uuid_id'))
-                password = str(self.driver.execute_script('return window.reduxStore.getState().items.password'))
+                uuid = self.driver.execute_script('return window.reduxStore.getState().items.uuid_id')
+                password = self.driver.execute_script('return window.reduxStore.getState().items.password')
             else:
-                uuid = str(self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id'))
-                password = str(self.driver.execute_script('return window.SignalDebug.getReduxState().items.password'))
+                uuid = self.driver.execute_script('return window.SignalDebug.getReduxState().items.uuid_id')
+                password = self.driver.execute_script('return window.SignalDebug.getReduxState().items.password')
         except JavascriptException:
             pass
 

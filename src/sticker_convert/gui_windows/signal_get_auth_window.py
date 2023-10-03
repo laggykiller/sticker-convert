@@ -50,10 +50,13 @@ class SignalGetAuthWindow(BaseWindow):
             uuid, password = m.get_cred()
 
             if uuid and password:
+                if not self.gui.creds.get('signal'):
+                    self.gui.creds['signal'] = {}
                 self.gui.creds['signal']['uuid'] = uuid
                 self.gui.creds['signal']['password'] = password
                 self.gui.signal_uuid_var.set(uuid)
                 self.gui.signal_password_var.set(password)
+                m.close()
                 
                 self.cb_msg_block_signal(f'Got uuid and password successfully:\nuuid={uuid}\npassword={password}')
                 self.gui.save_creds()

@@ -86,6 +86,8 @@ class KakaoGetAuthWindow(BaseWindow):
         auth_token = m.get_cred()
 
         if auth_token:
+            if not self.gui.creds.get('kakao'):
+                self.gui.creds['kakao'] = {}
             self.gui.creds['kakao']['auth_token'] = auth_token
             self.gui.kakao_auth_token_var.set(auth_token)
         

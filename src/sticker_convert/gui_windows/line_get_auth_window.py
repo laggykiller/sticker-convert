@@ -57,6 +57,8 @@ class LineGetAuthWindow(BaseWindow):
         line_cookies = m.get_cred()
 
         if line_cookies:
+            if not self.gui.creds.get('line'):
+                self.gui.creds['line'] = {}
             self.gui.creds['line']['cookies'] = line_cookies
             self.gui.line_cookies_var.set(line_cookies)
             
