@@ -19,8 +19,14 @@ class XcodeImessageIconset:
     def __init__(self):
         self.iconset = {}
 
-        with open('ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json') as f:
-            dict = json.load(f)
+        if os.path.isdir('ios-message-stickers-template'):
+            with open('ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json') as f:
+                dict = json.load(f)
+        elif os.path.isfile('ios-message-stickers-template.zip'):
+            with zipfile.ZipFile('ios-message-stickers-template.zip', 'r') as f:
+                dict = json.loads(f.read('stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json').decode())
+        else:
+            raise FileNotFoundError('ios-message-stickers-template not found')
         
         for i in dict['images']:
             filename = i['filename']

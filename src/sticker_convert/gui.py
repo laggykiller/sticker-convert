@@ -614,7 +614,7 @@ class GUI(Window):
                 self.input_frame.address_entry.config(bootstyle='warning')
 
             elif (download_option != input_option and
-                  not (input_option == 'kakao' and url.isnumeric())):
+                  not (input_option in ('kakao', 'line') and url.isnumeric())):
                 
                 self.input_frame.address_entry.config(bootstyle='danger')
                 self.input_frame.address_tip.config(text=f"Invalid URL. {self.input_presets[input_option_display]['example']}")
