@@ -114,6 +114,7 @@ class UploadSignal(UploadBase):
         
         packs = MetadataHandler.split_sticker_packs(self.in_dir, title=title, file_per_pack=200, separate_image_anim=False)
         for pack_title, stickers in packs.items():
+            self.cb_msg(f'Uploading pack {pack_title}')
             pack = LocalStickerPack()
             pack.title = pack_title
             pack.author = author

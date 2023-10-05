@@ -227,6 +227,7 @@ class UploadTelegram(UploadBase):
         packs = MetadataHandler.split_sticker_packs(self.in_dir, title=title, file_per_anim_pack=50, file_per_image_pack=120, separate_image_anim=not self.fake_vid)
 
         for pack_title, stickers in packs.items():
+            self.cb_msg(f'Uploading pack {pack_title}')
             result = anyio.run(self.upload_pack, pack_title, stickers, emoji_dict)
             self.cb_msg(result)
             urls.append(result)
