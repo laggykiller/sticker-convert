@@ -274,10 +274,10 @@ class StickerConvert:
         return frames_out
     
     def frames_drop(self, frames_in: list[np.ndarray]) -> list[np.ndarray]:
-        frames_out = []
+        if not self.fps:
+            return [frames_in[0]]
 
-        if not (self.duration_min or self.duration_max):
-            return frames_in
+        frames_out = []
         
         frames_orig = CodecInfo.get_file_frames(self.in_f)
         fps_orig = CodecInfo.get_file_fps(self.in_f)
@@ -303,7 +303,10 @@ class StickerConvert:
         return frames_out
 
     def frames_export(self):
-        if self.out_f_ext == '.apng':
+        if (self.out_f_ext == '.apng' or
+            (self.out_f_ext == '.png' and
+             self.fps != None and
+             (len(self.frames_processed) > 1 or self.fake_vid))):
             self.frames_export_apng()
         elif self.out_f_ext == '.png':
             self.frames_export_png()
@@ -388,9 +391,9 @@ class StickerConvert:
             self.apngasm.add_frame(frame_final)
 
         with CacheStore.get_cache_store(path=self.cache_dir) as tempdir:
-            self.apngasm.assemble(os.path.join(tempdir, 'out.apng'))
+            self.apngasm.assemble(os.path.join(tempdir, f'out{self.out_f_ext}'))
 
-            with open(os.path.join(tempdir, 'out.apng'), 'rb') as f:
+            with open(os.path.join(tempdir, f'out{self.out_f_ext}'), 'rb') as f:
                 self.tmp_f.write(f.read())
 
         self.apngasm.reset()

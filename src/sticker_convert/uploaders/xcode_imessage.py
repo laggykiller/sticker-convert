@@ -53,6 +53,7 @@ class XcodeImessageIconset:
         #     'Messages-iPad-Pro-74x55pt@2x.png': (148, 110),
         #     'Messages-iPhone-60x45pt@2x.png': (120, 90),
         #     'Messages-iPhone-60x45pt@3x.png': (180, 135)
+        # }
 
 
 
@@ -97,6 +98,8 @@ class XcodeImessage(UploadBase):
     def create_imessage_xcode(self) -> list[str]:
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(self.in_dir, title=self.opt_output.get('title'), author=self.opt_output.get('author'))
+        author = author.replace(' ', '_')
+        title = title.replace(' ', '_')
         packs = MetadataHandler.split_sticker_packs(self.in_dir, title=title, file_per_pack=100, separate_image_anim=False)
 
         res_choice = None
@@ -141,13 +144,9 @@ class XcodeImessage(UploadBase):
 
     def add_metadata(self, author: str, title: str):
         first_image_path = os.path.join(self.in_dir, [i for i in sorted(os.listdir(self.in_dir)) if os.path.isfile(os.path.join(self.in_dir, i)) and i.endswith('.png')][0])
-        cover_path_old = MetadataHandler.get_cover(self.in_dir)
-        cover_path_new = os.path.join(self.out_dir, 'cover.png')
-        if os.path.isfile(cover_path_old) and cover_path_new != cover_path_old:
-            shutil.copy(cover_path_old, cover_path_new)
-
-        if os.path.isfile(cover_path_old):
-            icon_source = cover_path_old
+        cover_path = MetadataHandler.get_cover(self.in_dir)
+        if cover_path:
+            icon_source = cover_path
         else:
             icon_source = first_image_path
 
@@ -199,7 +198,7 @@ class XcodeImessage(UploadBase):
         pbxproj_data = pbxproj_data.replace('/* Build configuration list for PBXProject "stickers" */', f'/* Build configuration list for PBXProject "{title}" */')
         pbxproj_data = pbxproj_data.replace('/* Build configuration list for PBXNativeTarget "stickers StickerPackExtension" */', f'/* Build configuration list for PBXNativeTarget "{title} StickerPackExtension" */')
         pbxproj_data = pbxproj_data.replace('/* Build configuration list for PBXNativeTarget "stickers" */', f'/* Build configuration list for PBXNativeTarget "{title}" */')
-        pbxproj_data = pbxproj_data.replace('com.niklaspeterson', f'{title}.{author}')
+        pbxproj_data = pbxproj_data.replace('com.niklaspeterson', f'com.{author}')
         pbxproj_data = pbxproj_data.replace('stickers/Info.plist', f'{title}/Info.plist')
 
         with open(os.path.join(pack_path, 'stickers.xcodeproj/project.pbxproj'), 'w+', encoding='utf-8') as f:
