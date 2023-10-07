@@ -103,10 +103,12 @@ class CLI:
             self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
         )
 
-        success = flow.start()
+        status = flow.start()
 
-        if not success:
+        if status == 1:
             self.cb_msg(msg='An error occured during this run.')
+        elif status == 2:
+            self.cb_msg(msg='Job cancelled.')
 
     def get_opt_input(self, args):
         download_options = {
