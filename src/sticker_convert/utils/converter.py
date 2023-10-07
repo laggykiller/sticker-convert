@@ -325,7 +325,7 @@ class StickerConvert:
     def frames_export_pyav(self):
         options = {}
         
-        if self.quality:
+        if type(self.quality) == int:
             options['quality'] = str(self.quality)
             options['lossless'] = '0'
 
