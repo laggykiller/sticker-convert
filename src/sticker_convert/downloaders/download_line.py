@@ -143,16 +143,24 @@ class DownloadLine(DownloadBase):
     def load_cookies(self) -> dict[str, str]:
         cookies = {}
         if self.opt_cred and self.opt_cred.get('line', {}).get('cookies'):
+            line_cookies = self.opt_cred['line']['cookies']
+
             try:
-                for i in self.opt_cred['line']['cookies'].split(';'):
-                    c_key, c_value = i.split('=')
-                    cookies[c_key] = c_value
-                if not GetLineAuth.validate_cookies(cookies):
+                line_cookies_dict = json.loads(line_cookies)
+                for c in line_cookies_dict:
+                    cookies[c['name']] = c['value']
+            except json.decoder.JSONDecodeError:
+                try:
+                    for i in line_cookies.split(';'):
+                        c_key, c_value = i.split('=')
+                        cookies[c_key] = c_value
+                except ValueError:
                     self.cb_msg('Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"')
-                    cookies = {}
-            except ValueError:
-                self.cb_msg('Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"')
         
+            if not GetLineAuth.validate_cookies(cookies):
+                self.cb_msg('Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"')
+                cookies = {}
+
         return cookies
 
     def get_pack_url(self) -> str:
