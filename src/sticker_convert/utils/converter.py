@@ -303,23 +303,31 @@ class StickerConvert:
         return frames_out
 
     def frames_export(self):
-        if (self.out_f_ext == '.apng' or
-            (self.out_f_ext == '.png' and
-             self.fps != None and
-             (len(self.frames_processed) > 1 or self.fake_vid))):
+        if self.out_f_ext in ('.apng', '.png') and self.fps:
             self.frames_export_apng()
         elif self.out_f_ext == '.png':
             self.frames_export_png()
-        elif self.out_f_ext == '.webp':
+        elif self.out_f_ext == '.webp' and self.fps:
             self.frames_export_webp()
+        elif self.fps:
+            self.frames_export_pyav()
         else:
-            self.frames_export_imageio()
+            self.frames_export_pil()
+    
+    def frames_export_pil(self):
+        image = Image.fromarray(self.frames_processed[0])
+        image.save(
+            self.tmp_f,
+            format=self.out_f_ext.replace('.', ''),
+            quality=self.quality
+        )
 
-    def frames_export_imageio(self):
-        options = {
-                'quality': str(self.quality),
-                'lossless': '0'
-            }
+    def frames_export_pyav(self):
+        options = {}
+        
+        if self.quality:
+            options['quality'] = str(self.quality)
+            options['lossless'] = '0'
 
         if self.out_f_ext == '.gif':
             codec = 'gif'
