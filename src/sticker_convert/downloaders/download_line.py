@@ -380,6 +380,13 @@ class DownloadLine(DownloadBase):
         return True
 
     @staticmethod
-    def start(url: str, out_dir: str, opt_cred: Optional[dict] = None, cb_msg=print, cb_msg_block=input, cb_bar=None) -> bool:
+    def start(
+        url: str,
+        out_dir: str,
+        opt_cred: Optional[dict] = None,
+        cb_msg=print,
+        cb_msg_block=input,
+        cb_bar=None,
+    ) -> bool:
         downloader = DownloadLine(url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)
         return downloader.download_stickers_line()

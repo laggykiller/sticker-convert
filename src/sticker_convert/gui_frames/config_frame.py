@@ -7,7 +7,7 @@ from ttkbootstrap import LabelFrame, Button, Label, Checkbutton # type: ignore
 
 if TYPE_CHECKING:
     from ..gui import GUI # type: ignore
-from ..utils.curr_dir import CurrDir # type: ignore
+from ..utils.dir_utils import DirUtils # type: ignore
 from ..utils.run_bin import RunBin # type: ignore
 from ..__init__ import __version__ # type: ignore
 
@@ -62,7 +62,7 @@ class ConfigFrame(LabelFrame):
             self.gui.cb_msg_block('Restored to default config.')
     
     def cb_open_config_directory(self, *args, **kwargs):
-        config_dir = CurrDir.get_config_dir()
+        config_dir = DirUtils.get_config_dir()
         self.gui.cb_msg(msg=f'Config is located at {config_dir}')
         if platform.system() == 'Windows':
             os.startfile(config_dir)

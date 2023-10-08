@@ -10,12 +10,15 @@ def main():
         script_path = os.path.dirname(sys.argv[0])
     os.chdir(script_path)
     if len(sys.argv) == 1:
-        print('Launching GUI...')
-        from sticker_convert.gui import GUI # type: ignore
+        print("Launching GUI...")
+        from sticker_convert.gui import GUI  # type: ignore
+
         GUI().gui()
     else:
         from sticker_convert.cli import CLI
+
         CLI().cli()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

@@ -4,9 +4,9 @@ import unicodedata
 import re
 from typing import Optional, Union
 
-from .codec_info import CodecInfo # type: ignore
+from .codec_info import CodecInfo  # type: ignore
 
-'''
+"""
 Example of spec
 spec = {
     "res": {
@@ -35,32 +35,37 @@ spec = {
     "square": True,
     "format": ".apng"
 }
-'''
+"""
+
 
 class FormatVerify:
     @staticmethod
     def check_file(file: str, spec: dict) -> bool:
         return (
-            FormatVerify.check_presence(file) and
-            FormatVerify.check_file_res(file, res=spec.get('res'), square=spec.get('square')) and 
-            FormatVerify.check_file_fps(file, fps=spec.get('fps')) and
-            FormatVerify.check_file_size(file, size=spec.get('size_max')) and
-            FormatVerify.check_animated(file, animated=spec.get('animated')) and
-            FormatVerify.check_format(file, format=spec.get('format')) and 
-            FormatVerify.check_duration(file, duration=spec.get('duration'))
+            FormatVerify.check_presence(file)
+            and FormatVerify.check_file_res(
+                file, res=spec.get("res"), square=spec.get("square")
             )
+            and FormatVerify.check_file_fps(file, fps=spec.get("fps"))
+            and FormatVerify.check_file_size(file, size=spec.get("size_max"))
+            and FormatVerify.check_animated(file, animated=spec.get("animated"))
+            and FormatVerify.check_format(file, format=spec.get("format"))
+            and FormatVerify.check_duration(file, duration=spec.get("duration"))
+        )
 
     @staticmethod
     def check_presence(file: str) -> bool:
         return os.path.isfile(file)
 
     @staticmethod
-    def check_file_res(file: str, res: Optional[dict[dict, int]] = None, square: Optional[bool] = None) -> bool:
+    def check_file_res(
+        file: str, res: Optional[dict[dict, int]] = None, square: Optional[bool] = None
+    ) -> bool:
         file_width, file_height = CodecInfo.get_file_res(file)
 
-        if res and (res.get('w', {}).get('min') and res.get('w', {}).get('max')) and (file_width < res['w']['min'] or file_width > res['w']['max']): # type: ignore[call-overload,index]
+        if res and (res.get("w", {}).get("min") and res.get("w", {}).get("max")) and (file_width < res["w"]["min"] or file_width > res["w"]["max"]):  # type: ignore[call-overload,index]
             return False
-        if res and (res.get('h', {}).get('min') and res.get('h', {}).get('max')) and (file_height < res['h']['min'] or file_height > res['h']['max']): # type: ignore[call-overload,index]
+        if res and (res.get("h", {}).get("min") and res.get("h", {}).get("max")) and (file_height < res["h"]["min"] or file_height > res["h"]["max"]):  # type: ignore[call-overload,index]
             return False
         if square != None and file_height != file_width:
             return False
@@ -71,73 +76,87 @@ class FormatVerify:
     def check_file_fps(file: str, fps: Optional[dict[str, float]]) -> bool:
         file_fps = CodecInfo.get_file_fps(file)
 
-        if fps and fps.get('min') != None and file_fps < fps['min']:
+        if fps and fps.get("min") != None and file_fps < fps["min"]:
             return False
-        if fps and fps.get('max') != None and file_fps > fps['max']:
+        if fps and fps.get("max") != None and file_fps > fps["max"]:
             return False
 
         return True
-        
+
     @staticmethod
     def check_file_size(file: str, size: Optional[dict[str, int]] = None) -> bool:
         file_size = os.path.getsize(file)
         file_animated = CodecInfo.is_anim(file)
 
-        if file_animated == True and size and size.get('vid') != None and file_size > size['vid']:
+        if (
+            file_animated == True
+            and size
+            and size.get("vid") != None
+            and file_size > size["vid"]
+        ):
             return False
-        if file_animated == False and size and size.get('img') != None and file_size > size['img']:
+        if (
+            file_animated == False
+            and size
+            and size.get("img") != None
+            and file_size > size["img"]
+        ):
             return False
-        
+
         return True
-    
+
     @staticmethod
     def check_animated(file: str, animated: Optional[bool] = None) -> bool:
         if animated != None and CodecInfo.is_anim(file) != animated:
             return False
-        
+
         return True
-    
+
     @staticmethod
-    def check_format(file: str, format: Union[dict[str, str], str, tuple, list, None] = None, allow_compat_ext: bool = True):
+    def check_format(
+        file: str,
+        format: Union[dict[str, str], str, tuple, list, None] = None,
+        allow_compat_ext: bool = True,
+    ):
         compat_ext = {
-            '.jpg': '.jpeg',
-            '.jpeg': '.jpg',
-            '.png': '.apng',
-            '.apng': '.png'
+            ".jpg": ".jpeg",
+            ".jpeg": ".jpg",
+            ".png": ".apng",
+            ".apng": ".png",
         }
 
         formats = []
         if format != None:
-            if type(format) == dict:
+            if isinstance(format, dict):
                 if FormatVerify.check_animated(file):
-                    format = format.get('vid')
+                    format = format.get("vid")
                 else:
-                    format = format.get('img')
+                    format = format.get("img")
 
-            if type(format) == str:
+            if isinstance(format, str):
                 formats.append(format)
-            elif (type(format) == tuple or type(format) == list):
+            elif isinstance(format, tuple) or isinstance(format, list):
                 formats.extend(format)
-            
+
             if allow_compat_ext:
                 for fmt in formats.copy():
                     if fmt in compat_ext:
-                        formats.append(compat_ext.get(fmt)) # type: ignore[arg-type]
+                        formats.append(compat_ext.get(fmt))  # type: ignore[arg-type]
             if CodecInfo.get_file_ext(file) not in formats:
                 return False
-            
+
         return True
-    
+
     @staticmethod
     def check_duration(file: str, duration: Optional[dict[str, int]] = None) -> bool:
         file_duration = CodecInfo.get_file_duration(file)
-        if duration and duration.get('min') != None and file_duration < duration['min']:
+        if duration and duration.get("min") != None and file_duration < duration["min"]:
             return False
-        if duration and duration.get('max') != None and file_duration > duration['max']:
+        if duration and duration.get("max") != None and file_duration > duration["max"]:
             return False
-        
+
         return True
-    
+
     @staticmethod
     def sanitize_filename(filename: str) -> str:
         # Based on https://gitlab.com/jplusplus/sanitize-filename/-/blob/master/sanitize_filename/sanitize_filename.py
@@ -149,15 +168,15 @@ class FormatVerify:
         and make sure we do not exceed Windows filename length limits.
         Hence a less safe blacklist, rather than a whitelist.
         """
-        blacklist = ["\\", "/", ":", "*", "?", "\"", "<", ">", "|", "\0"]
+        blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "\0"]
         reserved = [
             "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5",
             "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5",
             "LPT6", "LPT7", "LPT8", "LPT9",
         ]  # Reserved words on Windows
-        filename = "".join(c if c not in blacklist else '_' for c in filename)
+        filename = "".join(c if c not in blacklist else "_" for c in filename)
         # Remove all charcters below code point 32
-        filename = "".join(c if 31 < ord(c) else '_' for c in filename)
+        filename = "".join(c if 31 < ord(c) else "_" for c in filename)
         filename = unicodedata.normalize("NFKD", filename)
         filename = filename.rstrip(". ")  # Windows does not allow these at end
         filename = filename.strip()
@@ -171,7 +190,7 @@ class FormatVerify:
             parts = re.split(r"/|\\", filename)[-1].split(".")
             if len(parts) > 1:
                 ext = "." + parts.pop()
-                filename = filename[:-len(ext)]
+                filename = filename[: -len(ext)]
             else:
                 ext = ""
             if filename == "":

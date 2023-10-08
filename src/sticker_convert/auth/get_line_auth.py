@@ -7,9 +7,9 @@ import requests
 
 class GetLineAuth:
     def get_cred(self) -> Optional[str]:
-        cookies = [c for c in rookiepy.load() if c.domain == 'store.line.me']
-        cookies_dict = rookiepy.to_dict(cookies)
-        cookies_jar = rookiepy.to_cookiejar(cookies)
+        cookies_rookie = [c for c in rookiepy.load() if c.domain == 'store.line.me']
+        cookies_dict = rookiepy.to_dict(cookies_rookie)
+        cookies_jar = rookiepy.to_cookiejar(cookies_rookie)
 
         if not GetLineAuth.validate_cookies(cookies_jar):
             return None

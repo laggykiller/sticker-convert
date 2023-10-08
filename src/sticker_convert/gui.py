@@ -18,7 +18,7 @@ from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 
 from .flow import Flow # type: ignore
 from .utils.json_manager import JsonManager # type: ignore
-from .utils.curr_dir import CurrDir # type: ignore
+from .utils.dir_utils import DirUtils # type: ignore
 from .utils.metadata_handler import MetadataHandler # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .utils.gui_utils import GUIUtils # type: ignore
@@ -201,13 +201,13 @@ class GUI(Window):
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
 
-        self.settings_path = os.path.join(CurrDir.get_config_dir(), 'config.json')
+        self.settings_path = os.path.join(DirUtils.get_config_dir(), 'config.json')
         if os.path.isfile(self.settings_path):
             self.settings = JsonManager.load_json(self.settings_path)
         else:
             self.settings = {}
         
-        self.creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')
+        self.creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
         if os.path.isfile(self.creds_path):
             self.creds = JsonManager.load_json(self.creds_path)
         else:
@@ -320,7 +320,7 @@ class GUI(Window):
         self.default_input_mode = self.settings.get('input', {}).get('option', 'auto')
         self.input_address_var.set(self.settings.get('input', {}).get('url', ''))
         
-        default_stickers_input_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
+        default_stickers_input_dir = os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
         self.input_setdir_var.set(self.settings.get('input', {}).get('dir', default_stickers_input_dir))
         if not os.path.isdir(self.input_setdir_var.get()):
             self.input_setdir_var.set(default_stickers_input_dir)
@@ -334,7 +334,7 @@ class GUI(Window):
         self.processes_var.set(self.settings.get('comp', {}).get('processes', math.ceil(cpu_count() / 2)))
         self.default_output_mode = self.settings.get('output', {}).get('option', 'signal')
 
-        default_stickers_output_dir = os.path.join(CurrDir.get_curr_dir(), 'stickers_output')
+        default_stickers_output_dir = os.path.join(DirUtils.get_curr_dir(), 'stickers_output')
         self.output_setdir_var.set(self.settings.get('output', {}).get('dir', default_stickers_output_dir))
         if not os.path.isdir(self.output_setdir_var.get()):
             self.output_setdir_var.set(default_stickers_output_dir)
@@ -559,7 +559,11 @@ class GUI(Window):
         response = self.get_response_from_id(response_id)
         return response
     
-    def cb_ask_str(self, question: str, initialvalue: Optional[str] = None, cli_show_initialvalue: bool = True, parent: Optional[object] = None) -> str:
+    def cb_ask_str(self, 
+                   question: str, 
+                   initialvalue: Optional[str] = None, 
+                   cli_show_initialvalue: bool = True, 
+                   parent: Optional[object] = None) -> str:
         return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent))
 
     def cb_ask_bool(self, question, parent=None) -> bool:
@@ -573,7 +577,10 @@ class GUI(Window):
         with self.msg_lock:
             self.progress_frame.update_message_box(*args, **kwargs)
     
-    def cb_msg_block(self, message: Optional[str] = None, parent: Optional[object] = None, *args, **kwargs):
+    def cb_msg_block(self, 
+                     message: Optional[str] = None, 
+                     parent: Optional[object] = None, 
+                     *args, **kwargs):
         if message == None and len(args) > 0:
             message = ' '.join(str(i) for i in args)
         self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))

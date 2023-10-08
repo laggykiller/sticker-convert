@@ -12,7 +12,7 @@ from .utils.json_manager import JsonManager # type: ignore
 from .auth.get_kakao_auth import GetKakaoAuth # type: ignore
 from .auth.get_signal_auth import GetSignalAuth # type: ignore
 from .auth.get_line_auth import GetLineAuth # type: ignore
-from .utils.curr_dir import CurrDir # type: ignore
+from .utils.dir_utils import DirUtils # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .__init__ import __version__ # type: ignore
 
@@ -137,7 +137,7 @@ class CLI:
         self.opt_input = {
             'option': download_option,
             'url': url,
-            'dir': args.input_dir if args.input_dir else os.path.join(CurrDir.get_curr_dir(), 'stickers_input')
+            'dir': args.input_dir if args.input_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
         }
 
     def get_opt_output(self, args):
@@ -154,7 +154,7 @@ class CLI:
         
         self.opt_output = {
             'option': export_option,
-            'dir': args.output_dir if args.output_dir else os.path.join(CurrDir.get_curr_dir(), 'stickers_output'),
+            'dir': args.output_dir if args.output_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_output'),
             'title': args.title,
             'author': args.author
         }
@@ -231,7 +231,7 @@ class CLI:
         }
 
     def get_opt_cred(self, args):
-        creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')
+        creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
         creds = JsonManager.load_json(creds_path)
         if creds:
             self.cb_msg('Loaded credentials from creds.json')
@@ -295,7 +295,7 @@ class CLI:
                 self.cb_msg('Failed to get Line cookies. Have you logged in the web browser?')
         
         if args.save_cred:
-            creds_path = os.path.join(CurrDir.get_config_dir(), 'creds.json')
+            creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
             JsonManager.save_json(creds_path, self.opt_cred)
             self.cb_msg('Saved credentials to creds.json')
     

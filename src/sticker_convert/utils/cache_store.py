@@ -3,13 +3,16 @@ import os
 import platform
 import shutil
 from uuid import uuid4
-if platform.system() == 'Linux':
-    import memory_tempfile # type: ignore
+
+if platform.system() == "Linux":
+    import memory_tempfile  # type: ignore
+
     tempfile = memory_tempfile.MemoryTempfile(fallback=True)
 else:
     import tempfile
 import contextlib
 from typing import Optional
+
 
 @contextlib.contextmanager
 def debug_cache_dir(path: str):
@@ -19,6 +22,7 @@ def debug_cache_dir(path: str):
         yield path_random
     finally:
         shutil.rmtree(path_random)
+
 
 class CacheStore:
     @staticmethod

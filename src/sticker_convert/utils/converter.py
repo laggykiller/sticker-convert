@@ -27,10 +27,10 @@ def get_step_value(max: int, min: int, step: int, steps: int) -> Optional[int]:
 
 class StickerConvert:
     def __init__(self, in_f: Union[str, list[str, io.BytesIO]], out_f: str, opt_comp: dict, cb_msg=print):
-        if type(cb_msg) != QueueType:
+        if not isinstance(cb_msg, QueueType):
             cb_msg = FakeCbMsg(cb_msg)
 
-        if type(in_f) == str:
+        if isinstance(in_f, str):
             self.in_f = in_f
             self.in_f_name = os.path.split(self.in_f)[1]
             self.in_f_ext = CodecInfo.get_file_ext(self.in_f)
@@ -52,35 +52,35 @@ class StickerConvert:
         self.opt_comp = opt_comp
         self.preset = opt_comp.get('preset')
 
-        self.size_max = opt_comp.get('size_max') if type(opt_comp.get('size_max')) == int else None
+        self.size_max = opt_comp.get('size_max') if isinstance(opt_comp.get('size_max'), int) else None
         self.size_max_img = opt_comp.get('size_max', {}).get('img') if not self.size_max else self.size_max
         self.size_max_vid = opt_comp.get('size_max', {}).get('vid') if not self.size_max else self.size_max
 
-        self.format = opt_comp.get('format') if type(opt_comp.get('format')) == str else None
+        self.format = opt_comp.get('format') if isinstance(opt_comp.get('format'), str) else None
         self.format_img = opt_comp.get('format', {}).get('img') if not self.format else self.format
         self.format_vid = opt_comp.get('format', {}).get('vid') if not self.format else self.format
 
-        self.fps = opt_comp.get('fps') if type(opt_comp.get('fps')) == int else None
+        self.fps = opt_comp.get('fps') if isinstance(opt_comp.get('fps'), int) else None
         self.fps_min = opt_comp.get('fps', {}).get('min') if not self.fps else self.fps
         self.fps_max = opt_comp.get('fps', {}).get('max') if not self.fps else self.fps
 
-        self.res_w = opt_comp.get('res', {}).get('w') if type(opt_comp.get('res', {}).get('w')) == int else None
+        self.res_w = opt_comp.get('res', {}).get('w') if isinstance(opt_comp.get('res', {}).get('w'), int) else None
         self.res_w_min = opt_comp.get('res', {}).get('w', {}).get('min') if not self.res_w else self.res_w
         self.res_w_max = opt_comp.get('res', {}).get('w', {}).get('max') if not self.res_w else self.res_w
 
-        self.res_h = opt_comp.get('res', {}).get('h') if type(opt_comp.get('res', {}).get('h')) == int else None
+        self.res_h = opt_comp.get('res', {}).get('h') if isinstance(opt_comp.get('res', {}).get('h'), int) else None
         self.res_h_min = opt_comp.get('res', {}).get('h', {}).get('min') if not self.res_h else self.res_h
         self.res_h_max = opt_comp.get('res', {}).get('h', {}).get('max') if not self.res_h else self.res_h
 
-        self.quality = opt_comp.get('quality') if type(opt_comp.get('quality')) == int else None
+        self.quality = opt_comp.get('quality') if isinstance(opt_comp.get('quality'), int) else None
         self.quality_min = opt_comp.get('quality', {}).get('min') if not self.quality else self.quality
         self.quality_max = opt_comp.get('quality', {}).get('max') if not self.quality else self.quality
 
-        self.color = opt_comp.get('color') if type(opt_comp.get('color')) == int else None
+        self.color = opt_comp.get('color') if isinstance(opt_comp.get('color'), int) else None
         self.color_min = opt_comp.get('color', {}).get('min') if not self.color else self.color
         self.color_max = opt_comp.get('color', {}).get('max') if not self.color else self.color
 
-        self.duration = opt_comp.get('duration') if type(opt_comp.get('duration')) == int else None
+        self.duration = opt_comp.get('duration') if isinstance(opt_comp.get('duration'), int) else None
         self.duration_min = opt_comp.get('duration', {}).get('min') if not self.duration else self.duration
         self.duration_max = opt_comp.get('duration', {}).get('max') if not self.duration else self.duration
 
@@ -237,7 +237,7 @@ class StickerConvert:
         if self.in_f_ext == '.tgs':
             anim = LottieAnimation.from_tgs(self.in_f)
         else:
-            if type(self.in_f) == str:
+            if isinstance(self.in_f, str):
                 anim = LottieAnimation.from_file(self.in_f)
             else:
                 anim = LottieAnimation.from_data(self.in_f.read().decode('utf-8'))
@@ -325,7 +325,7 @@ class StickerConvert:
     def frames_export_pyav(self):
         options = {}
         
-        if type(self.quality) == int:
+        if isinstance(self.quality, int):
             options['quality'] = str(self.quality)
             options['lossless'] = '0'
 
