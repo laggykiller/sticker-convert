@@ -179,7 +179,7 @@ class GUI(Window):
     
     def warn_tkinter_bug(self):
         if (platform.system() == 'Darwin' and
-            platform.mac_ver().split('.')[0] == '14' and
+            platform.mac_ver()[0].split('.')[0] == '14' and
             sys.version_info[0] == 3 and
             sys.version_info[1] == 11):
             msg = 'NOTICE: If buttons are not responsive, try to press '
