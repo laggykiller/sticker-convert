@@ -15,7 +15,7 @@ from typing import Optional
 from .download_base import DownloadBase # type: ignore
 from ..auth.get_line_auth import GetLineAuth # type: ignore
 from ..utils.metadata_handler import MetadataHandler # type: ignore
-from ..utils.apple_png_normalize import ApplePngNormalize # type: ignore
+from ..media.apple_png_normalize import ApplePngNormalize # type: ignore
 
 class MetadataLine:
     @staticmethod

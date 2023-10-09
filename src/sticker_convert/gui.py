@@ -16,7 +16,7 @@ from PIL import ImageFont
 from ttkbootstrap import Window, StringVar, BooleanVar, IntVar # type: ignore
 from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 
-from .flow import Flow # type: ignore
+from .job import Job # type: ignore
 from .utils.json_manager import JsonManager # type: ignore
 from .utils.dir_utils import DirUtils # type: ignore
 from .utils.metadata_handler import MetadataHandler # type: ignore
@@ -73,7 +73,7 @@ class GUI(Window):
         self.mainloop()
 
     def quit(self):
-        if self.flow:
+        if self.job:
             response = self.cb_ask_bool('Job is running, really quit?')
             if response == False:
                 return
@@ -86,7 +86,7 @@ class GUI(Window):
         else:
             self.delete_creds()
         
-        if self.flow:
+        if self.job:
             self.cancel_job()
         self.destroy()
             
@@ -157,7 +157,7 @@ class GUI(Window):
         self.response_dict_lock = Lock()
         self.response_dict = {}
         self.action_queue = Queue()
-        self.flow = None
+        self.job = None
 
     def init_frames(self):
         self.input_frame = InputFrame(self, self.scrollable_frame, borderwidth=1, text='Input')
@@ -216,54 +216,14 @@ class GUI(Window):
     def save_config(self):
         # Only update comp_custom if custom preset is selected
         if self.comp_preset_var.get() == 'custom':
-            comp_custom = {
-                'size_max': {
-                    'img': self.img_size_max_var.get() if not self.size_disable_var.get() else None,
-                    'vid': self.vid_size_max_var.get() if not self.size_disable_var.get() else None
-                },
-                'format': {
-                    'img': self.img_format_var.get(),
-                    'vid': self.vid_format_var.get()
-                },
-                'fps': {
-                    'min': self.fps_min_var.get() if not self.fps_disable_var.get() else None,
-                    'max': self.fps_max_var.get() if not self.fps_disable_var.get() else None
-                },
-                'res': {
-                    'w': {
-                        'min': self.res_w_min_var.get() if not self.res_w_disable_var.get() else None,
-                        'max': self.res_w_max_var.get() if not self.res_w_disable_var.get() else None
-                    },
-                    'h': {
-                        'min': self.res_h_min_var.get() if not self.res_h_disable_var.get() else None,
-                        'max': self.res_h_max_var.get() if not self.res_h_disable_var.get() else None
-                    }
-                },
-                'quality': {
-                    'min': self.quality_min_var.get() if not self.quality_disable_var.get() else None,
-                    'max': self.quality_max_var.get() if not self.quality_disable_var.get() else None
-                },
-                'color': {
-                    'min': self.color_min_var.get() if not self.color_disable_var.get() else None,
-                    'max': self.color_max_var.get() if not self.color_disable_var.get() else None
-                },
-                'duration': {
-                    'min': self.duration_min_var.get() if not self.duration_disable_var.get() else None,
-                    'max': self.duration_max_var.get() if not self.duration_disable_var.get() else None
-                },
-                'steps': self.steps_var.get(),
-                'fake_vid': self.fake_vid_var.get(),
-                'default_emoji': self.default_emoji_var.get(),
-            }
+            comp_custom = self.get_opt_comp()
+            del comp_custom['preset']
+            del comp_custom['no_compress']
         else:
             comp_custom = self.compression_presets.get('custom')
 
         self.settings = {
-            'input': {
-                'option': self.get_input_name(),
-                'url': self.input_address_var.get(),
-                'dir':  self.input_setdir_var.get()
-            },
+            'input': self.get_opt_input(),
             'comp': {
                 'no_compress': self.no_compress_var.get(),
                 'preset': self.comp_preset_var.get(),
@@ -271,12 +231,7 @@ class GUI(Window):
                 'processes': self.processes_var.get()
             },
             'comp_custom': comp_custom,
-            'output': {
-                'option': self.get_output_name(),
-                'dir': self.output_setdir_var.get(),
-                'title': self.title_var.get(),
-                'author': self.author_var.get()
-            },
+            'output': self.get_opt_output(),
             'creds': {
                 'save_cred': self.settings_save_cred_var.get()
             }
@@ -285,26 +240,7 @@ class GUI(Window):
         JsonManager.save_json(self.settings_path, self.settings)
         
     def save_creds(self):
-        self.creds = {
-            'signal': {
-                'uuid': self.signal_uuid_var.get(),
-                'password': self.signal_password_var.get()
-            },
-            'telegram': {
-                'token': self.telegram_token_var.get(),
-                'userid': self.telegram_userid_var.get()
-            },
-            'kakao': {
-                'auth_token': self.kakao_auth_token_var.get(),
-                'username': self.kakao_username_var.get(),
-                'password': self.kakao_password_var.get(),
-                'country_code': self.kakao_country_code_var.get(),
-                'phone_number': self.kakao_phone_number_var.get()
-            },
-            'line': {
-                'cookies': self.line_cookies_var.get()
-            }
-        }
+        self.creds = self.get_opt_cred()
 
         JsonManager.save_json(self.creds_path, self.creds)
     
@@ -392,31 +328,24 @@ class GUI(Window):
     
     def start_job(self):
         Thread(target=self.start_process, daemon=True).start()
-
-    def start_process(self):
-        self.save_config()
-        if self.settings_save_cred_var.get() == True:
-            self.save_creds()
-        else:
-            self.delete_creds()
-
-        self.control_frame.start_btn.config(text='Cancel', bootstyle='danger')
-        self.set_inputs('disabled')
     
-        opt_input = {
+    def get_opt_input(self) -> dict:
+        return {
             'option': self.get_input_name(),
             'url': self.input_address_var.get(),
             'dir': self.input_setdir_var.get()
         }
-
-        opt_output = {
+    
+    def get_opt_output(self) -> dict:
+        return {
             'option': self.get_output_name(),
             'dir': self.output_setdir_var.get(),
             'title': self.title_var.get(),
             'author': self.author_var.get()
         }
-
-        opt_comp = {
+    
+    def get_opt_comp(self) -> dict:
+        return {
             'preset': self.get_preset(),
             'size_max': {
                 'img': self.img_size_max_var.get() if not self.size_disable_var.get() else None,
@@ -459,8 +388,9 @@ class GUI(Window):
             'no_compress': self.no_compress_var.get(),
             'processes': self.processes_var.get()
         }
-
-        opt_cred = {
+    
+    def get_opt_cred(self) -> dict:
+        return {
             'signal': {
                 'uuid': self.signal_uuid_var.get(),
                 'password': self.signal_password_var.get()
@@ -480,16 +410,30 @@ class GUI(Window):
                 'cookies': self.line_cookies_var.get()
             }
         }
+
+    def start_process(self):
+        self.save_config()
+        if self.settings_save_cred_var.get() == True:
+            self.save_creds()
+        else:
+            self.delete_creds()
+
+        self.control_frame.start_btn.config(text='Cancel', bootstyle='danger')
+        self.set_inputs('disabled')
+    
+        opt_input = self.get_opt_input()
+        opt_output = self.get_opt_output()
+        opt_comp = self.get_opt_comp()
+        opt_cred = self.get_opt_cred()
         
-        self.flow = Flow(
+        self.job = Job(
             opt_input, opt_comp, opt_output, opt_cred, 
-            self.input_presets, self.output_presets,
             self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
             )
         
-        status = self.flow.start()
+        status = self.job.start()
 
-        self.flow = None
+        self.job = None
 
         if status == 1:
             self.cb_msg(msg='An error occured during this run.')
@@ -505,10 +449,10 @@ class GUI(Window):
     
     def cancel_job(self):
         self.cb_msg(msg='Cancelling job...')
-        self.flow.is_cancel_job.value = 1
-        while not self.flow.jobs_queue.empty():
-            self.flow.jobs_queue.get()
-        for process in self.flow.processes:
+        self.job.is_cancel_job.value = 1
+        while not self.job.jobs_queue.empty():
+            self.job.jobs_queue.get()
+        for process in self.job.processes:
             process.terminate()
             process.join()
 

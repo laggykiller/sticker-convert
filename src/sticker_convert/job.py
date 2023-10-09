@@ -23,17 +23,15 @@ from .utils.codec_info import CodecInfo # type: ignore
 from .utils.json_manager import JsonManager # type: ignore
 from .utils.metadata_handler import MetadataHandler # type: ignore
 
-class Flow:
+class Job:
     def __init__(self,
         opt_input: dict, opt_comp: dict, opt_output: dict, opt_cred: dict, 
-        input_presets: dict, output_presets: dict, cb_msg, cb_msg_block, cb_bar, cb_ask_bool):
+        cb_msg, cb_msg_block, cb_bar, cb_ask_bool):
 
         self.opt_input = opt_input
         self.opt_comp = opt_comp
         self.opt_output = opt_output
         self.opt_cred = opt_cred
-        self.input_presets = input_presets
-        self.output_presets = output_presets
         self.cb_msg = cb_msg
         self.cb_msg_block = cb_msg_block
         self.cb_bar = cb_bar
@@ -340,7 +338,7 @@ class Flow:
 
         for i in range(min(self.opt_comp['processes'], in_fs_count)):
             process = Process(
-                target=Flow.compress_worker,
+                target=Job.compress_worker,
                 args=(self.jobs_queue, self.results_queue, self.cb_msg_queue),
                 daemon=True
             )

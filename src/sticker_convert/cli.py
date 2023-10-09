@@ -7,7 +7,7 @@ from typing import Optional
 
 from tqdm import tqdm
 
-from .flow import Flow # type: ignore
+from .job import Job # type: ignore
 from .utils.json_manager import JsonManager # type: ignore
 from .auth.get_kakao_auth import GetKakaoAuth # type: ignore
 from .auth.get_signal_auth import GetSignalAuth # type: ignore
@@ -97,13 +97,12 @@ class CLI:
         self.get_opt_comp(args)
         self.get_opt_cred(args)
 
-        flow = Flow(
+        job = Job(
             self.opt_input, self.opt_comp, self.opt_output, self.opt_cred, 
-            self.input_presets, self.output_presets,
             self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
         )
 
-        status = flow.start()
+        status = job.start()
 
         if status == 1:
             self.cb_msg(msg='An error occured during this run.')

@@ -16,7 +16,7 @@ class ControlFrame(Frame):
         self.start_btn.pack(expand=True, fill='x')
     
     def cb_start_btn(self, *args, **kwargs):
-        if self.gui.flow:
+        if self.gui.job:
             response = self.gui.cb_ask_bool('Cancel job?')
             if response == True:
                 self.gui.cancel_job()
