@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -9,8 +10,9 @@ from urllib.parse import urlparse
 from typing import Optional
 
 from .download_base import DownloadBase  # type: ignore
-from ..utils.metadata_handler import MetadataHandler  # type: ignore
-from ..media.decrypt_kakao import DecryptKakao
+from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..utils.media.decrypt_kakao import DecryptKakao  # type: ignore
+from ..job_option import CredOption  # type: ignore
 
 
 class MetadataKakao:
@@ -104,7 +106,7 @@ class DownloadKakao(DownloadBase):
 
     def download_stickers_kakao(self) -> bool:
         if self.opt_cred:
-            auth_token = self.opt_cred.get("kakao", {}).get("auth_token")
+            auth_token = self.opt_cred.kakao_auth_token
 
         if urlparse(self.url).netloc == "emoticon.kakao.com":
             self.pack_title, item_code = MetadataKakao.get_info_from_share_link(
@@ -230,7 +232,7 @@ class DownloadKakao(DownloadBase):
     def start(
         url: str,
         out_dir: str,
-        opt_cred: Optional[dict] = None,
+        opt_cred: Optional[CredOption] = None,
         cb_msg=print,
         cb_msg_block=input,
         cb_bar=None,

@@ -7,72 +7,72 @@ from typing import Optional
 import anyio
 from telegram import Bot, InputSticker
 from telegram.error import TelegramError
-from mergedeep import merge  # type: ignore
 
 from .upload_base import UploadBase  # type: ignore
-from ..utils.converter import StickerConvert  # type: ignore
-from ..utils.metadata_handler import MetadataHandler  # type: ignore
-from ..utils.format_verify import FormatVerify  # type: ignore
+from ..converter import StickerConvert  # type: ignore
+from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..utils.media.format_verify import FormatVerify  # type: ignore
+from ..job_option import CompOption, OutputOption, CredOption # type: ignore
 
 
 class UploadTelegram(UploadBase):
     def __init__(self, *args, **kwargs):
         super(UploadTelegram, self).__init__(*args, **kwargs)
 
-        base_spec = {
+        base_spec = CompOption({
             "size_max": {"img": 512000, "vid": 256000},
-            "res": {"w": {"min": 512, "max": 512}, "h": {"min": 512, "max": 512}},
+            "res": 512,
             "square": True,
-            "duration": {"max": 3000},
-            "fps": {},
-        }
+            "duration": {"max": 3000}
+        })
 
         self.png_spec = copy.deepcopy(base_spec)
-        self.png_spec["format"] = ".png"
-        self.png_spec["animated"] = False
+        self.png_spec.format = ".png"
+        self.png_spec.animated = False
 
         self.tgs_spec = copy.deepcopy(base_spec)
-        self.tgs_spec["format"] = ".tgs"
-        self.tgs_spec["fps"]["min"] = 60
-        self.tgs_spec["fps"]["max"] = 60
-        self.tgs_spec["size_max"]["img"] = 64000
-        self.tgs_spec["size_max"]["vid"] = 64000
+        self.tgs_spec.format = ".tgs"
+        self.tgs_spec.fps_min = 60
+        self.tgs_spec.fps_max = 60
+        self.tgs_spec.size_max_img = 64000
+        self.tgs_spec.size_max_vid = 64000
 
         self.webm_spec = copy.deepcopy(base_spec)
-        self.webm_spec["format"] = ".webm"
-        self.webm_spec["fps"]["max"] = 30
-        self.webm_spec["animated"] = None if self.fake_vid else True
+        self.webm_spec.format = ".webm"
+        self.webm_spec.fps_max = 30
+        self.webm_spec.animated = None if self.fake_vid else True
 
-        self.opt_comp_merged = merge({}, self.opt_comp, base_spec)
+        self.opt_comp_merged = copy.deepcopy(self.opt_comp)
+        self.opt_comp_merged.merge(base_spec)
 
-        base_cover_spec = {
+        base_cover_spec = CompOption({
             "size_max": {"img": 128000, "vid": 32000},
-            "res": {"w": {"min": 100, "max": 100}, "h": {"min": 100, "max": 100}},
+            "res": 100,
             "square": True,
-            "duration": {"max": 3000},
-            "fps": {},
-        }
+            "duration": {"max": 3000}
+        })
 
         self.png_cover_spec = copy.deepcopy(base_cover_spec)
-        self.png_cover_spec["format"] = ".png"
-        self.png_cover_spec["animated"] = False
+        self.png_cover_spec.format = ".png"
+        self.png_cover_spec.animated = False
 
         self.tgs_cover_spec = copy.deepcopy(base_cover_spec)
-        self.tgs_cover_spec["format"] = ".tgs"
-        self.tgs_cover_spec["fps"]["min"] = 60
-        self.tgs_cover_spec["fps"]["max"] = 60
+        self.tgs_cover_spec.format = ".tgs"
+        self.tgs_cover_spec.fps_min = 60
+        self.tgs_cover_spec.fps_max = 60
 
         self.webm_cover_spec = copy.deepcopy(base_cover_spec)
-        self.webm_cover_spec["format"] = ".webm"
-        self.webm_cover_spec["fps"]["max"] = 30
-        self.webm_cover_spec["animated"] = True
+        self.webm_cover_spec.format = ".webm"
+        self.webm_cover_spec.fps_max = 30
+        self.webm_cover_spec.animated = True
 
-        self.opt_comp_cover_merged = merge({}, self.opt_comp, base_cover_spec)
+        self.opt_comp_cover_merged = copy.deepcopy(self.opt_comp)
+        self.opt_comp_cover_merged.merge(base_spec)
 
     async def upload_pack(
         self, pack_title: str, stickers: list[str], emoji_dict: dict[str, str]
     ) -> str:
-        bot = Bot(self.opt_cred["telegram"]["token"])
+        bot = Bot(self.opt_cred.telegram_token)
 
         async with bot:
             pack_short_name = (
@@ -158,7 +158,7 @@ class UploadTelegram(UploadBase):
                 try:
                     if pack_exists == False:
                         await bot.create_new_sticker_set(
-                            user_id=self.opt_cred["telegram"]["userid"],
+                            user_id=self.opt_cred.telegram_userid,
                             name=pack_short_name,
                             title=pack_title,
                             stickers=[sticker],
@@ -167,7 +167,7 @@ class UploadTelegram(UploadBase):
                         pack_exists = True
                     else:
                         await bot.add_sticker_to_set(
-                            user_id=self.opt_cred["telegram"]["userid"],
+                            user_id=self.opt_cred.telegram_userid,
                             name=pack_short_name,
                             sticker=sticker,
                         )
@@ -195,7 +195,7 @@ class UploadTelegram(UploadBase):
                 try:
                     await bot.set_sticker_set_thumbnail(
                         name=pack_short_name,
-                        user_id=self.opt_cred["telegram"]["userid"],
+                        user_id=self.opt_cred.telegram_userid,
                         thumbnail=thumbnail_bytes,
                     )
                 except TelegramError as e:
@@ -209,14 +209,14 @@ class UploadTelegram(UploadBase):
     def upload_stickers_telegram(self) -> list[str]:
         urls = []
 
-        if not self.opt_cred.get("telegram", {}).get("token"):
+        if not self.opt_cred.telegram_token:
             self.cb_msg("Token required for uploading to telegram")
             return urls
 
         title, author, emoji_dict = MetadataHandler.get_metadata(
             self.in_dir,
-            title=self.opt_output.get("title"),
-            author=self.opt_output.get("author"),
+            title=self.opt_output.title,
+            author=self.opt_output.author,
         )
         if title == None:
             raise TypeError("title cannot be", title)
@@ -224,19 +224,19 @@ class UploadTelegram(UploadBase):
             msg_block = "emoji.txt is required for uploading signal stickers\n"
             msg_block += f"emoji.txt generated for you in {self.in_dir}\n"
             msg_block += (
-                f'Default emoji is set to {self.opt_comp.get("default_emoji")}.\n'
+                f'Default emoji is set to {self.opt_comp.default_emoji}.\n'
             )
             msg_block += f"Please edit emoji.txt now, then continue"
             MetadataHandler.generate_emoji_file(
-                dir=self.in_dir, default_emoji=self.opt_comp.get("default_emoji")
+                dir=self.in_dir, default_emoji=self.opt_comp.default_emoji
             )
 
             self.cb_msg_block(msg_block)
 
             title, author, emoji_dict = MetadataHandler.get_metadata(
                 self.in_dir,
-                title=self.opt_output.get("title"),
-                author=self.opt_output.get("author"),
+                title=self.opt_output.title,
+                author=self.opt_output.author,
             )
 
         packs = MetadataHandler.split_sticker_packs(
@@ -257,9 +257,9 @@ class UploadTelegram(UploadBase):
 
     @staticmethod
     def start(
-        opt_output: dict,
-        opt_comp: dict,
-        opt_cred: dict,
+        opt_output: OutputOption,
+        opt_comp: CompOption,
+        opt_cred: CredOption,
         cb_msg=print,
         cb_msg_block=input,
         cb_ask_bool=input,

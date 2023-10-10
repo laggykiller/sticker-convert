@@ -7,9 +7,8 @@ from ttkbootstrap import LabelFrame, Button, Label, Checkbutton # type: ignore
 
 if TYPE_CHECKING:
     from ..gui import GUI # type: ignore
-from ..utils.dir_utils import DirUtils # type: ignore
-from ..utils.run_bin import RunBin # type: ignore
-from ..__init__ import __version__ # type: ignore
+from ...utils.files.dir_utils import DirUtils # type: ignore
+from ...utils.files.run_bin import RunBin # type: ignore
 
 class ConfigFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args, **kwargs):

@@ -14,21 +14,30 @@ from av.codec.context import CodecContext # type: ignore
 import webp # type: ignore
 import oxipng
 
-from .codec_info import CodecInfo # type: ignore
-from .cache_store import CacheStore # type: ignore
-from .format_verify import FormatVerify # type: ignore
-from .fake_cb_msg import FakeCbMsg # type: ignore
+from .utils.media.codec_info import CodecInfo # type: ignore
+from .utils.files.cache_store import CacheStore # type: ignore
+from .utils.media.format_verify import FormatVerify # type: ignore
+from .utils.fake_cb_msg import FakeCbMsg # type: ignore
+from .job_option import CompOption
 
-def get_step_value(max: int, min: int, step: int, steps: int) -> Optional[int]:
+def get_step_value(
+        max: Optional[int], min: Optional[int],
+        step: int, steps: int
+        ) -> Optional[int]:
+    
     if max and min:
         return round((max - min) * step / steps + min)
     else:
         return None
 
 class StickerConvert:
-    def __init__(self, in_f: Union[str, list[str, io.BytesIO]], out_f: str, opt_comp: dict, cb_msg=print):
+    def __init__(self, in_f: Union[str, list[str, io.BytesIO]], out_f: str, opt_comp: CompOption, cb_msg: Union[FakeCbMsg, bool] = True):
         if not isinstance(cb_msg, QueueType):
-            cb_msg = FakeCbMsg(cb_msg)
+            if cb_msg == False:
+                silent = True
+            else:
+                silent = False
+            cb_msg = FakeCbMsg(print, silent=silent)
 
         if isinstance(in_f, str):
             self.in_f = in_f
@@ -41,55 +50,23 @@ class StickerConvert:
 
         self.out_f = out_f
         self.out_f_name = os.path.split(self.out_f)[1]
-        if os.path.splitext(out_f)[0] not in ('null', 'bytes'):
-            self.out_f_ext = CodecInfo.get_file_ext(self.out_f)
-        else:
-            self.out_f_ext = os.path.splitext(out_f)[1]
+        self.out_f_ext = os.path.splitext(out_f)[1]
 
         self.cb_msg = cb_msg
         self.frames_raw: list[np.ndarray] = []
         self.frames_processed: list[np.ndarray] = []
         self.opt_comp = opt_comp
-        self.preset = opt_comp.get('preset')
 
-        self.size_max = opt_comp.get('size_max') if isinstance(opt_comp.get('size_max'), int) else None
-        self.size_max_img = opt_comp.get('size_max', {}).get('img') if not self.size_max else self.size_max
-        self.size_max_vid = opt_comp.get('size_max', {}).get('vid') if not self.size_max else self.size_max
+        self.size_max = None
+        self.res_w = None
+        self.res_h = None
+        self.quality = None
+        self.fps = None
+        self.color = None
 
-        self.format = opt_comp.get('format') if isinstance(opt_comp.get('format'), str) else None
-        self.format_img = opt_comp.get('format', {}).get('img') if not self.format else self.format
-        self.format_vid = opt_comp.get('format', {}).get('vid') if not self.format else self.format
-
-        self.fps = opt_comp.get('fps') if isinstance(opt_comp.get('fps'), int) else None
-        self.fps_min = opt_comp.get('fps', {}).get('min') if not self.fps else self.fps
-        self.fps_max = opt_comp.get('fps', {}).get('max') if not self.fps else self.fps
-
-        self.res_w = opt_comp.get('res', {}).get('w') if isinstance(opt_comp.get('res', {}).get('w'), int) else None
-        self.res_w_min = opt_comp.get('res', {}).get('w', {}).get('min') if not self.res_w else self.res_w
-        self.res_w_max = opt_comp.get('res', {}).get('w', {}).get('max') if not self.res_w else self.res_w
-
-        self.res_h = opt_comp.get('res', {}).get('h') if isinstance(opt_comp.get('res', {}).get('h'), int) else None
-        self.res_h_min = opt_comp.get('res', {}).get('h', {}).get('min') if not self.res_h else self.res_h
-        self.res_h_max = opt_comp.get('res', {}).get('h', {}).get('max') if not self.res_h else self.res_h
-
-        self.quality = opt_comp.get('quality') if isinstance(opt_comp.get('quality'), int) else None
-        self.quality_min = opt_comp.get('quality', {}).get('min') if not self.quality else self.quality
-        self.quality_max = opt_comp.get('quality', {}).get('max') if not self.quality else self.quality
-
-        self.color = opt_comp.get('color') if isinstance(opt_comp.get('color'), int) else None
-        self.color_min = opt_comp.get('color', {}).get('min') if not self.color else self.color
-        self.color_max = opt_comp.get('color', {}).get('max') if not self.color else self.color
-
-        self.duration = opt_comp.get('duration') if isinstance(opt_comp.get('duration'), int) else None
-        self.duration_min = opt_comp.get('duration', {}).get('min') if not self.duration else self.duration
-        self.duration_max = opt_comp.get('duration', {}).get('max') if not self.duration else self.duration
-
-        if not self.size_max and not self.size_max_img and not self.size_max_vid:
-            self.steps = 1
-        else:
-            self.steps = opt_comp.get('steps') if opt_comp.get('steps') else 1
-        self.fake_vid = opt_comp.get('fake_vid')
-        self.cache_dir = opt_comp.get('cache_dir')
+        self.frames_orig = CodecInfo.get_file_frames(self.in_f)
+        self.fps_orig = CodecInfo.get_file_fps(self.in_f)
+        self.duration_orig = self.frames_orig / self.fps_orig * 1000
 
         self.tmp_f = None
         self.tmp_fs: list[bytes] = []
@@ -97,11 +74,11 @@ class StickerConvert:
         self.apngasm = APNGAsm() # type: ignore[call-arg]
 
     def convert(self) -> tuple[bool, str, Union[None, bytes, str], int]:
-        if (FormatVerify.check_format(self.in_f, format=self.out_f_ext) and
-            FormatVerify.check_file_res(self.in_f, res=self.opt_comp.get('res')) and
-            FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.get('fps')) and
-            FormatVerify.check_file_size(self.in_f, size=self.opt_comp.get('size_max')) and
-            FormatVerify.check_duration(self.in_f, duration=self.opt_comp.get('duration'))):
+        if (FormatVerify.check_format(self.in_f, fmt=self.out_f_ext) and
+            FormatVerify.check_file_res(self.in_f, res=self.opt_comp.res) and
+            FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.fps) and
+            FormatVerify.check_file_size(self.in_f, size=self.opt_comp.size_max) and
+            FormatVerify.check_duration(self.in_f, duration=self.opt_comp.duration)):
             self.cb_msg.put(f'[S] Compatible file found, skip compress and just copy {self.in_f_name} -> {self.out_f_name}')
 
             with open(self.in_f, 'rb') as f:
@@ -111,20 +88,20 @@ class StickerConvert:
         self.cb_msg.put(f'[I] Start compressing {self.in_f_name} -> {self.out_f_name}')
 
         steps_list = []
-        for step in range(self.steps, -1, -1):
+        for step in range(self.opt_comp.steps, -1, -1):
             steps_list.append((
-                get_step_value(self.res_w_max, self.res_w_min, step, self.steps),
-                get_step_value(self.res_h_max, self.res_h_min, step, self.steps),
-                get_step_value(self.quality_max, self.quality_min, step, self.steps),
-                get_step_value(self.fps_max, self.fps_min, step, self.steps),
-                get_step_value(self.color_max, self.color_min, step, self.steps)
+                get_step_value(self.opt_comp.res_w_max, self.opt_comp.res_w_min, step, self.opt_comp.steps),
+                get_step_value(self.opt_comp.res_h_max, self.opt_comp.res_h_min, step, self.opt_comp.steps),
+                get_step_value(self.opt_comp.quality_max, self.opt_comp.quality_min, step, self.opt_comp.steps),
+                get_step_value(self.opt_comp.fps_max, self.opt_comp.fps_min, step, self.opt_comp.steps),
+                get_step_value(self.opt_comp.color_max, self.opt_comp.color_min, step, self.opt_comp.steps)
             ))
-        self.tmp_fs = [None] * (self.steps + 1)
+        self.tmp_fs = [None] * (self.opt_comp.steps + 1)
 
         step_lower = 0
-        step_upper = self.steps
+        step_upper = self.opt_comp.steps
 
-        if self.size_max_vid == None and self.size_max_img == None:
+        if self.opt_comp.size_max_vid == None and self.opt_comp.size_max_img == None:
             # No limit to size, create the best quality result
             step_current = 0
         else:
@@ -149,27 +126,27 @@ class StickerConvert:
             self.tmp_f.seek(0)
             size = self.tmp_f.getbuffer().nbytes
             if CodecInfo.is_anim(self.in_f):
-                size_max = self.size_max_vid
+                self.size_max = self.opt_comp.size_max_vid
             else:
-                size_max = self.size_max_img
+                self.size_max = self.opt_comp.size_max_img
             
-            if not size_max or size < size_max:
+            if not self.size_max or size < self.size_max:
                 self.tmp_fs[step_current] = self.tmp_f.read()
 
-                for i in range(self.steps+1):
+                for i in range(self.opt_comp.steps+1):
                     if self.tmp_fs[i] != None:
-                        self.tmp_fs[min(i+2,self.steps+1):] = [None] * (self.steps+1 - min(i+2,self.steps+1))
+                        self.tmp_fs[min(i+2,self.opt_comp.steps+1):] = [None] * (self.opt_comp.steps+1 - min(i+2,self.opt_comp.steps+1))
                         break
             
-            if not size_max:
+            if not self.size_max:
                 self.write_out(self.tmp_fs[step_current], step_current)
                 return True, self.in_f, self.out_f, size
 
-            if size < size_max:
+            if size < self.size_max:
                 if step_upper - step_lower > 1:
                     step_upper = step_current
                     step_current = int((step_lower + step_upper) / 2)
-                    self.cb_msg.put(f'[<] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} < limit {size_max}, recompressing')
+                    self.cb_msg.put(f'[<] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} < limit {self.size_max}, recompressing')
                 else:
                     self.write_out(self.tmp_fs[step_current], step_current)
                     return True, self.in_f, self.out_f, size
@@ -177,19 +154,19 @@ class StickerConvert:
                 if step_upper - step_lower > 1:
                     step_lower = step_current
                     step_current = round((step_lower + step_upper) / 2)
-                    self.cb_msg.put(f'[>] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} > limit {size_max}, recompressing')
+                    self.cb_msg.put(f'[>] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} > limit {self.size_max}, recompressing')
                 else:
-                    if self.steps - step_current > 1:
+                    if self.opt_comp.steps - step_current > 1:
                         self.write_out(self.tmp_fs[step_current + 1], step_current)
                         return True, self.in_f, self.out_f, size
                     else:
-                        self.cb_msg.put(f'[F] Failed Compression {self.in_f_name} -> {self.out_f_name}, cannot get below limit {size_max} with lowest quality under current settings')
+                        self.cb_msg.put(f'[F] Failed Compression {self.in_f_name} -> {self.out_f_name}, cannot get below limit {self.size_max} with lowest quality under current settings')
                         return False, self.in_f, self.out_f, size
     
     def write_out(self, data: bytes, step_current: Optional[int] = None):
-        if os.path.splitext(self.out_f)[0] == 'none':
+        if os.path.splitext(self.out_f_name)[0] == 'none':
             self.out_f = None
-        elif os.path.splitext(self.out_f)[0] == 'bytes':
+        elif os.path.splitext(self.out_f_name)[0] == 'bytes':
             self.out_f = data
         else:
             with open(self.out_f, 'wb+') as f:
@@ -278,18 +255,14 @@ class StickerConvert:
             return [frames_in[0]]
 
         frames_out = []
-        
-        frames_orig = CodecInfo.get_file_frames(self.in_f)
-        fps_orig = CodecInfo.get_file_fps(self.in_f)
-        duration_orig = frames_orig / fps_orig * 1000
 
         # fps_ratio: 1 frame in new anim equal to how many frame in old anim
         # speed_ratio: How much to speed up / slow down
-        fps_ratio = fps_orig / self.fps
-        if self.duration_min and self.duration_min > 0 and duration_orig < self.duration_min:
-            speed_ratio = duration_orig / self.duration_min
-        elif self.duration_max and self.duration_max > 0 and duration_orig > self.duration_max:
-            speed_ratio = duration_orig / self.duration_max
+        fps_ratio = self.fps_orig / self.fps
+        if self.opt_comp.duration_min and self.opt_comp.duration_min > 0 and self.duration_orig < self.opt_comp.duration_min:
+            speed_ratio = self.duration_orig / self.opt_comp.duration_min
+        elif self.opt_comp.duration_max and self.opt_comp.duration_max > 0 and self.duration_orig > self.opt_comp.duration_max:
+            speed_ratio = self.duration_orig / self.opt_comp.duration_max
         else:
             speed_ratio = 1
 
@@ -326,6 +299,7 @@ class StickerConvert:
         options = {}
         
         if isinstance(self.quality, int):
+            # Seems not actually working
             options['quality'] = str(self.quality)
             options['lossless'] = '0'
 
@@ -369,7 +343,7 @@ class StickerConvert:
 
     def frames_export_png(self):
         image = Image.fromarray(self.frames_processed[0], 'RGBA')
-        if self.color and self.color < 256:
+        if self.color and self.color <= 256:
             image_quant = image.quantize(colors=self.color, method=2)
         else:
             image_quant = image
@@ -382,7 +356,7 @@ class StickerConvert:
     def frames_export_apng(self):
         frames_concat = np.concatenate(self.frames_processed)
         image_concat = Image.fromarray(frames_concat, 'RGBA')
-        if self.color and self.color < 256:
+        if self.color and self.color <= 256:
             image_quant = image_concat.quantize(colors=self.color, method=2)
         else:
             image_quant = image_concat
@@ -398,7 +372,7 @@ class StickerConvert:
             frame_final.delay_den = 1000
             self.apngasm.add_frame(frame_final)
 
-        with CacheStore.get_cache_store(path=self.cache_dir) as tempdir:
+        with CacheStore.get_cache_store(path=self.opt_comp.cache_dir) as tempdir:
             self.apngasm.assemble(os.path.join(tempdir, f'out{self.out_f_ext}'))
 
             with open(os.path.join(tempdir, f'out{self.out_f_ext}'), 'rb') as f:

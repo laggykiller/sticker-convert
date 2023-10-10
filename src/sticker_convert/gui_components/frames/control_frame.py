@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING
 from ttkbootstrap import Frame, Button # type: ignore
 
 if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
+    from ...gui import GUI # type: ignore
 
 class ControlFrame(Frame):
     def __init__(self, gui: "GUI", *args, **kwargs):

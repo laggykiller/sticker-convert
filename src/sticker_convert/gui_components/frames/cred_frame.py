@@ -5,10 +5,10 @@ from typing import TYPE_CHECKING
 from ttkbootstrap import LabelFrame, Button, Entry, Label # type: ignore
 
 if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
-from ..gui_windows.signal_get_auth_window import SignalGetAuthWindow # type: ignore
-from ..gui_windows.line_get_auth_window import LineGetAuthWindow # type: ignore
-from ..gui_windows.kakao_get_auth_window import KakaoGetAuthWindow # type: ignore
+    from ...gui import GUI # type: ignore
+from ..windows.signal_get_auth_window import SignalGetAuthWindow # type: ignore
+from ..windows.line_get_auth_window import LineGetAuthWindow # type: ignore
+from ..windows.kakao_get_auth_window import KakaoGetAuthWindow # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
 class CredFrame(LabelFrame):

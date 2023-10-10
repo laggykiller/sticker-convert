@@ -1,10 +1,12 @@
+#!/usr/bin/env python3
+from __future__ import annotations
 import platform
 from typing import Union, TYPE_CHECKING
 
 from ttkbootstrap import Frame, Canvas, Scrollbar, PhotoImage
 
 if TYPE_CHECKING:
-    from ..gui_windows.base_window import BaseWindow  # type: ignore
+    from .windows.base_window import BaseWindow  # type: ignore
     from ..gui import GUI  # type: ignore
 
 

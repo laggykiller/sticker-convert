@@ -5,52 +5,20 @@ import re
 from typing import Optional, Union
 
 from .codec_info import CodecInfo  # type: ignore
-
-"""
-Example of spec
-spec = {
-    "res": {
-        "w": {
-            "min": 256,
-            "max": 512
-        },
-        "h": {
-            "min": 256,
-            "max": 512
-        }
-    },
-    "fps": {
-        "min": 1,
-        "max": 30
-    },
-    "size_max": {
-        "vid": 500000,
-        "img": 300000
-    },
-    "duration": {
-        "min": 0,
-        "max": 3
-    },
-    "animated": True,
-    "square": True,
-    "format": ".apng"
-}
-"""
+from ...job_option import CompOption # type: ignore
 
 
 class FormatVerify:
     @staticmethod
-    def check_file(file: str, spec: dict) -> bool:
+    def check_file(file: str, spec: CompOption) -> bool:
         return (
             FormatVerify.check_presence(file)
-            and FormatVerify.check_file_res(
-                file, res=spec.get("res"), square=spec.get("square")
-            )
-            and FormatVerify.check_file_fps(file, fps=spec.get("fps"))
-            and FormatVerify.check_file_size(file, size=spec.get("size_max"))
-            and FormatVerify.check_animated(file, animated=spec.get("animated"))
-            and FormatVerify.check_format(file, format=spec.get("format"))
-            and FormatVerify.check_duration(file, duration=spec.get("duration"))
+            and FormatVerify.check_file_res(file, res=spec.res, square=spec.square)
+            and FormatVerify.check_file_fps(file, fps=spec.fps)
+            and FormatVerify.check_file_size(file, size=spec.size_max)
+            and FormatVerify.check_animated(file, animated=spec.animated)
+            and FormatVerify.check_format(file, fmt=spec.format)
+            and FormatVerify.check_duration(file, duration=spec.duration)
         )
 
     @staticmethod
@@ -59,47 +27,54 @@ class FormatVerify:
 
     @staticmethod
     def check_file_res(
-        file: str, res: Optional[dict[dict, int]] = None, square: Optional[bool] = None
+        file: str,
+        res: Optional[list[list[int]]] = None,
+        square: Optional[bool] = None
     ) -> bool:
         file_width, file_height = CodecInfo.get_file_res(file)
 
-        if res and (res.get("w", {}).get("min") and res.get("w", {}).get("max")) and (file_width < res["w"]["min"] or file_width > res["w"]["max"]):  # type: ignore[call-overload,index]
-            return False
-        if res and (res.get("h", {}).get("min") and res.get("h", {}).get("max")) and (file_height < res["h"]["min"] or file_height > res["h"]["max"]):  # type: ignore[call-overload,index]
-            return False
-        if square != None and file_height != file_width:
+        if res:
+            if res[0][0] and file_width < res[0][0]:
+                return False
+            if res[0][1] and file_width > res[0][1]:
+                return False
+            if res[1][0] and file_height < res[1][0]:
+                return False
+            if res[1][1] and file_height > res[1][1]:
+                return False
+        if square and file_height != file_width:
             return False
 
         return True
 
     @staticmethod
-    def check_file_fps(file: str, fps: Optional[dict[str, float]]) -> bool:
+    def check_file_fps(file: str, fps: Optional[list[int]]) -> bool:
         file_fps = CodecInfo.get_file_fps(file)
 
-        if fps and fps.get("min") != None and file_fps < fps["min"]:
+        if fps and fps[0] and file_fps < fps[0]:
             return False
-        if fps and fps.get("max") != None and file_fps > fps["max"]:
+        if fps and fps[1] and file_fps > fps[1]:
             return False
 
         return True
 
     @staticmethod
-    def check_file_size(file: str, size: Optional[dict[str, int]] = None) -> bool:
+    def check_file_size(file: str, size: Optional[list[int]] = None) -> bool:
         file_size = os.path.getsize(file)
         file_animated = CodecInfo.is_anim(file)
 
         if (
             file_animated == True
             and size
-            and size.get("vid") != None
-            and file_size > size["vid"]
+            and size[1] != None
+            and file_size > size[1]
         ):
             return False
         if (
             file_animated == False
             and size
-            and size.get("img") != None
-            and file_size > size["img"]
+            and size[0] != None
+            and file_size > size[0]
         ):
             return False
 
@@ -115,8 +90,7 @@ class FormatVerify:
     @staticmethod
     def check_format(
         file: str,
-        format: Union[dict[str, str], str, tuple, list, None] = None,
-        allow_compat_ext: bool = True,
+        fmt: Union[list[str], str, None] = None
     ):
         compat_ext = {
             ".jpg": ".jpeg",
@@ -126,33 +100,33 @@ class FormatVerify:
         }
 
         formats = []
-        if format != None:
-            if isinstance(format, dict):
-                if FormatVerify.check_animated(file):
-                    format = format.get("vid")
-                else:
-                    format = format.get("img")
 
-            if isinstance(format, str):
-                formats.append(format)
-            elif isinstance(format, tuple) or isinstance(format, list):
-                formats.extend(format)
+        if not fmt:
+            return True
+        
+        if isinstance(fmt, list):
+            if FormatVerify.check_animated(file):
+                formats.append(fmt[1])
+            else:
+                formats.append(fmt[0])
+        elif isinstance(fmt, str):
+            formats.append(fmt)
 
-            if allow_compat_ext:
-                for fmt in formats.copy():
-                    if fmt in compat_ext:
-                        formats.append(compat_ext.get(fmt))  # type: ignore[arg-type]
-            if CodecInfo.get_file_ext(file) not in formats:
-                return False
+        for fmt in formats.copy():
+            if fmt in compat_ext:
+                formats.append(compat_ext.get(fmt))  # type: ignore[arg-type]
+
+        if CodecInfo.get_file_ext(file) not in formats:
+            return False
 
         return True
 
     @staticmethod
-    def check_duration(file: str, duration: Optional[dict[str, int]] = None) -> bool:
+    def check_duration(file: str, duration: Optional[list[str]] = None) -> bool:
         file_duration = CodecInfo.get_file_duration(file)
-        if duration and duration.get("min") != None and file_duration < duration["min"]:
+        if duration and duration[0] and file_duration < duration[0]:
             return False
-        if duration and duration.get("max") != None and file_duration > duration["max"]:
+        if duration and duration[1] and file_duration > duration[1]:
             return False
 
         return True

@@ -6,32 +6,33 @@ from typing import Optional
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.models import LocalStickerPack, Sticker  # type: ignore
-from mergedeep import merge  # type: ignore
 
 from .upload_base import UploadBase  # type: ignore
-from ..utils.metadata_handler import MetadataHandler  # type: ignore
-from ..utils.converter import StickerConvert  # type: ignore
-from ..utils.format_verify import FormatVerify  # type: ignore
-from ..utils.codec_info import CodecInfo  # type: ignore
+from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..converter import StickerConvert  # type: ignore
+from ..utils.media.format_verify import FormatVerify  # type: ignore
+from ..utils.media.codec_info import CodecInfo  # type: ignore
+from ..job_option import CompOption, OutputOption, CredOption # type: ignore
 
 
 class UploadSignal(UploadBase):
     def __init__(self, *args, **kwargs):
         super(UploadSignal, self).__init__(*args, **kwargs)
 
-        base_spec = {
+        base_spec = CompOption({
             "size_max": {"img": 300000, "vid": 300000},
-            "res": {"w": {"max": 512}, "h": {"max": 512}},
+            "res": {"max": 512},
             "duration": {"max": 3000},
             "square": True,
-        }
+        })
 
         self.png_spec = copy.deepcopy(base_spec)
 
         self.webp_spec = copy.deepcopy(base_spec)
-        self.webp_spec["animated"] = False
+        self.webp_spec.animated = False
 
-        self.opt_comp_merged = merge({}, self.opt_comp, base_spec)
+        self.opt_comp_merged = copy.deepcopy(self.opt_comp)
+        self.opt_comp_merged.merge(base_spec)
 
     @staticmethod
     async def upload_pack(pack: LocalStickerPack, uuid: str, password: str):
@@ -86,17 +87,17 @@ class UploadSignal(UploadBase):
     def upload_stickers_signal(self) -> list[str]:
         urls = []
 
-        if not self.opt_cred.get("signal", {}).get("uuid"):
+        if not self.opt_cred.signal_uuid:
             self.cb_msg("uuid required for uploading to Signal")
             return urls
-        if not self.opt_cred.get("signal", {}).get("password"):
+        if not self.opt_cred.signal_password:
             self.cb_msg("password required for uploading to Signal")
             return urls
 
         title, author, emoji_dict = MetadataHandler.get_metadata(
             self.in_dir,
-            title=self.opt_output.get("title"),
-            author=self.opt_output.get("author"),
+            title=self.opt_output.title,
+            author=self.opt_output.author,
         )
         if title == None:
             raise TypeError(f"title cannot be {title}")
@@ -106,36 +107,36 @@ class UploadSignal(UploadBase):
             msg_block = "emoji.txt is required for uploading signal stickers\n"
             msg_block += f"emoji.txt generated for you in {self.in_dir}\n"
             msg_block += (
-                f'Default emoji is set to {self.opt_comp.get("default_emoji")}.\n'
+                f'Default emoji is set to {self.opt_comp.default_emoji}.\n'
             )
             msg_block += "Please edit emoji.txt now, then continue"
             MetadataHandler.generate_emoji_file(
-                dir=self.in_dir, default_emoji=self.opt_comp.get("default_emoji")
+                dir=self.in_dir, default_emoji=self.opt_comp.default_emoji
             )
 
             self.cb_msg_block(msg_block)
 
             title, author, emoji_dict = MetadataHandler.get_metadata(
                 self.in_dir,
-                title=self.opt_output.get("title"),
-                author=self.opt_output.get("author"),
+                title=self.opt_output.title,
+                author=self.opt_output.author,
             )
 
         packs = MetadataHandler.split_sticker_packs(
             self.in_dir, title=title, file_per_pack=200, separate_image_anim=False
         )
         for pack_title, stickers in packs.items():
-            self.cb_msg(f"Uploading pack {pack_title}")
             pack = LocalStickerPack()
             pack.title = pack_title
             pack.author = author
 
             self.add_stickers_to_pack(pack, stickers, emoji_dict)
+            self.cb_msg(f"Uploading pack {pack_title}")
             result = anyio.run(
                 UploadSignal.upload_pack,
                 pack,
-                self.opt_cred.get("signal", {}).get("uuid"),
-                self.opt_cred.get("signal", {}).get("password"),
+                self.opt_cred.signal_uuid,
+                self.opt_cred.signal_password,
             )
 
             self.cb_msg(result)
@@ -145,9 +146,9 @@ class UploadSignal(UploadBase):
 
     @staticmethod
     def start(
-        opt_output: dict,
-        opt_comp: dict,
-        opt_cred: dict,
+        opt_output: OutputOption,
+        opt_comp: CompOption,
+        opt_cred: CredOption,
         cb_msg=print,
         cb_msg_block=input,
         cb_ask_bool=input,

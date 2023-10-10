@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 from typing import Optional, Union
 
 import requests
+
+from ..job_option import CredOption # type: ignore
 
 
 class DownloadBase:
@@ -9,7 +12,7 @@ class DownloadBase:
         self,
         url: str,
         out_dir: str,
-        opt_cred: Optional[dict] = None,
+        opt_cred: Optional[CredOption] = None,
         cb_msg=print,
         cb_msg_block=input,
         cb_bar=None,

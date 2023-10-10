@@ -17,20 +17,21 @@ from ttkbootstrap import Window, StringVar, BooleanVar, IntVar # type: ignore
 from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 
 from .job import Job # type: ignore
-from .utils.json_manager import JsonManager # type: ignore
-from .utils.dir_utils import DirUtils # type: ignore
-from .utils.metadata_handler import MetadataHandler # type: ignore
+from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
+from .utils.files.json_manager import JsonManager # type: ignore
+from .utils.files.dir_utils import DirUtils # type: ignore
+from .utils.files.metadata_handler import MetadataHandler # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
-from .utils.gui_utils import GUIUtils # type: ignore
+from .gui_components.gui_utils import GUIUtils # type: ignore
 from .__init__ import __version__ # type: ignore
 
-from .gui_frames.input_frame import InputFrame # type: ignore
-from .gui_frames.comp_frame import CompFrame # type: ignore
-from .gui_frames.cred_frame import CredFrame # type: ignore
-from .gui_frames.output_frame import OutputFrame # type: ignore
-from .gui_frames.config_frame import ConfigFrame # type: ignore
-from .gui_frames.progress_frame import ProgressFrame # type: ignore
-from .gui_frames.control_frame import ControlFrame # type: ignore
+from .gui_components.frames.input_frame import InputFrame # type: ignore
+from .gui_components.frames.comp_frame import CompFrame # type: ignore
+from .gui_components.frames.cred_frame import CredFrame # type: ignore
+from .gui_components.frames.output_frame import OutputFrame # type: ignore
+from .gui_components.frames.config_frame import ConfigFrame # type: ignore
+from .gui_components.frames.progress_frame import ProgressFrame # type: ignore
+from .gui_components.frames.control_frame import ControlFrame # type: ignore
 
 class GUI(Window):
     def __init__(self):
@@ -253,38 +254,34 @@ class GUI(Window):
             os.remove(self.settings_path)
     
     def apply_config(self):
+        # Input
         self.default_input_mode = self.settings.get('input', {}).get('option', 'auto')
         self.input_address_var.set(self.settings.get('input', {}).get('url', ''))
-        
         default_stickers_input_dir = os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
         self.input_setdir_var.set(self.settings.get('input', {}).get('dir', default_stickers_input_dir))
         if not os.path.isdir(self.input_setdir_var.get()):
             self.input_setdir_var.set(default_stickers_input_dir)
+        self.input_option_display_var.set(self.input_presets[self.default_input_mode]['full_name'])
+        self.input_option_true_var.set(self.input_presets[self.default_input_mode]['full_name'])
 
+        # Compression
         self.no_compress_var.set(self.settings.get('comp', {}).get('no_compress', False))
-
         default_comp_preset = list(self.compression_presets.keys())[0]
         self.comp_preset_var.set(self.settings.get('comp', {}).get('preset', default_comp_preset))
-        
+        if self.settings.get('comp_custom'):
+            self.compression_presets['custom'] = self.settings.get('comp_custom')
         self.cache_dir_var.set(self.settings.get('comp', {}).get('cache_dir', ''))
         self.processes_var.set(self.settings.get('comp', {}).get('processes', math.ceil(cpu_count() / 2)))
         self.default_output_mode = self.settings.get('output', {}).get('option', 'signal')
 
+        # Output
         default_stickers_output_dir = os.path.join(DirUtils.get_curr_dir(), 'stickers_output')
         self.output_setdir_var.set(self.settings.get('output', {}).get('dir', default_stickers_output_dir))
         if not os.path.isdir(self.output_setdir_var.get()):
             self.output_setdir_var.set(default_stickers_output_dir)
-        
         self.title_var.set(self.settings.get('output', {}).get('title', ''))
         self.author_var.set(self.settings.get('output', {}).get('author', ''))
         self.settings_save_cred_var.set(self.settings.get('creds', {}).get('save_cred', True))
-
-        if self.settings.get('comp_custom'):
-            self.compression_presets['custom'] = self.settings.get('comp_custom')
-        
-        self.input_option_display_var.set(self.input_presets[self.default_input_mode]['full_name'])
-        self.input_option_true_var.set(self.input_presets[self.default_input_mode]['full_name'])
-
         self.output_option_display_var.set(self.output_presets[self.default_output_mode]['full_name'])
         self.output_option_true_var.set(self.output_presets[self.default_output_mode]['full_name'])
     
@@ -421,10 +418,10 @@ class GUI(Window):
         self.control_frame.start_btn.config(text='Cancel', bootstyle='danger')
         self.set_inputs('disabled')
     
-        opt_input = self.get_opt_input()
-        opt_output = self.get_opt_output()
-        opt_comp = self.get_opt_comp()
-        opt_cred = self.get_opt_cred()
+        opt_input = InputOption(self.get_opt_input())
+        opt_output = OutputOption(self.get_opt_output())
+        opt_comp = CompOption(self.get_opt_comp())
+        opt_cred = CredOption(self.get_opt_cred())
         
         self.job = Job(
             opt_input, opt_comp, opt_output, opt_cred, 

@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 from functools import partial
 
 from PIL import Image, ImageTk, ImageDraw
 from ttkbootstrap import LabelFrame, Frame, OptionMenu, Button, Entry, Label, Checkbutton, Scrollbar, Canvas, StringVar # type: ignore
 from tkinter import Event
 
-from ..gui_frames.right_clicker import RightClicker # type: ignore
+from ..frames.right_clicker import RightClicker # type: ignore
 from .base_window import BaseWindow # type: ignore
-from ..utils.gui_utils import GUIUtils # type: ignore
+from ..gui_utils import GUIUtils # type: ignore
 
 class AdvancedCompressionWindow(BaseWindow):
     emoji_column_per_row = 10

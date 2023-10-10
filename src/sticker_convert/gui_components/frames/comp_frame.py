@@ -3,10 +3,9 @@ from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label, Checkbutt
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
-from ..gui_windows.advanced_compression_window import AdvancedCompressionWindow # type: ignore
+    from ...gui import GUI # type: ignore
+from ..windows.advanced_compression_window import AdvancedCompressionWindow # type: ignore
 from .right_clicker import RightClicker # type: ignore
-from ..__init__ import __version__ # type: ignore
 
 class CompFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args, **kwargs):

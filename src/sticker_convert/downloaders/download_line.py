@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 '''Reference: https://github.com/doubleplusc/Line-sticker-downloader/blob/master/sticker_dl.py'''
 
 import requests
@@ -13,9 +14,11 @@ from bs4 import BeautifulSoup
 from typing import Optional
 
 from .download_base import DownloadBase # type: ignore
-from ..auth.get_line_auth import GetLineAuth # type: ignore
-from ..utils.metadata_handler import MetadataHandler # type: ignore
-from ..media.apple_png_normalize import ApplePngNormalize # type: ignore
+from ..utils.auth.get_line_auth import GetLineAuth # type: ignore
+from ..utils.files.metadata_handler import MetadataHandler # type: ignore
+from ..utils.media.apple_png_normalize import ApplePngNormalize # type: ignore
+from ..job_option import CredOption  # type: ignore
+
 
 class MetadataLine:
     @staticmethod
@@ -142,8 +145,8 @@ class DownloadLine(DownloadBase):
 
     def load_cookies(self) -> dict[str, str]:
         cookies = {}
-        if self.opt_cred and self.opt_cred.get('line', {}).get('cookies'):
-            line_cookies = self.opt_cred['line']['cookies']
+        if self.opt_cred and self.opt_cred.line_cookies:
+            line_cookies = self.opt_cred.line_cookies
 
             try:
                 line_cookies_dict = json.loads(line_cookies)
@@ -383,7 +386,7 @@ class DownloadLine(DownloadBase):
     def start(
         url: str,
         out_dir: str,
-        opt_cred: Optional[dict] = None,
+        opt_cred: Optional[CredOption] = None,
         cb_msg=print,
         cb_msg_block=input,
         cb_bar=None,

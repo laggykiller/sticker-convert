@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 import os
 import json
 from typing import Optional
 
-from .codec_info import CodecInfo  # type: ignore
+from ..media.codec_info import CodecInfo  # type: ignore
 from .json_manager import JsonManager  # type: ignore
 
 
 class MetadataHandler:
     @staticmethod
     def get_stickers_present(dir: str) -> list[str]:
-        from ..uploaders.xcode_imessage import XcodeImessageIconset  # type: ignore
+        from ...uploaders.xcode_imessage import XcodeImessageIconset  # type: ignore
 
         stickers_present = sorted(os.listdir(dir))
         for i in stickers_present:
@@ -90,9 +91,12 @@ class MetadataHandler:
     def check_metadata_provided(
         input_dir: str, input_option: str, metadata: str
     ) -> bool:
-        # Check if metadata provided via .txt file (if from local) or will be provided by input source (if not from local)
-        # Does not check if metadata provided via user input in GUI or flag options
-        # metadata = 'title' or 'author'
+        """
+        Check if metadata provided via .txt file (if from local)
+        or will be provided by input source (if not from local)
+        Does not check if metadata provided via user input in GUI or flag options
+        metadata = 'title' or 'author'
+        """
         input_presets = JsonManager.load_json("resources/input.json")
 
         if input_option == "local":

@@ -5,9 +5,9 @@ from threading import Thread
 
 from ttkbootstrap import Frame, Button, Label # type: ignore
 
-from ..auth.get_line_auth import GetLineAuth # type: ignore
+from ...utils.auth.get_line_auth import GetLineAuth # type: ignore
 from .base_window import BaseWindow # type: ignore
-from ..utils.gui_utils import GUIUtils # type: ignore
+from ..gui_utils import GUIUtils # type: ignore
 
 class LineGetAuthWindow(BaseWindow):
     def __init__(self, *args, **kwargs):

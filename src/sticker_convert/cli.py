@@ -8,11 +8,12 @@ from typing import Optional
 from tqdm import tqdm
 
 from .job import Job # type: ignore
-from .utils.json_manager import JsonManager # type: ignore
-from .auth.get_kakao_auth import GetKakaoAuth # type: ignore
-from .auth.get_signal_auth import GetSignalAuth # type: ignore
-from .auth.get_line_auth import GetLineAuth # type: ignore
-from .utils.dir_utils import DirUtils # type: ignore
+from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
+from .utils.files.json_manager import JsonManager # type: ignore
+from .utils.auth.get_kakao_auth import GetKakaoAuth # type: ignore
+from .utils.auth.get_signal_auth import GetSignalAuth # type: ignore
+from .utils.auth.get_line_auth import GetLineAuth # type: ignore
+from .utils.files.dir_utils import DirUtils # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .__init__ import __version__ # type: ignore
 
@@ -92,10 +93,10 @@ class CLI:
         
         self.no_confirm = args.no_confirm
 
-        self.get_opt_input(args)
-        self.get_opt_output(args)
-        self.get_opt_comp(args)
-        self.get_opt_cred(args)
+        self.opt_input = InputOption(self.get_opt_input(args))
+        self.opt_output = OutputOption(self.get_opt_output(args))
+        self.opt_comp = CompOption(self.get_opt_comp(args))
+        self.opt_cred = CredOption(self.get_opt_cred(args))
 
         job = Job(
             self.opt_input, self.opt_comp, self.opt_output, self.opt_cred, 
@@ -109,7 +110,7 @@ class CLI:
         elif status == 2:
             self.cb_msg(msg='Job cancelled.')
 
-    def get_opt_input(self, args):
+    def get_opt_input(self, args) -> dict:
         download_options = {
             'auto': args.download_auto,
             'signal': args.download_signal, 
@@ -133,13 +134,15 @@ class CLI:
                 self.cb_msg(f'Error: Unrecognied URL input source for url: {url}')
                 exit()
 
-        self.opt_input = {
+        opt_input = {
             'option': download_option,
             'url': url,
             'dir': args.input_dir if args.input_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
         }
 
-    def get_opt_output(self, args):
+        return opt_input
+
+    def get_opt_output(self, args) -> dict:
         if args.export_whatsapp:
             export_option = 'whatsapp'
         elif args.export_signal:
@@ -151,14 +154,16 @@ class CLI:
         else:
             export_option = 'local'
         
-        self.opt_output = {
+        opt_output = {
             'option': export_option,
             'dir': args.output_dir if args.output_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_output'),
             'title': args.title,
             'author': args.author
         }
 
-    def get_opt_comp(self, args):
+        return opt_output
+
+    def get_opt_comp(self, args) -> dict:
         preset = args.preset
         if args.preset == 'custom':
             if sum((args.export_whatsapp, args.export_signal, args.export_telegram, args.export_imessage)) > 1:
@@ -173,7 +178,7 @@ class CLI:
             elif args.export_imessage:
                 preset = 'imessage_small'
         elif args.preset == 'auto':
-            output_option = self.opt_output['option']
+            output_option = self.opt_output.option
             if output_option == 'local':
                 preset = 'custom'
                 args.no_compress = True
@@ -185,7 +190,7 @@ class CLI:
                 preset = output_option
                 self.cb_msg(f'Auto compression option set to {preset}')
 
-        self.opt_comp = {
+        opt_comp = {
             'preset': preset,
             'size_max': {
                 'img': self.compression_presets[preset]['size_max']['img'] if args.img_size_max == None else args.img_size_max,
@@ -229,7 +234,9 @@ class CLI:
             'processes': args.processes if args.processes else math.ceil(cpu_count() / 2)
         }
 
-    def get_opt_cred(self, args):
+        return opt_comp
+
+    def get_opt_cred(self, args) -> dict:
         creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
         creds = JsonManager.load_json(creds_path)
         if creds:
@@ -237,7 +244,7 @@ class CLI:
         else:
             creds = {}
 
-        self.opt_cred = {
+        opt_cred = {
             'signal': {
                 'uuid': args.signal_uuid if args.signal_uuid else creds.get('signal', {}).get('uuid'),
                 'password': args.signal_password if args.signal_password else creds.get('signal', {}).get('password')
@@ -263,7 +270,7 @@ class CLI:
             auth_token = m.get_cred()
 
             if auth_token:
-                self.opt_cred['kakao']['auth_token'] = auth_token
+                opt_cred['kakao']['auth_token'] = auth_token
                 
                 self.cb_msg(f'Got auth_token successfully: {auth_token}')
         
@@ -275,8 +282,8 @@ class CLI:
                 uuid, password = m.get_cred()
 
                 if uuid and password:
-                    self.opt_cred['signal']['uuid'] = uuid
-                    self.opt_cred['signal']['password'] = password
+                    opt_cred['signal']['uuid'] = uuid
+                    opt_cred['signal']['password'] = password
                 
                     self.cb_msg(f'Got uuid and password successfully: {uuid}, {password}')
                     break
@@ -287,7 +294,7 @@ class CLI:
             line_cookies = m.get_cred()
 
             if line_cookies:
-                self.opt_cred['line']['cookies'] = line_cookies
+                opt_cred['line']['cookies'] = line_cookies
             
                 self.cb_msg('Got Line cookies successfully')
             else:
@@ -295,8 +302,10 @@ class CLI:
         
         if args.save_cred:
             creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
-            JsonManager.save_json(creds_path, self.opt_cred)
+            JsonManager.save_json(creds_path, opt_cred)
             self.cb_msg('Saved credentials to creds.json')
+        
+        return opt_cred
     
     def cb_ask_str(self, msg: Optional[str] = None, initialvalue: Optional[str] = None, cli_show_initialvalue: bool = True) -> str:
         self.cb_msg(msg)

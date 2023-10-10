@@ -4,9 +4,9 @@ from threading import Thread
 
 from ttkbootstrap import Toplevel, Frame, Button, Label # type: ignore
 
-from ..auth.get_signal_auth import GetSignalAuth # type: ignore
+from ...utils.auth.get_signal_auth import GetSignalAuth # type: ignore
 from .base_window import BaseWindow # type: ignore
-from ..utils.gui_utils import GUIUtils # type: ignore
+from ..gui_utils import GUIUtils # type: ignore
 
 class SignalGetAuthWindow(BaseWindow):
     def __init__(self, *args, **kwargs):

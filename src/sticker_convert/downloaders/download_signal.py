@@ -7,8 +7,9 @@ from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.models import StickerPack  # type: ignore
 
 from .download_base import DownloadBase  # type: ignore
-from ..utils.metadata_handler import MetadataHandler  # type: ignore
-from ..utils.codec_info import CodecInfo  # type: ignore
+from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..utils.media.codec_info import CodecInfo  # type: ignore
+from ..job_option import CredOption  # type: ignore
 
 
 class DownloadSignal(DownloadBase):
@@ -77,7 +78,7 @@ class DownloadSignal(DownloadBase):
     def start(
         url: str,
         out_dir: str,
-        opt_cred: Optional[dict] = None,
+        opt_cred: Optional[CredOption] = None,
         cb_msg=print,
         cb_msg_block=input,
         cb_bar=None,

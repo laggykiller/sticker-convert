@@ -1,11 +1,12 @@
+#!/usr/bin/env python3
 import platform
 from typing import TYPE_CHECKING
 
 from ttkbootstrap import Toplevel # type: ignore
 
 if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
-from ..utils.gui_utils import GUIUtils # type: ignore
+    from ...gui import GUI # type: ignore
+from ..gui_utils import GUIUtils # type: ignore
 
 class BaseWindow(Toplevel):
     def __init__(self, gui: "GUI"):

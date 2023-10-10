@@ -4,10 +4,10 @@ from threading import Thread
 
 from ttkbootstrap import LabelFrame, Frame, Button, Entry, Label # type: ignore
 
-from ..auth.get_kakao_auth import GetKakaoAuth # type: ignore
-from ..gui_frames.right_clicker import RightClicker # type: ignore
+from ...utils.auth.get_kakao_auth import GetKakaoAuth # type: ignore
+from ..frames.right_clicker import RightClicker # type: ignore
 from .base_window import BaseWindow # type: ignore
-from ..utils.gui_utils import GUIUtils # type: ignore
+from ..gui_utils import GUIUtils # type: ignore
 
 class KakaoGetAuthWindow(BaseWindow):
     def __init__(self, *args, **kwargs):

@@ -7,13 +7,12 @@ import plistlib
 from typing import Optional
 import zipfile
 
-from mergedeep import merge  # type: ignore
-
 from .upload_base import UploadBase  # type: ignore
-from ..utils.converter import StickerConvert  # type: ignore
-from ..utils.format_verify import FormatVerify  # type: ignore
-from ..utils.metadata_handler import MetadataHandler  # type: ignore
-from ..utils.codec_info import CodecInfo  # type: ignore
+from ..converter import StickerConvert  # type: ignore
+from ..utils.media.format_verify import FormatVerify  # type: ignore
+from ..utils.media.codec_info import CodecInfo  # type: ignore
+from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..job_option import CompOption, OutputOption, CredOption # type: ignore
 
 
 class XcodeImessageIconset:
@@ -68,33 +67,27 @@ class XcodeImessage(UploadBase):
         super(XcodeImessage, self).__init__(*args, **kwargs)
         self.iconset = XcodeImessageIconset().iconset
 
-        base_spec = {
+        base_spec = CompOption({
             "size_max": {"img": 500000, "vid": 500000},
-            "res": {"w": {"min": 300, "max": 300}, "h": {"min": 300, "max": 300}},
-            "format": (".png", ".apng", ".gif", ".jpeg", "jpg"),
+            "res": 300,
+            "format": [".png", ".apng", ".gif", ".jpeg", "jpg"],
             "square": True,
-        }
+        })
 
         self.small_spec = copy.deepcopy(base_spec)
 
         self.medium_spec = copy.deepcopy(base_spec)
-        self.medium_spec["res"]["w"]["min"] = 408
-        self.medium_spec["res"]["w"]["max"] = 408
-        self.medium_spec["res"]["h"]["min"] = 408
-        self.medium_spec["res"]["h"]["max"] = 408
+        self.medium_spec.res = 408
 
         self.large_spec = copy.deepcopy(base_spec)
-        self.large_spec["res"]["w"]["min"] = 618
-        self.large_spec["res"]["w"]["max"] = 618
-        self.large_spec["res"]["h"]["min"] = 618
-        self.large_spec["res"]["h"]["max"] = 618
+        self.large_spec.res = 618
 
     def create_imessage_xcode(self) -> list[str]:
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(
             self.in_dir,
-            title=self.opt_output.get("title"),
-            author=self.opt_output.get("author"),
+            title=self.opt_output.title,
+            author=self.opt_output.author,
         )
         author = author.replace(" ", "_")
         title = title.replace(" ", "_")
@@ -125,7 +118,8 @@ class XcodeImessage(UploadBase):
                         # res_choice == 300
                         spec_choice = self.small_spec
 
-                    opt_comp_merged = merge({}, self.opt_comp, spec_choice)
+                    opt_comp_merged = copy.deepcopy(self.opt_comp)
+                    opt_comp_merged.merge(spec_choice)
 
                 if FormatVerify.check_file(src, spec=spec_choice):
                     if src_path != dst_path:
@@ -160,12 +154,12 @@ class XcodeImessage(UploadBase):
             icon_source = first_image_path
 
         for icon, res in self.iconset.items():
-            spec_cover = {
+            spec_cover = CompOption({
                 "res": {
-                    "w": {"min": res[0], "max": res[0]},
-                    "h": {"min": res[1], "max": res[1]},
+                    "w": res[0],
+                    "h": res[1]
                 }
-            }
+            })
 
             icon_old_path = os.path.join(self.in_dir, icon)
             icon_new_path = os.path.join(self.out_dir, icon)
@@ -328,9 +322,9 @@ class XcodeImessage(UploadBase):
 
     @staticmethod
     def start(
-        opt_output: dict,
-        opt_comp: dict,
-        opt_cred: dict,
+        opt_output: OutputOption,
+        opt_comp: CompOption,
+        opt_cred: CredOption,
         cb_msg=print,
         cb_msg_block=input,
         cb_ask_bool=input,

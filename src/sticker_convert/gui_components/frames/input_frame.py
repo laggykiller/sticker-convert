@@ -6,9 +6,9 @@ from tkinter import filedialog
 from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label # type: ignore
 
 if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
-from ..utils.url_detect import UrlDetect # type: ignore
-from ..utils.dir_utils import DirUtils # type: ignore
+    from ...gui import GUI # type: ignore
+from ...utils.url_detect import UrlDetect # type: ignore
+from ...utils.files.dir_utils import DirUtils # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
 class InputFrame(LabelFrame):

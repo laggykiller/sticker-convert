@@ -15,7 +15,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import JavascriptException
 
-from ..utils.run_bin import RunBin # type: ignore
+from ..files.run_bin import RunBin # type: ignore
 
 # https://stackoverflow.com/a/17197027
 def strings(filename: str, min: int = 4) -> Generator[str, None, None]:

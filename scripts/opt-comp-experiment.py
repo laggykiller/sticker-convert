@@ -23,11 +23,12 @@ from apngasm_python._apngasm_python import create_frame_from_rgba, APNGAsm
 os.chdir(os.path.split(os.path.abspath(__file__))[0])
 sys.path.append('../src')
 
-from sticker_convert.utils.converter import StickerConvert
+from sticker_convert.converter import StickerConvert
+from sticker_convert.job_option import CompOption
 
 processes_max = math.ceil(cpu_count() / 2)
 
-opt_comp_template = {
+opt_comp_template = CompOption({
     'size_max': {
         'img': 1,
         'vid': 1
@@ -55,7 +56,7 @@ opt_comp_template = {
     'duration': 3000,
     'steps': 1,
     'fake_vid': False
-}
+})
 
 formats = [
     ('img', '.webp'),
@@ -68,10 +69,6 @@ formats = [
     ('vid', '.webm'),
     ('vid', '.gif')
 ]
-
-class FakeCbMsg:
-    def put(self, msg: str):
-        pass
 
 def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
     apngasm = APNGAsm()
@@ -90,10 +87,10 @@ def generate_random_png(res: int, out_f: str):
 
 def compress_worker(jobs_queue: Queue, results_queue: Queue):
     for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None):
-        sticker = StickerConvert(in_f=in_f, out_f=out_f, opt_comp=opt_comp, cb_msg_queue=FakeCbMsg())
+        sticker = StickerConvert(in_f=in_f, out_f=out_f, opt_comp=opt_comp, cb_msg=False)
         success, in_f, out_f, size = sticker.convert()
         del sticker
-        results_queue.put((success, size, opt_comp['fps']['max'], opt_comp['res']['w']['max'], opt_comp['quality'], opt_comp['color']))
+        results_queue.put((success, size, opt_comp.fps_max, opt_comp.res_w_max, opt_comp.quality, opt_comp.color))
     
     jobs_queue.put(None)
 
@@ -131,7 +128,7 @@ def main():
 
         with TemporaryDirectory() as tmpdir:
             random_png_path = os.path.join(tmpdir, 'random.png')
-            result_path = 'null' + fmt
+            result_path = 'none' + fmt
 
             rnd_res = 618 if '618' in img_or_vid else 512
             rnd_duration = 10000 if img_or_vid == 'vidlong' else 3000
@@ -182,21 +179,16 @@ def main():
             
             for fps, res, quality, color in combinations:
                 opt_comp = copy.deepcopy(opt_comp_template)
-                opt_comp['size_max']['img'] = None
-                opt_comp['size_max']['vid'] = None
-                opt_comp['format'] = fmt
+                opt_comp.size_max = None
+                opt_comp.format = fmt
                 if img_or_vid == 'vidlong':
-                    opt_comp['duration'] = 10000
+                    opt_comp.duration = 10000
                 else:
-                    opt_comp['duration'] = 3000
-                opt_comp['fps']['min'] = fps
-                opt_comp['fps']['max'] = fps
-                opt_comp['res']['w']['min'] = res
-                opt_comp['res']['w']['max'] = res
-                opt_comp['res']['h']['min'] = res
-                opt_comp['res']['h']['max'] = res
-                opt_comp['quality'] = quality
-                opt_comp['color'] = color
+                    opt_comp.duration = 3000
+                opt_comp.fps = fps
+                opt_comp.res = res
+                opt_comp.quality = quality
+                opt_comp.color = color
 
                 jobs_queue.put((random_png_path, result_path, opt_comp))
             

@@ -6,7 +6,7 @@ from ttkbootstrap.scrolled import ScrolledText # type: ignore
 from tqdm import tqdm
 
 if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
+    from ...gui import GUI # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
 class ProgressFrame(LabelFrame):

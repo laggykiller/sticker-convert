@@ -7,7 +7,8 @@ from telegram import Bot
 from telegram.error import TelegramError
 
 from .download_base import DownloadBase  # type: ignore
-from ..utils.metadata_handler import MetadataHandler  # type: ignore
+from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..job_option import CredOption  # type: ignore
 
 
 class DownloadTelegram(DownloadBase):
@@ -15,7 +16,7 @@ class DownloadTelegram(DownloadBase):
         super(DownloadTelegram, self).__init__(*args, **kwargs)
 
     def download_stickers_telegram(self) -> bool:
-        self.token = self.opt_cred.get("telegram", {}).get("token")
+        self.token = self.opt_cred.telegram_token
         if self.token == None:
             self.cb_msg("Download failed: Token required for downloading from telegram")
             return False
@@ -108,7 +109,7 @@ class DownloadTelegram(DownloadBase):
     def start(
         url: str,
         out_dir: str,
-        opt_cred: Optional[dict] = None,
+        opt_cred: Optional[CredOption] = None,
         cb_msg=print,
         cb_msg_block=input,
         cb_bar=None,

@@ -6,12 +6,14 @@ import json
 from urllib.parse import urlparse, parse_qs
 from typing import Optional
 
+from ...job_option import CredOption
+
 class GetKakaoAuth:
-    def __init__(self, opt_cred: dict, cb_msg=print, cb_msg_block=input, cb_ask_str=input):
-        self.username = opt_cred['kakao']['username']
-        self.password = opt_cred['kakao']['password']
-        self.country_code = opt_cred['kakao']['country_code']
-        self.phone_number = opt_cred['kakao']['phone_number']
+    def __init__(self, opt_cred: CredOption, cb_msg=print, cb_msg_block=input, cb_ask_str=input):
+        self.username = opt_cred.kakao_username
+        self.password = opt_cred.kakao_password
+        self.country_code = opt_cred.kakao_country_code
+        self.phone_number = opt_cred.kakao_phone_number
 
         self.cb_msg = cb_msg
         self.cb_msg_block = cb_msg_block
