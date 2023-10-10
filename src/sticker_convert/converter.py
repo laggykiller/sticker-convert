@@ -31,7 +31,21 @@ def get_step_value(
         return None
 
 class StickerConvert:
-    def __init__(self, in_f: Union[str, list[str, io.BytesIO]], out_f: str, opt_comp: CompOption, cb_msg: Union[FakeCbMsg, bool] = True):
+    MSG_START_COMP = '[I] Start compressing {} -> {}'
+    MSG_SKIP_COMP = '[S] Compatible file found, skip compress and just copy {} -> {}'
+    MSG_COMP = ('[C] Compressing {} -> {} res={}x{}, '
+        'quality={}, fps={}, color={} (step {}-{}-{})')
+    MSG_REDO_COMP = '[{}] Compressed {} -> {} but size {} {} limit {}, recompressing'
+    MSG_DONE_COMP = '[S] Successful compression {} -> {} (step {})'
+    MSG_FAIL_COMP = ('[F] Failed Compression {} -> {}, '
+        'cannot get below limit {} with lowest quality under current settings')
+
+    def __init__(self,
+                 in_f: Union[str, list[str, io.BytesIO]],
+                 out_f: str,
+                 opt_comp: CompOption,
+                 cb_msg: Union[FakeCbMsg, bool] = True):
+        
         if not isinstance(cb_msg, QueueType):
             if cb_msg == False:
                 silent = True
@@ -57,6 +71,7 @@ class StickerConvert:
         self.frames_processed: list[np.ndarray] = []
         self.opt_comp = opt_comp
 
+        self.size = 0
         self.size_max = None
         self.res_w = None
         self.res_h = None
@@ -69,7 +84,9 @@ class StickerConvert:
         self.duration_orig = self.frames_orig / self.fps_orig * 1000
 
         self.tmp_f = None
-        self.tmp_fs: list[bytes] = []
+        self.result = None
+        self.result_size = 0
+        self.result_step = None
 
         self.apngasm = APNGAsm() # type: ignore[call-arg]
 
@@ -79,13 +96,15 @@ class StickerConvert:
             FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.fps) and
             FormatVerify.check_file_size(self.in_f, size=self.opt_comp.size_max) and
             FormatVerify.check_duration(self.in_f, duration=self.opt_comp.duration)):
-            self.cb_msg.put(f'[S] Compatible file found, skip compress and just copy {self.in_f_name} -> {self.out_f_name}')
+            self.cb_msg.put(self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name))
 
             with open(self.in_f, 'rb') as f:
-                self.write_out(f.read())
-            return True, self.in_f, self.out_f, os.path.getsize(self.in_f)
+                self.result = f.read()
+            self.result_size = os.path.getsize(self.in_f)
+            
+            return self.compress_done(self.result)
 
-        self.cb_msg.put(f'[I] Start compressing {self.in_f_name} -> {self.out_f_name}')
+        self.cb_msg.put(self.MSG_START_COMP.format(self.in_f_name, self.out_f_name))
 
         steps_list = []
         for step in range(self.opt_comp.steps, -1, -1):
@@ -96,12 +115,11 @@ class StickerConvert:
                 get_step_value(self.opt_comp.fps_max, self.opt_comp.fps_min, step, self.opt_comp.steps),
                 get_step_value(self.opt_comp.color_max, self.opt_comp.color_min, step, self.opt_comp.steps)
             ))
-        self.tmp_fs = [None] * (self.opt_comp.steps + 1)
 
         step_lower = 0
         step_upper = self.opt_comp.steps
 
-        if self.opt_comp.size_max_vid == None and self.opt_comp.size_max_img == None:
+        if self.opt_comp.size_max == [None, None]:
             # No limit to size, create the best quality result
             step_current = 0
         else:
@@ -117,53 +135,64 @@ class StickerConvert:
             self.color = param[4]
 
             self.tmp_f = io.BytesIO()
-            self.cb_msg.put(f'[C] Compressing {self.in_f_name} -> {self.out_f_name} res={self.res_w}x{self.res_h}, quality={self.quality}, fps={self.fps}, color={self.color} (step {step_lower}-{step_current}-{step_upper})')
+            msg = self.MSG_COMP.format(
+                    self.in_f_name, self.out_f_name,
+                    self.res_w, self.res_h,
+                    self.quality, self.fps, self.color, 
+                    step_lower, step_current, step_upper
+                )
+            self.cb_msg.put(msg)
             
             self.frames_processed = self.frames_drop(self.frames_raw)
             self.frames_processed = self.frames_resize(self.frames_processed)
             self.frames_export()
 
             self.tmp_f.seek(0)
-            size = self.tmp_f.getbuffer().nbytes
+            self.size = self.tmp_f.getbuffer().nbytes
             if CodecInfo.is_anim(self.in_f):
                 self.size_max = self.opt_comp.size_max_vid
             else:
                 self.size_max = self.opt_comp.size_max_img
-            
-            if not self.size_max or size < self.size_max:
-                self.tmp_fs[step_current] = self.tmp_f.read()
 
-                for i in range(self.opt_comp.steps+1):
-                    if self.tmp_fs[i] != None:
-                        self.tmp_fs[min(i+2,self.opt_comp.steps+1):] = [None] * (self.opt_comp.steps+1 - min(i+2,self.opt_comp.steps+1))
-                        break
-            
-            if not self.size_max:
-                self.write_out(self.tmp_fs[step_current], step_current)
-                return True, self.in_f, self.out_f, size
-
-            if size < self.size_max:
-                if step_upper - step_lower > 1:
+            if (not self.size_max or
+                (self.size <= self.size_max and self.size >= self.result_size)):
+                self.result = self.tmp_f.read()
+                self.result_size = self.size
+                self.result_step = step_current
+        
+            if step_upper - step_lower > 1:
+                if self.size <= self.size_max:
+                    sign = '<'
                     step_upper = step_current
-                    step_current = int((step_lower + step_upper) / 2)
-                    self.cb_msg.put(f'[<] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} < limit {self.size_max}, recompressing')
                 else:
-                    self.write_out(self.tmp_fs[step_current], step_current)
-                    return True, self.in_f, self.out_f, size
-            else:
-                if step_upper - step_lower > 1:
+                    sign = '>'
                     step_lower = step_current
-                    step_current = round((step_lower + step_upper) / 2)
-                    self.cb_msg.put(f'[>] Compressed {self.in_f_name} -> {self.out_f_name} but size {size} > limit {self.size_max}, recompressing')
-                else:
-                    if self.opt_comp.steps - step_current > 1:
-                        self.write_out(self.tmp_fs[step_current + 1], step_current)
-                        return True, self.in_f, self.out_f, size
-                    else:
-                        self.cb_msg.put(f'[F] Failed Compression {self.in_f_name} -> {self.out_f_name}, cannot get below limit {self.size_max} with lowest quality under current settings')
-                        return False, self.in_f, self.out_f, size
+                step_current = int((step_lower + step_upper) / 2)
+                self.recompress(sign)
+            elif self.result or not self.size_max:
+                return self.compress_done(self.result, self.result_step)
+            else:
+                return self.compress_fail()
     
-    def write_out(self, data: bytes, step_current: Optional[int] = None):
+    def recompress(self, sign: str):
+        msg = self.MSG_REDO_COMP.format(
+                sign, self.in_f_name, self.out_f_name, self.size, sign, self.size_max
+            )
+        self.cb_msg.put(msg)
+
+    def compress_fail(self) -> tuple[bool, str, Union[None, bytes, str], int]:
+        msg = self.MSG_FAIL_COMP.format(
+            self.in_f_name, self.out_f_name, self.size_max
+        )
+        self.cb_msg.put(msg)
+
+        return False, self.in_f, self.out_f, self.size
+
+    def compress_done(self,
+                  data: bytes,
+                  result_step: Optional[int] = None
+                  ) -> tuple[bool, str, Union[None, bytes, str], int]:
+        
         if os.path.splitext(self.out_f_name)[0] == 'none':
             self.out_f = None
         elif os.path.splitext(self.out_f_name)[0] == 'bytes':
@@ -172,8 +201,13 @@ class StickerConvert:
             with open(self.out_f, 'wb+') as f:
                 f.write(data)
 
-        if step_current:
-            self.cb_msg.put(f'[S] Successful compression {self.in_f_name} -> {self.out_f_name} (step {step_current})')
+        if result_step:            
+            msg = self.MSG_DONE_COMP.format(
+                self.in_f_name, self.out_f_name, result_step
+            )
+            self.cb_msg.put(msg)
+        
+        return True, self.in_f, self.out_f, self.result_size
 
     def frames_import(self):
         if self.in_f_ext in ('.tgs', '.lottie', '.json'):
@@ -186,29 +220,32 @@ class StickerConvert:
             # ffmpeg do not support webp decoding (yet)
             for frame in iio.imiter(self.in_f, plugin='pillow', mode='RGBA'):
                 self.frames_raw.append(frame)
-        else:
-            frame_format = 'rgba'
-            # Crashes when handling some webm in yuv420p and convert to rgba
-            # https://github.com/PyAV-Org/PyAV/issues/1166
-            metadata = iio.immeta(self.in_f, plugin='pyav', exclude_applied=False)
-            context = None
-            if metadata.get('video_format') == 'yuv420p':
-                if metadata.get('alpha_mode') != '1':
-                    frame_format = 'rgb24'
-                if metadata.get('codec') == 'vp8':
-                    context = CodecContext.create('v8', 'r')
-                elif metadata.get('codec') == 'vp9':
-                    context = CodecContext.create('libvpx-vp9', 'r')
-            
-            with av.open(self.in_f) as container:
-                if not context:
-                    context = container.streams.video[0].codec_context
-                for packet in container.demux(video=0):
-                    for frame in context.decode(packet):
-                        frame = frame.to_ndarray(format=frame_format)
-                        if frame_format == 'rgb24':
-                            frame = np.dstack((frame, np.zeros(frame.shape[:2], dtype=np.uint8)+255))
-                        self.frames_raw.append(frame)
+            return
+        
+        frame_format = 'rgba'
+        # Crashes when handling some webm in yuv420p and convert to rgba
+        # https://github.com/PyAV-Org/PyAV/issues/1166
+        metadata = iio.immeta(self.in_f, plugin='pyav', exclude_applied=False)
+        context = None
+        if metadata.get('video_format') == 'yuv420p':
+            if metadata.get('alpha_mode') != '1':
+                frame_format = 'rgb24'
+            if metadata.get('codec') == 'vp8':
+                context = CodecContext.create('v8', 'r')
+            elif metadata.get('codec') == 'vp9':
+                context = CodecContext.create('libvpx-vp9', 'r')
+        
+        with av.open(self.in_f) as container:
+            if not context:
+                context = container.streams.video[0].codec_context
+            for packet in container.demux(video=0):
+                for frame in context.decode(packet):
+                    frame = frame.to_ndarray(format=frame_format)
+                    if frame_format == 'rgb24':
+                        frame = np.dstack(
+                            (frame, np.zeros(frame.shape[:2], dtype=np.uint8)+255)
+                            )
+                    self.frames_raw.append(frame)
 
     def frames_import_lottie(self):
         if self.in_f_ext == '.tgs':
@@ -245,7 +282,9 @@ class StickerConvert:
                 width_new = width * self.res_h // height
             im = im.resize((width_new, height_new), resample=Image.LANCZOS)
             im_new = Image.new('RGBA', (self.res_w, self.res_h), (0, 0, 0, 0))
-            im_new.paste(im, ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2))
+            im_new.paste(
+                im, ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2)
+                )
             frames_out.append(np.asarray(im_new))
         
         return frames_out
@@ -259,9 +298,13 @@ class StickerConvert:
         # fps_ratio: 1 frame in new anim equal to how many frame in old anim
         # speed_ratio: How much to speed up / slow down
         fps_ratio = self.fps_orig / self.fps
-        if self.opt_comp.duration_min and self.opt_comp.duration_min > 0 and self.duration_orig < self.opt_comp.duration_min:
+        if (self.opt_comp.duration_min and
+            self.duration_orig < self.opt_comp.duration_min):
+
             speed_ratio = self.duration_orig / self.opt_comp.duration_min
-        elif self.opt_comp.duration_max and self.opt_comp.duration_max > 0 and self.duration_orig > self.opt_comp.duration_max:
+        elif (self.opt_comp.duration_max and
+              self.duration_orig > self.opt_comp.duration_max):
+            
             speed_ratio = self.duration_orig / self.opt_comp.duration_max
         else:
             speed_ratio = 1
@@ -363,11 +406,17 @@ class StickerConvert:
 
         for i in range(0, image_quant.height, self.res_h):
             with io.BytesIO() as f:
-                image_quant.crop((0, i, image_quant.width, i+self.res_h)).save(f, format='png')
+                crop_dimension = (0, i, image_quant.width, i+self.res_h)
+                image_cropped = image_quant.crop(crop_dimension)
+                image_cropped.save(f, format='png')
                 f.seek(0)
                 frame_optimized = oxipng.optimize_from_memory(f.read(), level=4)
             image_final = Image.open(io.BytesIO(frame_optimized)).convert('RGBA')
-            frame_final = create_frame_from_rgba(np.array(image_final), image_final.width, image_final.height)
+            frame_final = create_frame_from_rgba(
+                np.array(image_final),
+                image_final.width,
+                image_final.height
+                )
             frame_final.delay_num = int(1000 / self.fps)
             frame_final.delay_den = 1000
             self.apngasm.add_frame(frame_final)
