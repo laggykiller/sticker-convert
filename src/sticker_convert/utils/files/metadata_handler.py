@@ -13,6 +13,7 @@ class MetadataHandler:
     def get_stickers_present(dir: str) -> list[str]:
         from ...uploaders.xcode_imessage import XcodeImessageIconset  # type: ignore
 
+        blacklist_ext = (".txt", ".m4a", ".wastickers", ".DS_Store", "._.DS_Store")
         stickers_present = sorted(os.listdir(dir))
         for i in stickers_present:
             if os.path.splitext(i)[0] == "cover":
@@ -20,14 +21,10 @@ class MetadataHandler:
         for icon in XcodeImessageIconset().iconset:
             if icon in stickers_present:
                 stickers_present.remove(icon)
-        if ".DS_Store" in stickers_present:
-            stickers_present.remove(".DS_Store")
-        if "._.DS_Store" in stickers_present:
-            stickers_present.remove("._.DS_Store")
         stickers_present = [
             i
             for i in stickers_present
-            if os.path.isfile(os.path.join(dir, i)) and not i.endswith((".txt", ".m4a"))
+            if os.path.isfile(os.path.join(dir, i)) and not i.endswith(blacklist_ext)
         ]
 
         return stickers_present
