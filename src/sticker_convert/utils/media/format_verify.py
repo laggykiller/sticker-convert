@@ -90,7 +90,7 @@ class FormatVerify:
     @staticmethod
     def check_format(
         file: str,
-        fmt: Union[list[str], str, None] = None
+        fmt: list[Union[list[str], str, None]] = None
     ):
         compat_ext = {
             ".jpg": ".jpeg",
@@ -99,22 +99,25 @@ class FormatVerify:
             ".apng": ".png",
         }
 
-        formats = []
+        formats: list[str] = []
 
-        if not fmt:
+        if fmt == [None, None]:
             return True
         
-        if isinstance(fmt, list):
-            if FormatVerify.check_animated(file):
+        if FormatVerify.check_animated(file):
+            if isinstance(fmt[1], list):
+                formats = fmt[1].copy()
+            else:
                 formats.append(fmt[1])
+        else:
+            if isinstance(fmt[0], list):
+                formats = fmt[0].copy()
             else:
                 formats.append(fmt[0])
-        elif isinstance(fmt, str):
-            formats.append(fmt)
 
-        for fmt in formats.copy():
-            if fmt in compat_ext:
-                formats.append(compat_ext.get(fmt))  # type: ignore[arg-type]
+        for f in formats.copy():
+            if f in compat_ext:
+                formats.append(compat_ext.get(f))  # type: ignore[arg-type]
 
         if CodecInfo.get_file_ext(file) not in formats:
             return False

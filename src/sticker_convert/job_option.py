@@ -8,11 +8,9 @@ def to_int(i) -> Optional[int]:
 
 class BaseOption:
     def merge(self, config: "BaseOption"):
-        for i in dir(config):
-            if i.startswith('_') and not i.startswith('__'):
-                i_new = getattr(config, i)
-                if i_new != None:
-                    setattr(self, i, i_new)
+        for k, v in vars(config).items():
+            if v != None:
+                setattr(self, k, v)
 
 class InputOption(BaseOption):
     def __init__(self, input_config_dict: dict):

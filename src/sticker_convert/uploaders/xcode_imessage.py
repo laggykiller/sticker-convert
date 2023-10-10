@@ -16,8 +16,11 @@ from ..job_option import CompOption, OutputOption, CredOption # type: ignore
 
 
 class XcodeImessageIconset:
+    iconset = {}
+
     def __init__(self):
-        self.iconset = {}
+        if self.iconset != {}:
+            return
 
         if os.path.isdir("ios-message-stickers-template"):
             with open(

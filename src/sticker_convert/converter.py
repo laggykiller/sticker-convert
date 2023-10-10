@@ -36,7 +36,7 @@ class StickerConvert:
     MSG_COMP = ('[C] Compressing {} -> {} res={}x{}, '
         'quality={}, fps={}, color={} (step {}-{}-{})')
     MSG_REDO_COMP = '[{}] Compressed {} -> {} but size {} {} limit {}, recompressing'
-    MSG_DONE_COMP = '[S] Successful compression {} -> {} (step {})'
+    MSG_DONE_COMP = '[S] Successful compression {} -> {} size {} (step {})'
     MSG_FAIL_COMP = ('[F] Failed Compression {} -> {}, '
         'cannot get below limit {} with lowest quality under current settings')
 
@@ -203,7 +203,7 @@ class StickerConvert:
 
         if result_step:            
             msg = self.MSG_DONE_COMP.format(
-                self.in_f_name, self.out_f_name, result_step
+                self.in_f_name, self.out_f_name, self.result_size, result_step
             )
             self.cb_msg.put(msg)
         

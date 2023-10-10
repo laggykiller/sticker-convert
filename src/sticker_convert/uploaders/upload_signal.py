@@ -27,8 +27,10 @@ class UploadSignal(UploadBase):
         })
 
         self.png_spec = copy.deepcopy(base_spec)
+        self.png_spec.format_vid = '.apng'
 
         self.webp_spec = copy.deepcopy(base_spec)
+        self.webp_spec.format_img = '.webp'
         self.webp_spec.animated = False
 
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
