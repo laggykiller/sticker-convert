@@ -117,8 +117,6 @@ class CompOption(BaseOption):
             self.duration_max = to_int(duration)
         
         self.steps = to_int(comp_config_dict.get('steps'))
-        if not self.steps:
-            self.steps = 1
         self.fake_vid = comp_config_dict.get('fake_vid')
         self.cache_dir = comp_config_dict.get('cache_dir')
         self.default_emoji = comp_config_dict.get('default_emoji')

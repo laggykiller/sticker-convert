@@ -70,6 +70,8 @@ class StickerConvert:
         self.frames_raw: list[np.ndarray] = []
         self.frames_processed: list[np.ndarray] = []
         self.opt_comp = opt_comp
+        if not self.opt_comp.steps:
+            self.opt_comp.steps = 1
 
         self.size = 0
         self.size_max = None
