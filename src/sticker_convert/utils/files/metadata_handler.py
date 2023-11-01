@@ -173,7 +173,7 @@ class MetadataHandler:
             anim_present = False
             image_present = False
 
-            for file in stickers_present:
+            for processed, file in enumerate(stickers_present):
                 file_path = os.path.join(dir, file)
 
                 if CodecInfo.is_anim(file_path):
@@ -184,7 +184,6 @@ class MetadataHandler:
                 anim_present = anim_present or len(anim_stickers) > 0
                 image_present = image_present or len(image_stickers) > 0
 
-                processed += 1
                 finished_all = True if processed == len(stickers_present) else False
 
                 if len(anim_stickers) == file_per_anim_pack or (
@@ -208,20 +207,19 @@ class MetadataHandler:
             stickers = []
             pack_count = 0
 
-            for file in stickers_present:
+            for processed, file in enumerate(stickers_present):
                 file_path = os.path.join(dir, file)
 
                 stickers.append(file_path)
 
-                processed += 1
                 finished_all = True if processed == len(stickers_present) else False
 
                 if len(stickers) == file_per_pack or (
                     finished_all and len(stickers) > 0
                 ):
                     suffix = f'{"-" + str(pack_count) if pack_count > 0 else ""}'
-                    title = str(title) + suffix
-                    packs[title] = stickers.copy()
+                    title_current = str(title) + suffix
+                    packs[title_current] = stickers.copy()
                     stickers = []
                     pack_count += 1
 
