@@ -182,11 +182,12 @@ class GUI(Window):
         if (platform.system() == 'Darwin' and
             platform.mac_ver()[0].split('.')[0] == '14' and
             sys.version_info[0] == 3 and
-            sys.version_info[1] == 11):
+            sys.version_info[1] == 11 and
+            sys.version_info[2] <= 6):
             msg = 'NOTICE: If buttons are not responsive, try to press '
             msg += 'on title bar or move mouse cursor away from window for a while.'
             self.cb_msg(msg)
-            msg = '(This is due to a bug in tkinter specific to macOS 14 python3.11)'
+            msg = '(This is due to a bug in tkinter specific to macOS 14 python <=3.11.6)'
             self.cb_msg(msg)
             msg = '(https://github.com/python/cpython/issues/110218)'
             self.cb_msg(msg)
