@@ -44,7 +44,7 @@
             "vid": 300000
         },
         "format": {
-            "img": ".webp",
+            "img": ".png",
             "vid": ".apng"
         },
         "fps": {
