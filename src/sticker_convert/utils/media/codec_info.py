@@ -30,22 +30,37 @@ class CodecInfo:
                 fps = anim.lottie_animation_get_framerate()
         else:
             if file_ext == ".webp":
+                total_duration = 0
+                frames = 0
+                
                 with open(file, "r+b") as f:
                     mm = mmap.mmap(f.fileno(), 0)
-                    anmf_pos = mm.find(b"ANMF")
-                    if anmf_pos == -1:
-                        return 1
-                    mm.seek(anmf_pos + 20)
-                    frame_duration_32 = mm.read(4)
-                    frame_duration = frame_duration_32[:-1] + bytes(
-                        int(frame_duration_32[-1]) & 0b11111100
-                    )
-                    fps = 1000 / int.from_bytes(frame_duration, "little")
+                    while True:
+                        anmf_pos = mm.find(b"ANMF")
+                        if anmf_pos == -1:
+                            break
+                        mm.seek(anmf_pos + 20)
+                        frame_duration_32 = mm.read(4)
+                        frame_duration = frame_duration_32[:-1] + bytes(
+                            int(frame_duration_32[-1]) & 0b11111100
+                        )
+                        total_duration += int.from_bytes(frame_duration, "little")
+                        frames += 1
+                
+                if frames == 0:
+                    fps = 1
+                else:
+                    fps = frames / total_duration * 1000
             elif file_ext in (".gif", ".apng", ".png"):
-                metadata = iio.immeta(
-                    file, index=0, plugin="pillow", exclude_applied=False
-                )
-                fps = int(1000 / metadata.get("duration", 1000))
+                total_duration = 0
+                frames = len([* iio.imiter(file, plugin="pillow")])
+
+                for frame in range(frames):
+                    metadata = iio.immeta(
+                        file, index=frame, plugin="pillow", exclude_applied=False
+                    )
+                    total_duration += metadata.get("duration", 1000)
+                fps = frames / total_duration * 1000
             else:
                 metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
                 fps = metadata.get("fps", 1)
@@ -95,7 +110,7 @@ class CodecInfo:
             if file_ext == ".webp":
                 frames = Image.open(file).n_frames
             else:
-                frames = len(iio.imread(file, plugin="pyav"))
+                frames = frames = len([* iio.imiter(file, plugin="pyav")])
 
         return frames
 
