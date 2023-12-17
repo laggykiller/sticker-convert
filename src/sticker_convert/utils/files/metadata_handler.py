@@ -184,7 +184,7 @@ class MetadataHandler:
                 anim_present = anim_present or len(anim_stickers) > 0
                 image_present = image_present or len(image_stickers) > 0
 
-                finished_all = True if processed == len(stickers_present) else False
+                finished_all = True if processed == len(stickers_present) - 1 else False
 
                 if len(anim_stickers) == file_per_anim_pack or (
                     finished_all and len(anim_stickers) > 0
@@ -212,7 +212,7 @@ class MetadataHandler:
 
                 stickers.append(file_path)
 
-                finished_all = True if processed == len(stickers_present) else False
+                finished_all = True if processed == len(stickers_present) - 1 else False
 
                 if len(stickers) == file_per_pack or (
                     finished_all and len(stickers) > 0
