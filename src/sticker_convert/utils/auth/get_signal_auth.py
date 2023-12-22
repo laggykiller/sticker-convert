@@ -16,6 +16,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import JavascriptException
 
 from ..files.run_bin import RunBin # type: ignore
+from ..files.dir_utils import DirUtils # type: ignore
 
 # https://stackoverflow.com/a/17197027
 def strings(filename: str, min: int = 4) -> Generator[str, None, None]:
@@ -32,20 +33,9 @@ def strings(filename: str, min: int = 4) -> Generator[str, None, None]:
             yield result
 
 class GetSignalAuth:
-    def __init__(self, signal_bin_version: str = 'beta', chromedriver_download_dir: str = './bin', cb_msg=print, cb_ask_str=input):
-        if platform.system() == 'Windows':
-            fallback_dir = os.path.expandvars('%APPDATA%\\sticker-convert')
-        else:
-            fallback_dir = os.path.expanduser('~/.config/sticker-convert')
-
-        appimage_path = os.getenv('APPIMAGE')
-        if appimage_path:
-            chromedriver_download_dir = os.path.join(os.path.split(appimage_path)[0], 'bin')
-        
+    def __init__(self, signal_bin_version: str = 'beta', cb_msg=print, cb_ask_str=input):
+        chromedriver_download_dir = os.path.join(DirUtils.get_config_dir(), 'bin')
         os.makedirs(chromedriver_download_dir, exist_ok=True)
-        if not os.access(chromedriver_download_dir, os.W_OK):
-            os.makedirs(fallback_dir, exist_ok=True)
-            chromedriver_download_dir = fallback_dir
 
         self.signal_bin_version = signal_bin_version
         self.chromedriver_download_dir = chromedriver_download_dir
