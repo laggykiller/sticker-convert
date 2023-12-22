@@ -131,13 +131,19 @@ class GetSignalAuth:
             new_chrome = True
             r = requests.get('https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json')
             versions_dict = json.loads(r.text)
-            for channel, channel_info in versions_dict['channels'].items():
-                for i in channel_info['downloads']['chromedriver']:
-                    if i['platform'] == chromedriver_platform_new:
-                        chromedriver_url = i['url']
-                        break
-                if chromedriver_url:
-                    break
+            chromedriver_list = versions_dict \
+                .get('milestones', {}) \
+                .get(major_version, {}) \
+                .get('downloads', {}) \
+                .get('chromedriver', {})
+        
+            chromedriver_url = None
+            for i in chromedriver_list:
+                if i.get('platform') == chromedriver_platform_new:
+                    chromedriver_url = i.get('url')
+        
+        if not chromedriver_url:
+            return ''
 
         if platform.system() == 'Windows':
             chromedriver_name = 'chromedriver.exe'
@@ -251,6 +257,9 @@ class GetSignalAuth:
             self.cb_msg(f'Found chromedriver version {local_chromedriver_version}, skip downloading')
         else:
             chromedriver_path = self.download_chromedriver(major_version, chromedriver_download_dir=self.chromedriver_download_dir)
+            if chromedriver_path == '':
+                self.cb_msg('Unable to download suitable chromedriver')
+                return
 
         self.cb_msg('Killing all Signal Desktop processes')
         self.killall_signal()
