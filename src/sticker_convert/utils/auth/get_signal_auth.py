@@ -129,7 +129,7 @@ class GetSignalAuth:
             chromedriver_url = f'https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_{chromedriver_platform}.zip'
         else:
             new_chrome = True
-            r = requests.get('https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json')
+            r = requests.get('https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json')
             versions_dict = json.loads(r.text)
             for channel, channel_info in versions_dict['channels'].items():
                 for i in channel_info['downloads']['chromedriver']:
