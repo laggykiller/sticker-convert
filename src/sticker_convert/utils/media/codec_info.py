@@ -6,7 +6,7 @@ from typing import Optional
 
 import imageio.v3 as iio
 from rlottie_python import LottieAnimation  # type: ignore
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 import mmap
 
 
@@ -69,23 +69,19 @@ class CodecInfo:
 
     @staticmethod
     def get_file_codec(file: str) -> Optional[str]:
-        file_ext = CodecInfo.get_file_ext(file)
-
-        if file_ext == ".webp":
-            try:
-                metadata = iio.immeta(file, plugin="pillow", exclude_applied=False)
-            except AttributeError:
-                # Last resort, in case of incorrect file extension
-                metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
+        codec = None
+        try:
+            codec = Image.open(file).format
+        except UnidentifiedImageError:
+            pass
+        
+        # Unable to distinguish apng and png
+        if codec not in (None, 'PNG'):
+            return codec.lower()
         else:
-            try:
-                metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
-            except AttributeError:
-                # Handle webp files safely
-                metadata = iio.immeta(file, plugin="pillow", exclude_applied=False)
-        codec = metadata.get("codec", None)
-
-        return codec
+            metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
+            codec = metadata.get("codec", None)
+            return codec
 
     @staticmethod
     def get_file_res(file: str) -> tuple[int, int]:
