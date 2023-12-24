@@ -72,10 +72,17 @@ class CodecInfo:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == ".webp":
-            plugin = "pillow"
+            try:
+                metadata = iio.immeta(file, plugin="pillow", exclude_applied=False)
+            except AttributeError:
+                # Last resort, in case of incorrect file extension
+                metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
         else:
-            plugin = "pyav"
-        metadata = iio.immeta(file, plugin=plugin, exclude_applied=False)
+            try:
+                metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
+            except AttributeError:
+                # Handle webp files safely
+                metadata = iio.immeta(file, plugin="pillow", exclude_applied=False)
         codec = metadata.get("codec", None)
 
         return codec
