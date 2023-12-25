@@ -1,7 +1,7 @@
 apngasm_python~=1.2.1
 pyav~=11.4.1
 beautifulsoup4~=4.12.2
-rookiepy~=0.3.4
+rookiepy~=0.3.5
 imageio~=2.33.1
 memory-tempfile~=2.2.3
 numpy~=1.26.2
