@@ -60,7 +60,11 @@ class CodecInfo:
                         file, index=frame, plugin="pillow", exclude_applied=False
                     )
                     total_duration += metadata.get("duration", 1000)
-                fps = frames / total_duration * 1000
+                
+                if frames == 0:
+                    fps = 1
+                else:
+                    fps = frames / total_duration * 1000
             else:
                 metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
                 fps = metadata.get("fps", 1)
