@@ -410,7 +410,7 @@ class Job:
         
         if self.out_urls:
             with open(os.path.join(self.opt_output.dir, 'export-result.txt'), 'w+') as f:
-                f.writelines(self.out_urls)
+                f.write('\n'.join(self.out_urls))
         else:
             self.cb_msg('An error occured while exporting stickers')
             return False
