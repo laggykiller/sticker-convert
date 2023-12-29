@@ -61,7 +61,7 @@ class CodecInfo:
                     )
                     total_duration += metadata.get("duration", 1000)
                 
-                if frames == 0:
+                if frames == 0 or total_duration == 0:
                     fps = 1
                 else:
                     fps = frames / total_duration * 1000
