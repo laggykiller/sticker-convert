@@ -137,7 +137,7 @@ class CLI:
         opt_input = {
             'option': download_option,
             'url': url,
-            'dir': args.input_dir if args.input_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
+            'dir': os.path.abspath(args.input_dir) if args.input_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
         }
 
         return opt_input
@@ -156,7 +156,7 @@ class CLI:
         
         opt_output = {
             'option': export_option,
-            'dir': args.output_dir if args.output_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_output'),
+            'dir': os.path.abspath(args.output_dir) if args.output_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_output'),
             'title': args.title,
             'author': args.author
         }
