@@ -226,7 +226,7 @@ class UploadTelegram(UploadBase):
             msg_block += (
                 f'Default emoji is set to {self.opt_comp.default_emoji}.\n'
             )
-            msg_block += f"Please edit emoji.txt now, then continue"
+            msg_block += "Please edit emoji.txt now, then continue"
             MetadataHandler.generate_emoji_file(
                 dir=self.in_dir, default_emoji=self.opt_comp.default_emoji
             )
