@@ -218,8 +218,9 @@ class StickerConvert:
             self.frames_import_imageio()
 
     def frames_import_imageio(self):
-        if self.in_f_ext in '.webp':
-            # ffmpeg do not support webp decoding (yet)
+        # ffmpeg do not support webp decoding (yet)
+        # ffmpeg could fail to decode apng if file is buggy
+        if self.in_f_ext in ('.webp', '.apng', 'png'):
             for frame in iio.imiter(self.in_f, plugin='pillow', mode='RGBA'):
                 self.frames_raw.append(frame)
             return
