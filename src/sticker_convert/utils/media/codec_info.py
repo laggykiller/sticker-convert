@@ -103,7 +103,7 @@ class CodecInfo:
             with LottieAnimation.from_tgs(file) as anim:
                 width, height = anim.lottie_animation_get_size()
         else:
-            if file_ext == ".webp":
+            if file_ext in (".webp", ".png", ".apng"):
                 plugin = "pillow"
             else:
                 plugin = "pyav"
@@ -122,7 +122,7 @@ class CodecInfo:
             with LottieAnimation.from_tgs(file) as anim:
                 frames = anim.lottie_animation_get_totalframe()
         else:
-            if file_ext == ".webp":
+            if file_ext in (".webp", ".png", ".apng"):
                 frames = Image.open(file).n_frames
             else:
                 frames = frames = len([* iio.imiter(file, plugin="pyav")])
