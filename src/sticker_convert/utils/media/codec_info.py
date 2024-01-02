@@ -80,13 +80,20 @@ class CodecInfo:
         except UnidentifiedImageError:
             pass
         
-        # Unable to distinguish apng and png using im.format
-        if codec not in (None, 'PNG'):
-            return codec.lower()
-        elif im.is_animated:
-            return 'apng'
+        # Unable to distinguish apng and png
+        if codec == None:
+            metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
+            codec = metadata.get("codec", None)
+            if codec == None:
+                raise RuntimeError(f'Unable to get codec for file {file}')
+            return codec
+        elif codec == 'PNG':
+            if im.is_animated:
+                return 'apng'
+            else:
+                return 'png'
         else:
-            return 'png'
+            return codec.lower()
 
     @staticmethod
     def get_file_res(file: str) -> tuple[int, int]:
