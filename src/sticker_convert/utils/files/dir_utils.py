@@ -61,4 +61,5 @@ class DirUtils:
         if (config_dir := DirUtils._get_curr_dir_if_writable()) != None:
             return config_dir
         else:
+            os.makedirs(fallback_dir, exist_ok=True)
             return fallback_dir
