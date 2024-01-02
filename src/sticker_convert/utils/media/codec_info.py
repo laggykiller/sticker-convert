@@ -85,13 +85,13 @@ class CodecInfo:
             metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
             codec = metadata.get("codec", None)
             if codec == None:
-                raise RuntimeError(f'Unable to get codec for file {file}')
+                raise RuntimeError(f"Unable to get codec for file {file}")
             return codec
-        elif codec == 'PNG':
+        elif codec == "PNG":
             if im.is_animated:
-                return 'apng'
+                return "apng"
             else:
-                return 'png'
+                return "png"
         else:
             return codec.lower()
 
