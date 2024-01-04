@@ -41,7 +41,7 @@
         "vid_format": "Set file format if input is animated.",
         "img_format": "Set file format if input is static.",
         "fake_vid": "Convert (faking) image to video.\nUseful if:\n(1) Size limit for video is larger than image;\n(2) Mix image and video into same pack.",
-        "scale_filter": "Set scale filter. Default as lanczos. Valid options are:\n- nearest = Use nearest neighbour (Suitable for pixel art)\n- bilnear = linear interpolation\n- bicubic = Cubic spline interpolation\n- lanczos = A high-quality downsampling filter",
+        "scale_filter": "Set scale filter. Default as lanczos. Valid options are:\n- nearest = Use nearest neighbour (Suitable for pixel art)\n- bilinear = linear interpolation\n- bicubic = Cubic spline interpolation\n- lanczos = A high-quality downsampling filter",
         "cache_dir": "Set custom cache directory.\nUseful for debugging, or speed up conversion if cache_dir is on RAM disk.",
         "default_emoji": "Set the default emoji for uploading Signal and Telegram sticker packs."
     },

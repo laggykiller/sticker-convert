@@ -286,7 +286,7 @@ class StickerConvert:
             
             if self.opt_comp.scale_filter == 'nearest':
                 resample = Image.NEAREST
-            elif self.opt_comp.scale_filter == 'bilnear':
+            elif self.opt_comp.scale_filter == 'bilinear':
                 resample = Image.BILINEAR
             elif self.opt_comp.scale_filter == 'bicubic':
                 resample = Image.BICUBIC

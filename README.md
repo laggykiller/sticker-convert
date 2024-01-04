@@ -191,7 +191,7 @@ Compression options:
   --scale-filter SCALE_FILTER
                         Set scale filter. Default as lanczos. Valid options are:
                         - nearest = Use nearest neighbour (Suitable for pixel art)
-                        - bilnear = linear interpolation
+                        - bilinear = linear interpolation
                         - bicubic = Cubic spline interpolation
                         - lanczos = A high-quality downsampling filter
   --cache-dir CACHE_DIR

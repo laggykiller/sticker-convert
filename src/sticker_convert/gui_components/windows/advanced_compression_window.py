@@ -114,7 +114,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         self.scale_filter_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['scale_filter']), bootstyle='secondary')
         self.scale_filter_lbl = Label(self.frame_advcomp, text='Scale filter')
-        self.scale_filter_opt = OptionMenu(self.frame_advcomp, self.gui.scale_filter_var, self.gui.scale_filter_var.get(), 'nearest', 'bilnear', 'bicubic', 'lanczos', bootstyle='secondary')
+        self.scale_filter_opt = OptionMenu(self.frame_advcomp, self.gui.scale_filter_var, self.gui.scale_filter_var.get(), 'nearest', 'bilinear', 'bicubic', 'lanczos', bootstyle='secondary')
 
         self.cache_dir_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['cache_dir']), bootstyle='secondary')
         self.cache_dir_lbl = Label(self.frame_advcomp, text='Custom cache directory')
