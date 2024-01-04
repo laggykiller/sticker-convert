@@ -12,46 +12,38 @@ class CompFrame(LabelFrame):
         self.gui = gui
         super(CompFrame, self).__init__(*args, **kwargs)
         
-        self.grid_columnconfigure(2, weight = 1)
+        self.grid_columnconfigure(1, weight=1)
 
-        self.no_compress_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['no_compress']), bootstyle='secondary')
         self.no_compress_lbl = Label(self, text='No compression')
         self.no_compress_cbox = Checkbutton(self, variable=self.gui.no_compress_var, command=self.cb_no_compress, onvalue=True, offvalue=False, bootstyle='danger-round-toggle')
 
-        self.comp_preset_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['preset']), bootstyle='secondary')
         self.comp_preset_lbl = Label(self, text='Preset')
         self.comp_preset_opt = OptionMenu(self, self.gui.comp_preset_var, self.gui.comp_preset_var.get(), *self.gui.compression_presets.keys(), command=self.cb_comp_apply_preset, bootstyle='secondary')
         self.comp_preset_opt.config(width=15)
 
-        self.steps_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['steps']), bootstyle='secondary')
         self.steps_lbl = Label(self, text='Number of steps')
         self.steps_entry = Entry(self, textvariable=self.gui.steps_var, width=8)
         self.steps_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
-        self.processes_help_btn = Button(self, text='?', width=1, command=lambda: self.gui.cb_msg_block(self.gui.help['comp']['processes']), bootstyle='secondary')
         self.processes_lbl = Label(self, text='Number of processes')
         self.processes_entry = Entry(self, textvariable=self.gui.processes_var, width=8)
         self.processes_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
         self.comp_advanced_btn = Button(self, text='Advanced...', command=self.cb_compress_advanced, bootstyle='secondary')
 
-        self.no_compress_help_btn.grid(column=0, row=0, sticky='w', padx=3, pady=3)
-        self.no_compress_lbl.grid(column=1, row=0, sticky='w', padx=3, pady=3)
-        self.no_compress_cbox.grid(column=2, row=0, sticky='nes', padx=3, pady=3)
+        self.no_compress_lbl.grid(column=0, row=0, sticky='w', padx=3, pady=3)
+        self.no_compress_cbox.grid(column=1, row=0, sticky='nes', padx=3, pady=3)
 
-        self.comp_preset_help_btn.grid(column=0, row=1, sticky='w', padx=3, pady=3)
-        self.comp_preset_lbl.grid(column=1, row=1, sticky='w', padx=3, pady=3)
-        self.comp_preset_opt.grid(column=2, row=1, sticky='nes', padx=3, pady=3)
+        self.comp_preset_lbl.grid(column=0, row=1, sticky='w', padx=3, pady=3)
+        self.comp_preset_opt.grid(column=1, row=1, sticky='nes', padx=3, pady=3)
 
-        self.steps_help_btn.grid(column=0, row=2, sticky='w', padx=3, pady=3)
-        self.steps_lbl.grid(column=1, row=2, sticky='w', padx=3, pady=3)
-        self.steps_entry.grid(column=2, row=2, sticky='nes', padx=3, pady=3)
+        self.steps_lbl.grid(column=0, row=2, sticky='w', padx=3, pady=3)
+        self.steps_entry.grid(column=1, row=2, sticky='nes', padx=3, pady=3)
 
-        self.processes_help_btn.grid(column=0, row=3, sticky='w', padx=3, pady=3)
-        self.processes_lbl.grid(column=1, row=3, sticky='w', padx=3, pady=3)
-        self.processes_entry.grid(column=2, row=3, sticky='nes', padx=3, pady=3)
+        self.processes_lbl.grid(column=0, row=3, sticky='w', padx=3, pady=3)
+        self.processes_entry.grid(column=1, row=3, sticky='nes', padx=3, pady=3)
 
-        self.comp_advanced_btn.grid(column=2, row=4, sticky='nes', padx=3, pady=3)
+        self.comp_advanced_btn.grid(column=1, row=4, sticky='nes', padx=3, pady=3)
 
         self.cb_comp_apply_preset()
         self.cb_no_compress()
