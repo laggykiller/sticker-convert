@@ -375,7 +375,7 @@ class StickerConvert:
             options['loop'] = '0'
         
         with av.open(self.tmp_f, 'w', format=self.out_f_ext.replace('.', '')) as output:
-            out_stream = output.add_stream(codec, rate=self.fps, options=options)
+            out_stream = output.add_stream(codec, rate=int(self.fps), options=options)
             out_stream.width = self.res_w
             out_stream.height = self.res_h
             out_stream.pix_fmt = pixel_format
