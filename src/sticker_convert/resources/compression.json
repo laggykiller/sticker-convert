@@ -36,6 +36,7 @@
         },
         "steps": 16,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "signal": {
@@ -75,6 +76,7 @@
         },
         "steps": 16,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "telegram": {
@@ -114,6 +116,7 @@
         },
         "steps": 16,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "whatsapp": {
@@ -153,6 +156,7 @@
         },
         "steps": 16,
         "fake_vid": true,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "line": {
@@ -192,6 +196,7 @@
         },
         "steps": 16,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "kakao": {
@@ -231,6 +236,7 @@
         },
         "steps": 16,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "imessage_small": {
@@ -270,6 +276,7 @@
         },
         "steps": 8,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "imessage_medium": {
@@ -309,6 +316,7 @@
         },
         "steps": 8,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "imessage_large": {
@@ -348,6 +356,7 @@
         },
         "steps": 8,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     },
     "custom": {
@@ -387,6 +396,7 @@
         },
         "steps": 16,
         "fake_vid": false,
+        "scale_filter": "lanczos",
         "default_emoji": "😀"
     }
 }

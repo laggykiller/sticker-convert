@@ -81,6 +81,7 @@ class CompFrame(LabelFrame):
         self.gui.img_format_var.set(self.gui.compression_presets[selection]['format']['img'])
         self.gui.vid_format_var.set(self.gui.compression_presets[selection]['format']['vid'])
         self.gui.fake_vid_var.set(self.gui.compression_presets[selection]['fake_vid'])
+        self.gui.scale_filter_var.set(self.gui.compression_presets[selection]['scale_filter'])
         self.gui.default_emoji_var.set(self.gui.compression_presets[selection]['default_emoji'])
         self.gui.steps_var.set(self.gui.compression_presets[selection]['steps'])
 

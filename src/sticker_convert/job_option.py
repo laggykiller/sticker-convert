@@ -118,6 +118,7 @@ class CompOption(BaseOption):
         
         self.steps = to_int(comp_config_dict.get('steps'))
         self.fake_vid = comp_config_dict.get('fake_vid')
+        self.scale_filter = comp_config_dict.get('scale_filter', 'lanczos')
         self.cache_dir = comp_config_dict.get('cache_dir')
         self.default_emoji = comp_config_dict.get('default_emoji')
         self.no_compress = comp_config_dict.get('no_compress')
@@ -166,6 +167,7 @@ class CompOption(BaseOption):
             },
             'steps': self.steps,
             'fake_vid': self.fake_vid,
+            'scale_filter': self.scale_filter,
             'cache_dir': self.cache_dir,
             'default_emoji': self.default_emoji,
             'no_compress': self.no_compress,

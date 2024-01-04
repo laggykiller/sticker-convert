@@ -283,7 +283,19 @@ class StickerConvert:
             else:
                 height_new = self.res_h
                 width_new = width * self.res_h // height
-            im = im.resize((width_new, height_new), resample=Image.LANCZOS)
+            
+            if self.opt_comp.scale_filter == 'nearest':
+                resample = Image.NEAREST
+            elif self.opt_comp.scale_filter == 'bilnear':
+                resample = Image.BILINEAR
+            elif self.opt_comp.scale_filter == 'bicubic':
+                resample = Image.BICUBIC
+            elif self.opt_comp.scale_filter == 'lanczos':
+                resample = Image.LANCZOS
+            else:
+                resample = Image.LANCZOS
+
+            im = im.resize((width_new, height_new), resample=resample)
             im_new = Image.new('RGBA', (self.res_w, self.res_h), (0, 0, 0, 0))
             im_new.paste(
                 im, ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2)

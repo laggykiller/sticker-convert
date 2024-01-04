@@ -112,6 +112,10 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fake_vid_lbl = Label(self.frame_advcomp, text='Convert (faking) image to video')
         self.fake_vid_cbox = Checkbutton(self.frame_advcomp, variable=self.gui.fake_vid_var, onvalue=True, offvalue=False, bootstyle='success-round-toggle')
 
+        self.scale_filter_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['scale_filter']), bootstyle='secondary')
+        self.scale_filter_lbl = Label(self.frame_advcomp, text='Scale filter')
+        self.scale_filter_opt = OptionMenu(self.frame_advcomp, self.gui.scale_filter_var, self.gui.scale_filter_var.get(), 'nearest', 'bilnear', 'bicubic', 'lanczos', bootstyle='secondary')
+
         self.cache_dir_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['cache_dir']), bootstyle='secondary')
         self.cache_dir_lbl = Label(self.frame_advcomp, text='Custom cache directory')
         self.cache_dir_entry = Entry(self.frame_advcomp, textvariable=self.gui.cache_dir_var, width=30)
@@ -190,13 +194,17 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fake_vid_lbl.grid(column=1, row=10, sticky='w', padx=3, pady=3)
         self.fake_vid_cbox.grid(column=6, row=10, sticky='nes', padx=3, pady=3)
 
-        self.cache_dir_help_btn.grid(column=0, row=11, sticky='w', padx=3, pady=3)
-        self.cache_dir_lbl.grid(column=1, row=11, sticky='w', padx=3, pady=3)
-        self.cache_dir_entry.grid(column=2, row=11, columnspan=4, sticky='nes', padx=3, pady=3)
+        self.scale_filter_help_btn.grid(column=0, row=11, sticky='w', padx=3, pady=3)
+        self.scale_filter_lbl.grid(column=1, row=11, sticky='w', padx=3, pady=3)
+        self.scale_filter_opt.grid(column=2, row=11, columnspan=4, sticky='nes', padx=3, pady=3)
 
-        self.default_emoji_help_btn.grid(column=0, row=12, sticky='w', padx=3, pady=3)
-        self.default_emoji_lbl.grid(column=1, row=12, sticky='w', padx=3, pady=3)
-        self.default_emoji_dsp.grid(column=6, row=12, sticky='nes', padx=3, pady=3)
+        self.cache_dir_help_btn.grid(column=0, row=12, sticky='w', padx=3, pady=3)
+        self.cache_dir_lbl.grid(column=1, row=12, sticky='w', padx=3, pady=3)
+        self.cache_dir_entry.grid(column=2, row=12, columnspan=4, sticky='nes', padx=3, pady=3)
+
+        self.default_emoji_help_btn.grid(column=0, row=13, sticky='w', padx=3, pady=3)
+        self.default_emoji_lbl.grid(column=1, row=13, sticky='w', padx=3, pady=3)
+        self.default_emoji_dsp.grid(column=6, row=13, sticky='nes', padx=3, pady=3)
 
         # https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
         # Create a frame for the canvas with non-zero row&column weights

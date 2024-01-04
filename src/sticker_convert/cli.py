@@ -67,7 +67,7 @@ class CLI:
                     'color_min', 'color_max',
                     'duration_min', 'duration_max',
                     'vid_size_max', 'img_size_max')
-        flags_str = ('vid_format', 'img_format', 'cache_dir')
+        flags_str = ('vid_format', 'img_format', 'cache_dir', 'scale_filter')
         flags_bool = ('fake_vid')
         for k, v in self.help['comp'].items():
             if k in flags_int:
@@ -229,6 +229,7 @@ class CLI:
             'steps': self.compression_presets[preset]['steps'] if args.steps == None else args.steps,
             'fake_vid': self.compression_presets[preset]['fake_vid'] if args.fake_vid == None else args.fake_vid,
             'cache_dir': args.cache_dir,
+            'scale_filter': args.scale_filter,
             'default_emoji': args.default_emoji,
             'no_compress': args.no_compress,
             'processes': args.processes if args.processes else math.ceil(cpu_count() / 2)

@@ -125,6 +125,7 @@ class GUI(Window):
         self.img_format_var = StringVar(self)
         self.vid_format_var = StringVar(self)
         self.fake_vid_var = BooleanVar()
+        self.scale_filter_var = StringVar(self)
         self.cache_dir_var = StringVar(self)
         self.default_emoji_var = StringVar(self)
         self.steps_var = IntVar(self) 
@@ -381,6 +382,7 @@ class GUI(Window):
             },
             'steps': self.steps_var.get(),
             'fake_vid': self.fake_vid_var.get(),
+            'scale_filter': self.scale_filter_var.get(),
             'cache_dir': self.cache_dir_var.get() if self.cache_dir_var.get() != '' else None,
             'default_emoji': self.default_emoji_var.get(),
             'no_compress': self.no_compress_var.get(),
@@ -545,7 +547,7 @@ class GUI(Window):
         if os.path.isdir(self.input_setdir_var.get()):
             self.input_frame.input_setdir_entry.config(bootstyle='default')
         else:
-            self.input_frame.input_setdir_entry.config(bootstyle='danger')
+            self.input_frame.input_setdir_entry.config(bootstyle='warning')
 
         self.input_frame.address_lbl.config(text=self.input_presets[input_option_display]['address_lbls'])
         self.input_frame.address_entry.config(bootstyle='default')
@@ -575,7 +577,7 @@ class GUI(Window):
         if os.path.isdir(self.output_setdir_var.get()):
             self.output_frame.output_setdir_entry.config(bootstyle='default')
         else:
-            self.output_frame.output_setdir_entry.config(bootstyle='danger')
+            self.output_frame.output_setdir_entry.config(bootstyle='warning')
 
         if (MetadataHandler.check_metadata_required(output_option, 'title') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'title') and
