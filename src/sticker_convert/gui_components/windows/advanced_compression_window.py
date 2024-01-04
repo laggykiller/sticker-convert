@@ -225,7 +225,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         self.search_lbl = Label(self.frame_emoji_search, text='Search')
         self.search_var = StringVar(self.frame_emoji_search)
-        self.search_var.trace("w", self.render_emoji_list)
+        self.search_var.trace_add("write", self.render_emoji_list)
         self.search_entry = Entry(self.frame_emoji_search, textvariable=self.search_var)
         self.search_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
