@@ -15,7 +15,6 @@ from typing import Optional, Any
 from PIL import ImageFont
 from ttkbootstrap import Window, StringVar, BooleanVar, IntVar # type: ignore
 from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
-from ttkbootstrap.tooltip import ToolTip
 
 from .job import Job # type: ignore
 from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
@@ -545,26 +544,20 @@ class GUI(Window):
         url = self.input_address_var.get()
 
         # Input
-        ToolTip(self.input_frame.input_option_opt, text=self.input_presets[input_option]['help'], bootstyle='default')
-
         if os.path.isdir(self.input_setdir_var.get()):
             self.input_frame.input_setdir_entry.config(bootstyle='default')
-            ToolTip(self.input_frame.input_setdir_entry, text=self.help['input']['input_dir'], bootstyle='default')
         else:
             self.input_frame.input_setdir_entry.config(bootstyle='warning')
-            ToolTip(self.input_frame.input_setdir_entry, text='The directory could not be found. Will be created automatically.', bootstyle=('warning', 'inverse'))
 
         self.input_frame.address_lbl.config(text=self.input_presets[input_option_display]['address_lbls'])
         self.input_frame.address_entry.config(bootstyle='default')
 
         if input_option == 'local':
             self.input_frame.address_entry.config(state='disabled')
-            ToolTip(self.input_frame.address_entry, text='URL not required.', bootstyle='default')
             self.input_frame.address_tip.config(text=self.input_presets[input_option_display]['example'])
 
         else:
             self.input_frame.address_entry.config(state='normal')
-            ToolTip(self.input_frame.address_entry, text='URL to download from.', bootstyle='default')
             self.input_frame.address_tip.config(text=self.input_presets[input_option_display]['example'])
             download_option = UrlDetect.detect(url)
 
@@ -583,30 +576,24 @@ class GUI(Window):
         # Output
         if os.path.isdir(self.output_setdir_var.get()):
             self.output_frame.output_setdir_entry.config(bootstyle='default')
-            ToolTip(self.output_frame.output_setdir_entry, text=self.help['output']['output_dir'], bootstyle='default')
         else:
             self.output_frame.output_setdir_entry.config(bootstyle='warning')
-            ToolTip(self.output_frame.output_setdir_entry, text='The directory could not be found. Will be created automatically.', bootstyle=('warning', 'inverse'))
 
         if (MetadataHandler.check_metadata_required(output_option, 'title') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'title') and
             not self.title_var.get()):
 
             self.output_frame.title_entry.config(bootstyle='warning')
-            ToolTip(self.output_frame.title_entry, text='Title is required.', bootstyle=('warning', 'inverse'))
         else:
             self.output_frame.title_entry.config(bootstyle='default')
-            ToolTip(self.output_frame.title_entry, text=self.help['output']['title'], bootstyle='default')
 
         if (MetadataHandler.check_metadata_required(output_option, 'author') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'author') and
             not self.author_var.get()):
             
             self.output_frame.author_entry.config(bootstyle='warning')
-            ToolTip(self.output_frame.author_entry, text='Author is required.', bootstyle=('warning', 'inverse'))
         else:
             self.output_frame.author_entry.config(bootstyle='default')
-            ToolTip(self.output_frame.author_entry, text=self.help['output']['author'], bootstyle='default')
         
         if self.comp_preset_var.get() == 'auto':
             if output_option == 'local':
@@ -618,50 +605,29 @@ class GUI(Window):
         # Credentials
         if output_option == 'signal' and not self.signal_uuid_var.get():
             self.cred_frame.signal_uuid_entry.config(bootstyle='warning')
-            ToolTip(self.cred_frame.signal_uuid_entry, text='Signal uuid is required. Press "Get help" for more info.', bootstyle=('warning', 'inverse'))
         else:
             self.cred_frame.signal_uuid_entry.config(bootstyle='default')
-            ToolTip(self.cred_frame.signal_uuid_entry, text=self.help['cred']['signal_uuid'], bootstyle='default')
 
         if output_option == 'signal' and not self.signal_password_var.get():
             self.cred_frame.signal_password_entry.config(bootstyle='warning')
-            ToolTip(self.cred_frame.signal_password_entry, text='Signal password is required. Press "Get help" for more info.', bootstyle=('warning', 'inverse'))
         else:
             self.cred_frame.signal_password_entry.config(bootstyle='default')
-            ToolTip(self.cred_frame.signal_password_entry, text=self.help['cred']['signal_password'], bootstyle='default')
 
         if (input_option == 'telegram' or output_option == 'telegram') and not self.telegram_token_var.get():
             self.cred_frame.telegram_token_entry.config(bootstyle='warning')
-            ToolTip(self.cred_frame.telegram_token_entry, text='Telegram token is required. Press "Get help" for more info.', bootstyle=('warning', 'inverse'))
         else:
             self.cred_frame.telegram_token_entry.config(bootstyle='default')
-            ToolTip(self.cred_frame.telegram_token_entry, text=self.help['cred']['telegram_token'], bootstyle='default')
 
         if output_option == 'telegram' and not self.telegram_userid_var.get():
             self.cred_frame.telegram_userid_entry.config(bootstyle='warning')
-            ToolTip(self.cred_frame.telegram_userid_entry, text='Telegram userid is required. Press "Get help" for more info.', bootstyle=('warning', 'inverse'))
         else:
             self.cred_frame.telegram_userid_entry.config(bootstyle='default')
-            ToolTip(self.cred_frame.telegram_userid_entry, text=self.help['cred']['telegram_userid'], bootstyle='default')
         
         if urlparse(url).netloc == 'e.kakao.com' and not self.kakao_auth_token_var.get():
             self.cred_frame.kakao_auth_token_entry.config(bootstyle='warning')
-            ToolTip(self.cred_frame.kakao_auth_token_entry, text='Kakao auth token is required. Press "Get help" for more info.', bootstyle=('warning', 'inverse'))
         else:
             self.cred_frame.kakao_auth_token_entry.config(bootstyle='default')
-            ToolTip(self.cred_frame.kakao_auth_token_entry, text=self.help['cred']['kakao_auth_token'], bootstyle='default')
         
-        ToolTip(self.cred_frame.line_cookies_entry, text=self.help['cred']['line_cookies'], bootstyle='default')
-
-        ToolTip(self.cred_frame.signal_get_auth_btn, text=self.help['cred']['signal_get_auth'], bootstyle='default')
-        ToolTip(self.cred_frame.kakao_get_auth_btn, text=self.help['cred']['kakao_get_auth'], bootstyle='default')
-        ToolTip(self.cred_frame.line_get_auth_btn, text=self.help['cred']['line_get_auth'], bootstyle='default')
-        
-        # Compression
-        ToolTip(self.comp_frame.no_compress_cbox, text=self.help['comp']['no_compress'], bootstyle='default')
-        ToolTip(self.comp_frame.steps_entry, text=self.help['comp']['steps'], bootstyle='default')
-        ToolTip(self.comp_frame.processes_entry, text=self.help['comp']['processes'], bootstyle='default')
-
         # Check for Input and Compression mismatch
         if (not self.no_compress_var.get() and 
             self.get_output_name() != 'local' and
@@ -670,14 +636,8 @@ class GUI(Window):
 
             self.comp_frame.comp_preset_opt.config(bootstyle='warning')
             self.output_frame.output_option_opt.config(bootstyle='warning')
-
-            ToolTip(self.comp_frame.comp_preset_opt, text='Compression preset and output option do not match, which may cause upload to fail.', bootstyle=('warning', 'inverse'))
-            ToolTip(self.output_frame.output_option_opt, text='Compression preset and output option do not match, which may cause upload to fail.', bootstyle=('warning', 'inverse'))
         else:
             self.comp_frame.comp_preset_opt.config(bootstyle='secondary')
             self.output_frame.output_option_opt.config(bootstyle='secondary')
-
-            ToolTip(self.comp_frame.comp_preset_opt, text=self.help['comp']['preset'], bootstyle='default')
-            ToolTip(self.output_frame.output_option_opt, text=self.output_presets[output_option]['help'], bootstyle='default')
         
         return True
