@@ -133,7 +133,7 @@ class StickerConvert:
             self.res_w = param[0]
             self.res_h = param[1]
             self.quality = param[2]
-            self.fps = param[3]
+            self.fps = min(param[3], self.fps_orig)
             self.color = param[4]
 
             self.tmp_f = io.BytesIO()
