@@ -31,26 +31,13 @@ class DownloadSignal(DownloadBase):
         for sticker in pack.stickers:
             f_id = str(sticker.id).zfill(3)
             f_path = os.path.join(self.out_dir, f"{f_id}")
-            with open(
-                f_path,
-                "wb",
-            ) as f:
+            with open(f_path, "wb") as f:
                 f.write(sticker.image_data)
 
             emoji_dict[f_id] = sticker.emoji
 
             codec = CodecInfo.get_file_codec(f_path)
-            if "apng" in codec:
-                f_path_new = f_path + ".apng"
-            elif "png" in codec:
-                f_path_new = f_path + ".png"
-            elif "webp" in codec:
-                f_path_new = f_path + ".webp"
-            else:
-                self.cb_msg(f"Unknown codec {codec}, defaulting to webp")
-                codec = "webp"
-                f_path_new = f_path + ".webp"
-
+            f_path_new = f"{f_path}.{codec}"
             os.rename(f_path, f_path_new)
 
             self.cb_msg(f"Downloaded {f_id}.{codec}")
