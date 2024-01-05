@@ -5,6 +5,7 @@ from typing import Optional
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.models import StickerPack  # type: ignore
+from signalstickers_client.errors import SignalException # type: ignore
 
 from .download_base import DownloadBase  # type: ignore
 from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
@@ -56,7 +57,10 @@ class DownloadSignal(DownloadBase):
         pack_id = self.url.split("#pack_id=")[1].split("&pack_key=")[0]
         pack_key = self.url.split("&pack_key=")[1]
 
-        pack = anyio.run(DownloadSignal.get_pack, pack_id, pack_key)
+        try:
+            pack = anyio.run(DownloadSignal.get_pack, pack_id, pack_key)
+        except SignalException as e:
+            self.cb_msg(f"Failed to download pack due to {repr(e)}")
         self.save_stickers(pack)
 
         return True

@@ -6,6 +6,7 @@ from typing import Optional
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.models import LocalStickerPack, Sticker  # type: ignore
+from signalstickers_client.errors import SignalException # type: ignore
 
 from .upload_base import UploadBase  # type: ignore
 from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
@@ -134,15 +135,18 @@ class UploadSignal(UploadBase):
 
             self.add_stickers_to_pack(pack, stickers, emoji_dict)
             self.cb_msg(f"Uploading pack {pack_title}")
-            result = anyio.run(
-                UploadSignal.upload_pack,
-                pack,
-                self.opt_cred.signal_uuid,
-                self.opt_cred.signal_password,
-            )
+            try:
+                result = anyio.run(
+                    UploadSignal.upload_pack,
+                    pack,
+                    self.opt_cred.signal_uuid,
+                    self.opt_cred.signal_password,
+                )
+                self.cb_msg(result)
+                urls.append(result)
 
-            self.cb_msg(result)
-            urls.append(result)
+            except SignalException as e:
+                self.cb_msg(f"Failed to upload pack {pack_title} due to {repr(e)}")
 
         return urls
 
