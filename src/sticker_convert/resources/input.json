@@ -16,7 +16,7 @@
         "address_lbls": "URL address",
         "metadata_provides": {
             "title": true,
-            "author": false
+            "author": true
         }
     },
     "telegram": {
@@ -26,7 +26,7 @@
         "address_lbls": "URL address",
         "metadata_provides": {
             "title": true,
-            "author": true
+            "author": false
         }
     },
     "line": {
