@@ -108,7 +108,8 @@ class CodecInfo:
             else:
                 plugin = "pyav"
             frame = iio.imread(file, plugin=plugin, index=0)
-            width, height, _ = frame.shape
+            width = frame.shape[0]
+            height = frame.shape[1]
 
         return width, height
 
