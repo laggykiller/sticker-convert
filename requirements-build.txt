@@ -1,2 +1,2 @@
-nuitka==1.9.6
+nuitka==1.9.7
 wheel
