@@ -175,11 +175,9 @@ class DownloadKakao(DownloadBase):
 
         targets = []
 
-        num = 0
-        for url in thumbnail_urls:
+        for num, url in enumerate(thumbnail_urls):
             dest = os.path.join(self.out_dir, str(num).zfill(3) + ".png")
             targets.append((url, dest))
-            num += 1
 
         self.download_multiple_files(targets)
 
@@ -199,13 +197,12 @@ class DownloadKakao(DownloadBase):
             self.cb_msg(f"Cannot download {pack_url}")
             return False
 
-        num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
             self.cb_msg("Unzipping...")
             if self.cb_bar:
                 self.cb_bar(set_progress_mode="determinate", steps=len(zf.namelist()))
 
-            for f_path in sorted(zf.namelist()):
+            for num, f_path in enumerate(sorted(zf.namelist())):
                 _, ext = os.path.splitext(f_path)
 
                 if ext in (".gif", ".webp"):
@@ -221,8 +218,6 @@ class DownloadKakao(DownloadBase):
 
                 if self.cb_bar:
                     self.cb_bar(update_bar=True)
-
-                num += 1
 
         self.cb_msg(f"Finished getting {pack_url}")
 

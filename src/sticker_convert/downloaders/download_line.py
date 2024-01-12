@@ -184,51 +184,49 @@ class DownloadLine(DownloadBase):
                 pack_url = f'https://stickershop.line-scdn.net/stickershop/v1/product/{self.pack_id}/iphone/stickers@2x.zip'
         
         return pack_url
+
+    def decompress(self, zf: zipfile.ZipFile, f_path: str, num: int, prefix: str = '', suffix: str = ''):
+        data = zf.read(f_path)
+        ext = os.path.splitext(f_path)[-1]
+        if ext == '.png' and int(self.pack_id) < 775:
+            data = ApplePngNormalize.normalize(data)
+        self.cb_msg(f'Read {f_path}')
+        
+        out_path = os.path.join(self.out_dir, prefix + str(num).zfill(3) + suffix + ext)
+        with open(out_path, 'wb') as f:
+            f.write(data)
     
     def decompress_emoticon(self, zip_file: bytes):
-        num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
             self.cb_msg('Unzipping...')
 
             self.cb_bar(set_progress_mode='determinate', steps=len(self.pack_files))
-            for sticker in self.pack_files:
+            for num, sticker in enumerate(self.pack_files):
                 if self.resource_type == 'ANIMATION':
                     f_path = str(sticker) + '_animation.png'
                 else:
                     f_path = str(sticker) + '.png'
-                data = zf.read(f_path)
-                self.cb_msg(f'Read {f_path}')
-                
-                out_path = os.path.join(self.out_dir, str(num).zfill(3) + '.png')
-                with open(out_path, 'wb') as f:
-                    f.write(data)
+                self.decompress(zf, f_path, num)
                 
                 if self.cb_bar:
                     self.cb_bar(update_bar=True)
 
-                num += 1
-
     def decompress_stickers(self, zip_file: bytes):
-        num = 0
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
             self.cb_msg('Unzipping...')
 
             self.cb_bar(set_progress_mode='determinate', steps=len(self.pack_files))
-            for sticker in self.pack_files:
+            for num, sticker in enumerate(self.pack_files):
                 if self.resource_type in ('ANIMATION', 'ANIMATION_SOUND'):
                     f_path = 'animation@2x/' + str(sticker['id']) + '@2x.png'
                 elif self.resource_type == 'POPUP':
+                    if sticker.get('popup', {}).get('layer') == 'BACKGROUND':
+                        f_path = str(sticker['id']) + '@2x.png'
+                        self.decompress(zf, f_path, num, 'preview-')
                     f_path = 'popup/' + str(sticker['id']) + '.png'
                 else:
                     f_path = str(sticker['id']) + '@2x.png'
-                data = zf.read(f_path)
-                if int(self.pack_id) < 775:
-                    data = ApplePngNormalize.normalize(data)
-                self.cb_msg(f'Read {f_path}')
-                
-                out_path = os.path.join(self.out_dir, str(num).zfill(3) + '.png')
-                with open(out_path, 'wb') as f:
-                    f.write(data)
+                self.decompress(zf, f_path, num)
                 
                 if self.resource_type == 'PER_STICKER_TEXT':
                     self.sticker_text_dict[num] = {
@@ -244,17 +242,10 @@ class DownloadLine(DownloadBase):
                 
                 if self.has_sound:
                     f_path = 'sound/' + str(sticker['id']) + '.m4a'
-                    data = zf.read(f_path)
-                    self.cb_msg(f'Read {f_path}')
-                    
-                    out_path = os.path.join(self.out_dir, str(num).zfill(3) + '.m4a')
-                    with open(out_path, 'wb') as f:
-                        f.write(data)
+                    self.decompress(zf, f_path, num)
                 
                 if self.cb_bar:
                     self.cb_bar(update_bar=True)
-
-                num += 1
             
     def edit_custom_sticker_text(self):
         line_sticker_text_path = os.path.join(self.out_dir, 'line-sticker-text.txt')

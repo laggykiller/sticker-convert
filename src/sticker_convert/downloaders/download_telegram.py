@@ -56,8 +56,7 @@ class DownloadTelegram(DownloadBase):
                 )
 
             emoji_dict = {}
-            num = 0
-            for i in sticker_set.stickers:
+            for num, i in enumerate(sticker_set.stickers):
                 sticker = await i.get_file(
                     read_timeout=30,
                     write_timeout=30,
@@ -79,7 +78,6 @@ class DownloadTelegram(DownloadBase):
                 self.cb_msg(f"Downloaded {f_name}")
                 if self.cb_bar:
                     self.cb_bar(update_bar=True)
-                num += 1
 
             if sticker_set.thumbnail:
                 cover = await sticker_set.thumbnail.get_file(

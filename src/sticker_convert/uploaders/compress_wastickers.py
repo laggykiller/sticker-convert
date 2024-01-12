@@ -58,11 +58,11 @@ class CompressWastickers(UploadBase):
         )
 
         for pack_title, stickers in packs.items():
-            num = 0  # Originally the Sticker Maker application name the files with int(time.time())
+            # Originally the Sticker Maker application name the files with int(time.time())
             with CacheStore.get_cache_store(
                 path=self.opt_comp.cache_dir
             ) as tempdir:
-                for src in stickers:
+                for num, src in enumerate(stickers):
                     self.cb_msg(f"Verifying {src} for compressing into .wastickers")
 
                     if self.fake_vid or CodecInfo.is_anim(src):
@@ -71,7 +71,6 @@ class CompressWastickers(UploadBase):
                         ext = ".png"
 
                     dst = os.path.join(tempdir, str(num) + ext)
-                    num += 1
 
                     if (FormatVerify.check_file(src, spec=self.webp_spec) or
                         FormatVerify.check_file(src, spec=self.png_spec)):
