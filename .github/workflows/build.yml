@@ -113,8 +113,8 @@ jobs:
                 cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
                 # Bundling into appimage
                 ARCH=arm_aarch64 ./appimagetool ./AppDir
-                chmod +x sticker-convert-arm_aarch64.AppImage
-            OUT_FILE_NAME: ./sticker-convert-arm_aarch64.AppImage
+                chmod +x sticker-convert-aarch64.AppImage
+            OUT_FILE_NAME: ./sticker-convert-aarch64.AppImage
     steps:
     - uses: actions/checkout@v3
       with:
