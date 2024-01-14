@@ -1,5 +1,5 @@
 apngasm_python~=1.2.1
-pyav~=12.0.2
+av~=11.0.0
 beautifulsoup4~=4.12.2
 rookiepy~=0.3.6
 imageio~=2.33.1

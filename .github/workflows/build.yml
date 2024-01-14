@@ -20,21 +20,21 @@ jobs:
         token: "${{ secrets.GITHUB_TOKEN }}"
         name: Release ${{ github.ref_name }}
   
-  build-wheel:
-    name: Build wheel
-    needs: createrelease
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          submodules: recursive
+  # build-wheel:
+  #   name: Build wheel
+  #   needs: createrelease
+  #   runs-on: ubuntu-20.04
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #       with:
+  #         submodules: recursive
 
-      - name: Build SDist and wheel
-        run: pipx run build
+  #     - name: Build SDist and wheel
+  #       run: pipx run build
 
-      - uses: actions/upload-artifact@v3
-        with:
-          path: dist/*
+  #     - uses: actions/upload-artifact@v3
+  #       with:
+  #         path: dist/*
 
   build-binary:
     name: Build packages
@@ -83,7 +83,7 @@ jobs:
                 # That would be not possible to be verified by https://appimage.github.io/apps/
                 # Due to https://github.com/AppImage/appimage.github.io/blob/master/code/worker.sh
                 # runtime-fuse2-x86_64 unable to handle xz compression
-                ./appimage-builder --skip-appimage
+                ./appimage-builder --skip-appimage --recipe AppImageBuilder-x86_64.yml
                 # Add .desktop comment
                 sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage/g' ./AppDir/*.desktop
                 # Add appdata.xml
@@ -93,6 +93,28 @@ jobs:
                 ARCH=x86_64 ./appimagetool ./AppDir
                 chmod +x sticker-convert-x86_64.AppImage
             OUT_FILE_NAME: ./sticker-convert-x86_64.AppImage
+          - os: ubuntu-20.04
+            TARGET: linux
+            CMD_BUILD: |
+                sudo apt install -y libpng-dev libxft-dev libfontconfig1-dev libfreetype6-dev
+                wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+                wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+                chmod +x ./appimage-builder
+                chmod +x ./appimagetool
+                # Creating appimage directly with appimage-builder result in xz compression
+                # That would be not possible to be verified by https://appimage.github.io/apps/
+                # Due to https://github.com/AppImage/appimage.github.io/blob/master/code/worker.sh
+                # runtime-fuse2-x86_64 unable to handle xz compression
+                ./appimage-builder --skip-appimage --recipe AppImageBuilder-arm_aarch64.yml
+                # Add .desktop comment
+                sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage/g' ./AppDir/*.desktop
+                # Add appdata.xml
+                mkdir -p AppDir/usr/share/metainfo
+                cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
+                # Bundling into appimage
+                ARCH=arm_aarch64 ./appimagetool ./AppDir
+                chmod +x sticker-convert-arm_aarch64.AppImage
+            OUT_FILE_NAME: ./sticker-convert-arm_aarch64.AppImage
     steps:
     - uses: actions/checkout@v3
       with:
@@ -117,99 +139,99 @@ jobs:
       with:
         files: ${{ matrix.OUT_FILE_NAME }}
 
-  build-docker:
-    name: Build Docker image and push
-    runs-on: ubuntu-latest
+  # build-docker:
+  #   name: Build Docker image and push
+  #   runs-on: ubuntu-latest
 
-    permissions:
-      contents: read
-      packages: write
+  #   permissions:
+  #     contents: read
+  #     packages: write
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+  #     - name: Log in to Docker Hub
+  #       uses: docker/login-action@v2
+  #       with:
+  #         username: ${{ secrets.DOCKER_USERNAME }}
+  #         password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+  #     - name: Login to GitHub Container Registry
+  #       uses: docker/login-action@v2
+  #       with:
+  #         registry: ghcr.io
+  #         username: ${{ github.actor }}
+  #         password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Extract metadata (tags, labels) for Docker (min-cli)
-        id: meta_min_cli
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
-          flavor: |
-            suffix=-min-cli,onlatest=true
+  #     - name: Extract metadata (tags, labels) for Docker (min-cli)
+  #       id: meta_min_cli
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: |
+  #           ${{ github.repository }}
+  #           ghcr.io/${{ github.repository }}
+  #         flavor: |
+  #           suffix=-min-cli,onlatest=true
       
-      - name: Extract metadata (tags, labels) for Docker (min-gui)
-        id: meta_min_gui
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
-          flavor: |
-            suffix=-min-gui,onlatest=true
+  #     - name: Extract metadata (tags, labels) for Docker (min-gui)
+  #       id: meta_min_gui
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: |
+  #           ${{ github.repository }}
+  #           ghcr.io/${{ github.repository }}
+  #         flavor: |
+  #           suffix=-min-gui,onlatest=true
       
-      - name: Extract metadata (tags, labels) for Docker (full)
-        id: meta_full
-        uses: docker/metadata-action@v4
-        with:
-          images: |
-            ${{ github.repository }}
-            ghcr.io/${{ github.repository }}
+  #     - name: Extract metadata (tags, labels) for Docker (full)
+  #       id: meta_full
+  #       uses: docker/metadata-action@v4
+  #       with:
+  #         images: |
+  #           ${{ github.repository }}
+  #           ghcr.io/${{ github.repository }}
     
-      - name: Build and push Docker image (min-cli)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta_min_cli.outputs.tags }}
-          labels: ${{ steps.meta_min_cli.outputs.labels }}
-          target: min-cli
+  #     - name: Build and push Docker image (min-cli)
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ steps.meta_min_cli.outputs.tags }}
+  #         labels: ${{ steps.meta_min_cli.outputs.labels }}
+  #         target: min-cli
       
-      - name: Build and push Docker image (min-gui)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta_min_gui.outputs.tags }}
-          labels: ${{ steps.meta_min_gui.outputs.labels }}
-          target: min-gui
+  #     - name: Build and push Docker image (min-gui)
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ steps.meta_min_gui.outputs.tags }}
+  #         labels: ${{ steps.meta_min_gui.outputs.labels }}
+  #         target: min-gui
 
-      - name: Build and push Docker image (full)
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta_full.outputs.tags }}
-          labels: ${{ steps.meta_full.outputs.labels }}
-          target: full
+  #     - name: Build and push Docker image (full)
+  #       uses: docker/build-push-action@v4
+  #       with:
+  #         context: .
+  #         push: true
+  #         tags: ${{ steps.meta_full.outputs.tags }}
+  #         labels: ${{ steps.meta_full.outputs.labels }}
+  #         target: full
   
-  upload-pypi:
-    name: Upload to pypi
-    needs: [build-wheel, build-binary]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          # unpacks default artifact into dist/
-          # if `name: artifact` is omitted, the action will create extra parent dir
-          name: artifact
-          path: dist
+  # upload-pypi:
+  #   name: Upload to pypi
+  #   needs: [build-wheel, build-binary]
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         # unpacks default artifact into dist/
+  #         # if `name: artifact` is omitted, the action will create extra parent dir
+  #         name: artifact
+  #         path: dist
 
-      - uses: pypa/gh-action-pypi-publish@v1.5.0
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+  #     - uses: pypa/gh-action-pypi-publish@v1.5.0
+  #       with:
+  #         user: __token__
+  #         password: ${{ secrets.PYPI_API_TOKEN }}
