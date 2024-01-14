@@ -113,7 +113,7 @@ jobs:
                 mkdir -p AppDir/usr/share/metainfo
                 cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
                 # Bundling into appimage
-                ARCH=arm_aarch64 ./appimagetool --runtime-file runtime-aarch644 ./AppDir
+                ARCH=arm_aarch64 ./appimagetool --runtime-file ./runtime-aarch64 ./AppDir
                 chmod +x sticker-convert-aarch64.AppImage
             OUT_FILE_NAME: ./sticker-convert-aarch64.AppImage
     steps:
