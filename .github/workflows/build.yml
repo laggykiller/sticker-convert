@@ -98,7 +98,9 @@ jobs:
             CMD_BUILD: |
                 sudo apt install -y libpng-dev libxft-dev libfontconfig1-dev libfreetype6-dev
                 wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
+                wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
                 chmod +x ./appimage-builder
+                chmod +x ./appimagetool
                 # Creating appimage directly with appimage-builder result in xz compression
                 # That would be not possible to be verified by https://appimage.github.io/apps/
                 # Due to https://github.com/AppImage/appimage.github.io/blob/master/code/worker.sh
@@ -110,9 +112,7 @@ jobs:
                 mkdir -p AppDir/usr/share/metainfo
                 cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
                 # Bundling into appimage
-                git clone https://github.com/AppImage/appimagetool.git
-                docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
-                ARCH=aarch64 bash ./appimagetool/ci/build-in-docker.sh
+                ARCH=arm_aarch64 ./appimagetool ./AppDir
                 chmod +x sticker-convert-aarch64.AppImage
             OUT_FILE_NAME: ./sticker-convert-aarch64.AppImage
     steps:
