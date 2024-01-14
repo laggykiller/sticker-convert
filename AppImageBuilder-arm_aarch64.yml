@@ -40,15 +40,11 @@ AppDir:
       key_url: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776
     - sourceline: deb [arch=arm64] http://archive.ubuntu.com/ubuntu/ focal main restricted
       key_url: http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x3b4fe6acc0b21f32
-    - sourceline: deb [arch=arm64] http://archive.ubuntu.com/ubuntu/ focal-updates main restricted
-    - sourceline: deb [arch=arm64] http://archive.ubuntu.com/ubuntu/ focal universe
-    - sourceline: deb [arch=arm64] http://archive.ubuntu.com/ubuntu/ focal-updates universe
-    - sourceline: deb [arch=arm64] http://archive.ubuntu.com/ubuntu/ focal multiverse
-    - sourceline: deb [arch=arm64] http://archive.ubuntu.com/ubuntu/ focal-updates multiverse
-    - sourceline: deb [arch=arm64] http://archive.ubuntu.com/ubuntu/ focal-backports main restricted universe multiverse
-    - sourceline: deb [arch=arm64] http://security.ubuntu.com/ubuntu focal-security main restricted
-    - sourceline: deb [arch=arm64] http://security.ubuntu.com/ubuntu focal-security universe
-    - sourceline: deb [arch=arm64] http://security.ubuntu.com/ubuntu focal-security multiverse
+    - sourceline: deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal main restricted universe multiverse
+    - sourceline: deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-updates main restricted universe multiverse
+    - sourceline: deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-backports main restricted universe multiverse
+    - sourceline: deb [arch=arm64] http://ports.ubuntu.com/ubuntu-ports focal-security main restricted universe multiverse
+    - sourceline: deb [arch=arm64] http://archive.canonical.com/ubuntu focal partner
 
     include:
       - python3.11
