@@ -20,8 +20,8 @@ chmod +x appimage-builder-x86_64.AppImage
 sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
 ```
 3. Clone this repository
-4. Run `appimage-builder` inside the directory containing `AppImageBuilder.yml`
-5. If successful, `sticker-convert-latest-x86_64.AppImage` should be created
+4. Run `appimage-builder --recipe ./AppImageBuilder-x86_64.yml`
+5. If successful, `sticker-convert-x86_64.AppImage` should be created
 
 # Create msi installer
 1. Install [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
