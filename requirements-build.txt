@@ -1,2 +1,2 @@
-nuitka==1.9.7
+nuitka @ git+https://github.com/Nuitka/Nuitka.git@06ef10b14f1129cb5f08359935b149bfdb07edd8
 wheel
