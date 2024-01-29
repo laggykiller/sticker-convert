@@ -602,6 +602,13 @@ class GUI(Window):
                 self.no_compress_var.set(False)
             self.comp_frame.cb_no_compress()
         
+        if os.path.abspath(self.input_setdir_var.get()) == os.path.abspath(self.output_setdir_var.get()):
+            self.input_frame.input_setdir_entry.config(bootstyle='danger')
+            self.output_frame.output_setdir_entry.config(bootstyle='danger')
+        else:
+            self.input_frame.input_setdir_entry.config(bootstyle='default')
+            self.output_frame.output_setdir_entry.config(bootstyle='default')
+        
         # Credentials
         if output_option == 'signal' and not self.signal_uuid_var.get():
             self.cred_frame.signal_uuid_entry.config(bootstyle='warning')
