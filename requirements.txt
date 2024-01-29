@@ -1,4 +1,4 @@
-apngasm_python~=1.2.1
+apngasm_python~=1.2.2
 av~=11.0.0
 beautifulsoup4~=4.12.3
 rookiepy~=0.3.6
