@@ -543,11 +543,18 @@ class GUI(Window):
         # output_option_display = self.get_output_display_name()
         url = self.input_address_var.get()
 
-        # Input
-        if os.path.isdir(self.input_setdir_var.get()):
-            self.input_frame.input_setdir_entry.config(bootstyle='default')
+        if os.path.abspath(self.input_setdir_var.get()) == os.path.abspath(self.output_setdir_var.get()):
+            in_out_dir_same = True
         else:
+            in_out_dir_same = False
+
+        # Input
+        if in_out_dir_same == True:
+            self.input_frame.input_setdir_entry.config(bootstyle='danger')
+        elif not os.path.isdir(self.input_setdir_var.get()):
             self.input_frame.input_setdir_entry.config(bootstyle='warning')
+        else:
+            self.input_frame.input_setdir_entry.config(bootstyle='default')
 
         self.input_frame.address_lbl.config(text=self.input_presets[input_option_display]['address_lbls'])
         self.input_frame.address_entry.config(bootstyle='default')
@@ -574,10 +581,12 @@ class GUI(Window):
                 self.input_frame.address_tip.config(text=f'Detected URL: {download_option}')
 
         # Output
-        if os.path.isdir(self.output_setdir_var.get()):
-            self.output_frame.output_setdir_entry.config(bootstyle='default')
-        else:
+        if in_out_dir_same == True:
+            self.output_frame.output_setdir_entry.config(bootstyle='danger')
+        elif not os.path.isdir(self.output_setdir_var.get()):
             self.output_frame.output_setdir_entry.config(bootstyle='warning')
+        else:
+            self.output_frame.output_setdir_entry.config(bootstyle='default')
 
         if (MetadataHandler.check_metadata_required(output_option, 'title') and
             not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'title') and
@@ -601,13 +610,6 @@ class GUI(Window):
             else:
                 self.no_compress_var.set(False)
             self.comp_frame.cb_no_compress()
-        
-        if os.path.abspath(self.input_setdir_var.get()) == os.path.abspath(self.output_setdir_var.get()):
-            self.input_frame.input_setdir_entry.config(bootstyle='danger')
-            self.output_frame.output_setdir_entry.config(bootstyle='danger')
-        else:
-            self.input_frame.input_setdir_entry.config(bootstyle='default')
-            self.output_frame.output_setdir_entry.config(bootstyle='default')
         
         # Credentials
         if output_option == 'signal' and not self.signal_uuid_var.get():
