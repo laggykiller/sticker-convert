@@ -234,7 +234,7 @@ class StickerConvert:
             if metadata.get('alpha_mode') != '1':
                 frame_format = 'rgb24'
             if metadata.get('codec') == 'vp8':
-                context = CodecContext.create('v8', 'r')
+                context = CodecContext.create('vp8', 'r')
             elif metadata.get('codec') == 'vp9':
                 context = CodecContext.create('libvpx-vp9', 'r')
         
