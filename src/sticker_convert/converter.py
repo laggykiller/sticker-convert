@@ -313,11 +313,11 @@ class StickerConvert:
         # fps_ratio: 1 frame in new anim equal to how many frame in old anim
         # speed_ratio: How much to speed up / slow down
         fps_ratio = self.fps_orig / self.fps
-        if (self.opt_comp.duration_min and
+        if (self.opt_comp.duration_min != None and
             self.duration_orig < self.opt_comp.duration_min):
 
             speed_ratio = self.duration_orig / self.opt_comp.duration_min
-        elif (self.opt_comp.duration_max and
+        elif (self.opt_comp.duration_max != None and
               self.duration_orig > self.opt_comp.duration_max):
             
             speed_ratio = self.duration_orig / self.opt_comp.duration_max
