@@ -74,7 +74,7 @@ class CodecInfo:
                 context = None
                 if metadata.get('video_format') == 'yuv420p':
                     if metadata.get('codec') == 'vp8':
-                        context = CodecContext.create('vp8', 'r')
+                        context = CodecContext.create('libvpx', 'r')
                     elif metadata.get('codec') == 'vp9':
                         context = CodecContext.create('libvpx-vp9', 'r')
 
