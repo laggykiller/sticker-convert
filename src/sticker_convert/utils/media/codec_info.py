@@ -5,6 +5,8 @@ import mimetypes
 from typing import Optional
 
 import imageio.v3 as iio
+import av # type: ignore
+from av.codec.context import CodecContext # type: ignore
 from rlottie_python import LottieAnimation  # type: ignore
 from PIL import Image, UnidentifiedImageError
 import mmap
@@ -66,8 +68,28 @@ class CodecInfo:
                 else:
                     fps = frames / total_duration * 1000
             else:
-                metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
-                fps = metadata.get("fps", 1)
+                # Getting fps from metadata is not reliable
+                # Example: https://github.com/laggykiller/sticker-convert/issues/114
+                metadata = iio.immeta(file, plugin='pyav', exclude_applied=False)
+                context = None
+                if metadata.get('video_format') == 'yuv420p':
+                    if metadata.get('codec') == 'vp8':
+                        context = CodecContext.create('vp8', 'r')
+                    elif metadata.get('codec') == 'vp9':
+                        context = CodecContext.create('libvpx-vp9', 'r')
+
+                with av.open(file) as container:
+                    stream = container.streams.video[0]
+                    if not context:
+                        context = stream.codec_context
+                    
+                    frames = [i for i in container.decode(stream)]
+                    if len(frames) == 1:
+                        fps = 1
+                    else:
+                        # Need to minus one as dts is the start time of frame
+                        # Last frame dts is not last second of frame / whole video
+                        fps = (len(frames) - 1) / (frames[-1].dts * frames[-1].time_base.numerator / frames[-1].time_base.denominator)
 
         return fps
 
