@@ -82,14 +82,17 @@ class CodecInfo:
                     stream = container.streams.video[0]
                     if not context:
                         context = stream.codec_context
-                    
-                    frames = [i for i in container.decode(stream)]
-                    if len(frames) == 1:
+
+                    last_frame = None
+                    for frame_count, frame in enumerate(container.decode(stream)):
+                        last_frame = frame
+                        if frame_count > 10:
+                            break
+
+                    if frame_count <= 1:
                         fps = 1
                     else:
-                        # Need to minus one as dts is the start time of frame
-                        # Last frame dts is not last second of frame / whole video
-                        fps = (len(frames) - 1) / (frames[-1].dts * frames[-1].time_base.numerator / frames[-1].time_base.denominator)
+                        fps = frame_count / (last_frame.pts * last_frame.time_base.numerator / last_frame.time_base.denominator)
 
         return fps
 
