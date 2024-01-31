@@ -288,9 +288,9 @@ class StickerConvert:
                         yuv_array[:, :, 1:] = yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype) - 128
 
                         convert = np.array([
-                            [1.164,  0.000,  2.018],
-                            [1.164, -0.813, -0.391],
-                            [1.164,  1.596,  0.000]
+                            [1.164,  0.000,  1.793],
+                            [1.164, -0.213, -0.533],
+                            [1.164,  2.112,  0.000]
                         ])
                         rgb_array = np.matmul(yuv_array, convert.T).clip(0,255).astype('uint8')
                         rgba_array = np.concatenate((rgb_array, a), axis=2)
