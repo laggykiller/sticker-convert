@@ -30,6 +30,14 @@ def get_step_value(
     else:
         return None
 
+def useful_array(plane, bytes_per_pixel=1, dtype='uint8'):
+    total_line_size = abs(plane.line_size)
+    useful_line_size = plane.width * bytes_per_pixel
+    arr = np.frombuffer(plane, np.uint8)
+    if total_line_size != useful_line_size:
+        arr = arr.reshape(-1, total_line_size)[:, 0:useful_line_size].reshape(-1)
+    return arr.view(np.dtype(dtype))
+
 class StickerConvert:
     MSG_START_COMP = '[I] Start compressing {} -> {}'
     MSG_SKIP_COMP = '[S] Compatible file found, skip compress and just copy {} -> {}'
@@ -225,30 +233,69 @@ class StickerConvert:
                 self.frames_raw.append(frame)
             return
         
-        frame_format = 'rgba'
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
         metadata = iio.immeta(self.in_f, plugin='pyav', exclude_applied=False)
         context = None
         if metadata.get('video_format') == 'yuv420p':
-            if metadata.get('alpha_mode') != '1':
-                frame_format = 'rgb24'
             if metadata.get('codec') == 'vp8':
-                context = CodecContext.create('vp8', 'r')
+                context = CodecContext.create('libvpx', 'r')
             elif metadata.get('codec') == 'vp9':
                 context = CodecContext.create('libvpx-vp9', 'r')
         
         with av.open(self.in_f) as container:
             if not context:
                 context = container.streams.video[0].codec_context
-            for packet in container.demux(video=0):
+
+            for packet in container.demux(container.streams.video):
                 for frame in context.decode(packet):
-                    frame = frame.to_ndarray(format=frame_format)
-                    if frame_format == 'rgb24':
-                        frame = np.dstack(
-                            (frame, np.zeros(frame.shape[:2], dtype=np.uint8)+255)
-                            )
-                    self.frames_raw.append(frame)
+                    if frame.width % 2 != 0:
+                        width = frame.width - 1
+                    else:
+                        width = frame.width
+                    if frame.height % 2 != 0:
+                        height = frame.height - 1
+                    else:
+                        height = frame.height
+                    if frame.format.name == 'yuv420p':
+                        rgb_array = frame.to_ndarray(format='rgb24')
+                        rgba_array = np.dstack(
+                            (rgb_array, np.zeros(frame.shape[:2], dtype=np.uint8) + 255)
+                        )
+                    else:
+                        # yuva420p may cause crash
+                        # https://github.com/laggykiller/sticker-convert/issues/114
+                        frame = frame.reformat(width=width, height=height, format='yuva420p', dst_colorspace=1)
+
+                        # https://stackoverflow.com/questions/72308308/converting-yuv-to-rgb-in-python-coefficients-work-with-array-dont-work-with-n
+                        y = useful_array(frame.planes[0]).reshape(height, width)
+                        u = useful_array(frame.planes[1]).reshape(height // 2, width // 2)
+                        v = useful_array(frame.planes[2]).reshape(height // 2, width // 2)
+                        a = useful_array(frame.planes[3]).reshape(height, width)
+
+                        u = u.repeat(2, axis=0).repeat(2, axis=1)
+                        v = v.repeat(2, axis=0).repeat(2, axis=1)
+
+                        y = y.reshape((y.shape[0], y.shape[1], 1))
+                        u = u.reshape((u.shape[0], u.shape[1], 1))
+                        v = v.reshape((v.shape[0], v.shape[1], 1))
+                        a = a.reshape((a.shape[0], a.shape[1], 1))
+
+                        yuv_array = np.concatenate((y, u, v), axis=2)
+
+                        yuv_array = yuv_array.astype(np.float32)
+                        yuv_array[:, :, 0] = yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype) - 16
+                        yuv_array[:, :, 1:] = yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype) - 128
+
+                        convert = np.array([
+                            [1.164,  0.000,  2.018],
+                            [1.164, -0.813, -0.391],
+                            [1.164,  1.596,  0.000]
+                        ])
+                        rgb_array = np.matmul(yuv_array, convert.T).clip(0,255).astype('uint8')
+                        rgba_array = np.concatenate((rgb_array, a), axis=2)
+
+                        self.frames_raw.append(rgba_array)
 
     def frames_import_lottie(self):
         if self.in_f_ext == '.tgs':
