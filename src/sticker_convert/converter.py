@@ -416,9 +416,13 @@ class StickerConvert:
             codec = 'apng'
             pixel_format = 'rgba'
             options['plays'] = '0'
-        else:
+        elif self.out_f_ext in ('.webp', '.webm', '.mkv'):
             codec = 'vp9'
             pixel_format = 'yuva420p'
+            options['loop'] = '0'
+        else:
+            codec = 'libx264'
+            pixel_format = 'yuv420p'
             options['loop'] = '0'
         
         with av.open(self.tmp_f, 'w', format=self.out_f_ext.replace('.', '')) as output:
