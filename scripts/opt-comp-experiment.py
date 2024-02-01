@@ -82,8 +82,8 @@ def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
 
 def generate_random_png(res: int, out_f: str):
     im_numpy = numpy.random.rand(res, res, 4) * 255
-    im = Image.fromarray(im_numpy, 'RGBA')
-    im.save(out_f)
+    with Image.fromarray(im_numpy, 'RGBA') as im:
+        im.save(out_f)
 
 def compress_worker(jobs_queue: Queue, results_queue: Queue):
     for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None):

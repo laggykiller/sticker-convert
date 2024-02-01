@@ -52,6 +52,7 @@ class CompOption(BaseOption):
         else:
             self.fps_min = to_int(fps)
             self.fps_max = to_int(fps)
+        self.fps_power = fps.get('power') if fps.get('power') else 1.0
         
         self.res_w_min = None
         self.res_w_max = None
@@ -91,6 +92,7 @@ class CompOption(BaseOption):
             self.res_w_max = to_int(res)
             self.res_h_min = to_int(res)
             self.res_h_max = to_int(res)
+        self.res_power = res.get('power') if res.get('power') else 1.0
         
         quality = comp_config_dict.get('quality')
         if isinstance(quality, dict):
@@ -99,6 +101,7 @@ class CompOption(BaseOption):
         else:
             self.quality_min = to_int(quality)
             self.quality_max = to_int(quality)
+        self.quality_power = quality.get('power') if quality.get('power') else 1.0
         
         color = comp_config_dict.get('color')
         if isinstance(color, dict):
@@ -107,6 +110,7 @@ class CompOption(BaseOption):
         else:
             self.color_min = to_int(color)
             self.color_max = to_int(color)
+        self.color_power = color.get('power') if color.get('power') else 1.0
         
         duration = comp_config_dict.get('duration')
         if isinstance(duration, dict):
@@ -118,6 +122,7 @@ class CompOption(BaseOption):
         
         self.steps = to_int(comp_config_dict.get('steps'))
         self.fake_vid = comp_config_dict.get('fake_vid')
+        self.quantize_method = comp_config_dict.get('quantize_method', 'imagequant')
         self.scale_filter = comp_config_dict.get('scale_filter', 'lanczos')
         self.cache_dir = comp_config_dict.get('cache_dir')
         self.default_emoji = comp_config_dict.get('default_emoji')
@@ -141,7 +146,8 @@ class CompOption(BaseOption):
             },
             'fps': {
                 'min': self.fps_min,
-                'max': self.fps_max
+                'max': self.fps_max,
+                'power': self.fps_power
             },
             'res': {
                 'w': {
@@ -151,15 +157,18 @@ class CompOption(BaseOption):
                 'h': {
                     'min': self.res_h_min,
                     'max': self.res_h_max
-                }
+                },
+                'power': self.res_power
             },
             'quality': {
                 'min': self.quality_min,
-                'max': self.quality_max
+                'max': self.quality_max,
+                'power': self.quality_power
             },
             'color': {
                 'min': self.color_min,
-                'max': self.color_max
+                'max': self.color_max,
+                'power': self.color_power
             },
             'duration': {
                 'min': self.duration_min,

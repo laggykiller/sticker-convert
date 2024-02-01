@@ -10,7 +10,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 30
+            "max": 30,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -20,15 +21,18 @@
             "h": {
                 "min": 512,
                 "max": 512
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -37,6 +41,7 @@
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "signal": {
@@ -50,25 +55,29 @@
         },
         "fps": {
             "min": 1,
-            "max": 30
+            "max": 30,
+            "power": -0.5
         },
         "res": {
             "w": {
-                "min": 256,
+                "min": 128,
                 "max": 512
             },
             "h": {
-                "min": 256,
+                "min": 128,
                 "max": 512
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -77,6 +86,7 @@
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "telegram": {
@@ -90,7 +100,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 30
+            "max": 30,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -100,15 +111,18 @@
             "h": {
                 "min": 512,
                 "max": 512
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -117,6 +131,7 @@
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "whatsapp": {
@@ -130,7 +145,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 30
+            "max": 30,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -140,15 +156,18 @@
             "h": {
                 "min": 512,
                 "max": 512
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 8,
@@ -157,6 +176,7 @@
         "steps": 16,
         "fake_vid": true,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "line": {
@@ -170,7 +190,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 60
+            "max": 60,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -180,15 +201,18 @@
             "h": {
                 "min": 100,
                 "max": 320
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 83,
@@ -197,6 +221,7 @@
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "kakao": {
@@ -210,7 +235,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 60
+            "max": 60,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -220,15 +246,18 @@
             "h": {
                 "min": 360,
                 "max": 360
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -237,6 +266,7 @@
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "imessage_small": {
@@ -250,7 +280,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 60
+            "max": 60,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -260,15 +291,18 @@
             "h": {
                 "min": 300,
                 "max": 300
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -277,6 +311,7 @@
         "steps": 8,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "imessage_medium": {
@@ -290,7 +325,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 60
+            "max": 60,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -300,15 +336,18 @@
             "h": {
                 "min": 408,
                 "max": 408
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -317,6 +356,7 @@
         "steps": 8,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "imessage_large": {
@@ -330,7 +370,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 60
+            "max": 60,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -340,15 +381,18 @@
             "h": {
                 "min": 618,
                 "max": 618
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -357,6 +401,7 @@
         "steps": 8,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
     "custom": {
@@ -370,7 +415,8 @@
         },
         "fps": {
             "min": 1,
-            "max": 30
+            "max": 30,
+            "power": -0.5
         },
         "res": {
             "w": {
@@ -380,15 +426,18 @@
             "h": {
                 "min": 512,
                 "max": 512
-            }
+            },
+            "power": 3
         },
         "quality": {
             "min": 50,
-            "max": 95
+            "max": 95,
+            "power": 5
         },
         "color": {
             "min": 50,
-            "max": 257
+            "max": 257,
+            "power": 2
         },
         "duration": {
             "min": 0,
@@ -397,6 +446,7 @@
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
         "default_emoji": "😀"
     }
 }

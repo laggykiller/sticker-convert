@@ -108,6 +108,24 @@ class AdvancedCompressionWindow(BaseWindow):
         self.vid_format_entry = Entry(self.frame_advcomp, textvariable=self.gui.vid_format_var, width=8)
         self.vid_format_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
 
+        self.power_help_btn1 = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['fps_power']), bootstyle='secondary')
+        self.power_lbl1 = Label(self.frame_advcomp, text='Power (Importance)')
+        self.fps_power_lbl = Label(self.frame_advcomp, text='FPS:')
+        self.fps_power_entry = Entry(self.frame_advcomp, textvariable=self.gui.fps_power_var, width=8)
+        self.fps_power_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
+        self.res_power_lbl = Label(self.frame_advcomp, text='Res:')
+        self.res_power_entry = Entry(self.frame_advcomp, textvariable=self.gui.res_power_var, width=8)
+        self.res_power_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
+
+        self.power_help_btn2 = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['fps_power']), bootstyle='secondary')
+        self.power_lbl2 = Label(self.frame_advcomp, text='Power (Importance)')
+        self.quality_power_lbl = Label(self.frame_advcomp, text='Quality:')
+        self.quality_power_entry = Entry(self.frame_advcomp, textvariable=self.gui.quality_power_var, width=8)
+        self.quality_power_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
+        self.color_power_lbl = Label(self.frame_advcomp, text='Color:')
+        self.color_power_entry = Entry(self.frame_advcomp, textvariable=self.gui.color_power_var, width=8)
+        self.color_power_entry.bind('<Button-3><ButtonRelease-3>', RightClicker)
+
         self.fake_vid_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['fake_vid']), bootstyle='secondary')
         self.fake_vid_lbl = Label(self.frame_advcomp, text='Convert (faking) image to video')
         self.fake_vid_cbox = Checkbutton(self.frame_advcomp, variable=self.gui.fake_vid_var, onvalue=True, offvalue=False, bootstyle='success-round-toggle')
@@ -115,6 +133,10 @@ class AdvancedCompressionWindow(BaseWindow):
         self.scale_filter_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['scale_filter']), bootstyle='secondary')
         self.scale_filter_lbl = Label(self.frame_advcomp, text='Scale filter')
         self.scale_filter_opt = OptionMenu(self.frame_advcomp, self.gui.scale_filter_var, self.gui.scale_filter_var.get(), 'nearest', 'bilinear', 'bicubic', 'lanczos', bootstyle='secondary')
+
+        self.quantize_method_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['quantize_method']), bootstyle='secondary')
+        self.quantize_method_lbl = Label(self.frame_advcomp, text='Quantize method')
+        self.quantize_method_opt = OptionMenu(self.frame_advcomp, self.gui.quantize_method_var, self.gui.quantize_method_var.get(), 'imagequant', 'fastoctree', 'none', bootstyle='secondary')
 
         self.cache_dir_help_btn = Button(self.frame_advcomp, text='?', width=1, command=lambda: cb_msg_block_adv_comp_win(self.gui.help['comp']['cache_dir']), bootstyle='secondary')
         self.cache_dir_lbl = Label(self.frame_advcomp, text='Custom cache directory')
@@ -190,21 +212,39 @@ class AdvancedCompressionWindow(BaseWindow):
         self.vid_format_lbl.grid(column=4, row=9, sticky='w', padx=3, pady=3)
         self.vid_format_entry.grid(column=5, row=9, sticky='nes', padx=3, pady=3)
 
-        self.fake_vid_help_btn.grid(column=0, row=10, sticky='w', padx=3, pady=3)
-        self.fake_vid_lbl.grid(column=1, row=10, sticky='w', padx=3, pady=3)
-        self.fake_vid_cbox.grid(column=6, row=10, sticky='nes', padx=3, pady=3)
+        self.power_help_btn1.grid(column=0, row=10, sticky='w', padx=3, pady=3)
+        self.power_lbl1.grid(column=1, row=10, sticky='w', padx=3, pady=3)
+        self.fps_power_lbl.grid(column=2, row=10, sticky='w', padx=3, pady=3)
+        self.fps_power_entry.grid(column=3, row=10, sticky='w', padx=3, pady=3)
+        self.res_power_lbl.grid(column=4, row=10, sticky='w', padx=3, pady=3)
+        self.res_power_entry.grid(column=5, row=10, sticky='w', padx=3, pady=3)
 
-        self.scale_filter_help_btn.grid(column=0, row=11, sticky='w', padx=3, pady=3)
-        self.scale_filter_lbl.grid(column=1, row=11, sticky='w', padx=3, pady=3)
-        self.scale_filter_opt.grid(column=2, row=11, columnspan=4, sticky='nes', padx=3, pady=3)
+        self.power_help_btn2.grid(column=0, row=11, sticky='w', padx=3, pady=3)
+        self.power_lbl2.grid(column=1, row=11, sticky='w', padx=3, pady=3)
+        self.quality_power_lbl.grid(column=2, row=11, sticky='w', padx=3, pady=3)
+        self.quality_power_entry.grid(column=3, row=11, sticky='w', padx=3, pady=3)
+        self.color_power_lbl.grid(column=4, row=11, sticky='w', padx=3, pady=3)
+        self.color_power_entry.grid(column=5, row=11, sticky='w', padx=3, pady=3)
 
-        self.cache_dir_help_btn.grid(column=0, row=12, sticky='w', padx=3, pady=3)
-        self.cache_dir_lbl.grid(column=1, row=12, sticky='w', padx=3, pady=3)
-        self.cache_dir_entry.grid(column=2, row=12, columnspan=4, sticky='nes', padx=3, pady=3)
+        self.fake_vid_help_btn.grid(column=0, row=12, sticky='w', padx=3, pady=3)
+        self.fake_vid_lbl.grid(column=1, row=12, sticky='w', padx=3, pady=3)
+        self.fake_vid_cbox.grid(column=6, row=12, sticky='nes', padx=3, pady=3)
 
-        self.default_emoji_help_btn.grid(column=0, row=13, sticky='w', padx=3, pady=3)
-        self.default_emoji_lbl.grid(column=1, row=13, sticky='w', padx=3, pady=3)
-        self.default_emoji_dsp.grid(column=6, row=13, sticky='nes', padx=3, pady=3)
+        self.scale_filter_help_btn.grid(column=0, row=13, sticky='w', padx=3, pady=3)
+        self.scale_filter_lbl.grid(column=1, row=13, sticky='w', padx=3, pady=3)
+        self.scale_filter_opt.grid(column=2, row=13, columnspan=4, sticky='nes', padx=3, pady=3)
+
+        self.quantize_method_help_btn.grid(column=0, row=14, sticky='w', padx=3, pady=3)
+        self.quantize_method_lbl.grid(column=1, row=14, sticky='w', padx=3, pady=3)
+        self.quantize_method_opt.grid(column=2, row=14, columnspan=4, sticky='nes', padx=3, pady=3)
+
+        self.cache_dir_help_btn.grid(column=0, row=15, sticky='w', padx=3, pady=3)
+        self.cache_dir_lbl.grid(column=1, row=15, sticky='w', padx=3, pady=3)
+        self.cache_dir_entry.grid(column=2, row=15, columnspan=4, sticky='nes', padx=3, pady=3)
+
+        self.default_emoji_help_btn.grid(column=0, row=16, sticky='w', padx=3, pady=3)
+        self.default_emoji_lbl.grid(column=1, row=16, sticky='w', padx=3, pady=3)
+        self.default_emoji_dsp.grid(column=6, row=16, sticky='nes', padx=3, pady=3)
 
         # https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
         # Create a frame for the canvas with non-zero row&column weights

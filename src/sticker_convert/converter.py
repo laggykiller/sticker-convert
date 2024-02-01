@@ -4,15 +4,8 @@ import io
 from multiprocessing.queues import Queue as QueueType
 from typing import Optional, Union
 
-import imageio.v3 as iio
-from rlottie_python import LottieAnimation # type: ignore
-from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
 import numpy as np
 from PIL import Image
-import av # type: ignore
-from av.codec.context import CodecContext # type: ignore
-import webp # type: ignore
-import oxipng
 
 from .utils.media.codec_info import CodecInfo # type: ignore
 from .utils.files.cache_store import CacheStore # type: ignore
@@ -22,11 +15,21 @@ from .job_option import CompOption
 
 def get_step_value(
         max: Optional[int], min: Optional[int],
-        step: int, steps: int
-        ) -> Optional[int]:
+        step: int, steps: int,
+        power: int
+    ) -> Optional[int]:
+    # Power should be between -1 and positive infinity
+    # Smaller power = More 'importance' of the parameter
+    # Power of 1 is linear relationship
+    # e.g. fps has lower power -> Try not to reduce it early on
+
+    if step > 0:
+        factor = pow(step / steps, power)
+    else:
+        factor = 0
     
-    if max and min:
-        return round((max - min) * step / steps + min)
+    if max != None and min != None:
+        return round((max - min) * step / steps * factor + min)
     else:
         return None
 
@@ -98,7 +101,7 @@ class StickerConvert:
         self.result_size = 0
         self.result_step = None
 
-        self.apngasm = APNGAsm() # type: ignore[call-arg]
+        self.apngasm = None
 
     def convert(self) -> tuple[bool, str, Union[None, bytes, str], int]:
         if (FormatVerify.check_format(self.in_f, fmt=self.out_f_ext) and
@@ -119,11 +122,11 @@ class StickerConvert:
         steps_list = []
         for step in range(self.opt_comp.steps, -1, -1):
             steps_list.append((
-                get_step_value(self.opt_comp.res_w_max, self.opt_comp.res_w_min, step, self.opt_comp.steps),
-                get_step_value(self.opt_comp.res_h_max, self.opt_comp.res_h_min, step, self.opt_comp.steps),
-                get_step_value(self.opt_comp.quality_max, self.opt_comp.quality_min, step, self.opt_comp.steps),
-                get_step_value(self.opt_comp.fps_max, self.opt_comp.fps_min, step, self.opt_comp.steps),
-                get_step_value(self.opt_comp.color_max, self.opt_comp.color_min, step, self.opt_comp.steps)
+                get_step_value(self.opt_comp.res_w_max, self.opt_comp.res_w_min, step, self.opt_comp.steps, self.opt_comp.res_power),
+                get_step_value(self.opt_comp.res_h_max, self.opt_comp.res_h_min, step, self.opt_comp.steps, self.opt_comp.res_power),
+                get_step_value(self.opt_comp.quality_max, self.opt_comp.quality_min, step, self.opt_comp.steps, self.opt_comp.quality_power),
+                get_step_value(self.opt_comp.fps_max, self.opt_comp.fps_min, step, self.opt_comp.steps, self.opt_comp.fps_power),
+                get_step_value(self.opt_comp.color_max, self.opt_comp.color_min, step, self.opt_comp.steps, self.opt_comp.color_power)
             ))
 
         step_lower = 0
@@ -148,7 +151,7 @@ class StickerConvert:
             msg = self.MSG_COMP.format(
                     self.in_f_name, self.out_f_name,
                     self.res_w, self.res_h,
-                    self.quality, self.fps, self.color, 
+                    self.quality, int(self.fps), self.color, 
                     step_lower, step_current, step_upper
                 )
             self.cb_msg.put(msg)
@@ -221,31 +224,35 @@ class StickerConvert:
 
     def frames_import(self):
         if self.in_f_ext in ('.tgs', '.lottie', '.json'):
-            self.frames_import_lottie()
+            self._frames_import_lottie()
+        elif self.in_f_ext in ('.webp', '.apng', 'png'):
+            # ffmpeg do not support webp decoding (yet)
+            # ffmpeg could fail to decode apng if file is buggy
+            self._frames_import_pillow()
         else:
-            self.frames_import_imageio()
+            self._frames_import_pyav()
 
-    def frames_import_imageio(self):
-        # ffmpeg do not support webp decoding (yet)
-        # ffmpeg could fail to decode apng if file is buggy
-        if self.in_f_ext in ('.webp', '.apng', 'png'):
-            for frame in iio.imiter(self.in_f, plugin='pillow', mode='RGBA'):
-                self.frames_raw.append(frame)
-            return
-        
+    def _frames_import_pillow(self):
+        with Image.open(self.in_f, mode='RGBA') as im:
+            if 'n_frames'in im.__dir__():
+                for i in range(im.n_frames):
+                    im.seek(i)
+                    self.frames_raw.append(im.copy().asarray())
+            else:
+                self.frames_raw.append(im.copy().asarray())
+    
+    def _frames_import_pyav(self):
+        import av # type: ignore
+        from av.codec.context import CodecContext # type: ignore
+
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
-        metadata = iio.immeta(self.in_f, plugin='pyav', exclude_applied=False)
-        context = None
-        if metadata.get('video_format') == 'yuv420p':
-            if metadata.get('codec') == 'vp8':
-                context = CodecContext.create('libvpx', 'r')
-            elif metadata.get('codec') == 'vp9':
-                context = CodecContext.create('libvpx-vp9', 'r')
-        
         with av.open(self.in_f) as container:
-            if not context:
-                context = container.streams.video[0].codec_context
+            context = container.streams.video[0].codec_context
+            if context.name == 'vp8':
+                context = CodecContext.create('libvpx', 'r')
+            elif context.name == 'vp9':
+                context = CodecContext.create('libvpx-vp9', 'r')
 
             for packet in container.demux(container.streams.video):
                 for frame in context.decode(packet):
@@ -297,7 +304,9 @@ class StickerConvert:
 
                         self.frames_raw.append(rgba_array)
 
-    def frames_import_lottie(self):
+    def _frames_import_lottie(self):
+        from rlottie_python import LottieAnimation # type: ignore
+        
         if self.in_f_ext == '.tgs':
             anim = LottieAnimation.from_tgs(self.in_f)
         else:
@@ -315,39 +324,40 @@ class StickerConvert:
     def frames_resize(self, frames_in: list[np.ndarray]) -> list[np.ndarray]:
         frames_out = []
 
+        if self.opt_comp.scale_filter == 'nearest':
+            resample = Image.NEAREST
+        elif self.opt_comp.scale_filter == 'bilinear':
+            resample = Image.BILINEAR
+        elif self.opt_comp.scale_filter == 'bicubic':
+            resample = Image.BICUBIC
+        elif self.opt_comp.scale_filter == 'lanczos':
+            resample = Image.LANCZOS
+        else:
+            resample = Image.LANCZOS
+
         for frame in frames_in:
-            im = Image.fromarray(frame, 'RGBA')
-            width, height = im.size
+            with Image.fromarray(frame, 'RGBA') as im:
+                width, height = im.size
 
-            if self.res_w == None:
-                self.res_w = width
-            if self.res_h == None:
-                self.res_h = height
+                if self.res_w == None:
+                    self.res_w = width
+                if self.res_h == None:
+                    self.res_h = height
 
-            if width > height:
-                width_new = self.res_w
-                height_new = height * self.res_w // width
-            else:
-                height_new = self.res_h
-                width_new = width * self.res_h // height
-            
-            if self.opt_comp.scale_filter == 'nearest':
-                resample = Image.NEAREST
-            elif self.opt_comp.scale_filter == 'bilinear':
-                resample = Image.BILINEAR
-            elif self.opt_comp.scale_filter == 'bicubic':
-                resample = Image.BICUBIC
-            elif self.opt_comp.scale_filter == 'lanczos':
-                resample = Image.LANCZOS
-            else:
-                resample = Image.LANCZOS
+                if width > height:
+                    width_new = self.res_w
+                    height_new = height * self.res_w // width
+                else:
+                    height_new = self.res_h
+                    width_new = width * self.res_h // height
 
-            im = im.resize((width_new, height_new), resample=resample)
-            im_new = Image.new('RGBA', (self.res_w, self.res_h), (0, 0, 0, 0))
-            im_new.paste(
-                im, ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2)
-                )
-            frames_out.append(np.asarray(im_new))
+                with (im.resize((width_new, height_new), resample=resample) as im_resized,
+                      Image.new('RGBA', (self.res_w, self.res_h), (0, 0, 0, 0)) as im_new):
+                    
+                    im_new.paste(
+                        im_resized, ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2)
+                    )
+                    frames_out.append(np.asarray(im_new))
         
         return frames_out
     
@@ -382,25 +392,27 @@ class StickerConvert:
 
     def frames_export(self):
         if self.out_f_ext in ('.apng', '.png') and self.fps:
-            self.frames_export_apng()
+            self._frames_export_apng()
         elif self.out_f_ext == '.png':
-            self.frames_export_png()
+            self._frames_export_png()
         elif self.out_f_ext == '.webp' and self.fps:
-            self.frames_export_webp()
+            self._frames_export_webp()
         elif self.fps:
-            self.frames_export_pyav()
+            self._frames_export_pyav()
         else:
-            self.frames_export_pil()
+            self._frames_export_pil()
     
-    def frames_export_pil(self):
-        image = Image.fromarray(self.frames_processed[0])
-        image.save(
-            self.tmp_f,
-            format=self.out_f_ext.replace('.', ''),
-            quality=self.quality
-        )
+    def _frames_export_pil(self):
+        with Image.fromarray(self.frames_processed[0]) as im:
+            im.save(
+                self.tmp_f,
+                format=self.out_f_ext.replace('.', ''),
+                quality=self.quality
+            )
 
-    def frames_export_pyav(self):
+    def _frames_export_pyav(self):
+        import av # type: ignore
+
         options = {}
         
         if isinstance(self.quality, int):
@@ -417,7 +429,7 @@ class StickerConvert:
             pixel_format = 'rgba'
             options['plays'] = '0'
         elif self.out_f_ext in ('.webp', '.webm', '.mkv'):
-            codec = 'vp9'
+            codec = 'libvpx-vp9'
             pixel_format = 'yuva420p'
             options['loop'] = '0'
         else:
@@ -439,7 +451,9 @@ class StickerConvert:
             for packet in out_stream.encode():
                 output.mux(packet)
     
-    def frames_export_webp(self):
+    def _frames_export_webp(self):
+        import webp # type: ignore
+
         config = webp.WebPConfig.new(quality=self.quality)
         enc = webp.WebPAnimEncoder.new(self.res_w, self.res_h)
         timestamp_ms = 0
@@ -449,26 +463,35 @@ class StickerConvert:
             timestamp_ms += int(1 / self.fps * 1000)
         anim_data = enc.assemble(timestamp_ms)
         self.tmp_f.write(anim_data.buffer())
+    
+    def _frames_export_png(self):
+        import oxipng
 
-    def frames_export_png(self):
-        image = Image.fromarray(self.frames_processed[0], 'RGBA')
-        if self.color and self.color <= 256:
-            image_quant = image.quantize(colors=self.color, method=2)
-        else:
-            image_quant = image
+        with Image.fromarray(self.frames_processed[0], 'RGBA') as image:
+            if self.color and self.color <= 256:
+                image_quant = self.quantize(image)
+            else:
+                image_quant = image.copy()
+
         with io.BytesIO() as f:
             image_quant.save(f, format='png')
             f.seek(0)
             frame_optimized = oxipng.optimize_from_memory(f.read(), level=4)
             self.tmp_f.write(frame_optimized)
 
-    def frames_export_apng(self):
+    def _frames_export_apng(self):
+        import oxipng
+        from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
+
         frames_concat = np.concatenate(self.frames_processed)
-        image_concat = Image.fromarray(frames_concat, 'RGBA')
-        if self.color and self.color <= 256:
-            image_quant = image_concat.quantize(colors=self.color, method=2)
-        else:
-            image_quant = image_concat
+        with Image.fromarray(frames_concat, 'RGBA') as image_concat:
+            if self.color and self.color <= 256:
+                image_quant = self.quantize(image_concat)
+            else:
+                image_quant = image_concat.copy()
+
+        if self.apngasm == None:
+            self.apngasm = APNGAsm()
 
         for i in range(0, image_quant.height, self.res_h):
             with io.BytesIO() as f:
@@ -477,12 +500,13 @@ class StickerConvert:
                 image_cropped.save(f, format='png')
                 f.seek(0)
                 frame_optimized = oxipng.optimize_from_memory(f.read(), level=4)
-            image_final = Image.open(io.BytesIO(frame_optimized)).convert('RGBA')
+            with Image.open(io.BytesIO(frame_optimized)) as im:
+                image_final = im.convert('RGBA')
             frame_final = create_frame_from_rgba(
                 np.array(image_final),
                 image_final.width,
                 image_final.height
-                )
+            )
             frame_final.delay_num = int(1000 / self.fps)
             frame_final.delay_den = 1000
             self.apngasm.add_frame(frame_final)
@@ -494,3 +518,34 @@ class StickerConvert:
                 self.tmp_f.write(f.read())
 
         self.apngasm.reset()
+
+    def quantize(self, image: Image.Image) -> Image.Image:
+        if self.opt_comp.quantize_method == 'imagequant':
+            return self._quantize_by_imagequant(image)
+        elif self.opt_comp.quantize_method == 'fastoctree':
+            return self._quantize_by_fastoctree(image)
+        else:
+            return image
+
+    def _quantize_by_imagequant(self, image: Image.Image) -> Image.Image:
+        import imagequant
+
+        dither = 1 - (self.quality - self.opt_comp.quality_min) / (self.opt_comp.quality_max - self.opt_comp.quality_min)
+        image_quant = None
+        for i in range(self.quality, 101, 5):
+            try:
+                image_quant = imagequant.quantize_pil_image(
+                    image,
+                    dithering_level=dither,
+                    max_colors=self.color,
+                    min_quality=self.opt_comp.quality_min,
+                    max_quality=i
+                )
+                return image_quant
+            except RuntimeError:
+                pass
+        
+        return image
+
+    def _quantize_by_fastoctree(self, image: Image.Image) -> Image.Image:
+        return image.quantize(colors=self.color, method=2)

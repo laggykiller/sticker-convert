@@ -1,16 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 import os
+import mmap
 import mimetypes
 from typing import Optional
 
-import imageio.v3 as iio
-import av # type: ignore
-from av.codec.context import CodecContext # type: ignore
-from rlottie_python import LottieAnimation  # type: ignore
 from PIL import Image, UnidentifiedImageError
-import mmap
-
 
 class CodecInfo:
     def __init__(self):
@@ -27,138 +22,182 @@ class CodecInfo:
     def get_file_fps(file: str) -> float:
         file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext in ".tgs":
-            with LottieAnimation.from_tgs(file) as anim:
-                fps = anim.lottie_animation_get_framerate()
+        if file_ext == ".tgs":
+            return CodecInfo._get_file_fps_tgs(file)
+        elif file_ext == ".webp":
+            frames, duration = CodecInfo._get_file_frames_duration_webp(file)
+        elif file_ext in (".gif", ".apng", ".png"):
+            frames, duration = CodecInfo._get_file_frames_duration_pillow(file)
         else:
-            if file_ext == ".webp":
-                total_duration = 0
-                frames = 0
-                
-                with open(file, "r+b") as f:
-                    mm = mmap.mmap(f.fileno(), 0)
-                    while True:
-                        anmf_pos = mm.find(b"ANMF")
-                        if anmf_pos == -1:
-                            break
-                        mm.seek(anmf_pos + 20)
-                        frame_duration_32 = mm.read(4)
-                        frame_duration = frame_duration_32[:-1] + bytes(
-                            int(frame_duration_32[-1]) & 0b11111100
-                        )
-                        total_duration += int.from_bytes(frame_duration, "little")
-                        frames += 1
-                
-                if frames == 0:
-                    fps = 1
-                else:
-                    fps = frames / total_duration * 1000
-            elif file_ext in (".gif", ".apng", ".png"):
-                total_duration = 0
-                frames = len([* iio.imiter(file, plugin="pillow")])
+            frames, duration = CodecInfo._get_file_frames_duration_av(file, frames_to_iterate=10)
+            
+        return frames / duration * 1000
+    
+    @staticmethod
+    def get_file_frames(file: str) -> int:
+        file_ext = CodecInfo.get_file_ext(file)
 
-                for frame in range(frames):
-                    metadata = iio.immeta(
-                        file, index=frame, plugin="pillow", exclude_applied=False
-                    )
-                    total_duration += metadata.get("duration", 1000)
-                
-                if frames == 0 or total_duration == 0:
-                    fps = 1
-                else:
-                    fps = frames / total_duration * 1000
+        if file_ext == ".tgs":
+            return CodecInfo._get_file_frames_tgs(file)
+        elif file_ext in (".gif", ".webp", ".png", ".apng"):
+            frames, _ = CodecInfo._get_file_frames_duration_pillow(file, frames_only=True)
+        else:
+            frames, _ = CodecInfo._get_file_frames_duration_av(file)
+
+        return frames
+
+    @staticmethod
+    def get_file_duration(file: str) -> int:
+        # Return duration in miliseconds
+        file_ext = CodecInfo.get_file_ext(file)
+
+        if file_ext == ".tgs":
+            return CodecInfo._get_file_duration_tgs(file)
+        elif file_ext == ".webp":
+            _, duration = CodecInfo._get_file_frames_duration_webp(file)
+        elif file_ext in (".gif", ".png", ".apng"):
+            _, duration = CodecInfo._get_file_frames_duration_pillow(file)
+        else:
+            _, duration = CodecInfo._get_file_frames_duration_av(file)
+        
+        return duration
+    
+    @staticmethod
+    def _get_file_fps_tgs(file: str) -> int:
+        from rlottie_python import LottieAnimation  # type: ignore
+
+        with LottieAnimation.from_tgs(file) as anim:
+            return anim.lottie_animation_get_framerate()
+
+    @staticmethod    
+    def _get_file_frames_tgs(file: str) -> int:
+        from rlottie_python import LottieAnimation  # type: ignore
+
+        with LottieAnimation.from_tgs(file) as anim:
+            return anim.lottie_animation_get_totalframe()
+    
+    @staticmethod
+    def _get_file_duration_tgs(file: str) -> int:
+        from rlottie_python import LottieAnimation  # type: ignore
+
+        with LottieAnimation.from_tgs(file) as anim:
+            fps = anim.lottie_animation_get_framerate()
+            frames = anim.lottie_animation_get_totalframe()
+
+        return int(frames / fps * 1000)
+    
+    @staticmethod
+    def _get_file_frames_duration_pillow(file: str, frames_only: bool = False) -> tuple[int, int]:
+        total_duration = 0
+
+        with Image.open(file) as im:
+            if 'n_frames' in im.__dir__():
+                frames = im.n_frames
+                if frames_only == True:
+                    return frames, 1
+                for i in range(im.n_frames):
+                    im.seek(i)
+                    total_duration += im.info.get('duration', 1000)
+                return frames, total_duration
             else:
-                # Getting fps from metadata is not reliable
-                # Example: https://github.com/laggykiller/sticker-convert/issues/114
-                metadata = iio.immeta(file, plugin='pyav', exclude_applied=False)
-                context = None
-                if metadata.get('video_format') == 'yuv420p':
-                    if metadata.get('codec') == 'vp8':
-                        context = CodecContext.create('libvpx', 'r')
-                    elif metadata.get('codec') == 'vp9':
-                        context = CodecContext.create('libvpx-vp9', 'r')
+                return 1, 1
+        
+    @staticmethod
+    def _get_file_frames_duration_webp(file: str) -> tuple[int, int]:
+        total_duration = 0
+        frames = 0
+        
+        with open(file, "r+b") as f:
+            with mmap.mmap(f.fileno(), 0) as mm:
+                while True:
+                    anmf_pos = mm.find(b"ANMF")
+                    if anmf_pos == -1:
+                        break
+                    mm.seek(anmf_pos + 20)
+                    frame_duration_32 = mm.read(4)
+                    frame_duration = frame_duration_32[:-1] + bytes(
+                        int(frame_duration_32[-1]) & 0b11111100
+                    )
+                    total_duration += int.from_bytes(frame_duration, "little")
+                    frames += 1
+        
+        if frames == 0:
+            return 1, 1
+        else:
+            return frames, total_duration
+    
+    @staticmethod
+    def _get_file_frames_duration_av(file: str, frames_to_iterate: Optional[int] = None) -> tuple[int, float]:
+        import av # type: ignore
 
-                with av.open(file) as container:
-                    stream = container.streams.video[0]
-                    if not context:
-                        context = stream.codec_context
+        # Getting fps from metadata is not reliable
+        # Example: https://github.com/laggykiller/sticker-convert/issues/114
 
-                    last_frame = None
-                    for frame_count, frame in enumerate(container.decode(stream)):
-                        last_frame = frame
-                        if frame_count > 10:
-                            break
+        with av.open(file) as container:
+            stream = container.streams.video[0]
 
-                    if frame_count <= 1:
-                        fps = 1
-                    else:
-                        fps = frame_count / (last_frame.pts * last_frame.time_base.numerator / last_frame.time_base.denominator)
+            last_frame = None
+            for frame_count, frame in enumerate(container.decode(stream)):
+                last_frame = frame
 
-        return fps
+                if frames_to_iterate != None and frame_count > frames_to_iterate:
+                    break
+
+            if frame_count <= 1:
+                return 1, 1
+            else:
+                duration = last_frame.pts * last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
+                return frame_count, duration
 
     @staticmethod
     def get_file_codec(file: str) -> Optional[str]:
         codec = None
         try:
-            im = Image.open(file)
-            codec = im.format
+            with Image.open(file) as im:
+                codec = im.format
+                animated = im.is_animated
         except UnidentifiedImageError:
             pass
-        
-        # Unable to distinguish apng and png
-        if codec == None:
-            metadata = iio.immeta(file, plugin="pyav", exclude_applied=False)
-            codec = metadata.get("codec", None)
-            if codec == None:
-                raise RuntimeError(f"Unable to get codec for file {file}")
-            return codec
-        elif codec == "PNG":
-            if im.is_animated:
+
+        if codec == "PNG":
+            # Unable to distinguish apng and png
+            if animated:
                 return "apng"
             else:
                 return "png"
-        else:
+        elif codec != None:
             return codec.lower()
+        
+        import av # type: ignore
+        
+        with av.open(file) as container:
+            codec = container.streams.video[0].codec_context.name
+        if codec == None:
+            raise RuntimeError(f"Unable to get codec for file {file}")
+        return codec.lower()
 
     @staticmethod
     def get_file_res(file: str) -> tuple[int, int]:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == ".tgs":
+            from rlottie_python import LottieAnimation  # type: ignore
+
             with LottieAnimation.from_tgs(file) as anim:
                 width, height = anim.lottie_animation_get_size()
+        elif file_ext in (".webp", ".png", ".apng"):
+            with Image.open(file) as im:
+                width = im.width
+                height = im.height
         else:
-            if file_ext in (".webp", ".png", ".apng"):
-                plugin = "pillow"
-            else:
-                plugin = "pyav"
-            frame = iio.imread(file, plugin=plugin, index=0)
-            width = frame.shape[0]
-            height = frame.shape[1]
+            import av # type: ignore
+
+            with av.open(file) as container:
+                stream = container.streams.video[0]
+                width = stream.width
+                height = stream.height
 
         return width, height
-
-    @staticmethod
-    def get_file_frames(file: str) -> int:
-        file_ext = CodecInfo.get_file_ext(file)
-
-        frames = None
-
-        if file_ext == ".tgs":
-            with LottieAnimation.from_tgs(file) as anim:
-                frames = anim.lottie_animation_get_totalframe()
-        else:
-            if file_ext in (".webp", ".png", ".apng"):
-                frames = Image.open(file).n_frames
-            else:
-                frames = frames = len([* iio.imiter(file, plugin="pyav")])
-
-        return frames
-
-    @staticmethod
-    def get_file_duration(file: str) -> float:
-        # Return duration in miliseconds
-        return CodecInfo.get_file_frames(file) / CodecInfo.get_file_fps(file) * 1000
 
     @staticmethod
     def get_file_ext(file: str) -> str:

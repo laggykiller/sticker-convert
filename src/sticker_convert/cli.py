@@ -67,11 +67,14 @@ class CLI:
                     'color_min', 'color_max',
                     'duration_min', 'duration_max',
                     'vid_size_max', 'img_size_max')
-        flags_str = ('vid_format', 'img_format', 'cache_dir', 'scale_filter')
+        flags_float = ('fps_power', 'res_power', 'quality_power', 'color_power')
+        flags_str = ('vid_format', 'img_format', 'cache_dir', 'scale_filter', 'quantize_method')
         flags_bool = ('fake_vid')
         for k, v in self.help['comp'].items():
             if k in flags_int:
                 keyword_args = {'type': int, 'default': None}
+            elif k in flags_float:
+                keyword_args = {'type': float, 'default': None}
             elif k in flags_str:
                 keyword_args = {'default': None}
             elif k in flags_bool:
@@ -202,7 +205,8 @@ class CLI:
             },
             'fps': {
                 'min': self.compression_presets[preset]['fps']['min'] if args.fps_min == None else args.fps_min,
-                'max': self.compression_presets[preset]['fps']['max'] if args.fps_max == None else args.fps_max
+                'max': self.compression_presets[preset]['fps']['max'] if args.fps_max == None else args.fps_max,
+                'power': self.compression_presets[preset]['fps']['power'] if args.fps_power == None else args.fps_power,
             },
             'res': {
                 'w': {
@@ -212,15 +216,18 @@ class CLI:
                 'h': {
                     'min': self.compression_presets[preset]['res']['h']['min'] if args.res_h_min == None else args.res_h_min,
                     'max': self.compression_presets[preset]['res']['h']['max'] if args.res_h_max == None else args.res_h_max
-                }
+                },
+                'power': self.compression_presets[preset]['res']['power'] if args.res_power == None else args.res_power,
             },
             'quality': {
                 'min': self.compression_presets[preset]['quality']['min'] if args.quality_min == None else args.quality_min,
-                'max': self.compression_presets[preset]['quality']['max'] if args.quality_max == None else args.quality_max
+                'max': self.compression_presets[preset]['quality']['max'] if args.quality_max == None else args.quality_max,
+                'power': self.compression_presets[preset]['quality']['power'] if args.quality_power == None else args.quality_power,
             },
             'color': {
                 'min': self.compression_presets[preset]['color']['min'] if args.color_min == None else args.color_min,
-                'max': self.compression_presets[preset]['color']['max'] if args.color_max == None else args.color_max
+                'max': self.compression_presets[preset]['color']['max'] if args.color_max == None else args.color_max,
+                'power': self.compression_presets[preset]['color']['power'] if args.color_power == None else args.color_power,
             },
             'duration': {
                 'min': self.compression_presets[preset]['duration']['min'] if args.duration_min == None else args.duration_min,
@@ -229,8 +236,9 @@ class CLI:
             'steps': self.compression_presets[preset]['steps'] if args.steps == None else args.steps,
             'fake_vid': self.compression_presets[preset]['fake_vid'] if args.fake_vid == None else args.fake_vid,
             'cache_dir': args.cache_dir,
-            'scale_filter': args.scale_filter,
-            'default_emoji': args.default_emoji,
+            'scale_filter': self.compression_presets[preset]['scale_filter'] if args.scale_filter == None else args.scale_filter,
+            'quantize_method': self.compression_presets[preset]['quantize_method'] if args.quantize_method == None else args.quantize_method,
+            'default_emoji': self.compression_presets[preset]['default_emoji'] if args.default_emoji == None else args.default_emoji,
             'no_compress': args.no_compress,
             'processes': args.processes if args.processes else math.ceil(cpu_count() / 2)
         }

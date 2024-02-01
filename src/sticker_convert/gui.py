@@ -13,7 +13,7 @@ from urllib.parse import urlparse
 from typing import Optional, Any
 
 from PIL import ImageFont
-from ttkbootstrap import Window, StringVar, BooleanVar, IntVar # type: ignore
+from ttkbootstrap import Window, StringVar, BooleanVar, IntVar, DoubleVar # type: ignore
 from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 
 from .job import Job # type: ignore
@@ -104,18 +104,22 @@ class GUI(Window):
         self.fps_min_var = IntVar(self)
         self.fps_max_var = IntVar(self)
         self.fps_disable_var = BooleanVar()
+        self.fps_power_var = DoubleVar()
         self.res_w_min_var = IntVar(self)
         self.res_w_max_var = IntVar(self)
         self.res_w_disable_var = BooleanVar()
         self.res_h_min_var = IntVar(self)
         self.res_h_max_var = IntVar(self)
         self.res_h_disable_var = BooleanVar()
+        self.res_power_var = DoubleVar()
         self.quality_min_var = IntVar(self)
         self.quality_max_var = IntVar(self)
         self.quality_disable_var = BooleanVar()
+        self.quality_power_var = DoubleVar()
         self.color_min_var = IntVar(self)
         self.color_max_var = IntVar(self)
         self.color_disable_var = BooleanVar()
+        self.color_power_var = DoubleVar()
         self.duration_min_var = IntVar(self)
         self.duration_max_var = IntVar(self)
         self.duration_disable_var = BooleanVar()
@@ -126,6 +130,7 @@ class GUI(Window):
         self.vid_format_var = StringVar(self)
         self.fake_vid_var = BooleanVar()
         self.scale_filter_var = StringVar(self)
+        self.quantize_method_var = StringVar(self)
         self.cache_dir_var = StringVar(self)
         self.default_emoji_var = StringVar(self)
         self.steps_var = IntVar(self) 
@@ -356,7 +361,8 @@ class GUI(Window):
             },
             'fps': {
                 'min': self.fps_min_var.get() if not self.fps_disable_var.get() else None,
-                'max': self.fps_max_var.get() if not self.fps_disable_var.get() else None
+                'max': self.fps_max_var.get() if not self.fps_disable_var.get() else None,
+                'power': self.fps_power_var.get()
             },
             'res': {
                 'w': {
@@ -366,15 +372,18 @@ class GUI(Window):
                 'h': {
                     'min': self.res_h_min_var.get() if not self.res_h_disable_var.get() else None,
                     'max': self.res_h_max_var.get() if not self.res_h_disable_var.get() else None
-                }
+                },
+                'power': self.res_power_var.get()
             },
             'quality': {
                 'min': self.quality_min_var.get() if not self.quality_disable_var.get() else None,
-                'max': self.quality_max_var.get() if not self.quality_disable_var.get() else None
+                'max': self.quality_max_var.get() if not self.quality_disable_var.get() else None,
+                'power': self.quality_power_var.get()
             },
             'color': {
                 'min': self.color_min_var.get() if not self.color_disable_var.get() else None,
-                'max': self.color_max_var.get() if not self.color_disable_var.get() else None
+                'max': self.color_max_var.get() if not self.color_disable_var.get() else None,
+                'power': self.color_power_var.get()
             },
             'duration': {
                 'min': self.duration_min_var.get() if not self.duration_disable_var.get() else None,
@@ -383,6 +392,7 @@ class GUI(Window):
             'steps': self.steps_var.get(),
             'fake_vid': self.fake_vid_var.get(),
             'scale_filter': self.scale_filter_var.get(),
+            'quantize_method': self.quantize_method_var.get(),
             'cache_dir': self.cache_dir_var.get() if self.cache_dir_var.get() != '' else None,
             'default_emoji': self.default_emoji_var.get(),
             'no_compress': self.no_compress_var.get(),

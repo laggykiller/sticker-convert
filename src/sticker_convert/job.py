@@ -177,6 +177,26 @@ class Job:
             if response == False:
                 return False
         
+        for param, value in (
+            ('fps_power', self.opt_comp.fps_power),
+            ('res_power', self.opt_comp.res_power),
+            ('quality_power', self.opt_comp.quality_power),
+            ('color_power', self.opt_comp.color_power)
+        ):
+            if value < -1:
+                error_msg += '\n'
+                error_msg += f'[X] {param} should be between -1 and positive infinity. {value} was given.'
+        
+        if self.opt_comp.scale_filter not in ('nearest', 'bilinear', 'bicubic', 'lanczos'):
+            error_msg += '\n'
+            error_msg += f'[X] scale_filter {self.opt_comp.scale_filter} is not valid option'
+            error_msg += '    Valid options: nearest, bilinear, bicubic, lanczos'
+
+        if self.opt_comp.quantize_method not in ('imagequant', 'fastoctree', 'none'):
+            error_msg += '\n'
+            error_msg += f'[X] quantize_method {self.opt_comp.quantize_method} is not valid option'
+            error_msg += '    Valid options: imagequant, fastoctree, none'
+        
         # Warn about unable to download animated Kakao stickers with such link
         if (self.opt_output.option == 'kakao' and 
             urlparse(self.opt_input.url).netloc == 'e.kakao.com' and

@@ -91,7 +91,6 @@ def nuitka(python_bin, arch):
         '--enable-plugin=tk-inter',
         '--enable-plugin=multiprocessing',
         '--include-package-data=signalstickers_client',
-        '--include-package=imageio',
         '--noinclude-data-file=tcl/opt0.4',
         '--noinclude-data-file=tcl/http1.0'
     ]

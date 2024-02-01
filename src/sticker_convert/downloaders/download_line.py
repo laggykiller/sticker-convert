@@ -315,10 +315,14 @@ class DownloadLine(DownloadBase):
                 base_path = os.path.join(self.out_dir, i.replace('-text.png', '.png'))
                 text_path = os.path.join(self.out_dir, i)
 
-                base_img = Image.open(base_path).convert('RGBA')
-                text_img = Image.open(text_path).convert('RGBA')
+                with Image.open(base_path) as im:
+                    base_img = im.convert('RGBA')
+                
+                with Image.open(text_path) as im:
+                    text_img = im.convert('RGBA')
 
-                Image.alpha_composite(base_img, text_img).save(base_path)
+                with Image.alpha_composite(base_img, text_img) as im:
+                    im.save(base_path)
 
                 os.remove(text_path)
 
