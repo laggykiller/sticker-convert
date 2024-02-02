@@ -92,12 +92,14 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                           [--export-signal | --export-telegram | --export-whatsapp | --export-imessage] [--no-compress]
                           [--preset {auto,signal,telegram,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--res-min RES_MIN]
-                          [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
-                          [--res-h-max RES_H_MAX] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--color-min COLOR_MIN]
-                          [--color-max COLOR_MAX] [--duration-min DURATION_MIN] [--duration-max DURATION_MAX]
-                          [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                          [--img-format IMG_FORMAT] [--fake-vid] [--scale-filter SCALE_FILTER] [--cache-dir CACHE_DIR]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
+                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
+                          [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
+                          [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER]
+                          [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX]
+                          [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
+                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
                           [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
                           [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
                           [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth] [--kakao-username KAKAO_USERNAME]
@@ -154,6 +156,8 @@ Compression options:
                         Processes higher = Compress faster but consume more resources.
   --fps-min FPS_MIN     Set minimum output fps.
   --fps-max FPS_MAX     Set maximum output fps.
+  --fps-power FPS_POWER
+                        Between -1 and positive infinity. Power lower = More importance of the parameter, try harder to keep higher and not sacrifice.
   --res-min RES_MIN     Set minimum width and height
   --res-max RES_MAX     Set maximum width and height
   --res-w-min RES_W_MIN
@@ -164,14 +168,22 @@ Compression options:
                         Set minimum height.
   --res-h-max RES_H_MAX
                         Set maximum height.
+  --res-power RES_POWER
+                        Between -1 and positive infinity.
+                        Power lower = More importance of the parameter,
+                        try harder to keep higher and not sacrifice.
   --quality-min QUALITY_MIN
                         Set minimum quality.
   --quality-max QUALITY_MAX
                         Set maximum quality.
+  --quality-power QUALITY_POWER
+                        Between -1 and positive infinity. Power lower = More importance of the parameter, try harder to keep higher and not sacrifice.
   --color-min COLOR_MIN
                         Set minimum number of colors (For converting to apng and apng only).
   --color-max COLOR_MAX
                         Set maximum number of colors (For converting to apng and apng only).
+  --color-power COLOR_POWER
+                        Between -1 and positive infinity. Power lower = More importance of the parameter, try harder to keep higher and not sacrifice.
   --duration-min DURATION_MIN
                         Set minimum output duration in miliseconds.
   --duration-max DURATION_MAX
@@ -194,6 +206,11 @@ Compression options:
                         - bilinear = linear interpolation
                         - bicubic = Cubic spline interpolation
                         - lanczos = A high-quality downsampling filter
+  --quantize-method QUANTIZE_METHOD
+                        Set method for quantizing image. Default as imagequant. Valid options are:
+                        - imagequant = Best quality but slow
+                        - fastoctree = Fast but image looks chunky
+                        - none = No image quantizing, large image size as result
   --cache-dir CACHE_DIR
                         Set custom cache directory.
                         Useful for debugging, or speed up conversion if cache_dir is on RAM disk.
