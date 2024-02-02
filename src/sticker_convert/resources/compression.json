@@ -25,14 +25,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,
@@ -70,14 +70,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,
@@ -115,14 +115,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,
@@ -160,14 +160,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 8,
@@ -205,14 +205,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 83,
@@ -250,14 +250,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,
@@ -295,14 +295,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,
@@ -340,14 +340,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,
@@ -385,14 +385,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,
@@ -430,14 +430,14 @@
             "power": 3
         },
         "quality": {
-            "min": 50,
+            "min": 10,
             "max": 95,
             "power": 5
         },
         "color": {
             "min": 50,
             "max": 257,
-            "power": 2
+            "power": 3
         },
         "duration": {
             "min": 0,

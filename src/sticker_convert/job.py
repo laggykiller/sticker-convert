@@ -451,6 +451,7 @@ class Job:
             msg += f'Warning: The following {len(self.compress_fails)} file{"s" if len(self.compress_fails) > 1 else ""} compression failed:\n'
             msg += "\n".join(self.compress_fails)
             msg += '\n'
+            msg += '\nConsider adjusting compression parameters'
 
         if self.out_urls != []:
             msg += 'Export results:\n'

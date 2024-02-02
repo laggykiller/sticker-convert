@@ -20,7 +20,10 @@ class CodecInfo:
 
         if file_ext == ".tgs":
             fps, frames = CodecInfo._get_file_fps_frames_tgs(file)
-            duration = int(frames / fps * 1000)
+            if fps > 0:
+                duration = int(frames / fps * 1000)
+            else:
+                duration = 0
         else:
             if file_ext == ".webp":
                 frames, duration = CodecInfo._get_file_frames_duration_webp(file)
@@ -29,7 +32,10 @@ class CodecInfo:
             else:
                 frames, duration = CodecInfo._get_file_frames_duration_av(file)
 
-            fps = frames / duration * 1000
+            if duration > 0:
+                fps = frames / duration * 1000
+            else:
+                fps = 0
         
         return fps, frames, duration
 
@@ -45,8 +51,11 @@ class CodecInfo:
             frames, duration = CodecInfo._get_file_frames_duration_pillow(file)
         else:
             frames, duration = CodecInfo._get_file_frames_duration_av(file, frames_to_iterate=10)
-            
-        return frames / duration * 1000
+        
+        if duration > 0:
+            return frames / duration * 1000
+        else:
+            return 0
     
     @staticmethod
     def get_file_frames(file: str, check_anim: bool = False) -> int:
@@ -73,7 +82,10 @@ class CodecInfo:
 
         if file_ext == ".tgs":
             fps, frames = CodecInfo._get_file_fps_frames_tgs(file)
-            duration = int(frames / fps * 1000)
+            if fps > 0:
+                duration = int(frames / fps * 1000)
+            else:
+                duration = 0
         elif file_ext == ".webp":
             _, duration = CodecInfo._get_file_frames_duration_webp(file)
         elif file_ext in (".gif", ".png", ".apng"):
@@ -121,7 +133,7 @@ class CodecInfo:
                     total_duration += im.info.get('duration', 1000)
                 return frames, total_duration
             else:
-                return 1, 1
+                return 1, 0
         
     @staticmethod
     def _get_file_frames_duration_webp(file: str) -> tuple[int, int]:
@@ -143,7 +155,7 @@ class CodecInfo:
                     frames += 1
         
         if frames == 0:
-            return 1, 1
+            return 1, 0
         else:
             return frames, total_duration
     
@@ -168,7 +180,7 @@ class CodecInfo:
                     break
 
             if frame_count <= 1:
-                return 1, 1
+                return 1, 0
             else:
                 duration = last_frame.pts * last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
                 return frame_count, duration

@@ -49,10 +49,11 @@ class CompOption(BaseOption):
         if isinstance(fps, dict):
             self.fps_min = to_int(fps.get('min'))
             self.fps_max = to_int(fps.get('max'))
+            self.fps_power = fps.get('power') if fps.get('power') else -0.5
         else:
             self.fps_min = to_int(fps)
             self.fps_max = to_int(fps)
-        self.fps_power = fps.get('power') if fps.get('power') else 1.0
+            self.fps_power = -0.5
         
         self.res_w_min = None
         self.res_w_max = None
@@ -87,30 +88,33 @@ class CompOption(BaseOption):
                 else:
                     self.res_w_max = res_max
                     self.res_h_max = res_max
+            self.res_power = res.get('power') if res.get('power') else 3.0
         else:
             self.res_w_min = to_int(res)
             self.res_w_max = to_int(res)
             self.res_h_min = to_int(res)
             self.res_h_max = to_int(res)
-        self.res_power = res.get('power') if res.get('power') else 1.0
+            self.res_power = 3.0
         
         quality = comp_config_dict.get('quality')
         if isinstance(quality, dict):
             self.quality_min = to_int(quality.get('min'))
             self.quality_max = to_int(quality.get('max'))
+            self.quality_power = quality.get('power') if quality.get('power') else 5.0
         else:
             self.quality_min = to_int(quality)
             self.quality_max = to_int(quality)
-        self.quality_power = quality.get('power') if quality.get('power') else 1.0
+            self.quality_power = 5.0
         
         color = comp_config_dict.get('color')
         if isinstance(color, dict):
             self.color_min = to_int(color.get('min'))
             self.color_max = to_int(color.get('max'))
+            self.color_power = color.get('power') if color.get('power') else 3.0
         else:
             self.color_min = to_int(color)
             self.color_max = to_int(color)
-        self.color_power = color.get('power') if color.get('power') else 1.0
+            self.color_power = 3.0
         
         duration = comp_config_dict.get('duration')
         if isinstance(duration, dict):

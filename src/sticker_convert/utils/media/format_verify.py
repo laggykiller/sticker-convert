@@ -84,6 +84,8 @@ class FormatVerify:
         else:
             file_duration = CodecInfo.get_file_duration(file)
 
+        if file_duration == 0:
+            return True
         if duration and duration[0] and file_duration < duration[0]:
             return False
         if duration and duration[1] and file_duration > duration[1]:
@@ -151,35 +153,36 @@ class FormatVerify:
         else:
             file_animated = CodecInfo.is_anim(file)
             file_ext = CodecInfo.get_file_ext(file)
-
-        compat_ext = {
-            ".jpg": ".jpeg",
-            ".jpeg": ".jpg",
-            ".png": ".apng",
-            ".apng": ".png",
-        }
-
-        formats: list[str] = []
-
-        if fmt == [None, None]:
-            return True
         
+        jpg_exts = (".jpg", ".jpeg")
+        png_exts = (".png", ".apng")
+
         if file_animated:
-            if isinstance(fmt[1], list):
-                formats = fmt[1].copy()
-            else:
-                formats.append(fmt[1])
+            valid_fmt = fmt[1]
         else:
-            if isinstance(fmt[0], list):
-                formats = fmt[0].copy()
+            valid_fmt = fmt[0]
+
+        if isinstance(valid_fmt, str):
+            if file_ext == valid_fmt:
+                return True
+            elif file_ext in jpg_exts and valid_fmt in jpg_exts:
+                return True
+            elif file_ext in png_exts and valid_fmt in png_exts:
+                return True
             else:
-                formats.append(fmt[0])
-
-        for f in formats.copy():
-            if f in compat_ext:
-                formats.append(compat_ext.get(f))  # type: ignore[arg-type]
-
-        if file_ext not in formats:
+                return False
+            
+        elif isinstance(valid_fmt, list):
+            if file_ext in valid_fmt:
+                return True
+            elif file_ext in jpg_exts and (".jpg" in valid_fmt or ".jpeg" in valid_fmt):
+                return True
+            elif file_ext in png_exts and (".png" in valid_fmt or ".apng" in valid_fmt):
+                return True
+            else:
+                return False
+            
+        elif valid_fmt == None:
             return False
-
-        return True
+        else:
+            raise TypeError(f"valid_fmt should be either str, list or None. {valid_fmt} was given")

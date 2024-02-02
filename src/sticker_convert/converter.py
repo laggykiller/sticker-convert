@@ -236,13 +236,14 @@ class StickerConvert:
             self._frames_import_pyav()
 
     def _frames_import_pillow(self):
-        with Image.open(self.in_f, mode='RGBA') as im:
+        with Image.open(self.in_f) as im:
+            im = im.convert("RGBA")
             if 'n_frames'in im.__dir__():
                 for i in range(im.n_frames):
                     im.seek(i)
-                    self.frames_raw.append(im.copy().asarray())
+                    self.frames_raw.append(np.asarray(im))
             else:
-                self.frames_raw.append(im.copy().asarray())
+                self.frames_raw.append(np.asarray(im))
     
     def _frames_import_pyav(self):
         import av # type: ignore
@@ -270,7 +271,7 @@ class StickerConvert:
                     if frame.format.name == 'yuv420p':
                         rgb_array = frame.to_ndarray(format='rgb24')
                         rgba_array = np.dstack(
-                            (rgb_array, np.zeros(frame.shape[:2], dtype=np.uint8) + 255)
+                            (rgb_array, np.zeros(rgb_array.shape[:2], dtype=np.uint8) + 255)
                         )
                     else:
                         # yuva420p may cause crash
@@ -305,7 +306,7 @@ class StickerConvert:
                         rgb_array = np.matmul(yuv_array, convert.T).clip(0,255).astype('uint8')
                         rgba_array = np.concatenate((rgb_array, a), axis=2)
 
-                        self.frames_raw.append(rgba_array)
+                    self.frames_raw.append(rgba_array)
 
     def _frames_import_lottie(self):
         from rlottie_python import LottieAnimation # type: ignore
@@ -365,7 +366,7 @@ class StickerConvert:
         return frames_out
     
     def frames_drop(self, frames_in: list[np.ndarray]) -> list[np.ndarray]:
-        if not self.fps:
+        if not self.codec_info_orig.is_animated or not self.fps:
             return [frames_in[0]]
 
         frames_out = []
@@ -468,8 +469,6 @@ class StickerConvert:
         self.tmp_f.write(anim_data.buffer())
     
     def _frames_export_png(self):
-        import oxipng
-
         with Image.fromarray(self.frames_processed[0], 'RGBA') as image:
             if self.color and self.color <= 256:
                 image_quant = self.quantize(image)
@@ -479,11 +478,10 @@ class StickerConvert:
         with io.BytesIO() as f:
             image_quant.save(f, format='png')
             f.seek(0)
-            frame_optimized = oxipng.optimize_from_memory(f.read(), level=4)
+            frame_optimized = self.optimize_png(f.read())
             self.tmp_f.write(frame_optimized)
 
     def _frames_export_apng(self):
-        import oxipng
         from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
 
         frames_concat = np.concatenate(self.frames_processed)
@@ -502,7 +500,7 @@ class StickerConvert:
                 image_cropped = image_quant.crop(crop_dimension)
                 image_cropped.save(f, format='png')
                 f.seek(0)
-                frame_optimized = oxipng.optimize_from_memory(f.read(), level=4)
+                frame_optimized = self.optimize_png(f.read())
             with Image.open(io.BytesIO(frame_optimized)) as im:
                 image_final = im.convert('RGBA')
             frame_final = create_frame_from_rgba(
@@ -521,6 +519,18 @@ class StickerConvert:
                 self.tmp_f.write(f.read())
 
         self.apngasm.reset()
+
+    def optimize_png(self, image_bytes: bytes) -> bytes:
+        import oxipng
+
+        return oxipng.optimize_from_memory(
+            image_bytes,
+            level=4,
+            fix_errors=True,
+            filter=[oxipng.RowFilter.Brute],
+            optimize_alpha=True,
+            strip=oxipng.StripChunks.safe()
+        )
 
     def quantize(self, image: Image.Image) -> Image.Image:
         if self.opt_comp.quantize_method == 'imagequant':
