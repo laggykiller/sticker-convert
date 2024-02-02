@@ -124,13 +124,13 @@ class CodecInfo:
         total_duration = 0
 
         with Image.open(file) as im:
-            if 'n_frames' in im.__dir__():
+            if "n_frames" in im.__dir__():
                 frames = im.n_frames
                 if frames_only == True:
                     return frames, 1
                 for i in range(im.n_frames):
                     im.seek(i)
-                    total_duration += im.info.get('duration', 1000)
+                    total_duration += im.info.get("duration", 1000)
                 return frames, total_duration
             else:
                 return 1, 0
@@ -188,6 +188,10 @@ class CodecInfo:
     @staticmethod
     def get_file_codec(file: str) -> Optional[str]:
         codec = None
+
+        file_ext = CodecInfo.get_file_ext(file)
+        if file_ext in (".tgs", ".lottie", ".json"):
+            return file_ext.replace(".", "")
         try:
             with Image.open(file) as im:
                 codec = im.format
@@ -205,11 +209,15 @@ class CodecInfo:
             return codec.lower()
         
         import av # type: ignore
+        from av.error import InvalidDataError
         
-        with av.open(file) as container:
-            codec = container.streams.video[0].codec_context.name
+        try:
+            with av.open(file) as container:
+                codec = container.streams.video[0].codec_context.name
+        except InvalidDataError:
+            return ""
         if codec == None:
-            raise RuntimeError(f"Unable to get codec for file {file}")
+            raise ""
         return codec.lower()
 
     @staticmethod
