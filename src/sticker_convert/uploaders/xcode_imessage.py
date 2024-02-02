@@ -12,6 +12,7 @@ from ..converter import StickerConvert  # type: ignore
 from ..utils.media.format_verify import FormatVerify  # type: ignore
 from ..utils.media.codec_info import CodecInfo  # type: ignore
 from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..utils.files.sanitize_filename import sanitize_filename  # type: ignore
 from ..job_option import CompOption, OutputOption, CredOption # type: ignore
 
 
@@ -101,7 +102,7 @@ class XcodeImessage(UploadBase):
         res_choice = None
 
         for pack_title, stickers in packs.items():
-            pack_title = FormatVerify.sanitize_filename(pack_title)
+            pack_title = sanitize_filename(pack_title)
 
             for src in stickers:
                 self.cb_msg(f"Verifying {src} for creating Xcode iMessage sticker pack")

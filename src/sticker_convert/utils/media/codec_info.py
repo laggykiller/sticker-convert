@@ -2,21 +2,36 @@
 from __future__ import annotations
 import os
 import mmap
-import mimetypes
 from typing import Optional
 
 from PIL import Image, UnidentifiedImageError
 
 class CodecInfo:
-    def __init__(self):
-        mimetypes.init()
-        vid_ext = []
-        for ext in mimetypes.types_map:
-            if mimetypes.types_map[ext].split("/")[0] == "video":
-                vid_ext.append(ext)
-        vid_ext.append(".webm")
-        vid_ext.append(".webp")
-        self.vid_ext = tuple(vid_ext)
+    def __init__(self, file: str):
+        self.file_ext = CodecInfo.get_file_ext(file)
+        self.fps, self.frames, self.duration = CodecInfo.get_file_fps_frames_duration(file)
+        self.codec = CodecInfo.get_file_codec(file)
+        self.res = CodecInfo.get_file_res(file)
+        self.is_animated = True if self.fps > 1 else False
+
+    @staticmethod
+    def get_file_fps_frames_duration(file: str) -> tuple[float, int, int]:
+        file_ext = CodecInfo.get_file_ext(file)
+
+        if file_ext == ".tgs":
+            fps, frames = CodecInfo._get_file_fps_frames_tgs(file)
+            duration = int(frames / fps * 1000)
+        else:
+            if file_ext == ".webp":
+                frames, duration = CodecInfo._get_file_frames_duration_webp(file)
+            elif file_ext in (".gif", ".apng", ".png"):
+                frames, duration = CodecInfo._get_file_frames_duration_pillow(file)
+            else:
+                frames, duration = CodecInfo._get_file_frames_duration_av(file)
+
+            fps = frames / duration * 1000
+        
+        return fps, frames, duration
 
     @staticmethod
     def get_file_fps(file: str) -> float:
@@ -34,7 +49,8 @@ class CodecInfo:
         return frames / duration * 1000
     
     @staticmethod
-    def get_file_frames(file: str) -> int:
+    def get_file_frames(file: str, check_anim: bool = False) -> int:
+        # If check_anim is True, return value > 1 means the file is animated
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == ".tgs":
@@ -42,7 +58,11 @@ class CodecInfo:
         elif file_ext in (".gif", ".webp", ".png", ".apng"):
             frames, _ = CodecInfo._get_file_frames_duration_pillow(file, frames_only=True)
         else:
-            frames, _ = CodecInfo._get_file_frames_duration_av(file)
+            if check_anim == True:
+                frames_to_iterate = 2
+            else:
+                frames_to_iterate = None
+            frames, _ = CodecInfo._get_file_frames_duration_av(file, frames_only=True, frames_to_iterate=frames_to_iterate)
 
         return frames
 
@@ -52,7 +72,8 @@ class CodecInfo:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == ".tgs":
-            return CodecInfo._get_file_duration_tgs(file)
+            fps, frames = CodecInfo._get_file_fps_frames_tgs(file)
+            duration = int(frames / fps * 1000)
         elif file_ext == ".webp":
             _, duration = CodecInfo._get_file_frames_duration_webp(file)
         elif file_ext in (".gif", ".png", ".apng"):
@@ -77,14 +98,14 @@ class CodecInfo:
             return anim.lottie_animation_get_totalframe()
     
     @staticmethod
-    def _get_file_duration_tgs(file: str) -> int:
+    def _get_file_fps_frames_tgs(file: str) -> tuple[int, int]:
         from rlottie_python import LottieAnimation  # type: ignore
 
         with LottieAnimation.from_tgs(file) as anim:
             fps = anim.lottie_animation_get_framerate()
             frames = anim.lottie_animation_get_totalframe()
 
-        return int(frames / fps * 1000)
+        return fps, frames
     
     @staticmethod
     def _get_file_frames_duration_pillow(file: str, frames_only: bool = False) -> tuple[int, int]:
@@ -127,7 +148,7 @@ class CodecInfo:
             return frames, total_duration
     
     @staticmethod
-    def _get_file_frames_duration_av(file: str, frames_to_iterate: Optional[int] = None) -> tuple[int, float]:
+    def _get_file_frames_duration_av(file: str, frames_to_iterate: Optional[int] = None, frames_only: bool = False) -> tuple[int, float]:
         import av # type: ignore
 
         # Getting fps from metadata is not reliable
@@ -135,6 +156,9 @@ class CodecInfo:
 
         with av.open(file) as container:
             stream = container.streams.video[0]
+
+            if frames_only == True and stream.frames > 1:
+                return stream.frames, 1
 
             last_frame = None
             for frame_count, frame in enumerate(container.decode(stream)):
@@ -205,7 +229,7 @@ class CodecInfo:
 
     @staticmethod
     def is_anim(file: str) -> bool:
-        if CodecInfo.get_file_frames(file) > 1:
+        if CodecInfo.get_file_frames(file, check_anim=True) > 1:
             return True
         else:
             return False

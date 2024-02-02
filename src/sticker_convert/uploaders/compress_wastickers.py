@@ -9,6 +9,7 @@ from .upload_base import UploadBase  # type: ignore
 from ..converter import StickerConvert  # type: ignore
 from ..utils.media.format_verify import FormatVerify  # type: ignore
 from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
+from ..utils.files.sanitize_filename import sanitize_filename  # type: ignore
 from ..utils.media.codec_info import CodecInfo  # type: ignore
 from ..utils.files.cache_store import CacheStore  # type: ignore
 from ..job_option import CompOption, OutputOption, CredOption # type: ignore
@@ -80,7 +81,7 @@ class CompressWastickers(UploadBase):
 
                 out_f = os.path.join(
                     self.out_dir,
-                    FormatVerify.sanitize_filename(pack_title + ".wastickers"),
+                    sanitize_filename(pack_title + ".wastickers"),
                 )
 
                 self.add_metadata(tempdir, pack_title, author)

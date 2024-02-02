@@ -16,7 +16,8 @@ from .job_option import CompOption
 def get_step_value(
         max: Optional[int], min: Optional[int],
         step: int, steps: int,
-        power: int
+        power: int = 1,
+        even: bool = False
     ) -> Optional[int]:
     # Power should be between -1 and positive infinity
     # Smaller power = More 'importance' of the parameter
@@ -29,7 +30,11 @@ def get_step_value(
         factor = 0
     
     if max != None and min != None:
-        return round((max - min) * step / steps * factor + min)
+        v = round((max - min) * step / steps * factor + min)
+        if even == True and v % 2 == 1:
+            return v + 1
+        else:
+            return v
     else:
         return None
 
@@ -92,9 +97,7 @@ class StickerConvert:
         self.fps = None
         self.color = None
 
-        self.frames_orig = CodecInfo.get_file_frames(self.in_f)
-        self.fps_orig = CodecInfo.get_file_fps(self.in_f)
-        self.duration_orig = self.frames_orig / self.fps_orig * 1000
+        self.codec_info_orig = CodecInfo(self.in_f)
 
         self.tmp_f = None
         self.result = None
@@ -104,11 +107,11 @@ class StickerConvert:
         self.apngasm = None
 
     def convert(self) -> tuple[bool, str, Union[None, bytes, str], int]:
-        if (FormatVerify.check_format(self.in_f, fmt=self.out_f_ext) and
-            FormatVerify.check_file_res(self.in_f, res=self.opt_comp.res) and
-            FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.fps) and
-            FormatVerify.check_file_size(self.in_f, size=self.opt_comp.size_max) and
-            FormatVerify.check_duration(self.in_f, duration=self.opt_comp.duration)):
+        if (FormatVerify.check_format(self.in_f, fmt=self.out_f_ext, file_info=self.codec_info_orig) and
+            FormatVerify.check_file_res(self.in_f, res=self.opt_comp.res, file_info=self.codec_info_orig) and
+            FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.fps, file_info=self.codec_info_orig) and
+            FormatVerify.check_file_size(self.in_f, size=self.opt_comp.size_max, file_info=self.codec_info_orig) and
+            FormatVerify.check_file_duration(self.in_f, duration=self.opt_comp.duration, file_info=self.codec_info_orig)):
             self.cb_msg.put(self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name))
 
             with open(self.in_f, 'rb') as f:
@@ -122,8 +125,8 @@ class StickerConvert:
         steps_list = []
         for step in range(self.opt_comp.steps, -1, -1):
             steps_list.append((
-                get_step_value(self.opt_comp.res_w_max, self.opt_comp.res_w_min, step, self.opt_comp.steps, self.opt_comp.res_power),
-                get_step_value(self.opt_comp.res_h_max, self.opt_comp.res_h_min, step, self.opt_comp.steps, self.opt_comp.res_power),
+                get_step_value(self.opt_comp.res_w_max, self.opt_comp.res_w_min, step, self.opt_comp.steps, self.opt_comp.res_power, True),
+                get_step_value(self.opt_comp.res_h_max, self.opt_comp.res_h_min, step, self.opt_comp.steps, self.opt_comp.res_power, True),
                 get_step_value(self.opt_comp.quality_max, self.opt_comp.quality_min, step, self.opt_comp.steps, self.opt_comp.quality_power),
                 get_step_value(self.opt_comp.fps_max, self.opt_comp.fps_min, step, self.opt_comp.steps, self.opt_comp.fps_power),
                 get_step_value(self.opt_comp.color_max, self.opt_comp.color_min, step, self.opt_comp.steps, self.opt_comp.color_power)
@@ -144,7 +147,7 @@ class StickerConvert:
             self.res_w = param[0]
             self.res_h = param[1]
             self.quality = param[2]
-            self.fps = min(param[3], self.fps_orig)
+            self.fps = min(param[3], self.codec_info_orig.fps)
             self.color = param[4]
 
             self.tmp_f = io.BytesIO()
@@ -162,7 +165,7 @@ class StickerConvert:
 
             self.tmp_f.seek(0)
             self.size = self.tmp_f.getbuffer().nbytes
-            if CodecInfo.is_anim(self.in_f):
+            if self.codec_info_orig.is_animated == True:
                 self.size_max = self.opt_comp.size_max_vid
             else:
                 self.size_max = self.opt_comp.size_max_img
@@ -369,15 +372,15 @@ class StickerConvert:
 
         # fps_ratio: 1 frame in new anim equal to how many frame in old anim
         # speed_ratio: How much to speed up / slow down
-        fps_ratio = self.fps_orig / self.fps
+        fps_ratio = self.codec_info_orig.fps / self.fps
         if (self.opt_comp.duration_min != None and
-            self.duration_orig < self.opt_comp.duration_min):
+            self.codec_info_orig.duration < self.opt_comp.duration_min):
 
-            speed_ratio = self.duration_orig / self.opt_comp.duration_min
+            speed_ratio = self.codec_info_orig.duration / self.opt_comp.duration_min
         elif (self.opt_comp.duration_max != None and
-              self.duration_orig > self.opt_comp.duration_max):
+              self.codec_info_orig.duration > self.opt_comp.duration_max):
             
-            speed_ratio = self.duration_orig / self.opt_comp.duration_max
+            speed_ratio = self.codec_info_orig.duration / self.opt_comp.duration_max
         else:
             speed_ratio = 1
 

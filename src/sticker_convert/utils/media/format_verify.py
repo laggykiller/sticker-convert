@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import os
-import unicodedata
-import re
 from typing import Optional, Union
 
 from .codec_info import CodecInfo  # type: ignore
@@ -11,14 +9,18 @@ from ...job_option import CompOption # type: ignore
 class FormatVerify:
     @staticmethod
     def check_file(file: str, spec: CompOption) -> bool:
+        if FormatVerify.check_presence(file) == False:
+            return False
+
+        file_info = CodecInfo(file)
+
         return (
-            FormatVerify.check_presence(file)
-            and FormatVerify.check_file_res(file, res=spec.res, square=spec.square)
-            and FormatVerify.check_file_fps(file, fps=spec.fps)
-            and FormatVerify.check_file_size(file, size=spec.size_max)
-            and FormatVerify.check_animated(file, animated=spec.animated)
-            and FormatVerify.check_format(file, fmt=spec.format)
-            and FormatVerify.check_duration(file, duration=spec.duration)
+            FormatVerify.check_file_res(file, res=spec.res, square=spec.square, file_info=file_info)
+            and FormatVerify.check_file_fps(file, fps=spec.fps, file_info=file_info)
+            and FormatVerify.check_file_duration(file, duration=spec.duration, file_info=file_info)
+            and FormatVerify.check_file_size(file, size=spec.size_max, file_info=file_info)
+            and FormatVerify.check_animated(file, animated=spec.animated, file_info=file_info)
+            and FormatVerify.check_format(file, fmt=spec.format, file_info=file_info)
         )
 
     @staticmethod
@@ -29,9 +31,14 @@ class FormatVerify:
     def check_file_res(
         file: str,
         res: Optional[list[list[int]]] = None,
-        square: Optional[bool] = None
+        square: Optional[bool] = None,
+        file_info: Optional[CodecInfo] = None
     ) -> bool:
-        file_width, file_height = CodecInfo.get_file_res(file)
+        
+        if file_info:
+            file_width, file_height = file_info.res
+        else:
+            file_width, file_height = CodecInfo.get_file_res(file)
 
         if res:
             if res[0][0] and file_width < res[0][0]:
@@ -48,8 +55,15 @@ class FormatVerify:
         return True
 
     @staticmethod
-    def check_file_fps(file: str, fps: Optional[list[int]]) -> bool:
-        file_fps = CodecInfo.get_file_fps(file)
+    def check_file_fps(
+        file: str,fps: Optional[list[int]],
+        file_info: Optional[CodecInfo] = None
+    ) -> bool:
+        
+        if file_info:
+            file_fps = file_info.fps
+        else:
+            file_fps = CodecInfo.get_file_fps(file)
 
         if fps and fps[0] and file_fps < fps[0]:
             return False
@@ -57,11 +71,38 @@ class FormatVerify:
             return False
 
         return True
+    
+    @staticmethod
+    def check_file_duration(
+        file: str,
+        duration: Optional[list[str]] = None,
+        file_info: Optional[CodecInfo] = None
+    ) -> bool:
+        
+        if file_info:
+            file_duration = file_info.duration
+        else:
+            file_duration = CodecInfo.get_file_duration(file)
+
+        if duration and duration[0] and file_duration < duration[0]:
+            return False
+        if duration and duration[1] and file_duration > duration[1]:
+            return False
+
+        return True
 
     @staticmethod
-    def check_file_size(file: str, size: Optional[list[int]] = None) -> bool:
+    def check_file_size(
+        file: str,
+        size: Optional[list[int]] = None,
+        file_info: Optional[CodecInfo] = None
+    ) -> bool:
+        
         file_size = os.path.getsize(file)
-        file_animated = CodecInfo.is_anim(file)
+        if file_info:
+            file_animated = file_info.is_animated
+        else:
+            file_animated = CodecInfo.is_anim(file)
 
         if (
             file_animated == True
@@ -81,8 +122,18 @@ class FormatVerify:
         return True
 
     @staticmethod
-    def check_animated(file: str, animated: Optional[bool] = None) -> bool:
-        if animated != None and CodecInfo.is_anim(file) != animated:
+    def check_animated(
+        file: str,
+        animated: Optional[bool] = None,
+        file_info: Optional[CodecInfo] = None
+    ) -> bool:
+        
+        if file_info:
+            file_animated = file_info.is_animated
+        else:
+            file_animated = CodecInfo.is_anim(file)
+
+        if animated != None and file_animated != animated:
             return False
 
         return True
@@ -90,8 +141,17 @@ class FormatVerify:
     @staticmethod
     def check_format(
         file: str,
-        fmt: list[Union[list[str], str, None]] = None
+        fmt: list[Union[list[str], str, None]] = None,
+        file_info: Optional[CodecInfo] = None
     ):
+        
+        if file_info:
+            file_animated = file_info.is_animated
+            file_ext = file_info.file_ext
+        else:
+            file_animated = CodecInfo.is_anim(file)
+            file_ext = CodecInfo.get_file_ext(file)
+
         compat_ext = {
             ".jpg": ".jpeg",
             ".jpeg": ".jpg",
@@ -104,7 +164,7 @@ class FormatVerify:
         if fmt == [None, None]:
             return True
         
-        if FormatVerify.check_animated(file):
+        if file_animated:
             if isinstance(fmt[1], list):
                 formats = fmt[1].copy()
             else:
@@ -119,66 +179,7 @@ class FormatVerify:
             if f in compat_ext:
                 formats.append(compat_ext.get(f))  # type: ignore[arg-type]
 
-        if CodecInfo.get_file_ext(file) not in formats:
+        if file_ext not in formats:
             return False
 
         return True
-
-    @staticmethod
-    def check_duration(file: str, duration: Optional[list[str]] = None) -> bool:
-        file_duration = CodecInfo.get_file_duration(file)
-        if duration and duration[0] and file_duration < duration[0]:
-            return False
-        if duration and duration[1] and file_duration > duration[1]:
-            return False
-
-        return True
-
-    @staticmethod
-    def sanitize_filename(filename: str) -> str:
-        # Based on https://gitlab.com/jplusplus/sanitize-filename/-/blob/master/sanitize_filename/sanitize_filename.py
-        # Replace illegal character with '_'
-        """Return a fairly safe version of the filename.
-
-        We don't limit ourselves to ascii, because we want to keep municipality
-        names, etc, but we do want to get rid of anything potentially harmful,
-        and make sure we do not exceed Windows filename length limits.
-        Hence a less safe blacklist, rather than a whitelist.
-        """
-        blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "\0"]
-        reserved = [
-            "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5",
-            "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5",
-            "LPT6", "LPT7", "LPT8", "LPT9",
-        ]  # Reserved words on Windows
-        filename = "".join(c if c not in blacklist else "_" for c in filename)
-        # Remove all charcters below code point 32
-        filename = "".join(c if 31 < ord(c) else "_" for c in filename)
-        filename = unicodedata.normalize("NFKD", filename)
-        filename = filename.rstrip(". ")  # Windows does not allow these at end
-        filename = filename.strip()
-        if all([x == "." for x in filename]):
-            filename = "__" + filename
-        if filename in reserved:
-            filename = "__" + filename
-        if len(filename) == 0:
-            filename = "__"
-        if len(filename) > 255:
-            parts = re.split(r"/|\\", filename)[-1].split(".")
-            if len(parts) > 1:
-                ext = "." + parts.pop()
-                filename = filename[: -len(ext)]
-            else:
-                ext = ""
-            if filename == "":
-                filename = "__"
-            if len(ext) > 254:
-                ext = ext[254:]
-            maxl = 255 - len(ext)
-            filename = filename[:maxl]
-            filename = filename + ext
-            # Re-check last character (if there was no extension)
-            filename = filename.rstrip(". ")
-            if len(filename) == 0:
-                filename = "__"
-        return filename
