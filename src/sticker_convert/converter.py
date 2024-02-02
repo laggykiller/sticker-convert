@@ -395,13 +395,13 @@ class StickerConvert:
         return frames_out
 
     def frames_export(self):
-        if self.out_f_ext in ('.apng', '.png') and self.fps:
+        if self.out_f_ext == '.apng' or (self.out_f_ext == '.png' and self.fps):
             self._frames_export_apng()
         elif self.out_f_ext == '.png':
             self._frames_export_png()
         elif self.out_f_ext == '.webp' and self.fps:
             self._frames_export_webp()
-        elif self.fps:
+        elif self.out_f_ext in ('.webm', '.mp4', '.mkv') or self.fps:
             self._frames_export_pyav()
         else:
             self._frames_export_pil()
@@ -437,7 +437,7 @@ class StickerConvert:
             pixel_format = 'yuva420p'
             options['loop'] = '0'
         else:
-            codec = 'libx264'
+            codec = 'libvpx-vp9'
             pixel_format = 'yuv420p'
             options['loop'] = '0'
         
