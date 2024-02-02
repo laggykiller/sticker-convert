@@ -195,7 +195,10 @@ class CodecInfo:
         try:
             with Image.open(file) as im:
                 codec = im.format
-                animated = im.is_animated
+                if 'is_animated' in im.__dir__():
+                    animated = im.is_animated
+                else:
+                    animated = False
         except UnidentifiedImageError:
             pass
 
