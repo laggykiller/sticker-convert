@@ -190,7 +190,7 @@
         },
         "fps": {
             "min": 1,
-            "max": 60,
+            "max": 30,
             "power": -0.5
         },
         "res": {
@@ -235,7 +235,7 @@
         },
         "fps": {
             "min": 1,
-            "max": 60,
+            "max": 30,
             "power": -0.5
         },
         "res": {
@@ -261,7 +261,7 @@
         },
         "duration": {
             "min": 0,
-            "max": 0
+            "max": 5000
         },
         "steps": 16,
         "fake_vid": false,
@@ -280,7 +280,7 @@
         },
         "fps": {
             "min": 1,
-            "max": 60,
+            "max": 30,
             "power": -0.5
         },
         "res": {
@@ -306,7 +306,7 @@
         },
         "duration": {
             "min": 0,
-            "max": 0
+            "max": 5000
         },
         "steps": 8,
         "fake_vid": false,
@@ -325,7 +325,7 @@
         },
         "fps": {
             "min": 1,
-            "max": 60,
+            "max": 30,
             "power": -0.5
         },
         "res": {
@@ -351,7 +351,7 @@
         },
         "duration": {
             "min": 0,
-            "max": 0
+            "max": 5000
         },
         "steps": 8,
         "fake_vid": false,
@@ -370,7 +370,7 @@
         },
         "fps": {
             "min": 1,
-            "max": 60,
+            "max": 30,
             "power": -0.5
         },
         "res": {
@@ -396,7 +396,7 @@
         },
         "duration": {
             "min": 0,
-            "max": 0
+            "max": 5000
         },
         "steps": 8,
         "fake_vid": false,
