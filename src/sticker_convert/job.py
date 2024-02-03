@@ -350,13 +350,7 @@ class Job:
 
         for i in in_fs:
             in_f = os.path.join(input_dir, i)
-
-            if CodecInfo.is_anim(in_f) or self.opt_comp.fake_vid:
-                extension = self.opt_comp.format_vid
-            else:
-                extension = self.opt_comp.format_img
-
-            out_f = os.path.join(output_dir, os.path.splitext(i)[0] + extension)
+            out_f = os.path.join(output_dir, os.path.splitext(i)[0])
 
             self.jobs_queue.put((in_f, out_f, self.opt_comp))
 

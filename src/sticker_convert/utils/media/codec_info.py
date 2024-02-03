@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import mmap
 from typing import Optional
+from decimal import Decimal, ROUND_HALF_UP
 
 from PIL import Image, UnidentifiedImageError
 
@@ -160,32 +161,33 @@ class CodecInfo:
             return frames, total_duration
     
     @staticmethod
-    def _get_file_frames_duration_av(file: str, frames_to_iterate: Optional[int] = None, frames_only: bool = False) -> tuple[int, float]:
+    def _get_file_frames_duration_av(file: str, frames_to_iterate: Optional[int] = None, frames_only: bool = False) -> tuple[int, int]:
         import av # type: ignore
 
-        # Getting fps from metadata is not reliable
+        # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
 
         with av.open(file) as container:
             stream = container.streams.video[0]
+            duration_metadata = int(Decimal(container.duration / 1000).quantize(0, ROUND_HALF_UP))
 
             if frames_only == True and stream.frames > 1:
-                return stream.frames, 1
+                return stream.frames, duration_metadata
 
             last_frame = None
             for frame_count, frame in enumerate(container.decode(stream)):
-                last_frame = frame
-
                 if frames_to_iterate != None and frame_count == frames_to_iterate:
                     break
-
-            if frame_count <= 1:
-                return 1, 0
+                last_frame = frame
+            
+            time_base_ms = last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
+            if frame_count <= 1 or duration_metadata != 0:
+                return frame_count, duration_metadata
             else:
-                duration_n_minus_one = last_frame.pts * last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
-                ms_per_frame = duration_n_minus_one / frame_count
-                duration = (frame_count + 1) * ms_per_frame
-                return frame_count, duration
+                duration_n_minus_one = last_frame.pts * time_base_ms
+                ms_per_frame = duration_n_minus_one / (frame_count - 1)
+                duration = frame_count * ms_per_frame
+                return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))
 
     @staticmethod
     def get_file_codec(file: str) -> Optional[str]:

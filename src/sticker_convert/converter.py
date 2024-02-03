@@ -3,6 +3,7 @@ import os
 import io
 from multiprocessing.queues import Queue as QueueType
 from typing import Optional, Union
+from decimal import Decimal, ROUND_HALF_UP
 
 import numpy as np
 from PIL import Image
@@ -71,16 +72,37 @@ class StickerConvert:
 
         if isinstance(in_f, str):
             self.in_f = in_f
-            self.in_f_name = os.path.split(self.in_f)[1]
-            self.in_f_ext = CodecInfo.get_file_ext(self.in_f)
+            self.in_f_name = os.path.split(in_f)[1]
+            self.in_f_ext = CodecInfo.get_file_ext(in_f)
         else:
             self.in_f = in_f[1]
             self.in_f_name = os.path.split(in_f[0])[1]
             self.in_f_ext = CodecInfo.get_file_ext(in_f[0])
 
-        self.out_f = out_f
-        self.out_f_name = os.path.split(self.out_f)[1]
-        self.out_f_ext = os.path.splitext(out_f)[1]
+        self.codec_info_orig = CodecInfo(self.in_f)
+
+        self.out_f_ext = ""
+        valid_formats = []
+        for i in opt_comp.format:
+            if isinstance(i, list):
+                valid_formats.extend(i)
+            else:
+                valid_formats.append(i)
+
+        for i in valid_formats:
+            if out_f.endswith(i):
+                self.out_f_ext = i
+                self.out_f = out_f
+                self.out_f_name = os.path.split(out_f)[1]
+                break
+        
+        if self.out_f_ext == "":
+            if self.codec_info_orig.is_animated or opt_comp.fake_vid:
+                self.out_f_ext = opt_comp.format_vid
+            else:
+                self.out_f_ext = opt_comp.format_img
+            self.out_f = out_f + self.out_f_ext
+            self.out_f_name = os.path.split(self.out_f)[1]
 
         self.cb_msg = cb_msg
         self.frames_raw: list[np.ndarray] = []
@@ -97,8 +119,6 @@ class StickerConvert:
         self.fps = None
         self.color = None
 
-        self.codec_info_orig = CodecInfo(self.in_f)
-
         self.tmp_f = None
         self.result = None
         self.result_size = 0
@@ -107,7 +127,7 @@ class StickerConvert:
         self.apngasm = None
 
     def convert(self) -> tuple[bool, str, Union[None, bytes, str], int]:
-        if (FormatVerify.check_format(self.in_f, fmt=self.out_f_ext, file_info=self.codec_info_orig) and
+        if (FormatVerify.check_format(self.in_f, fmt=self.opt_comp.format, file_info=self.codec_info_orig) and
             FormatVerify.check_file_res(self.in_f, res=self.opt_comp.res, file_info=self.codec_info_orig) and
             FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.fps, file_info=self.codec_info_orig) and
             FormatVerify.check_file_size(self.in_f, size=self.opt_comp.size_max, file_info=self.codec_info_orig) and
@@ -237,13 +257,13 @@ class StickerConvert:
 
     def _frames_import_pillow(self):
         with Image.open(self.in_f) as im:
-            im = im.convert("RGBA")
+            # Note: im.convert("RGBA") would return rgba image of current frame only
             if 'n_frames'in im.__dir__():
                 for i in range(im.n_frames):
                     im.seek(i)
-                    self.frames_raw.append(np.asarray(im))
+                    self.frames_raw.append(np.asarray(im.convert("RGBA")))
             else:
-                self.frames_raw.append(np.asarray(im))
+                self.frames_raw.append(np.asarray(im.convert("RGBA")))
     
     def _frames_import_pyav(self):
         import av # type: ignore
@@ -366,7 +386,7 @@ class StickerConvert:
         return frames_out
     
     def frames_drop(self, frames_in: list[np.ndarray]) -> list[np.ndarray]:
-        if not self.codec_info_orig.is_animated or not self.fps:
+        if not self.codec_info_orig.is_animated or not self.fps or len(self.frames_processed) == 1:
             return [frames_in[0]]
 
         frames_out = []
@@ -374,35 +394,41 @@ class StickerConvert:
         # fps_ratio: 1 frame in new anim equal to how many frame in old anim
         # speed_ratio: How much to speed up / slow down
         fps_ratio = self.codec_info_orig.fps / self.fps
-        if (self.opt_comp.duration_min != None and
+        if (self.opt_comp.duration_min and
             self.codec_info_orig.duration < self.opt_comp.duration_min):
 
             speed_ratio = self.codec_info_orig.duration / self.opt_comp.duration_min
-        elif (self.opt_comp.duration_max != None and
+        elif (self.opt_comp.duration_max and
               self.codec_info_orig.duration > self.opt_comp.duration_max):
             
             speed_ratio = self.codec_info_orig.duration / self.opt_comp.duration_max
         else:
             speed_ratio = 1
 
+        frame_increment = fps_ratio * speed_ratio
+
         frame_current = 0
         frame_current_float = 0
-        while frame_current < len(frames_in):
-            frames_out.append(frames_in[frame_current])
-            frame_current_float += fps_ratio * speed_ratio
-            frame_current = round(frame_current_float)
-
-        return frames_out
+        while True:
+            frame_current_float += frame_increment
+            frame_current = int(Decimal(frame_current_float).quantize(0, ROUND_HALF_UP))
+            if frame_current <= len(frames_in) - 1:
+                frames_out.append(frames_in[frame_current])
+            else:
+                if len(frames_out) == 0:
+                    frames_out.append(frames_in[0])
+                return frames_out
 
     def frames_export(self):
+        is_animated = len(self.frames_processed) > 1 and self.fps
         if self.out_f_ext in ('.apng', '.png'):
-            if self.fps:
+            if is_animated:
                 self._frames_export_apng()
             else:
                 self._frames_export_png()
-        elif self.out_f_ext == '.webp' and self.fps:
+        elif self.out_f_ext == '.webp' and is_animated:
             self._frames_export_webp()
-        elif self.out_f_ext in ('.webm', '.mp4', '.mkv') or self.fps:
+        elif self.out_f_ext in ('.webm', '.mp4', '.mkv') or is_animated:
             self._frames_export_pyav()
         else:
             self._frames_export_pil()
@@ -495,6 +521,7 @@ class StickerConvert:
         if self.apngasm == None:
             self.apngasm = APNGAsm()
 
+        delay_num = int(Decimal(1000 / self.fps).quantize(0, ROUND_HALF_UP))
         for i in range(0, image_quant.height, self.res_h):
             with io.BytesIO() as f:
                 crop_dimension = (0, i, image_quant.width, i+self.res_h)
@@ -506,13 +533,13 @@ class StickerConvert:
                 image_final = im.convert('RGBA')
             frame_final = create_frame_from_rgba(
                 np.array(image_final),
-                image_final.width,
-                image_final.height
+                width=image_final.width,
+                height=image_final.height,
+                delay_num=delay_num,
+                delay_den=1000
             )
-            frame_final.delay_num = int(1000 / self.fps)
-            frame_final.delay_den = 1000
             self.apngasm.add_frame(frame_final)
-
+                        
         with CacheStore.get_cache_store(path=self.opt_comp.cache_dir) as tempdir:
             self.apngasm.assemble(os.path.join(tempdir, f'out{self.out_f_ext}'))
 
