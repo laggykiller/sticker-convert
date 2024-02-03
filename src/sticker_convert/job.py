@@ -8,6 +8,7 @@ from multiprocessing import Process, Queue, Value
 from multiprocessing.queues import Queue as QueueType
 from threading import Thread
 from urllib.parse import urlparse
+import traceback
 from typing import Optional
 
 from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
@@ -48,6 +49,7 @@ class Job:
 
         self.jobs_queue: QueueType[Optional[tuple[str, str, CompOption]]] = Queue()
         self.results_queue: QueueType[Optional[tuple[bool, str, str, int]]] = Queue()
+        self.exceptions_queue: QueueType[Optional[str]] = Queue()
         self.cb_msg_queue: QueueType[Optional[str]] = Queue()
         self.processes: list[Process] = []
 
@@ -341,7 +343,12 @@ class Job:
         for i in range(min(self.opt_comp.processes, in_fs_count)):
             process = Process(
                 target=Job.compress_worker,
-                args=(self.jobs_queue, self.results_queue, self.cb_msg_queue),
+                args=(
+                    self.jobs_queue,
+                    self.results_queue,
+                    self.cb_msg_queue,
+                    self.exceptions_queue
+                ),
                 daemon=True
             )
 
@@ -361,6 +368,17 @@ class Job:
         
         self.results_queue.put(None)
         self.cb_msg_queue.put(None)
+        self.exceptions_queue.put(None)
+
+        exception_exist = False
+        for count, e in enumerate(iter(self.exceptions_queue.get, None)):
+            exception_exist = True
+            self.cb_msg(f'##### EXCEPTION {count} #####')
+            self.cb_msg(e)
+            self.cb_msg('#######################')
+
+        if exception_exist:
+            return False
 
         return True
     
@@ -387,14 +405,22 @@ class Job:
     def compress_worker(
         jobs_queue: QueueType[Optional[tuple[str, str, CompOption]]], 
         results_queue: QueueType[Optional[tuple[bool, str, str, int]]], 
-        cb_msg_queue: QueueType[Optional[str]]
+        cb_msg_queue: QueueType[Optional[str]],
+        exceptions_queue: QueueType[Optional[str]]
         ):
 
         for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None): # type: ignore[misc]
-            sticker = StickerConvert(in_f, out_f, opt_comp, cb_msg_queue) # type: ignore
-            success, in_f, out_f, size = sticker.convert()
-            del sticker
-            results_queue.put((success, in_f, out_f, size))
+            try:
+                sticker = StickerConvert(in_f, out_f, opt_comp, cb_msg_queue) # type: ignore
+                success, in_f, out_f, size = sticker.convert()
+                del sticker
+                results_queue.put((success, in_f, out_f, size))
+            except Exception:
+                e = f"Input file: {in_f}\n"
+                e += f"Output file: {out_f}\n"
+                e += traceback.format_exc()
+                results_queue.put((False, in_f, out_f, 0))
+                exceptions_queue.put(e)
         
         jobs_queue.put(None)
 
@@ -446,6 +472,7 @@ class Job:
             msg += "\n".join(self.compress_fails)
             msg += '\n'
             msg += '\nConsider adjusting compression parameters'
+            msg += '\n'
 
         if self.out_urls != []:
             msg += 'Export results:\n'
