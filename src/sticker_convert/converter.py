@@ -395,10 +395,11 @@ class StickerConvert:
         return frames_out
 
     def frames_export(self):
-        if self.out_f_ext == '.apng' or (self.out_f_ext == '.png' and self.fps):
-            self._frames_export_apng()
-        elif self.out_f_ext == '.png':
-            self._frames_export_png()
+        if self.out_f_ext in ('.apng', '.png'):
+            if self.fps:
+                self._frames_export_apng()
+            else:
+                self._frames_export_png()
         elif self.out_f_ext == '.webp' and self.fps:
             self._frames_export_webp()
         elif self.out_f_ext in ('.webm', '.mp4', '.mkv') or self.fps:
