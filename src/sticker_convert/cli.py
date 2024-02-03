@@ -110,8 +110,12 @@ class CLI:
 
         if status == 1:
             self.cb_msg(msg='An error occured during this run.')
+            exit(1)
         elif status == 2:
             self.cb_msg(msg='Job cancelled.')
+            exit(1)
+        
+        exit(0)
 
     def get_opt_input(self, args) -> dict:
         download_options = {
