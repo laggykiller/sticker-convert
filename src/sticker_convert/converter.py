@@ -497,10 +497,7 @@ class StickerConvert:
     
     def _frames_export_png(self):
         with Image.fromarray(self.frames_processed[0], 'RGBA') as image:
-            if self.color and self.color <= 256:
-                image_quant = self.quantize(image)
-            else:
-                image_quant = image.copy()
+            image_quant = self.quantize(image)
 
         with io.BytesIO() as f:
             image_quant.save(f, format='png')
@@ -513,10 +510,7 @@ class StickerConvert:
 
         frames_concat = np.concatenate(self.frames_processed)
         with Image.fromarray(frames_concat, 'RGBA') as image_concat:
-            if self.color and self.color <= 256:
-                image_quant = self.quantize(image_concat)
-            else:
-                image_quant = image_concat.copy()
+            image_quant = self.quantize(image_concat)
 
         if self.apngasm == None:
             self.apngasm = APNGAsm()
@@ -561,6 +555,8 @@ class StickerConvert:
         )
 
     def quantize(self, image: Image.Image) -> Image.Image:
+        if not (self.color and self.color <= 256):
+            return image.copy()
         if self.opt_comp.quantize_method == 'imagequant':
             return self._quantize_by_imagequant(image)
         elif self.opt_comp.quantize_method == 'fastoctree':
