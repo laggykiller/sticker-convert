@@ -174,7 +174,10 @@ class StickerConvert:
             self.res_w = param[0]
             self.res_h = param[1]
             self.quality = param[2]
-            self.fps = min(param[3], self.codec_info_orig.fps)
+            if param[3] and self.codec_info_orig.fps:
+                self.fps = min(param[3], self.codec_info_orig.fps)
+            else:
+                self.fps = 0
             self.color = param[4]
 
             self.tmp_f = io.BytesIO()
