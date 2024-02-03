@@ -50,7 +50,6 @@ class Job:
 
         self.jobs_queue: QueueType[Optional[tuple[str, str, CompOption]]] = Queue()
         self.results_queue: QueueType[Optional[tuple[bool, str, str, int]]] = Queue()
-        self.exceptions_queue: QueueType[Optional[str]] = Queue()
         self.cb_msg_queue: QueueType[Optional[str]] = Queue()
         self.processes: list[Process] = []
 
@@ -347,8 +346,7 @@ class Job:
                 args=(
                     self.jobs_queue,
                     self.results_queue,
-                    self.cb_msg_queue,
-                    self.exceptions_queue
+                    self.cb_msg_queue
                 ),
                 daemon=True
             )
@@ -369,14 +367,8 @@ class Job:
         
         self.results_queue.put(None)
         self.cb_msg_queue.put(None)
-        self.exceptions_queue.put(None)
 
         exception_exist = False
-        for count, e in enumerate(iter(self.exceptions_queue.get, None)):
-            exception_exist = True
-            self.cb_msg(f'##### EXCEPTION {count} #####', file=sys.stderr)
-            self.cb_msg(e, file=sys.stderr)
-            self.cb_msg('#######################', file=sys.stderr)
 
         if exception_exist:
             return False
@@ -406,8 +398,7 @@ class Job:
     def compress_worker(
         jobs_queue: QueueType[Optional[tuple[str, str, CompOption]]], 
         results_queue: QueueType[Optional[tuple[bool, str, str, int]]], 
-        cb_msg_queue: QueueType[Optional[str]],
-        exceptions_queue: QueueType[Optional[str]]
+        cb_msg_queue: QueueType[Optional[str]]
         ):
 
         for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None): # type: ignore[misc]
@@ -417,12 +408,14 @@ class Job:
                 del sticker
                 results_queue.put((success, in_f, out_f, size))
             except Exception:
-                e = f"Input file: {in_f}\n"
+                e = '##### EXCEPTION #####\n'
+                e += f"Input file: {in_f}\n"
                 e += f"Output file: {out_f}\n"
                 e += traceback.format_exc()
+                e += '#####################'
                 results_queue.put((False, in_f, out_f, 0))
-                exceptions_queue.put(e)
-        
+                cb_msg_queue.put(e)
+
         jobs_queue.put(None)
 
     def export(self) -> bool:
