@@ -84,17 +84,24 @@ class StickerConvert:
         self.out_f_ext = ""
         valid_formats = []
         for i in opt_comp.format:
-            if isinstance(i, list):
+            if i == None:
+                pass
+            elif isinstance(i, list):
                 valid_formats.extend(i)
             else:
                 valid_formats.append(i)
 
-        for i in valid_formats:
-            if out_f.endswith(i):
-                self.out_f_ext = i
-                self.out_f = out_f
-                self.out_f_name = os.path.split(out_f)[1]
-                break
+        if len(valid_formats) == 0:
+            self.out_f_ext = os.path.splitext(out_f)[1]
+            self.out_f = out_f
+            self.out_f_name = os.path.split(out_f)[1]
+        else:
+            for i in valid_formats:
+                if out_f.endswith(i):
+                    self.out_f_ext = i
+                    self.out_f = out_f
+                    self.out_f_name = os.path.split(out_f)[1]
+                    break
         
         if self.out_f_ext == "":
             if self.codec_info_orig.is_animated or opt_comp.fake_vid:
