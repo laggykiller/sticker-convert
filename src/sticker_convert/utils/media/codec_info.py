@@ -176,13 +176,15 @@ class CodecInfo:
             for frame_count, frame in enumerate(container.decode(stream)):
                 last_frame = frame
 
-                if frames_to_iterate != None and frame_count > frames_to_iterate:
+                if frames_to_iterate != None and frame_count == frames_to_iterate:
                     break
 
             if frame_count <= 1:
                 return 1, 0
             else:
-                duration = last_frame.pts * last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
+                duration_n_minus_one = last_frame.pts * last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
+                ms_per_frame = duration_n_minus_one / frame_count
+                duration = (frame_count + 1) * ms_per_frame
                 return frame_count, duration
 
     @staticmethod
