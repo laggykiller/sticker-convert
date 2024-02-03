@@ -29,6 +29,7 @@ class CompressWastickers(UploadBase):
         self.spec_cover = CompOption({
             "size_max": {"img": 50000, "vid": 50000},
             "res": 96,
+            "fps": 0,
             "format": ".png",
             "animated": False,
         })

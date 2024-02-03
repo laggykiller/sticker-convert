@@ -161,7 +161,8 @@ class XcodeImessage(UploadBase):
             spec_cover = CompOption({
                 "res": {
                     "w": res[0],
-                    "h": res[1]
+                    "h": res[1],
+                    "fps": 0
                 }
             })
 
