@@ -176,6 +176,8 @@ class StickerConvert:
             self.quality = param[2]
             if param[3] and self.codec_info_orig.fps:
                 self.fps = min(param[3], self.codec_info_orig.fps)
+                if self.out_f_ext == '.gif':
+                    self.fix_gif_fps()
             else:
                 self.fps = 0
             self.color = param[4]
@@ -442,7 +444,7 @@ class StickerConvert:
             self._frames_export_pyav()
         else:
             self._frames_export_pil()
-    
+
     def _frames_export_pil(self):
         with Image.fromarray(self.frames_processed[0]) as im:
             im.save(
@@ -525,7 +527,7 @@ class StickerConvert:
         if self.apngasm == None:
             self.apngasm = APNGAsm()
 
-        delay_num = int(Decimal(1000 / self.fps).quantize(0, ROUND_HALF_UP))
+        delay_num = int(1000 / self.fps)
         for i in range(0, image_quant.height, self.res_h):
             with io.BytesIO() as f:
                 crop_dimension = (0, i, image_quant.width, i+self.res_h)
@@ -596,3 +598,16 @@ class StickerConvert:
 
     def _quantize_by_fastoctree(self, image: Image.Image) -> Image.Image:
         return image.quantize(colors=self.color, method=2)
+
+    def fix_gif_fps(self):
+        # Quote from https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+        # vii) Delay Time - If not 0, this field specifies
+        # the number of hundredths (1/100) of a second
+        #
+        # We need to adjust fps such that delay is matching to hundreths of second
+        delay_hundreths = round(100 / self.fps)
+        self.fps = 100 / delay_hundreths
+        if self.fps > self.opt_comp.fps_max:
+            self.fps = 100 / (delay_hundreths + 1)
+        elif self.fps < self.opt_comp.fps_min:
+            self.fps = 100 / (delay_hundreths - 1)
