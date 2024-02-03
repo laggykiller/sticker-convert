@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import shutil
 from datetime import datetime
 from multiprocessing import Process, Queue, Value
@@ -373,9 +374,9 @@ class Job:
         exception_exist = False
         for count, e in enumerate(iter(self.exceptions_queue.get, None)):
             exception_exist = True
-            self.cb_msg(f'##### EXCEPTION {count} #####')
-            self.cb_msg(e)
-            self.cb_msg('#######################')
+            self.cb_msg(f'##### EXCEPTION {count} #####', file=sys.stderr)
+            self.cb_msg(e, file=sys.stderr)
+            self.cb_msg('#######################', file=sys.stderr)
 
         if exception_exist:
             return False

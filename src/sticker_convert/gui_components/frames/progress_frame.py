@@ -56,6 +56,7 @@ class ProgressFrame(LabelFrame):
     def update_message_box(self, *args, **kwargs):
         msg = kwargs.get('msg')
         cls = kwargs.get('cls')
+        file = kwargs.get('file')
 
         if not msg and len(args) == 1:
             msg = str(args[0])
@@ -63,6 +64,8 @@ class ProgressFrame(LabelFrame):
         if msg:
             if self.progress_bar_cli:
                 self.progress_bar_cli.write(msg)
+            elif file:
+                print(msg, file=file)
             else:
                 print(msg)
             msg += '\n'

@@ -352,6 +352,7 @@ class CLI:
     
     def cb_msg(self, *args, **kwargs):
         msg = kwargs.get('msg')
+        file = kwargs.get('file')
 
         if not msg and len(args) == 1:
             msg = str(args[0])
@@ -359,6 +360,8 @@ class CLI:
         if msg:
             if self.progress_bar:
                 self.progress_bar.write(msg)
+            elif file:
+                print(msg, file=file)
             else:
                 print(msg)
 
