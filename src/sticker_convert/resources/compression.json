@@ -30,7 +30,7 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
@@ -75,7 +75,7 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
@@ -120,7 +120,7 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
@@ -165,7 +165,7 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
@@ -210,7 +210,7 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
@@ -255,7 +255,7 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
@@ -292,7 +292,7 @@
                 "min": 300,
                 "max": 300
             },
-            "power": 3
+            "power": 1
         },
         "quality": {
             "min": 10,
@@ -300,13 +300,13 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
         "duration": {
             "min": 0,
-            "max": 5000
+            "max": 2000
         },
         "steps": 8,
         "fake_vid": false,
@@ -326,7 +326,7 @@
         "fps": {
             "min": 1,
             "max": 30,
-            "power": -0.5
+            "power": -0.2
         },
         "res": {
             "w": {
@@ -337,7 +337,7 @@
                 "min": 408,
                 "max": 408
             },
-            "power": 3
+            "power": 1
         },
         "quality": {
             "min": 10,
@@ -345,13 +345,13 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
         "duration": {
             "min": 0,
-            "max": 5000
+            "max": 2000
         },
         "steps": 8,
         "fake_vid": false,
@@ -371,7 +371,7 @@
         "fps": {
             "min": 1,
             "max": 30,
-            "power": -0.5
+            "power": 1
         },
         "res": {
             "w": {
@@ -382,7 +382,7 @@
                 "min": 618,
                 "max": 618
             },
-            "power": 3
+            "power": 1
         },
         "quality": {
             "min": 10,
@@ -390,13 +390,13 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
         "duration": {
             "min": 0,
-            "max": 5000
+            "max": 2000
         },
         "steps": 8,
         "fake_vid": false,
@@ -435,7 +435,7 @@
             "power": 5
         },
         "color": {
-            "min": 50,
+            "min": 32,
             "max": 257,
             "power": 3
         },
