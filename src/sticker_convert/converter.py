@@ -55,7 +55,7 @@ class StickerConvert:
     MSG_REDO_COMP = '[{}] Compressed {} -> {} but size {} {} limit {}, recompressing'
     MSG_DONE_COMP = '[S] Successful compression {} -> {} size {} (step {})'
     MSG_FAIL_COMP = ('[F] Failed Compression {} -> {}, '
-        'cannot get below limit {} with lowest quality under current settings')
+        'cannot get below limit {} with lowest quality under current settings (Best size: {})')
 
     def __init__(self,
                  in_f: Union[str, list[str, io.BytesIO]],
@@ -230,7 +230,7 @@ class StickerConvert:
 
     def compress_fail(self) -> tuple[bool, str, Union[None, bytes, str], int]:
         msg = self.MSG_FAIL_COMP.format(
-            self.in_f_name, self.out_f_name, self.size_max
+            self.in_f_name, self.out_f_name, self.size_max, self.size
         )
         self.cb_msg.put(msg)
 
