@@ -19,7 +19,7 @@ RUN apt purge -y python3-pip && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-VOLUME ["/app/stickers_input", "/app/stickers_output"]
+VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 
 ENTRYPOINT ["/app/sticker-convert.py"]
 
@@ -58,7 +58,7 @@ COPY ./src /app/
 
 RUN chmod -R 777 /app
 
-VOLUME ["/app/stickers_input", "/app/stickers_output"]
+VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 
 FROM base-gui AS min-gui
 RUN apt purge -y curl wget gpg git && \
