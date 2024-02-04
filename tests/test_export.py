@@ -1,0 +1,143 @@
+import os
+import sys
+from pathlib import Path
+
+import pytest
+
+from .common import run_cmd, PYTHON_EXE, SRC_DIR, SAMPLE_DIR, COMPRESSION_DICT
+
+os.chdir(Path(__file__).resolve().parent)
+sys.path.append('../src')
+
+from sticker_convert.utils.media.codec_info import CodecInfo
+
+SIGNAL_UUID = os.environ.get("SIGNAL_UUID")
+SIGNAL_PASSWORD = os.environ.get("SIGNAL_UUID")
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+TELEGRAM_USERID = os.environ.get("TELEGRAM_USERID")
+
+def _run_sticker_convert(tmp_path: Path, preset: str, export: str):
+    preset_dict = COMPRESSION_DICT.get(preset)
+
+    cmd = [
+        PYTHON_EXE,
+        'sticker-convert.py',
+        '--input-dir', SAMPLE_DIR,
+        '--output-dir', tmp_path,
+        '--preset', preset,
+        '--no-confirm',
+        '--author', 'sticker-convert-test',
+        '--title', 'sticker-convert-test'
+    ]
+
+    if export:
+        cmd.append(f'--export-{export}')
+
+    run_cmd(cmd, cwd=SRC_DIR)
+
+    for i in os.listdir(SAMPLE_DIR):
+        preset_dict.get("size_max").get("img")
+
+        if i.startswith("static_") and preset_dict.get("fake_vid") == False:
+            size_max = preset_dict.get("size_max").get("img")
+            fmt = preset_dict.get("format").get("img")
+        else:
+            size_max = preset_dict.get("size_max").get("vid")
+            fmt = preset_dict.get("format").get("vid")
+
+        fname = os.path.splitext(i)[0] + fmt
+        fpath = tmp_path / fname
+        fps, frames, duration = CodecInfo.get_file_fps_frames_duration(fpath)
+
+        print(f"[TEST] Check if {fname} exists")
+        assert os.path.isfile(fpath)
+        assert os.path.getsize(fpath) < size_max
+
+        if i.startswith("animated_"):
+            print(f"[TEST] {fname}: {fps=} {frames=} {duration=}")
+            duration_min = preset_dict.get("duration").get("min")
+            duration_max = preset_dict.get("duration").get("max")
+            assert fps <= preset_dict.get("fps").get("max")
+            if duration_min:
+                assert duration >= duration_min
+            if duration_max:
+                assert duration <= duration_max
+
+def _xcode_asserts(tmp_path: Path):
+    iconset = {
+        'App-Store-1024x1024pt.png': (1024, 1024),
+        'iPad-Settings-29pt@2x.png': (58, 58),
+        'iPhone-settings-29pt@2x.png': (58, 58),
+        'iPhone-Settings-29pt@3x.png': (87, 87),
+        'Messages27x20pt@2x.png': (54, 40),
+        'Messages27x20pt@3x.png': (81, 60),
+        'Messages32x24pt@2x.png': (64, 48),
+        'Messages32x24pt@3x.png': (96, 72),
+        'Messages-App-Store-1024x768pt.png': (1024, 768),
+        'Messages-iPad-67x50pt@2x.png': (134, 100),
+        'Messages-iPad-Pro-74x55pt@2x.png': (148, 110),
+        'Messages-iPhone-60x45pt@2x.png': (120, 90),
+        'Messages-iPhone-60x45pt@3x.png': (180, 135)
+    }
+
+    imessage_xcode_dir = tmp_path / "sticker-convert-test"
+
+    assert os.path.isfile(imessage_xcode_dir / "sticker-convert-test/Info.plist")
+
+    assert os.path.isfile(imessage_xcode_dir / "sticker-convert-test StickerPackExtension/Info.plist")
+    assert os.path.isfile(imessage_xcode_dir / "sticker-convert-test StickerPackExtension/Stickers.xcstickers/Contents.json")
+    for i in iconset:
+        assert os.path.isfile(imessage_xcode_dir / "sticker-convert-test StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset" / i)
+
+    assert os.path.isfile(imessage_xcode_dir / "sticker-convert-test.xcodeproj/project.pbxproj")
+
+@pytest.mark.skipif(not (SIGNAL_UUID and SIGNAL_PASSWORD), reason="No credentials")
+def test_upload_signal_with_upload(tmp_path):
+    _run_sticker_convert(tmp_path, "signal", "signal")
+
+@pytest.mark.skipif(not (TELEGRAM_TOKEN and TELEGRAM_USERID), reason="No credentials")
+def test_upload_telegram_with_upload(tmp_path):
+    _run_sticker_convert(tmp_path, "telegram", "telegram")
+
+@pytest.mark.skipif(not (TELEGRAM_TOKEN and TELEGRAM_USERID), reason="No credentials")
+def test_upload_telegram_emoji_with_upload(tmp_path):
+    _run_sticker_convert(tmp_path, "telegram_emoji", None)
+
+@pytest.mark.skipif(TELEGRAM_TOKEN and TELEGRAM_USERID, reason="With credentials")
+def test_upload_signal(tmp_path):
+    _run_sticker_convert(tmp_path, "signal", None)
+
+@pytest.mark.skipif(TELEGRAM_TOKEN and TELEGRAM_USERID, reason="With credentials")
+def test_upload_telegram(tmp_path):
+    _run_sticker_convert(tmp_path, "telegram", None)
+
+@pytest.mark.skipif(TELEGRAM_TOKEN and TELEGRAM_USERID, reason="With credentials")
+def test_upload_telegram_emoji(tmp_path):
+    _run_sticker_convert(tmp_path, "telegram_emoji", None)
+
+def test_export_wastickers(tmp_path):
+    _run_sticker_convert(tmp_path, "whatsapp", "whatsapp")
+
+    wastickers_path = tmp_path / f"sticker-convert-test.wastickers"
+    assert os.path.isfile(wastickers_path)
+
+def test_export_line(tmp_path):
+    _run_sticker_convert(tmp_path, "line", None)
+
+def test_export_kakao(tmp_path):
+    _run_sticker_convert(tmp_path, "kakao", None)
+
+def test_export_xcode_imessage_small(tmp_path):
+    _run_sticker_convert(tmp_path, "imessage_small", "imessage")
+
+    _xcode_asserts(tmp_path)
+
+def test_export_xcode_imessage_medium(tmp_path):
+    _run_sticker_convert(tmp_path, "imessage_medium", "imessage")
+
+    _xcode_asserts(tmp_path)
+
+def test_export_xcode_imessage_large(tmp_path):
+    _run_sticker_convert(tmp_path, "imessage_large", "imessage")
+
+    _xcode_asserts(tmp_path)

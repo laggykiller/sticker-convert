@@ -34,3 +34,9 @@ sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
 # Build wheel
 1. To build wheel `pip -m build .`
 2. To install wheel `pip install dist/sticker_convert-xxx.whl`
+
+# Run tests
+```
+pip install -r requirements-build.txt
+pytest ./tests
+```

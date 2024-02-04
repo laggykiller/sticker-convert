@@ -1,2 +1,3 @@
 nuitka==2.0
 wheel
+pytest
