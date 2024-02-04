@@ -3,12 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from .common import run_cmd, PYTHON_EXE, SRC_DIR
+from .common import run_cmd, PYTHON_EXE, SRC_DIR, TELEGRAM_TOKEN, LINE_COOKIES, KAKAO_TOKEN
 
 TEST_DOWNLOAD = os.environ.get("TEST_DOWNLOAD")
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-KAKAO_TOKEN = os.environ.get("KAKAO_TOKEN")
-LINE_COOKIES = os.environ.get("LINE_COOKIES")
 
 def _run_sticker_convert(
         tmp_path: Path,

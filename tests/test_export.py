@@ -4,17 +4,17 @@ from pathlib import Path
 
 import pytest
 
-from .common import run_cmd, PYTHON_EXE, SRC_DIR, SAMPLE_DIR, COMPRESSION_DICT
+from .common import (
+    run_cmd, PYTHON_EXE, SRC_DIR, SAMPLE_DIR, COMPRESSION_DICT, 
+    SIGNAL_UUID, SIGNAL_PASSWORD, TELEGRAM_TOKEN, TELEGRAM_USERID
+)
 
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append('../src')
 
 from sticker_convert.utils.media.codec_info import CodecInfo
 
-SIGNAL_UUID = os.environ.get("SIGNAL_UUID")
-SIGNAL_PASSWORD = os.environ.get("SIGNAL_UUID")
-TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-TELEGRAM_USERID = os.environ.get("TELEGRAM_USERID")
+TEST_UPLOAD = os.environ.get("TEST_UPLOAD")
 
 def _run_sticker_convert(tmp_path: Path, preset: str, export: str):
     preset_dict = COMPRESSION_DICT.get(preset)
@@ -91,14 +91,17 @@ def _xcode_asserts(tmp_path: Path):
 
     assert os.path.isfile(imessage_xcode_dir / "sticker-convert-test.xcodeproj/project.pbxproj")
 
+@pytest.mark.skipif(not TEST_UPLOAD, reason="TEST_UPLOAD not set")
 @pytest.mark.skipif(not (SIGNAL_UUID and SIGNAL_PASSWORD), reason="No credentials")
 def test_upload_signal_with_upload(tmp_path):
     _run_sticker_convert(tmp_path, "signal", "signal")
 
+@pytest.mark.skipif(not TEST_UPLOAD, reason="TEST_UPLOAD not set")
 @pytest.mark.skipif(not (TELEGRAM_TOKEN and TELEGRAM_USERID), reason="No credentials")
 def test_upload_telegram_with_upload(tmp_path):
     _run_sticker_convert(tmp_path, "telegram", "telegram")
 
+@pytest.mark.skipif(not TEST_UPLOAD, reason="TEST_UPLOAD not set")
 @pytest.mark.skipif(not (TELEGRAM_TOKEN and TELEGRAM_USERID), reason="No credentials")
 def test_upload_telegram_emoji_with_upload(tmp_path):
     _run_sticker_convert(tmp_path, "telegram_emoji", None)
