@@ -40,7 +40,7 @@ def check_root_dir_exe_writable() -> bool:
         or Path("/usr/local/bin") in ROOT_DIR_EXE.parents
         or Path("C:/Program Files") in ROOT_DIR_EXE.parents
         or Path("/Applications/") in ROOT_DIR_EXE.parents
-        or Path("site-packages") in ROOT_DIR_EXE.parents
+        or "site-packages" in ROOT_DIR_EXE.as_posix()
     ):
         return False
     else:
