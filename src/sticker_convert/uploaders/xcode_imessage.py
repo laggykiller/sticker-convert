@@ -34,7 +34,7 @@ class XcodeImessageIconset:
             with zipfile.ZipFile((ROOT_DIR / "ios-message-stickers-template.zip"), "r") as f:
                 dict = json.loads(
                     f.read(
-                        ROOT_DIR / "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
+                        "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
                     ).decode()
                 )
         else:
