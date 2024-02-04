@@ -3,6 +3,7 @@ import os
 import io
 from pathlib import Path
 from multiprocessing.queues import Queue as QueueType
+from fractions import Fraction
 from typing import Optional, Union
 from decimal import Decimal, ROUND_HALF_UP
 
@@ -171,11 +172,10 @@ class StickerConvert:
             self.res_h = param[1]
             self.quality = param[2]
             if param[3] and self.codec_info_orig.fps:
-                self.fps = min(param[3], self.codec_info_orig.fps)
-                if self.out_f.suffix == '.gif':
-                    self.fix_gif_fps()
+                fps_tmp = min(param[3], self.codec_info_orig.fps)
+                self.fps = self.fix_fps(fps_tmp)
             else:
-                self.fps = 0
+                self.fps = Fraction(0)
             self.color = param[4]
 
             self.tmp_f = io.BytesIO()
@@ -477,7 +477,7 @@ class StickerConvert:
             options['loop'] = '0'
         
         with av.open(self.tmp_f, 'w', format=self.out_f.suffix.replace('.', '')) as output:
-            out_stream = output.add_stream(codec, rate=int(self.fps), options=options)
+            out_stream = output.add_stream(codec, rate=self.fps, options=options)
             out_stream.width = self.res_w
             out_stream.height = self.res_h
             out_stream.pix_fmt = pixel_format
@@ -499,7 +499,7 @@ class StickerConvert:
         for frame in self.frames_processed:
             pic = webp.WebPPicture.from_numpy(frame)
             enc.encode_frame(pic, timestamp_ms, config=config)
-            timestamp_ms += int(1 / self.fps * 1000)
+            timestamp_ms += int(Decimal(1000 / self.fps).quantize(0, ROUND_HALF_UP))
         anim_data = enc.assemble(timestamp_ms)
         self.tmp_f.write(anim_data.buffer())
     
@@ -523,7 +523,7 @@ class StickerConvert:
         if self.apngasm == None:
             self.apngasm = APNGAsm()
 
-        delay_num = int(1000 / self.fps)
+        delay_num = int(Decimal(1000 / self.fps).quantize(0, ROUND_HALF_UP))
         for i in range(0, image_quant.height, self.res_h):
             with io.BytesIO() as f:
                 crop_dimension = (0, i, image_quant.width, i+self.res_h)
@@ -596,15 +596,30 @@ class StickerConvert:
     def _quantize_by_fastoctree(self, image: Image.Image) -> Image.Image:
         return image.quantize(colors=self.color, method=2)
 
-    def fix_gif_fps(self):
-        # Quote from https://www.w3.org/Graphics/GIF/spec-gif89a.txt
-        # vii) Delay Time - If not 0, this field specifies
-        # the number of hundredths (1/100) of a second
-        #
-        # We need to adjust fps such that delay is matching to hundreths of second
-        delay_hundreths = round(100 / self.fps)
-        self.fps = 100 / delay_hundreths
-        if self.fps > self.opt_comp.fps_max:
-            self.fps = 100 / (delay_hundreths + 1)
-        elif self.fps < self.opt_comp.fps_min:
-            self.fps = 100 / (delay_hundreths - 1)
+    def fix_fps(self, fps: float) -> Fraction:
+        # After rounding fps/duration during export,
+        # Video duration may exceed limit.
+        # Hence we need to 'fix' the fps
+        if self.out_f.suffix == '.gif':
+            # Quote from https://www.w3.org/Graphics/GIF/spec-gif89a.txt
+            # vii) Delay Time - If not 0, this field specifies
+            # the number of hundredths (1/100) of a second
+            #
+            # For GIF, we need to adjust fps such that delay is matching to hundreths of second
+            return self._fix_fps_duration(fps, 100)
+        elif self.out_f.suffix in ('.webp', '.apng'):
+            return self._fix_fps_duration(fps, 1000)
+        else:
+            return self._fix_fps_pyav(fps)
+    
+    def _fix_fps_duration(self, fps: float, denominator: int) -> Fraction:
+        delay = int(Decimal(denominator / fps).quantize(0, ROUND_HALF_UP))
+        fps = Fraction(denominator, delay)
+        if fps > self.opt_comp.fps_max:
+            return Fraction(denominator, (delay + 1))
+        elif fps < self.opt_comp.fps_min:
+            return Fraction(denominator, (delay - 1))
+        return fps
+
+    def _fix_fps_pyav(self, fps: float) -> Fraction:
+        return Fraction(Decimal(fps).quantize(0, ROUND_HALF_UP))
