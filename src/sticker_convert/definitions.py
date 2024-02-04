@@ -34,12 +34,12 @@ ROOT_DIR_EXE = get_root_dir_exe()
 def check_root_dir_exe_writable() -> bool:
     if (
         not os.access(ROOT_DIR_EXE.parent, os.W_OK)
-        or "/usr/bin/" in ROOT_DIR_EXE.parents
-        or "/bin" in ROOT_DIR_EXE.parents
-        or "/usr/local/bin" in ROOT_DIR_EXE.parents
-        or "C:\\Program Files" in ROOT_DIR_EXE.parents
-        or "/Applications/" in ROOT_DIR_EXE.parents
-        or "site-packages" in ROOT_DIR_EXE.parents
+        or Path("/usr/bin/") in ROOT_DIR_EXE.parents
+        or Path("/bin") in ROOT_DIR_EXE.parents
+        or Path("/usr/local/bin") in ROOT_DIR_EXE.parents
+        or Path("C:/Program Files") in ROOT_DIR_EXE.parents
+        or Path("/Applications/") in ROOT_DIR_EXE.parents
+        or Path("site-packages") in ROOT_DIR_EXE.parents
     ):
         return False
     else:
