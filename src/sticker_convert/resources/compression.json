@@ -134,6 +134,51 @@
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
+    "telegram_emoji": {
+        "size_max": {
+            "img": 512000,
+            "vid": 256000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".webm"
+        },
+        "fps": {
+            "min": 1,
+            "max": 30,
+            "power": -0.5
+        },
+        "res": {
+            "w": {
+                "min": 100,
+                "max": 100
+            },
+            "h": {
+                "min": 100,
+                "max": 100
+            },
+            "power": 1
+        },
+        "quality": {
+            "min": 10,
+            "max": 95,
+            "power": 5
+        },
+        "color": {
+            "min": 32,
+            "max": 257,
+            "power": 3
+        },
+        "duration": {
+            "min": 0,
+            "max": 3000
+        },
+        "steps": 16,
+        "fake_vid": false,
+        "scale_filter": "lanczos",
+        "quantize_method": "imagequant",
+        "default_emoji": "😀"
+    },
     "whatsapp": {
         "size_max": {
             "img": 100000,

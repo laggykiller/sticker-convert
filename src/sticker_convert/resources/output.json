@@ -15,6 +15,14 @@
             "author": false
         }
     },
+    "telegram_emoji": {
+        "full_name": "Upload to Telegram (Custom emoji)",
+        "help": "Upload to Telegram (Custom emoji)",
+        "metadata_requirements": {
+            "title": true,
+            "author": false
+        }
+    },
     "whatsapp": {
         "full_name": "Compress to .wastickers (WhatsApp)",
         "help": "Create a .wastickers file for uploading to WhatsApp",

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-import os
 from pathlib import Path
 from typing import Optional
+from urllib.parse import urlparse
 
 import anyio
 from telegram import Bot
@@ -25,12 +25,8 @@ class DownloadTelegram(DownloadBase):
         if not ("telegram.me" in self.url or "t.me" in self.url):
             self.cb_msg("Download failed: Unrecognized URL format")
             return False
-
-        self.title = ""
-        try:
-            self.title = self.url.split("/addstickers/")[1].split("?")[0]
-        except IndexError:
-            self.title = self.url.split("eu/stickers/")[1].split("?")[0]
+        
+        self.title = Path(urlparse(self.url).path).name
 
         return anyio.run(self.save_stickers)
 

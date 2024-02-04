@@ -22,7 +22,7 @@
     "telegram": {
         "full_name": "Download from Telegram",
         "help": "Download telegram stickers from a URL as input",
-        "example": "Example: https://telegram.me/addstickers/xxxxx",
+        "example": "Example: https://telegram.me/addstickers/xxxxx\n OR https://telegram.me/addemoji/xxxxx",
         "address_lbls": "URL address",
         "metadata_provides": {
             "title": true,

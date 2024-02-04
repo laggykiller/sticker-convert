@@ -437,6 +437,9 @@ class Job:
 
         if self.opt_output.option == 'telegram':
             exporters.append(UploadTelegram.start)
+        
+        if self.opt_output.option == 'telegram_emoji':
+            exporters.append(UploadTelegram.start)
 
         if self.opt_output.option == 'imessage':
             exporters.append(XcodeImessage.start)

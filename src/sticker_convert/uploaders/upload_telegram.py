@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 import copy
 import re
 from pathlib import Path
@@ -8,6 +7,7 @@ from typing import Optional
 import anyio
 from telegram import Bot, InputSticker
 from telegram.error import TelegramError
+from telegram import Sticker
 
 from .upload_base import UploadBase  # type: ignore
 from ..converter import StickerConvert  # type: ignore
@@ -142,6 +142,12 @@ class UploadTelegram(UploadBase):
                     spec_choice = self.png_spec
                     cover_spec_choice = self.png_cover_spec
                     sticker_format = "static"
+                
+                if self.opt_output.option == "telegram_emoji":
+                    sticker_type = Sticker.CUSTOM_EMOJI
+                    spec_choice.res = 100
+                else:
+                    sticker_type = Sticker.REGULAR
 
                 if FormatVerify.check_file(src, spec=spec_choice):
                     with open(src, "rb") as f:
@@ -161,6 +167,7 @@ class UploadTelegram(UploadBase):
                             title=pack_title,
                             stickers=[sticker],
                             sticker_format=sticker_format,
+                            sticker_type=sticker_type
                         )
                         pack_exists = True
                     else:
@@ -201,7 +208,10 @@ class UploadTelegram(UploadBase):
                         f"Cannot upload cover (thumbnail) for {pack_short_name} due to {e}"
                     )
 
-        result = f"https://t.me/addstickers/{pack_short_name}"
+        if self.opt_output.option == "telegram_emoji":
+            result = f"https://t.me/addemoji/{pack_short_name}"
+        else:
+            result = f"https://t.me/addstickers/{pack_short_name}"
         return result
 
     def upload_stickers_telegram(self) -> list[str]:
