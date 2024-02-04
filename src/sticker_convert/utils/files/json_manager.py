@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-from pathlib import Path
 import json
+from pathlib import Path
 from typing import Optional
+
 
 class JsonManager:
     @staticmethod

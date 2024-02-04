@@ -2,13 +2,15 @@
 from functools import partial
 from threading import Thread
 
-from ttkbootstrap import LabelFrame, Frame, Button, Entry, Label # type: ignore
+from ttkbootstrap import (Button, Entry, Frame, Label,  # type: ignore
+                          LabelFrame)
 
-from ...utils.auth.get_kakao_auth import GetKakaoAuth # type: ignore
-from ...job_option import CredOption
-from ..frames.right_clicker import RightClicker # type: ignore
-from .base_window import BaseWindow # type: ignore
-from ..gui_utils import GUIUtils # type: ignore
+from sticker_convert.gui_components.frames.right_clicker import RightClicker  # type: ignore
+from sticker_convert.gui_components.gui_utils import GUIUtils  # type: ignore
+from sticker_convert.gui_components.windows.base_window import BaseWindow  # type: ignore
+from sticker_convert.job_option import CredOption
+from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth  # type: ignore
+
 
 class KakaoGetAuthWindow(BaseWindow):
     def __init__(self, *args, **kwargs):

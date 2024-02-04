@@ -1,19 +1,20 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import os
+
 import json
+import os
 from pathlib import Path
 from typing import Optional
 
-from ..media.codec_info import CodecInfo  # type: ignore
-from .json_manager import JsonManager  # type: ignore
-from ...definitions import ROOT_DIR # type: ignore
+from sticker_convert.definitions import ROOT_DIR  # type: ignore
+from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
+from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
 
 
 class MetadataHandler:
     @staticmethod
     def get_stickers_present(dir: str) -> list[str]:
-        from ...uploaders.xcode_imessage import XcodeImessageIconset  # type: ignore
+        from sticker_convert.uploaders.xcode_imessage import         XcodeImessageIconset  # type: ignore
 
         blacklist_prefix = ('cover',)
         blacklist_suffix = (".txt", ".m4a", ".wastickers", ".DS_Store", "._.DS_Store")

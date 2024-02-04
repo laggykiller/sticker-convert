@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-from typing import Optional
 from pathlib import Path
-from ..job_option import CompOption, OutputOption, CredOption # type: ignore
+from typing import Optional
+
+from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
+                                        OutputOption)
 
 
 class UploadBase:

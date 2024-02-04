@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-from pathlib import Path
+
 import mmap
+from decimal import ROUND_HALF_UP, Decimal
+from pathlib import Path
 from typing import Optional
-from decimal import Decimal, ROUND_HALF_UP
 
 from PIL import Image, UnidentifiedImageError
+
 
 class CodecInfo:
     def __init__(self, file: Path):
@@ -171,7 +173,7 @@ class CodecInfo:
     
     @staticmethod
     def _get_file_frames_duration_av(file: Path, frames_to_iterate: Optional[int] = None, frames_only: bool = False) -> tuple[int, int]:
-        import av # type: ignore
+        import av  # type: ignore
 
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
@@ -227,7 +229,7 @@ class CodecInfo:
         elif codec != None:
             return codec.lower()
         
-        import av # type: ignore
+        import av  # type: ignore
         from av.error import InvalidDataError
 
         if isinstance(file, Path):
@@ -256,7 +258,7 @@ class CodecInfo:
                 width = im.width
                 height = im.height
         else:
-            import av # type: ignore
+            import av  # type: ignore
 
             if isinstance(file, Path):
                 file = file.as_posix()

@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-import requests
+import json
 import secrets
 import uuid
-import json
-from urllib.parse import urlparse, parse_qs
 from typing import Optional
+from urllib.parse import parse_qs, urlparse
 
-from ...job_option import CredOption
+import requests
+
+from sticker_convert.job_option import CredOption
+
 
 class GetKakaoAuth:
     def __init__(self, opt_cred: CredOption, cb_msg=print, cb_msg_block=input, cb_ask_str=input):

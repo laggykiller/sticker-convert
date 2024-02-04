@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-import subprocess
 import os
-import shutil
 import platform
+import shutil
+import subprocess
 from pathlib import Path
-from typing import Union, AnyStr
+from typing import AnyStr, Union
 
 
 class RunBin:

@@ -3,8 +3,8 @@ import os
 from pathlib import Path
 from typing import Optional, Union
 
-from .codec_info import CodecInfo  # type: ignore
-from ...job_option import CompOption # type: ignore
+from sticker_convert.job_option import CompOption  # type: ignore
+from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
 
 
 class FormatVerify:

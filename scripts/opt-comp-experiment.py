@@ -5,21 +5,21 @@ based on compression on random pixels, which is an almost
 worst case scenario for compression
 '''
 
+import copy
+import csv
+import itertools
+import math
 import os
 import sys
-import math
+from multiprocessing import Process, Queue, cpu_count
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
-from multiprocessing import Process, Queue, cpu_count
-import itertools
-import copy
-import csv
 
 import numpy
+from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
 from PIL import Image
 from tqdm import tqdm
-from apngasm_python._apngasm_python import create_frame_from_rgba, APNGAsm
 
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append('../src')

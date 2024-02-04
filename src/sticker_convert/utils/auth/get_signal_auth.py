@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
-import os
 import io
 import json
+import os
+import platform
 import shutil
 import stat
-import platform
-import zipfile
 import string
-from pathlib import Path
 import webbrowser
-from typing import Optional, Generator
+import zipfile
+from pathlib import Path
+from typing import Generator, Optional
 
 import requests
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import JavascriptException
+from selenium.webdriver.chrome.service import Service
 
-from ..files.run_bin import RunBin # type: ignore
-from ...definitions import CONFIG_DIR # type: ignore
+from sticker_convert.definitions import CONFIG_DIR  # type: ignore
+from sticker_convert.utils.files.run_bin import RunBin  # type: ignore
+
 
 # https://stackoverflow.com/a/17197027
 def strings(filename: str, min: int = 4) -> Generator[str, None, None]:

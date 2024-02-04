@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 from typing import TYPE_CHECKING
 
-from ttkbootstrap import LabelFrame, Progressbar # type: ignore
-from ttkbootstrap.scrolled import ScrolledText # type: ignore
 from tqdm import tqdm
+from ttkbootstrap import LabelFrame, Progressbar  # type: ignore
+from ttkbootstrap.scrolled import ScrolledText  # type: ignore
 
 if TYPE_CHECKING:
-    from ...gui import GUI # type: ignore
-from .right_clicker import RightClicker # type: ignore
+    from sticker_convert.gui import GUI # type: ignore
+
+from sticker_convert.gui_components.frames.right_clicker import RightClicker  # type: ignore
+
 
 class ProgressFrame(LabelFrame):
     progress_bar_cli = None

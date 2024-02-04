@@ -1,5 +1,7 @@
-from ttkbootstrap import Menu # type: ignore
 from tkinter import Event
+
+from ttkbootstrap import Menu  # type: ignore
+
 
 # Reference: https://stackoverflow.com/a/57704013
 class RightClicker:

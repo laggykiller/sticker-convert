@@ -3,33 +3,31 @@ from __future__ import annotations
 
 import os
 import shutil
-from pathlib import Path
+import traceback
 from datetime import datetime
 from multiprocessing import Process, Queue, Value
 from multiprocessing.queues import Queue as QueueType
+from pathlib import Path
 from threading import Thread
-from urllib.parse import urlparse
-import traceback
 from typing import Optional
+from urllib.parse import urlparse
 
-from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
-
-from .downloaders.download_line import DownloadLine # type: ignore
-from .downloaders.download_signal import DownloadSignal # type: ignore
-from .downloaders.download_telegram import DownloadTelegram # type: ignore
-from .downloaders.download_kakao import DownloadKakao # type: ignore
-
-from .uploaders.upload_base import UploadBase
-from .uploaders.upload_signal import UploadSignal # type: ignore
-from .uploaders.upload_telegram import UploadTelegram # type: ignore
-from .uploaders.compress_wastickers import CompressWastickers # type: ignore
-from .uploaders.xcode_imessage import XcodeImessage # type: ignore
-
-from .converter import StickerConvert # type: ignore
-from .utils.media.codec_info import CodecInfo # type: ignore
-from .utils.files.json_manager import JsonManager # type: ignore
-from .definitions import ROOT_DIR # type: ignore
-from .utils.files.metadata_handler import MetadataHandler # type: ignore
+from sticker_convert.converter import StickerConvert  # type: ignore
+from sticker_convert.definitions import ROOT_DIR  # type: ignore
+from sticker_convert.downloaders.download_kakao import DownloadKakao  # type: ignore
+from sticker_convert.downloaders.download_line import DownloadLine  # type: ignore
+from sticker_convert.downloaders.download_signal import DownloadSignal  # type: ignore
+from sticker_convert.downloaders.download_telegram import DownloadTelegram  # type: ignore
+from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
+                                        InputOption, OutputOption)
+from sticker_convert.uploaders.compress_wastickers import CompressWastickers  # type: ignore
+from sticker_convert.uploaders.upload_base import UploadBase
+from sticker_convert.uploaders.upload_signal import UploadSignal  # type: ignore
+from sticker_convert.uploaders.upload_telegram import UploadTelegram  # type: ignore
+from sticker_convert.uploaders.xcode_imessage import XcodeImessage  # type: ignore
+from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
+from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
+from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
 
 
 class Job:

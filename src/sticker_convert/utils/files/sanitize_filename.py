@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-import unicodedata
 import re
+import unicodedata
+
 
 def sanitize_filename(filename: str) -> str:
     # Based on https://gitlab.com/jplusplus/sanitize-filename/-/blob/master/sanitize_filename/sanitize_filename.py

@@ -4,10 +4,9 @@ from pathlib import Path
 
 import pytest
 
-from .common import (
-    run_cmd, PYTHON_EXE, SRC_DIR, SAMPLE_DIR, COMPRESSION_DICT, 
-    SIGNAL_UUID, SIGNAL_PASSWORD, TELEGRAM_TOKEN, TELEGRAM_USERID
-)
+from tests.common import (COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR,
+                          SIGNAL_PASSWORD, SIGNAL_UUID, SRC_DIR,
+                          TELEGRAM_TOKEN, TELEGRAM_USERID, run_cmd)
 
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append('../src')

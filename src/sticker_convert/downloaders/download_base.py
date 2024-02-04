@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+
 from typing import Optional, Union
 
 import requests
 
-from ..job_option import CredOption # type: ignore
+from sticker_convert.job_option import CredOption  # type: ignore
 
 
 class DownloadBase:

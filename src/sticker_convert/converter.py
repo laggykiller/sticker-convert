@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-import os
 import io
-from pathlib import Path
-from multiprocessing.queues import Queue as QueueType
-from fractions import Fraction
-from typing import Optional, Union
-from decimal import Decimal, ROUND_HALF_UP
 import math
+import os
+from decimal import ROUND_HALF_UP, Decimal
+from fractions import Fraction
+from multiprocessing.queues import Queue as QueueType
+from pathlib import Path
+from typing import Optional, Union
 
 import numpy as np
 from PIL import Image
 
-from .utils.media.codec_info import CodecInfo # type: ignore
-from .utils.files.cache_store import CacheStore # type: ignore
-from .utils.media.format_verify import FormatVerify # type: ignore
-from .utils.fake_cb_msg import FakeCbMsg # type: ignore
-from .job_option import CompOption
+from sticker_convert.job_option import CompOption
+from sticker_convert.utils.fake_cb_msg import FakeCbMsg  # type: ignore
+from sticker_convert.utils.files.cache_store import CacheStore  # type: ignore
+from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
+from sticker_convert.utils.media.format_verify import FormatVerify  # type: ignore
+
 
 def get_step_value(
         max: Optional[int], min: Optional[int],
@@ -271,8 +272,8 @@ class StickerConvert:
                 self.frames_raw.append(np.asarray(im.convert("RGBA")))
     
     def _frames_import_pyav(self):
-        import av # type: ignore
-        from av.codec.context import CodecContext # type: ignore
+        import av  # type: ignore
+        from av.codec.context import CodecContext  # type: ignore
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
@@ -334,7 +335,7 @@ class StickerConvert:
                     self.frames_raw.append(rgba_array)
 
     def _frames_import_lottie(self):
-        from rlottie_python import LottieAnimation # type: ignore
+        from rlottie_python import LottieAnimation  # type: ignore
         
         if self.in_f.suffix == '.tgs':
             anim = LottieAnimation.from_tgs(self.in_f)
@@ -458,7 +459,7 @@ class StickerConvert:
             )
 
     def _frames_export_pyav(self):
-        import av # type: ignore
+        import av  # type: ignore
 
         options = {}
         
@@ -499,7 +500,7 @@ class StickerConvert:
                 output.mux(packet)
     
     def _frames_export_webp(self):
-        import webp # type: ignore
+        import webp  # type: ignore
 
         config = webp.WebPConfig.new(quality=self.quality)
         enc = webp.WebPAnimEncoder.new(self.res_w, self.res_h)
@@ -522,7 +523,8 @@ class StickerConvert:
             self.tmp_f.write(frame_optimized)
 
     def _frames_export_apng(self):
-        from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba
+        from apngasm_python._apngasm_python import (APNGAsm,
+                                                    create_frame_from_rgba)
 
         frames_concat = np.concatenate(self.frames_processed)
         with Image.fromarray(frames_concat, 'RGBA') as image_concat:

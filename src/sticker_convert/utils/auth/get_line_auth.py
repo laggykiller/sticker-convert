@@ -3,8 +3,9 @@ import json
 import platform
 from typing import Optional
 
-import rookiepy # type: ignore
 import requests
+import rookiepy  # type: ignore
+
 
 class GetLineAuth:
     def get_cred(self) -> Optional[str]:

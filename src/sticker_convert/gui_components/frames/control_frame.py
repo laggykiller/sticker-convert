@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 from typing import TYPE_CHECKING
 
-from ttkbootstrap import Frame, Button # type: ignore
+from ttkbootstrap import Button, Frame  # type: ignore
 
 if TYPE_CHECKING:
-    from ...gui import GUI # type: ignore
+    from sticker_convert.gui import GUI  # type: ignore
 
 class ControlFrame(Frame):
     def __init__(self, gui: "GUI", *args, **kwargs):

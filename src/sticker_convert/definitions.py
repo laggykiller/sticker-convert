@@ -1,7 +1,8 @@
 import os
-import sys
 import platform
+import sys
 from pathlib import Path
+
 
 def get_root_dir() -> Path:
     i = 0

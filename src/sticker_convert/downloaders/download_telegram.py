@@ -7,9 +7,9 @@ import anyio
 from telegram import Bot
 from telegram.error import TelegramError
 
-from .download_base import DownloadBase  # type: ignore
-from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
-from ..job_option import CredOption  # type: ignore
+from sticker_convert.downloaders.download_base import DownloadBase  # type: ignore
+from sticker_convert.job_option import CredOption  # type: ignore
+from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
 
 
 class DownloadTelegram(DownloadBase):

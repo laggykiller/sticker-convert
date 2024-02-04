@@ -1,14 +1,17 @@
 #!/usr/bin/env python3
 from pathlib import Path
+from tkinter import filedialog
 from typing import TYPE_CHECKING
 
-from tkinter import filedialog
-from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label # type: ignore
+from ttkbootstrap import (Button, Entry, Label, LabelFrame,  # type: ignore
+                          OptionMenu)
 
 if TYPE_CHECKING:
-    from ...gui import GUI # type: ignore
-from ...definitions import DEFAULT_DIR # type: ignore
-from .right_clicker import RightClicker # type: ignore
+    from sticker_convert.gui import GUI # type: ignore
+
+from sticker_convert.definitions import DEFAULT_DIR  # type: ignore
+from sticker_convert.gui_components.frames.right_clicker import RightClicker  # type: ignore
+
 
 class OutputFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args, **kwargs):

@@ -3,12 +3,14 @@ import os
 import platform
 from typing import TYPE_CHECKING
 
-from ttkbootstrap import LabelFrame, Button, Label, Checkbutton # type: ignore
+from ttkbootstrap import Button, Checkbutton, Label, LabelFrame  # type: ignore
 
 if TYPE_CHECKING:
-    from ..gui import GUI # type: ignore
-from ...definitions import CONFIG_DIR # type: ignore
-from ...utils.files.run_bin import RunBin # type: ignore
+    from sticker_convert.gui_components.gui import GUI # type: ignore
+
+from sticker_convert.definitions import CONFIG_DIR  # type: ignore
+from sticker_convert.utils.files.run_bin import RunBin  # type: ignore
+
 
 class ConfigFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args, **kwargs):

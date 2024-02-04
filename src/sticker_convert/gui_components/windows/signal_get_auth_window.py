@@ -2,11 +2,12 @@
 from functools import partial
 from threading import Thread
 
-from ttkbootstrap import Toplevel, Frame, Button, Label # type: ignore
+from ttkbootstrap import Button, Frame, Label, Toplevel  # type: ignore
 
-from ...utils.auth.get_signal_auth import GetSignalAuth # type: ignore
-from .base_window import BaseWindow # type: ignore
-from ..gui_utils import GUIUtils # type: ignore
+from sticker_convert.gui_components.gui_utils import GUIUtils  # type: ignore
+from sticker_convert.gui_components.windows.base_window import BaseWindow  # type: ignore
+from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth  # type: ignore
+
 
 class SignalGetAuthWindow(BaseWindow):
     def __init__(self, *args, **kwargs):

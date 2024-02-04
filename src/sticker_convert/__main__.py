@@ -2,7 +2,8 @@
 def main():
     import multiprocessing
     import sys
-    from .__init__ import __version__
+
+    from sticker_convert.__init__ import __version__
 
     multiprocessing.freeze_support()
     print(f"sticker-convert {__version__}")

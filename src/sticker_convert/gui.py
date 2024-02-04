@@ -1,38 +1,40 @@
 #!/usr/bin/env python3
-import os
-import sys
-import platform
-import time
 import math
-from pathlib import Path
-from multiprocessing import cpu_count
-from threading import Thread, Lock, current_thread, main_thread
-from queue import Queue
+import os
+import platform
+import sys
+import time
 from functools import partial
-from uuid import uuid4
+from multiprocessing import cpu_count
+from pathlib import Path
+from queue import Queue
+from threading import Lock, Thread, current_thread, main_thread
+from typing import Any, Optional
 from urllib.parse import urlparse
-from typing import Optional, Any
+from uuid import uuid4
 
 from PIL import ImageFont
-from ttkbootstrap import Window, StringVar, BooleanVar, IntVar, DoubleVar # type: ignore
-from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
+from ttkbootstrap import (BooleanVar, DoubleVar, IntVar,  # type: ignore
+                          StringVar, Window)
+from ttkbootstrap.dialogs import Messagebox, Querybox  # type: ignore
 
-from .job import Job # type: ignore
-from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
-from .utils.files.json_manager import JsonManager # type: ignore
-from .definitions import ROOT_DIR, DEFAULT_DIR, CONFIG_DIR # type: ignore
-from .utils.files.metadata_handler import MetadataHandler # type: ignore
-from .utils.url_detect import UrlDetect # type: ignore
-from .gui_components.gui_utils import GUIUtils # type: ignore
-from .__init__ import __version__ # type: ignore
-
-from .gui_components.frames.input_frame import InputFrame # type: ignore
-from .gui_components.frames.comp_frame import CompFrame # type: ignore
-from .gui_components.frames.cred_frame import CredFrame # type: ignore
-from .gui_components.frames.output_frame import OutputFrame # type: ignore
-from .gui_components.frames.config_frame import ConfigFrame # type: ignore
-from .gui_components.frames.progress_frame import ProgressFrame # type: ignore
-from .gui_components.frames.control_frame import ControlFrame # type: ignore
+from sticker_convert.__init__ import __version__  # type: ignore
+from sticker_convert.definitions import (CONFIG_DIR,  # type: ignore
+                                         DEFAULT_DIR, ROOT_DIR)
+from sticker_convert.gui_components.frames.comp_frame import CompFrame  # type: ignore
+from sticker_convert.gui_components.frames.config_frame import ConfigFrame  # type: ignore
+from sticker_convert.gui_components.frames.control_frame import ControlFrame  # type: ignore
+from sticker_convert.gui_components.frames.cred_frame import CredFrame  # type: ignore
+from sticker_convert.gui_components.frames.input_frame import InputFrame  # type: ignore
+from sticker_convert.gui_components.frames.output_frame import OutputFrame  # type: ignore
+from sticker_convert.gui_components.frames.progress_frame import ProgressFrame  # type: ignore
+from sticker_convert.gui_components.gui_utils import GUIUtils  # type: ignore
+from sticker_convert.job import Job  # type: ignore
+from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
+                                        InputOption, OutputOption)
+from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
+from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
+from sticker_convert.utils.url_detect import UrlDetect  # type: ignore
 
 
 class GUI(Window):

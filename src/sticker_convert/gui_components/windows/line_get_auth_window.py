@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-from functools import partial
 import webbrowser
+from functools import partial
 from threading import Thread
 
-from ttkbootstrap import Frame, Button, Label # type: ignore
+from ttkbootstrap import Button, Frame, Label  # type: ignore
 
-from ...utils.auth.get_line_auth import GetLineAuth # type: ignore
-from .base_window import BaseWindow # type: ignore
-from ..gui_utils import GUIUtils # type: ignore
+from sticker_convert.gui_components.gui_utils import GUIUtils  # type: ignore
+from sticker_convert.gui_components.windows.base_window import BaseWindow  # type: ignore
+from sticker_convert.utils.auth.get_line_auth import GetLineAuth  # type: ignore
+
 
 class LineGetAuthWindow(BaseWindow):
     def __init__(self, *args, **kwargs):

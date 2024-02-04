@@ -4,7 +4,8 @@ from pathlib import Path
 
 import pytest
 
-from .common import run_cmd, PYTHON_EXE, SRC_DIR, SAMPLE_DIR, COMPRESSION_DICT
+from tests.common import (COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SRC_DIR,
+                          run_cmd)
 
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append('../src')

@@ -3,7 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from .common import run_cmd, PYTHON_EXE, SRC_DIR, TELEGRAM_TOKEN, LINE_COOKIES, KAKAO_TOKEN
+from tests.common import (KAKAO_TOKEN, LINE_COOKIES, PYTHON_EXE, SRC_DIR,
+                          TELEGRAM_TOKEN, run_cmd)
 
 TEST_DOWNLOAD = os.environ.get("TEST_DOWNLOAD")
 

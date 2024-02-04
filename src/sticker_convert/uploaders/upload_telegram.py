@@ -5,15 +5,15 @@ from pathlib import Path
 from typing import Optional
 
 import anyio
-from telegram import Bot, InputSticker
+from telegram import Bot, InputSticker, Sticker
 from telegram.error import TelegramError
-from telegram import Sticker
 
-from .upload_base import UploadBase  # type: ignore
-from ..converter import StickerConvert  # type: ignore
-from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
-from ..utils.media.format_verify import FormatVerify  # type: ignore
-from ..job_option import CompOption, OutputOption, CredOption # type: ignore
+from sticker_convert.converter import StickerConvert  # type: ignore
+from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
+                                        OutputOption)
+from sticker_convert.uploaders.upload_base import UploadBase  # type: ignore
+from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
+from sticker_convert.utils.media.format_verify import FormatVerify  # type: ignore
 
 
 class UploadTelegram(UploadBase):

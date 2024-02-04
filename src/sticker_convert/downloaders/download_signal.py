@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 import os
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
+from signalstickers_client.errors import SignalException  # type: ignore
 from signalstickers_client.models import StickerPack  # type: ignore
-from signalstickers_client.errors import SignalException # type: ignore
 
-from .download_base import DownloadBase  # type: ignore
-from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
-from ..utils.media.codec_info import CodecInfo  # type: ignore
-from ..job_option import CredOption  # type: ignore
+from sticker_convert.downloaders.download_base import DownloadBase  # type: ignore
+from sticker_convert.job_option import CredOption  # type: ignore
+from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
+from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
 
 
 class DownloadSignal(DownloadBase):

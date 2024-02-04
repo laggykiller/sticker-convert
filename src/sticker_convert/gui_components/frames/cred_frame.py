@@ -2,14 +2,16 @@
 import webbrowser
 from typing import TYPE_CHECKING
 
-from ttkbootstrap import LabelFrame, Button, Entry, Label # type: ignore
+from ttkbootstrap import Button, Entry, Label, LabelFrame  # type: ignore
 
 if TYPE_CHECKING:
-    from ...gui import GUI # type: ignore
-from ..windows.signal_get_auth_window import SignalGetAuthWindow # type: ignore
-from ..windows.line_get_auth_window import LineGetAuthWindow # type: ignore
-from ..windows.kakao_get_auth_window import KakaoGetAuthWindow # type: ignore
-from .right_clicker import RightClicker # type: ignore
+    from sticker_convert.gui import GUI # type: ignore
+
+from sticker_convert.gui_components.frames.right_clicker import RightClicker  # type: ignore
+from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGetAuthWindow  # type: ignore
+from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow  # type: ignore
+from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow  # type: ignore
+
 
 class CredFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args, **kwargs):

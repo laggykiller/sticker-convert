@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
-from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label, Checkbutton # type: ignore
 from typing import TYPE_CHECKING
 
+from ttkbootstrap import (Button, Checkbutton, Entry, Label,  # type: ignore
+                          LabelFrame, OptionMenu)
+
 if TYPE_CHECKING:
-    from ...gui import GUI # type: ignore
-from ..windows.advanced_compression_window import AdvancedCompressionWindow # type: ignore
-from .right_clicker import RightClicker # type: ignore
+    from sticker_convert.gui import GUI # type: ignore
+
+from sticker_convert.gui_components.frames.right_clicker import RightClicker  # type: ignore
+from sticker_convert.gui_components.windows.advanced_compression_window import AdvancedCompressionWindow  # type: ignore
+
 
 class CompFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args, **kwargs):

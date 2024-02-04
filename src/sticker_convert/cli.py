@@ -1,21 +1,23 @@
 #!/usr/bin/env python3
+import argparse
 import math
 from multiprocessing import cpu_count
-import argparse
 from pathlib import Path
 from typing import Optional
 
 from tqdm import tqdm
 
-from .job import Job # type: ignore
-from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
-from .utils.files.json_manager import JsonManager # type: ignore
-from .utils.auth.get_kakao_auth import GetKakaoAuth # type: ignore
-from .utils.auth.get_signal_auth import GetSignalAuth # type: ignore
-from .utils.auth.get_line_auth import GetLineAuth # type: ignore
-from .definitions import ROOT_DIR, DEFAULT_DIR, CONFIG_DIR # type: ignore
-from .utils.url_detect import UrlDetect # type: ignore
-from .__init__ import __version__ # type: ignore
+from sticker_convert.__init__ import __version__  # type: ignore
+from sticker_convert.definitions import (CONFIG_DIR,  # type: ignore
+                                         DEFAULT_DIR, ROOT_DIR)
+from sticker_convert.job import Job  # type: ignore
+from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
+                                        InputOption, OutputOption)
+from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth  # type: ignore
+from sticker_convert.utils.auth.get_line_auth import GetLineAuth  # type: ignore
+from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth  # type: ignore
+from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
+from sticker_convert.utils.url_detect import UrlDetect  # type: ignore
 
 
 class CLI:

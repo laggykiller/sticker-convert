@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 import os
-import sys
-import subprocess
 import platform
 import shutil
+import subprocess
+import sys
 from pathlib import Path
 
 sys.path.append('./src')
 from sticker_convert.__init__ import __version__
+
 
 def osx_run_in_venv(cmd, get_stdout=False):
     if Path('/bin/zsh').is_file():

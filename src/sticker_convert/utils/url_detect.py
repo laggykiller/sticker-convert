@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import string
-from urllib.parse import urlparse
 from typing import Optional
+from urllib.parse import urlparse
 
 
 class UrlDetect:

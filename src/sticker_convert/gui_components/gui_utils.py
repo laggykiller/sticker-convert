@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+
 import platform
-from typing import Union, TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 
-from ttkbootstrap import Frame, Canvas, Scrollbar, PhotoImage
+from ttkbootstrap import Canvas, Frame, PhotoImage, Scrollbar
 
-from ..definitions import ROOT_DIR
+from sticker_convert.definitions import ROOT_DIR
+
 if TYPE_CHECKING:
-    from .windows.base_window import BaseWindow  # type: ignore
-    from ..gui import GUI  # type: ignore
+    from sticker_convert.gui import GUI  # type: ignore
+    from sticker_convert.gui_components.windows.base_window import     BaseWindow  # type: ignore
 
 
 class GUIUtils:

@@ -1,24 +1,26 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+
 '''Reference: https://github.com/doubleplusc/Line-sticker-downloader/blob/master/sticker_dl.py'''
 
-import requests
+import io
 import json
 import os
-import io
-from pathlib import Path
-import zipfile
 import string
-from urllib import parse
-from PIL import Image
-from bs4 import BeautifulSoup
+import zipfile
+from pathlib import Path
 from typing import Optional
+from urllib import parse
 
-from .download_base import DownloadBase # type: ignore
-from ..utils.auth.get_line_auth import GetLineAuth # type: ignore
-from ..utils.files.metadata_handler import MetadataHandler # type: ignore
-from ..utils.media.apple_png_normalize import ApplePngNormalize # type: ignore
-from ..job_option import CredOption  # type: ignore
+import requests
+from bs4 import BeautifulSoup
+from PIL import Image
+
+from sticker_convert.downloaders.download_base import DownloadBase  # type: ignore
+from sticker_convert.job_option import CredOption  # type: ignore
+from sticker_convert.utils.auth.get_line_auth import GetLineAuth  # type: ignore
+from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
+from sticker_convert.utils.media.apple_png_normalize import ApplePngNormalize  # type: ignore
 
 
 class MetadataLine:
