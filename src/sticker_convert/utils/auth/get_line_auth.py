@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import platform
 from typing import Optional
 
 import rookiepy # type: ignore
@@ -7,13 +8,45 @@ import requests
 
 class GetLineAuth:
     def get_cred(self) -> Optional[str]:
-        cookies_rookie = [c for c in rookiepy.load() if c.domain == 'store.line.me']
-        cookies_dict = rookiepy.to_dict(cookies_rookie)
-        cookies_jar = rookiepy.to_cookiejar(cookies_rookie)
+        browsers = [
+            rookiepy.load, # Supposed to load from any browser, but may fail
+            rookiepy.firefox,
+            rookiepy.libre_wolf,
+            rookiepy.chrome,
+            rookiepy.chromium,
+            rookiepy.brave,
+            rookiepy.edge,
+            rookiepy.opera,
+            rookiepy.vivaldi
+        ]
 
-        if not GetLineAuth.validate_cookies(cookies_jar):
+        if platform.system() == 'Windows':
+            browsers.extend([
+                rookiepy.opera_gx,
+                rookiepy.internet_explorer,
+            ])
+        elif platform.system() == 'Darwin':
+            browsers.extend([
+                rookiepy.opera_gx,
+                rookiepy.safari,
+            ])
+
+        cookies_dict = None
+        cookies_jar = None
+        for browser in browsers:
+            try:
+                cookies_dict = browser(['store.line.me'])
+                cookies_jar = rookiepy.to_cookiejar(cookies_dict)
+
+                if GetLineAuth.validate_cookies(cookies_jar):
+                    break
+
+            except Exception:
+                continue
+        
+        if cookies_jar == None:
             return None
-                
+        
         cookies_list = ['%s=%s' % (i['name'], i['value']) for i in cookies_dict]
         cookies = ';'.join(cookies_list)
 
