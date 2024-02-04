@@ -129,7 +129,7 @@ class StickerConvert:
 
         self.apngasm = None
 
-    def convert(self) -> tuple[bool, str, Union[None, bytes, str], int]:
+    def convert(self) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         if (FormatVerify.check_format(self.in_f, fmt=self.opt_comp.format, file_info=self.codec_info_orig) and
             FormatVerify.check_file_res(self.in_f, res=self.opt_comp.res, file_info=self.codec_info_orig) and
             FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.fps, file_info=self.codec_info_orig) and
@@ -224,7 +224,7 @@ class StickerConvert:
             )
         self.cb_msg.put(msg)
 
-    def compress_fail(self) -> tuple[bool, str, Union[None, bytes, str], int]:
+    def compress_fail(self) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         msg = self.MSG_FAIL_COMP.format(
             self.in_f_name, self.out_f_name, self.size_max, self.size
         )
@@ -235,7 +235,7 @@ class StickerConvert:
     def compress_done(self,
                   data: bytes,
                   result_step: Optional[int] = None
-                  ) -> tuple[bool, str, Union[None, bytes, str], int]:
+                  ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         
         if self.out_f.stem == 'none':
             self.out_f = None

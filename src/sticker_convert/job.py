@@ -50,8 +50,8 @@ class Job:
         self.compress_fails: list[str] = []
         self.out_urls: list[str] = []
 
-        self.jobs_queue: QueueType[Optional[tuple[str, str, CompOption]]] = Queue()
-        self.results_queue: QueueType[Optional[tuple[bool, str, str, int]]] = Queue()
+        self.jobs_queue: QueueType[Optional[tuple[Path, Path, CompOption]]] = Queue()
+        self.results_queue: QueueType[Optional[tuple[bool, Path, Path, int]]] = Queue()
         self.cb_msg_queue: QueueType[Optional[str]] = Queue()
         self.processes: list[Process] = []
 
@@ -379,12 +379,12 @@ class Job:
     
     def processes_watcher_thread(
             self, 
-            results_queue: QueueType[Optional[tuple[bool, str, str, int]]]
+            results_queue: QueueType[Optional[tuple[bool, Path, Path, int]]]
             ):
         
         for (success, in_f, out_f, size) in iter(results_queue.get, None): # type: ignore[misc]
             if success == False: # type: ignore
-                self.compress_fails.append(in_f) # type: ignore[has-type]
+                self.compress_fails.append(in_f.as_posix()) # type: ignore[has-type]
 
             self.cb_bar(update_bar=True)
     
@@ -398,8 +398,8 @@ class Job:
 
     @staticmethod
     def compress_worker(
-        jobs_queue: QueueType[Optional[tuple[str, str, CompOption]]], 
-        results_queue: QueueType[Optional[tuple[bool, str, str, int]]], 
+        jobs_queue: QueueType[Optional[tuple[Path, Path, CompOption]]], 
+        results_queue: QueueType[Optional[tuple[bool, Path, Path, int]]], 
         cb_msg_queue: QueueType[Optional[str]]
         ):
 
@@ -467,7 +467,7 @@ class Job:
         msg += '\n'
 
         if self.compress_fails != []:
-            msg += f'Warning: The following {len(self.compress_fails)} file{"s" if len(self.compress_fails) > 1 else ""} compression failed:\n'
+            msg += f'Warning: Coudl not compress the following {len(self.compress_fails)} file{"s" if len(self.compress_fails) > 1 else ""}:\n'
             msg += "\n".join(self.compress_fails)
             msg += '\n'
             msg += '\nConsider adjusting compression parameters'
