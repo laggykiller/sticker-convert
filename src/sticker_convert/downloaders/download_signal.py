@@ -39,10 +39,13 @@ class DownloadSignal(DownloadBase):
             emoji_dict[f_id] = sticker.emoji
 
             codec = CodecInfo.get_file_codec(f_path)
-            f_path_new = f"{f_path}.{codec}"
-            os.rename(f_path, f_path_new)
+            if codec == "":
+                self.cb_msg(f"Warning: Downloaded {f_path} but cannot get file codec")
+            else:
+                f_path_new = f"{f_path}.{codec}"
+                os.rename(f_path, f_path_new)
+                self.cb_msg(f"Downloaded {f_id}.{codec}")
 
-            self.cb_msg(f"Downloaded {f_id}.{codec}")
             if self.cb_bar:
                 self.cb_bar(update_bar=True)
 

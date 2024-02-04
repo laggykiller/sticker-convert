@@ -81,7 +81,7 @@ def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
         apngasm.add_frame(frame)
     apngasm.assemble(out_f)
 
-def generate_random_png(res: int, out_f: str):
+def generate_random_png(res: int, out_f: Path):
     im_numpy = numpy.random.rand(res, res, 4) * 255
     with Image.fromarray(im_numpy, 'RGBA') as im:
         im.save(out_f)

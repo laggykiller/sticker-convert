@@ -239,7 +239,7 @@ class CodecInfo:
         except InvalidDataError:
             return ""
         if codec == None:
-            raise ""
+            return ""
         return codec.lower()
 
     @staticmethod

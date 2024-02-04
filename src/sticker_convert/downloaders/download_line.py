@@ -273,9 +273,11 @@ class DownloadLine(DownloadBase):
             sticker_text = data['sticker_text']
 
             if self.resource_type == 'PER_STICKER_TEXT':
-                custom_sticker_text_urls.append((f'https://store.line.me/overlay/sticker/{self.pack_id}/{sticker_id}/iPhone/sticker.png?text={parse.quote(sticker_text)}', out_path + '-text.png'))
+                out_path_text = out_path.with_name(out_path.name + '-text.png')
+                custom_sticker_text_urls.append((f'https://store.line.me/overlay/sticker/{self.pack_id}/{sticker_id}/iPhone/sticker.png?text={parse.quote(sticker_text)}', out_path_text))
 
             elif self.resource_type == 'NAME_TEXT' and sticker_text:
+                out_path_text = out_path.with_name(out_path.name + '-text.png')
                 name_text_key = name_text_key_cache.get(sticker_text, None)
                 if not name_text_key:
                     name_text_key = self.get_name_text_key(sticker_text)
@@ -284,7 +286,7 @@ class DownloadLine(DownloadBase):
                 else:
                     continue
 
-                custom_sticker_text_urls.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/overlay/name/{name_text_key}/sticker@2x.png', out_path + '-text.png'))
+                custom_sticker_text_urls.append((f'https://stickershop.line-scdn.net/stickershop/v1/sticker/{sticker_id}/iPhone/overlay/name/{name_text_key}/sticker@2x.png', out_path_text))
         
         return custom_sticker_text_urls
 

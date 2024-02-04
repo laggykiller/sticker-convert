@@ -85,18 +85,14 @@ class StickerConvert:
 
         valid_formats = []
         for i in opt_comp.format:
-            if i == None:
-                pass
-            elif isinstance(i, list):
+            if isinstance(i, list):
                 valid_formats.extend(i)
-            else:
+            elif i != None:
                 valid_formats.append(i)
 
         valid_ext = False
-        if len(valid_formats) == 0:
-            self.out_f = Path(out_f)
-            valid_ext = True
-        elif Path(out_f).suffix in valid_formats:
+        if (len(valid_formats) == 0
+            or Path(out_f).suffix in valid_formats):
             self.out_f = Path(out_f)
             valid_ext = True
         
