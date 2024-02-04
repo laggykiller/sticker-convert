@@ -21,7 +21,7 @@ def _run_sticker_convert(fmt: str, tmp_path: Path):
         '--input-dir', SAMPLE_DIR,
         '--output-dir', tmp_path,
         '--preset', 'custom',
-        '--duration-max', '2',
+        '--duration-max', '2000',
         '--steps', '6',
         '--img-format', fmt,
         '--vid-format', fmt
