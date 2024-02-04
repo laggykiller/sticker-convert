@@ -6,6 +6,7 @@ import json
 import os
 import zipfile
 import io
+from pathlib import Path
 from urllib.parse import urlparse
 from typing import Optional
 
@@ -176,7 +177,7 @@ class DownloadKakao(DownloadBase):
         targets = []
 
         for num, url in enumerate(thumbnail_urls):
-            dest = os.path.join(self.out_dir, str(num).zfill(3) + ".png")
+            dest = Path(self.out_dir, str(num).zfill(3) + ".png")
             targets.append((url, dest))
 
         self.download_multiple_files(targets)
@@ -203,7 +204,7 @@ class DownloadKakao(DownloadBase):
                 self.cb_bar(set_progress_mode="determinate", steps=len(zf.namelist()))
 
             for num, f_path in enumerate(sorted(zf.namelist())):
-                _, ext = os.path.splitext(f_path)
+                ext = Path(f_path).suffix
 
                 if ext in (".gif", ".webp"):
                     data = DecryptKakao.xor_data(zf.read(f_path))
@@ -212,7 +213,7 @@ class DownloadKakao(DownloadBase):
                     data = zf.read(f_path)
                     self.cb_msg(f"Read {f_path}")
 
-                out_path = os.path.join(self.out_dir, str(num).zfill(3) + ext)
+                out_path = Path(self.out_dir, str(num).zfill(3) + ext)
                 with open(out_path, "wb") as f:
                     f.write(data)
 

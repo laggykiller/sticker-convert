@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 from tkinter import filedialog
@@ -8,7 +8,7 @@ from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label # type: ig
 if TYPE_CHECKING:
     from ...gui import GUI # type: ignore
 from ...utils.url_detect import UrlDetect # type: ignore
-from ...utils.files.dir_utils import DirUtils # type: ignore
+from ...utils.files.dir_utils import CURR_DIR # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
 class InputFrame(LabelFrame):
@@ -49,8 +49,8 @@ class InputFrame(LabelFrame):
     
     def cb_set_indir(self, *args):
         orig_input_dir = self.gui.input_setdir_var.get()
-        if not os.path.isdir(orig_input_dir):
-            orig_input_dir = DirUtils.get_curr_dir()
+        if not Path(orig_input_dir).is_dir():
+            orig_input_dir = CURR_DIR
         input_dir = filedialog.askdirectory(initialdir=orig_input_dir)
         if input_dir:
             self.gui.input_setdir_var.set(input_dir)

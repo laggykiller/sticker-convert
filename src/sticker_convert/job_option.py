@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+from pathlib import Path
 from typing import Optional, Union
 
 
@@ -14,15 +15,15 @@ class BaseOption:
 
 class InputOption(BaseOption):
     def __init__(self, input_config_dict: dict):
-        self.option = input_config_dict.get('option')
-        self.url = input_config_dict.get('url')
-        self.dir = input_config_dict.get('dir')
+        self.option: str = input_config_dict.get('option')
+        self.url: str = input_config_dict.get('url')
+        self.dir: Path = Path(input_config_dict.get('dir'))
         
     def to_dict(self) -> dict:
         return {
             'option': self.option,
             'url': self.url,
-            'dir': self.dir
+            'dir': self.dir.as_posix()
         }
 
 class CompOption(BaseOption):
@@ -267,15 +268,15 @@ class CompOption(BaseOption):
 
 class OutputOption(BaseOption):
     def __init__(self, output_config_dict: dict):
-        self.option = output_config_dict.get('option')
-        self.dir = output_config_dict.get('dir')
-        self.title = output_config_dict.get('title')
-        self.author = output_config_dict.get('author')
+        self.option: str = output_config_dict.get('option')
+        self.dir: Path = Path(output_config_dict.get('dir'))
+        self.title: str = output_config_dict.get('title')
+        self.author: str = output_config_dict.get('author')
     
     def to_dict(self) -> dict:
         return {
             'option': self.option,
-            'dir': self.dir,
+            'dir': self.dir.as_posix(),
             'title': self.title,
             'author': self.author
         }

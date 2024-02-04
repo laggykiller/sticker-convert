@@ -8,6 +8,7 @@ worst case scenario for compression
 import os
 import sys
 import math
+from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
 from multiprocessing import Process, Queue, cpu_count
@@ -20,7 +21,7 @@ from PIL import Image
 from tqdm import tqdm
 from apngasm_python._apngasm_python import create_frame_from_rgba, APNGAsm
 
-os.chdir(os.path.split(os.path.abspath(__file__))[0])
+os.chdir(Path(__file__).resolve().parent)
 sys.path.append('../src')
 
 from sticker_convert.converter import StickerConvert
@@ -114,9 +115,9 @@ def main():
     
     for (img_or_vid, fmt) in formats:
         csv_name = f'{fmt.replace(".", "")}-{img_or_vid}.csv'
-        csv_path = os.path.join('opt-comp-result', csv_name)
+        csv_path = Path('opt-comp-result', csv_name)
 
-        if os.path.exists(csv_path):
+        if csv_path.is_file():
             with open(csv_path) as f:
                 if f.read():
                     print(f'Skip generating as result already exists for {fmt} ({img_or_vid})...')
@@ -127,7 +128,7 @@ def main():
         print(f'Generating result for compressing using preset {fmt} ({img_or_vid})...')
 
         with TemporaryDirectory() as tmpdir:
-            random_png_path = os.path.join(tmpdir, 'random.png')
+            random_png_path = Path(tmpdir, 'random.png')
             result_path = 'none' + fmt
 
             rnd_res = 618 if '618' in img_or_vid else 512

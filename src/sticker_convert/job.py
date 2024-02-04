@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import os
-import sys
 import shutil
+from pathlib import Path
 from datetime import datetime
 from multiprocessing import Process, Queue, Value
 from multiprocessing.queues import Queue as QueueType
@@ -55,10 +55,10 @@ class Job:
 
         self.is_cancel_job = Value('i', 0)
 
-        if os.path.isdir(self.opt_input.dir) == False:
+        if Path(self.opt_input.dir).is_dir() == False:
             os.makedirs(self.opt_input.dir)
 
-        if os.path.isdir(self.opt_output.dir) == False:
+        if Path(self.opt_output.dir).is_dir() == False:
             os.makedirs(self.opt_output.dir)
 
     def start(self) -> bool:
@@ -91,7 +91,7 @@ class Job:
         save_to_local_tip += '    If you want to upload the results by yourself,\n'
         save_to_local_tip += '    select "Save to local directory only" for output\n'
 
-        if os.path.abspath(self.opt_input.dir) == os.path.abspath(self.opt_output.dir):
+        if Path(self.opt_input.dir).resolve() == Path(self.opt_output.dir).resolve():
             error_msg += '\n'
             error_msg += '[X] Input and output directories cannot be the same\n'
 
@@ -239,12 +239,12 @@ class Job:
         elif len(in_dir_files) == 0:
             self.cb_msg('Skip moving old files in input directory as input source is empty')
         else:
-            archive_dir = os.path.join(self.opt_input.dir, dir_name)
+            archive_dir = Path(self.opt_input.dir, dir_name)
             self.cb_msg(f"Moving old files in input directory to {archive_dir} as input source is not local")
             os.makedirs(archive_dir)
             for i in in_dir_files:
-                old_path = os.path.join(self.opt_input.dir, i)
-                new_path = os.path.join(archive_dir, i)
+                old_path = Path(self.opt_input.dir, i)
+                new_path = archive_dir / i
                 shutil.move(old_path, new_path)
 
         if self.opt_comp.no_compress:
@@ -252,12 +252,12 @@ class Job:
         elif len(out_dir_files) == 0:
             self.cb_msg('Skip moving old files in output directory as output source is empty')
         else:
-            archive_dir = os.path.join(self.opt_output.dir, dir_name)
+            archive_dir = Path(self.opt_output.dir, dir_name)
             self.cb_msg(f"Moving old files in output directory to {archive_dir}")
             os.makedirs(archive_dir)
             for i in out_dir_files:
-                old_path = os.path.join(self.opt_output.dir, i)
-                new_path = os.path.join(archive_dir, i)
+                old_path = Path(self.opt_output.dir, i)
+                new_path = archive_dir / i
                 shutil.move(old_path, new_path)
         
         return True
@@ -298,8 +298,8 @@ class Job:
     def compress(self) -> bool:
         if self.opt_comp.no_compress == True:
             self.cb_msg('no_compress is set to True, skip compression')
-            in_dir_files = [i for i in sorted(os.listdir(self.opt_input.dir)) if os.path.isfile(os.path.join(self.opt_input.dir, i))]
-            out_dir_files = [i for i in sorted(os.listdir(self.opt_output.dir)) if os.path.isfile(os.path.join(self.opt_output.dir, i))]
+            in_dir_files = [i for i in sorted(os.listdir(self.opt_input.dir)) if Path(self.opt_input.dir, i).is_file()]
+            out_dir_files = [i for i in sorted(os.listdir(self.opt_output.dir)) if Path(self.opt_output.dir, i).is_file()]
             if len(in_dir_files) == 0:
                 self.cb_msg('Input directory is empty, nothing to copy to output directory')
             elif len(out_dir_files) != 0:
@@ -307,28 +307,28 @@ class Job:
             else:
                 self.cb_msg('Output directory is empty, copying files from input directory')
                 for i in in_dir_files:
-                    src_f = os.path.join(self.opt_input.dir, i)
-                    dst_f = os.path.join(self.opt_output.dir, i)
+                    src_f = Path(self.opt_input.dir, i)
+                    dst_f = Path(self.opt_output.dir, i)
                     shutil.copy(src_f, dst_f)
             return True
         msg = 'Compressing...'
 
-        input_dir = self.opt_input.dir
-        output_dir = self.opt_output.dir
+        input_dir = Path(self.opt_input.dir)
+        output_dir = Path(self.opt_output.dir)
         
         in_fs = []
 
         # .txt: emoji.txt, title.txt
         # .m4a: line sticker sound effects
         for i in sorted(os.listdir(input_dir)):
-            in_f = os.path.join(input_dir, i)
+            in_f = input_dir / i
             
-            if not os.path.isfile(in_f):
+            if not in_f.is_file():
                 continue
             elif (CodecInfo.get_file_ext(i) in ('.txt', '.m4a') or
-                  os.path.splitext(i)[0] == 'cover'):
+                  Path(i).stem == 'cover'):
                 
-                shutil.copy(in_f, os.path.join(output_dir, i))
+                shutil.copy(in_f, output_dir / i)
             else:
                 in_fs.append(i)
 
@@ -355,8 +355,8 @@ class Job:
             self.processes.append(process)
 
         for i in in_fs:
-            in_f = os.path.join(input_dir, i)
-            out_f = os.path.join(output_dir, os.path.splitext(i)[0])
+            in_f = input_dir / i
+            out_f = output_dir / Path(i).stem
 
             self.jobs_queue.put((in_f, out_f, self.opt_comp))
 
@@ -447,7 +447,7 @@ class Job:
                 cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_ask_bool=self.cb_ask_bool, cb_bar=self.cb_bar)
         
         if self.out_urls:
-            with open(os.path.join(self.opt_output.dir, 'export-result.txt'), 'w+') as f:
+            with open(Path(self.opt_output.dir, 'export-result.txt'), 'w+') as f:
                 f.write('\n'.join(self.out_urls))
         else:
             self.cb_msg('An error occured while exporting stickers')

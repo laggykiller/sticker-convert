@@ -4,12 +4,13 @@ import sys
 import subprocess
 import platform
 import shutil
+from pathlib import Path
 
 sys.path.append('./src')
 from sticker_convert.__init__ import __version__
 
 def osx_run_in_venv(cmd, get_stdout=False):
-    if os.path.isfile('/bin/zsh'):
+    if Path('/bin/zsh').is_file():
         sh_cmd = ['/bin/zsh', '-c']
     else:
         sh_cmd = ['/bin/bash', '-c']
@@ -27,13 +28,13 @@ def search_wheel_in_dir(package: str, dir: str):
 
 def copy_if_universal(wheel_name: str, in_dir: str, out_dir: str):
     if wheel_name.endswith('universal2.whl') or wheel_name.endswith('any.whl'):
-        src_path = os.path.join(in_dir, wheel_name)
-        dst_path = os.path.join(
-            out_dir, 
+        src_path = Path(in_dir, wheel_name)
+        dst_path = Path(
+            out_dir,
             wheel_name
             .replace('x86_64', 'universal2')
             .replace('arm64', 'universal2')
-            )
+        )
 
         shutil.copy(src_path, dst_path)
         return True
@@ -49,16 +50,16 @@ def create_universal_wheels(in_dir1, in_dir2, out_dir):
         if copy_if_universal(wheel_name_2, in_dir2, out_dir):
             continue
         
-        wheel_path_1 = os.path.join(in_dir1, wheel_name_1)
-        wheel_path_2 = os.path.join(in_dir2, wheel_name_2)
+        wheel_path_1 = Path(in_dir1, wheel_name_1)
+        wheel_path_2 = Path(in_dir2, wheel_name_2)
         subprocess.run(['delocate-fuse', wheel_path_1, wheel_path_2, '-w', out_dir])
         print(f'Created universal wheel {wheel_path_1} {wheel_path_2}')
 
     for wheel_name in os.listdir(out_dir):
         wheel_name_new = wheel_name.replace('x86_64', 'universal2').replace('arm64', 'universal2')
 
-        src_path = os.path.join(out_dir, wheel_name)
-        dst_path = os.path.join(out_dir, wheel_name_new)
+        src_path = Path(out_dir, wheel_name)
+        dst_path = Path(out_dir, wheel_name_new)
 
         os.rename(src_path, dst_path)
         print(f'Renamed universal wheel {dst_path}')
@@ -114,8 +115,8 @@ def nuitka(python_bin, arch):
 
 def win_patch():
     for i in os.listdir('sticker-convert.dist/av.libs'):
-        file_path = os.path.join('sticker-convert.dist', i)
-        if os.path.isfile(file_path):
+        file_path = Path('sticker-convert.dist', i)
+        if file_path.is_file():
             os.remove(file_path)
 
 def osx_patch():
@@ -131,11 +132,11 @@ def osx_patch():
 
 def compile():
     arch = os.environ.get('SC_COMPILE_ARCH')
-    python_bin = os.path.abspath(sys.executable)
+    python_bin = Path(sys.executable).resolve()
 
     ios_stickers_path = 'src/sticker_convert/ios-message-stickers-template'
     ios_stickers_zip = ios_stickers_path + '.zip'
-    if os.path.isfile(ios_stickers_zip):
+    if Path(ios_stickers_zip).exists():
         os.remove(ios_stickers_zip)
     shutil.make_archive(ios_stickers_path, 'zip', ios_stickers_path)
 

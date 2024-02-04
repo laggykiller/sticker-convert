@@ -2,6 +2,7 @@
 import os
 import copy
 import re
+from pathlib import Path
 from typing import Optional
 
 import anyio
@@ -114,23 +115,20 @@ class UploadTelegram(UploadBase):
             for src in stickers:
                 self.cb_msg(f"Verifying {src} for uploading to telegram")
 
-                src_full_name = os.path.split(src)[-1]
-                src_name = os.path.splitext(src_full_name)[0]
-                ext = os.path.splitext(src_full_name)[-1]
-
-                emoji = emoji_dict.get(src_name, None)
+                emoji = emoji_dict.get(Path(src).stem, None)
                 if emoji:
                     if len(emoji) > 20:
                         self.cb_msg(
-                            f"Warning: {len(emoji)} emoji for file {src_full_name}, exceeding limit of 20, keep first 20 only..."
+                            f"Warning: {len(emoji)} emoji for file {Path(src).name}, exceeding limit of 20, keep first 20 only..."
                         )
                     emoji_list = [*emoji][:20]
                 else:
                     self.cb_msg(
-                        f"Warning: Cannot find emoji for file {src_full_name}, skip uploading this file..."
+                        f"Warning: Cannot find emoji for file {Path(src).name}, skip uploading this file..."
                     )
                     continue
-
+                
+                ext = Path(src).suffix
                 if ext == ".tgs":
                     spec_choice = self.tgs_spec
                     cover_spec_choice = self.tgs_cover_spec
@@ -150,7 +148,7 @@ class UploadTelegram(UploadBase):
                         sticker_bytes = f.read()
                 else:
                     _, _, sticker_bytes, _ = StickerConvert(
-                        src, f"bytes{ext}", self.opt_comp_merged, self.cb_msg
+                        Path(src), Path(f"bytes{ext}"), self.opt_comp_merged, self.cb_msg
                     ).convert()
 
                 sticker = InputSticker(sticker=sticker_bytes, emoji_list=emoji_list)
@@ -187,7 +185,7 @@ class UploadTelegram(UploadBase):
                 else:
                     _, _, thumbnail_bytes, _ = StickerConvert(
                         cover_path,
-                        f"bytes{ext}",
+                        Path(f"bytes{ext}"),
                         self.opt_comp_cover_merged,
                         self.cb_msg,
                     ).convert()

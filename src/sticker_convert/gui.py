@@ -4,6 +4,7 @@ import sys
 import platform
 import time
 import math
+from pathlib import Path
 from multiprocessing import cpu_count
 from threading import Thread, Lock, current_thread, main_thread
 from queue import Queue
@@ -19,7 +20,7 @@ from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 from .job import Job # type: ignore
 from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
 from .utils.files.json_manager import JsonManager # type: ignore
-from .utils.files.dir_utils import DirUtils # type: ignore
+from .utils.files.dir_utils import CURR_DIR, CONFIG_DIR # type: ignore
 from .utils.files.metadata_handler import MetadataHandler # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .gui_components.gui_utils import GUIUtils # type: ignore
@@ -39,7 +40,8 @@ class GUI(Window):
         self.init_done = False
         self.load_jsons()
 
-        self.emoji_font = ImageFont.truetype("./resources/NotoColorEmoji.ttf", 109)
+        font_path = CURR_DIR / "resources/NotoColorEmoji.ttf"
+        self.emoji_font = ImageFont.truetype(font_path.as_posix(), 109)
 
         GUIUtils.set_icon(self)
 
@@ -209,14 +211,14 @@ class GUI(Window):
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
             sys.exit()
 
-        self.settings_path = os.path.join(DirUtils.get_config_dir(), 'config.json')
-        if os.path.isfile(self.settings_path):
+        self.settings_path = CONFIG_DIR / 'config.json'
+        if self.settings_path.is_file():
             self.settings = JsonManager.load_json(self.settings_path)
         else:
             self.settings = {}
         
-        self.creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
-        if os.path.isfile(self.creds_path):
+        self.creds_path = CONFIG_DIR / 'creds.json'
+        if self.creds_path.is_file():
             self.creds = JsonManager.load_json(self.creds_path)
         else:
             self.creds = {}
@@ -253,20 +255,20 @@ class GUI(Window):
         JsonManager.save_json(self.creds_path, self.creds)
     
     def delete_creds(self):
-        if os.path.isfile(self.creds_path):
+        if self.creds_path.is_file():
             os.remove(self.creds_path)
     
     def delete_config(self):
-        if os.path.isfile(self.settings_path):
+        if self.settings_path.is_file():
             os.remove(self.settings_path)
     
     def apply_config(self):
         # Input
         self.default_input_mode = self.settings.get('input', {}).get('option', 'auto')
         self.input_address_var.set(self.settings.get('input', {}).get('url', ''))
-        default_stickers_input_dir = os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
+        default_stickers_input_dir = CURR_DIR / 'stickers_input'
         self.input_setdir_var.set(self.settings.get('input', {}).get('dir', default_stickers_input_dir))
-        if not os.path.isdir(self.input_setdir_var.get()):
+        if not Path(self.input_setdir_var.get()).is_dir():
             self.input_setdir_var.set(default_stickers_input_dir)
         self.input_option_display_var.set(self.input_presets[self.default_input_mode]['full_name'])
         self.input_option_true_var.set(self.input_presets[self.default_input_mode]['full_name'])
@@ -282,9 +284,9 @@ class GUI(Window):
         self.default_output_mode = self.settings.get('output', {}).get('option', 'signal')
 
         # Output
-        default_stickers_output_dir = os.path.join(DirUtils.get_curr_dir(), 'stickers_output')
+        default_stickers_output_dir = CURR_DIR / 'stickers_output'
         self.output_setdir_var.set(self.settings.get('output', {}).get('dir', default_stickers_output_dir))
-        if not os.path.isdir(self.output_setdir_var.get()):
+        if not Path(self.output_setdir_var.get()).is_dir():
             self.output_setdir_var.set(default_stickers_output_dir)
         self.title_var.set(self.settings.get('output', {}).get('title', ''))
         self.author_var.set(self.settings.get('output', {}).get('author', ''))
@@ -553,7 +555,7 @@ class GUI(Window):
         # output_option_display = self.get_output_display_name()
         url = self.input_address_var.get()
 
-        if os.path.abspath(self.input_setdir_var.get()) == os.path.abspath(self.output_setdir_var.get()):
+        if Path(self.input_setdir_var.get()).absolute() == Path(self.output_setdir_var.get()).absolute():
             in_out_dir_same = True
         else:
             in_out_dir_same = False
@@ -561,7 +563,7 @@ class GUI(Window):
         # Input
         if in_out_dir_same == True:
             self.input_frame.input_setdir_entry.config(bootstyle='danger')
-        elif not os.path.isdir(self.input_setdir_var.get()):
+        elif not Path(self.input_setdir_var.get()).is_dir():
             self.input_frame.input_setdir_entry.config(bootstyle='warning')
         else:
             self.input_frame.input_setdir_entry.config(bootstyle='default')
@@ -593,7 +595,7 @@ class GUI(Window):
         # Output
         if in_out_dir_same == True:
             self.output_frame.output_setdir_entry.config(bootstyle='danger')
-        elif not os.path.isdir(self.output_setdir_var.get()):
+        elif not Path(self.output_setdir_var.get()).is_dir():
             self.output_frame.output_setdir_entry.config(bootstyle='warning')
         else:
             self.output_frame.output_setdir_entry.config(bootstyle='default')

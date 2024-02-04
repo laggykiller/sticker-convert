@@ -3,6 +3,7 @@ import subprocess
 import os
 import shutil
 import platform
+from pathlib import Path
 from typing import Union, AnyStr
 
 
@@ -11,7 +12,7 @@ class RunBin:
     def get_bin(
         bin: str, silent: bool = False, cb_msg=print
     ) -> Union[str, AnyStr, None]:
-        if os.path.isfile(bin):
+        if Path(bin).is_file():
             return bin
 
         if platform.system() == "Windows":
@@ -19,7 +20,7 @@ class RunBin:
 
         which_result = shutil.which(bin)
         if which_result != None:
-            return os.path.abspath(which_result)  # type: ignore[type-var]
+            return Path(which_result).resolve()  # type: ignore[type-var]
         elif silent == False:
             cb_msg(f"Warning: Cannot find binary file {bin}")
 

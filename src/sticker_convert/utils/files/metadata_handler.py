@@ -2,6 +2,7 @@
 from __future__ import annotations
 import os
 import json
+from pathlib import Path
 from typing import Optional
 
 from ..media.codec_info import CodecInfo  # type: ignore
@@ -20,7 +21,7 @@ class MetadataHandler:
         stickers_present = [
             i
             for i in sorted(os.listdir(dir))
-            if os.path.isfile(os.path.join(dir, i)) and
+            if Path(dir, i).is_file() and
             not i.startswith(blacklist_prefix) and
             not i.endswith(blacklist_suffix) and
             not i in xcode_iconset
@@ -29,11 +30,11 @@ class MetadataHandler:
         return stickers_present
 
     @staticmethod
-    def get_cover(dir: str) -> Optional[str]:
+    def get_cover(dir: str) -> Optional[Path]:
         stickers_present = sorted(os.listdir(dir))
         for i in stickers_present:
-            if os.path.splitext(i)[0] == "cover":
-                return os.path.join(dir, i)
+            if Path(i).stem == "cover":
+                return Path(dir, i)
 
         return None
 
@@ -44,18 +45,18 @@ class MetadataHandler:
         author: Optional[str] = None,
         emoji_dict: Optional[dict[str, str]] = None,
     ) -> tuple[Optional[str], Optional[str], Optional[dict[str, str]]]:
-        title_path = os.path.join(dir, "title.txt")
-        if not title and os.path.isfile(title_path):
+        title_path = Path(dir, "title.txt")
+        if not title and title_path.is_file():
             with open(title_path, encoding="utf-8") as f:
                 title = f.read().strip()
 
-        author_path = os.path.join(dir, "author.txt")
-        if not author and os.path.isfile(author_path):
+        author_path = Path(dir, "author.txt")
+        if not author and author_path.is_file():
             with open(author_path, encoding="utf-8") as f:
                 author = f.read().strip()
 
-        emoji_path = os.path.join(dir, "emoji.txt")
-        if not emoji_dict and os.path.isfile(emoji_path):
+        emoji_path = Path(dir, "emoji.txt")
+        if not emoji_dict and emoji_path.is_file():
             with open(emoji_path, "r", encoding="utf-8") as f:
                 emoji_dict = json.load(f)
 
@@ -68,17 +69,17 @@ class MetadataHandler:
         author: Optional[str] = None,
         emoji_dict: Optional[dict[str, str]] = None,
     ):
-        title_path = os.path.join(dir, "title.txt")
+        title_path = Path(dir, "title.txt")
         if title != None:
             with open(title_path, "w+", encoding="utf-8") as f:
                 f.write(title)  # type: ignore[arg-type]
 
-        author_path = os.path.join(dir, "author.txt")
+        author_path = Path(dir, "author.txt")
         if author != None:
             with open(author_path, "w+", encoding="utf-8") as f:
                 f.write(author)  # type: ignore[arg-type]
 
-        emoji_path = os.path.join(dir, "emoji.txt")
+        emoji_path = Path(dir, "emoji.txt")
         if emoji_dict != None:
             with open(emoji_path, "w+", encoding="utf-8") as f:
                 json.dump(emoji_dict, f, indent=4, ensure_ascii=False)
@@ -96,8 +97,8 @@ class MetadataHandler:
         input_presets = JsonManager.load_json("resources/input.json")
 
         if input_option == "local":
-            metadata_file_path = os.path.join(input_dir, f"{metadata}.txt")
-            metadata_provided = os.path.isfile(metadata_file_path)
+            metadata_file_path = Path(input_dir, f"{metadata}.txt")
+            metadata_provided = metadata_file_path.is_file()
             if metadata_provided:
                 with open(metadata_file_path, encoding="utf-8") as f:
                     metadata_provided = True if f.read() else False
@@ -116,19 +117,19 @@ class MetadataHandler:
 
     @staticmethod
     def generate_emoji_file(dir: str, default_emoji: str = ""):
-        emoji_path = os.path.join(dir, "emoji.txt")
+        emoji_path = Path(dir, "emoji.txt")
         emoji_dict = None
-        if os.path.isfile(emoji_path):
+        if emoji_path.is_file():
             with open(emoji_path, "r", encoding="utf-8") as f:
                 emoji_dict = json.load(f)
 
         emoji_dict_new = {}
         for file in sorted(os.listdir(dir)):
-            if not os.path.isfile(os.path.join(dir, file)) and CodecInfo.get_file_ext(
+            if not Path(dir, file).is_file() and CodecInfo.get_file_ext(
                 file
             ) in (".txt", ".m4a"):
                 continue
-            file_name = os.path.splitext(file)[0]
+            file_name = Path(file).stem
             if emoji_dict and file_name in emoji_dict:
                 emoji_dict_new[file_name] = emoji_dict[file_name]
             else:
@@ -174,7 +175,7 @@ class MetadataHandler:
             image_present = False
 
             for processed, file in enumerate(stickers_present):
-                file_path = os.path.join(dir, file)
+                file_path = Path(dir, file)
 
                 if CodecInfo.is_anim(file_path):
                     anim_stickers.append(file_path)
@@ -208,7 +209,7 @@ class MetadataHandler:
             pack_count = 0
 
             for processed, file in enumerate(stickers_present):
-                file_path = os.path.join(dir, file)
+                file_path = Path(dir, file)
 
                 stickers.append(file_path)
 

@@ -2,64 +2,76 @@
 import os
 import sys
 import platform
+from pathlib import Path
 from typing import Optional
 
+def _get_curr_dir_if_writable() -> Optional[Path]:
+    appimage_path = os.getenv("APPIMAGE")
+    try:
+        curr_dir = Path(__compiled__.containing_dir)
+    except NameError:
+        # curr_dir = os.path.dirname(__file__)
+        program = Path(sys.argv[0]).resolve()
+        if program.name == "sticker-convert.py":
+            curr_dir = program.parent / "sticker_convert"
+        
+        if not curr_dir.is_dir():
+            curr_dir = Path(__file__).resolve().parent
+            curr_dir = (curr_dir / "../../").resolve()
 
-class DirUtils:
-    @staticmethod
-    def _get_curr_dir_if_writable() -> Optional[str]:
-        appimage_path = os.getenv("APPIMAGE")
-        curr_dir = os.getcwd()
+    if (
+        "/usr/bin/" in curr_dir.parents
+        or "/bin" in curr_dir.parents
+        or "/usr/local/bin" in curr_dir.parents
+        or "C:\\Program Files" in curr_dir.parents
+        or "site-packages" in __file__
+    ):
+        return None
 
-        if (
-            curr_dir.startswith("/usr/bin/")
-            or curr_dir.startswith("/bin")
-            or curr_dir.startswith("/usr/local/bin")
-            or curr_dir.startswith("C:\\Program Files")
-            or "site-packages" in __file__
-        ):
+    if (
+        platform.system() == "Darwin"
+        and getattr(sys, "frozen", False)
+        and ".app/Contents/MacOS" in curr_dir
+    ):
+        if "/Applications/" in curr_dir.parents:
             return None
+        else:
+            curr_dir = (curr_dir / "../../../").resolve()
 
-        if (
-            platform.system() == "Darwin"
-            and getattr(sys, "frozen", False)
-            and ".app/Contents/MacOS" in curr_dir
-        ):
-            if curr_dir.startswith("/Applications/"):
-                return None
-            else:
-                curr_dir = os.path.abspath("../../../")
+    if appimage_path:
+        curr_dir = Path(appimage_path).parent
 
-        if appimage_path:
-            curr_dir = os.path.split(appimage_path)[0]
+    if not os.access(curr_dir, os.W_OK):
+        return None
 
-        if not os.access(curr_dir, os.W_OK):
-            return None
+    return curr_dir
 
+staticmethod
+def get_curr_dir() -> Path:
+    home_dir = Path.home()
+    desktop_dir = home_dir / "Desktop"
+    if desktop_dir.is_dir():
+        fallback_dir = desktop_dir
+    else:
+        fallback_dir = home_dir
+
+    if (curr_dir := _get_curr_dir_if_writable()) != None:
         return curr_dir
+    else:
+        return fallback_dir
 
-    @staticmethod
-    def get_curr_dir() -> str:
-        home_dir = os.path.expanduser("~")
-        if os.path.isdir(os.path.join(home_dir, "Desktop")):
-            fallback_dir = os.path.join(home_dir, "Desktop")
-        else:
-            fallback_dir = home_dir
+staticmethod
+def get_config_dir() -> Path:
+    if platform.system() == "Windows":
+        fallback_dir = Path(os.path.expandvars("%APPDATA%\\sticker-convert"))
+    else:
+        fallback_dir = Path.home() / ".config/sticker-convert"
 
-        if (curr_dir := DirUtils._get_curr_dir_if_writable()) != None:
-            return curr_dir
-        else:
-            return fallback_dir
+    if (config_dir := _get_curr_dir_if_writable()) != None:
+        return config_dir
+    else:
+        os.makedirs(fallback_dir, exist_ok=True)
+        return fallback_dir
 
-    @staticmethod
-    def get_config_dir() -> str:
-        if platform.system() == "Windows":
-            fallback_dir = os.path.expandvars("%APPDATA%\\sticker-convert")
-        else:
-            fallback_dir = os.path.expanduser("~/.config/sticker-convert")
-
-        if (config_dir := DirUtils._get_curr_dir_if_writable()) != None:
-            return config_dir
-        else:
-            os.makedirs(fallback_dir, exist_ok=True)
-            return fallback_dir
+CURR_DIR = get_curr_dir()
+CONFIG_DIR = get_config_dir()

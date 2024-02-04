@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 from typing import Optional, Union
 
 from .codec_info import CodecInfo  # type: ignore
@@ -8,7 +9,7 @@ from ...job_option import CompOption # type: ignore
 
 class FormatVerify:
     @staticmethod
-    def check_file(file: str, spec: CompOption) -> bool:
+    def check_file(file: Path, spec: CompOption) -> bool:
         if FormatVerify.check_presence(file) == False:
             return False
 
@@ -24,12 +25,12 @@ class FormatVerify:
         )
 
     @staticmethod
-    def check_presence(file: str) -> bool:
-        return os.path.isfile(file)
+    def check_presence(file: Path) -> bool:
+        return Path(file).is_file()
 
     @staticmethod
     def check_file_res(
-        file: str,
+        file: Path,
         res: Optional[list[list[int]]] = None,
         square: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None
@@ -56,7 +57,7 @@ class FormatVerify:
 
     @staticmethod
     def check_file_fps(
-        file: str,fps: Optional[list[int]],
+        file: Path,fps: Optional[list[int]],
         file_info: Optional[CodecInfo] = None
     ) -> bool:
         
@@ -74,7 +75,7 @@ class FormatVerify:
     
     @staticmethod
     def check_file_duration(
-        file: str,
+        file: Path,
         duration: Optional[list[str]] = None,
         file_info: Optional[CodecInfo] = None
     ) -> bool:
@@ -95,7 +96,7 @@ class FormatVerify:
 
     @staticmethod
     def check_file_size(
-        file: str,
+        file: Path,
         size: Optional[list[int]] = None,
         file_info: Optional[CodecInfo] = None
     ) -> bool:
@@ -125,7 +126,7 @@ class FormatVerify:
 
     @staticmethod
     def check_animated(
-        file: str,
+        file: Path,
         animated: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None
     ) -> bool:
@@ -142,7 +143,7 @@ class FormatVerify:
 
     @staticmethod
     def check_format(
-        file: str,
+        file: Path,
         fmt: list[Union[list[str], str, None]] = None,
         file_info: Optional[CodecInfo] = None
     ):

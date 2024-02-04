@@ -6,6 +6,7 @@ import requests
 import json
 import os
 import io
+from pathlib import Path
 import zipfile
 import string
 from urllib import parse
@@ -187,12 +188,12 @@ class DownloadLine(DownloadBase):
 
     def decompress(self, zf: zipfile.ZipFile, f_path: str, num: int, prefix: str = '', suffix: str = ''):
         data = zf.read(f_path)
-        ext = os.path.splitext(f_path)[-1]
+        ext = Path(f_path).suffix
         if ext == '.png' and int(self.pack_id) < 775:
             data = ApplePngNormalize.normalize(data)
         self.cb_msg(f'Read {f_path}')
         
-        out_path = os.path.join(self.out_dir, prefix + str(num).zfill(3) + suffix + ext)
+        out_path = Path(self.out_dir, prefix + str(num).zfill(3) + suffix + ext)
         with open(out_path, 'wb') as f:
             f.write(data)
     
@@ -248,9 +249,9 @@ class DownloadLine(DownloadBase):
                     self.cb_bar(update_bar=True)
             
     def edit_custom_sticker_text(self):
-        line_sticker_text_path = os.path.join(self.out_dir, 'line-sticker-text.txt')
+        line_sticker_text_path = Path(self.out_dir, 'line-sticker-text.txt')
 
-        if not os.path.isfile(line_sticker_text_path):
+        if not line_sticker_text_path.is_file():
             with open(line_sticker_text_path, 'w+', encoding='utf-8') as f:
                 json.dump(self.sticker_text_dict, f, indent=4, ensure_ascii=False)
 
@@ -267,7 +268,7 @@ class DownloadLine(DownloadBase):
         name_text_key_cache: dict[str, str] = {}
 
         for num, data in self.sticker_text_dict.items():
-            out_path = os.path.join(self.out_dir, str(num).zfill(3))
+            out_path = Path(self.out_dir, str(num).zfill(3))
             sticker_id = data['sticker_id']
             sticker_text = data['sticker_text']
 
@@ -312,8 +313,8 @@ class DownloadLine(DownloadBase):
     def combine_custom_text(self):
         for i in sorted(os.listdir(self.out_dir)):
             if i.endswith('-text.png'):
-                base_path = os.path.join(self.out_dir, i.replace('-text.png', '.png'))
-                text_path = os.path.join(self.out_dir, i)
+                base_path = Path(self.out_dir, i.replace('-text.png', '.png'))
+                text_path = Path(self.out_dir, i)
 
                 with Image.open(base_path) as im:
                     base_img = im.convert('RGBA')

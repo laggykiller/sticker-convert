@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 from typing import Optional
+from pathlib import Path
 
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
@@ -31,7 +32,7 @@ class DownloadSignal(DownloadBase):
         emoji_dict = {}
         for sticker in pack.stickers:
             f_id = str(sticker.id).zfill(3)
-            f_path = os.path.join(self.out_dir, f"{f_id}")
+            f_path = Path(self.out_dir, f_id)
             with open(f_path, "wb") as f:
                 f.write(sticker.image_data)
 

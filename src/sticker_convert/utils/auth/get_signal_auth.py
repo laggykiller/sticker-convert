@@ -7,6 +7,7 @@ import stat
 import platform
 import zipfile
 import string
+from pathlib import Path
 import webbrowser
 from typing import Optional, Generator
 
@@ -16,7 +17,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.common.exceptions import JavascriptException
 
 from ..files.run_bin import RunBin # type: ignore
-from ..files.dir_utils import DirUtils # type: ignore
+from ..files.dir_utils import CONFIG_DIR # type: ignore
 
 # https://stackoverflow.com/a/17197027
 def strings(filename: str, min: int = 4) -> Generator[str, None, None]:
@@ -34,7 +35,7 @@ def strings(filename: str, min: int = 4) -> Generator[str, None, None]:
 
 class GetSignalAuth:
     def __init__(self, signal_bin_version: str = 'beta', cb_msg=print, cb_ask_str=input):
-        chromedriver_download_dir = os.path.join(DirUtils.get_config_dir(), 'bin')
+        chromedriver_download_dir = CONFIG_DIR / 'bin'
         os.makedirs(chromedriver_download_dir, exist_ok=True)
 
         self.signal_bin_version = signal_bin_version
@@ -53,7 +54,7 @@ class GetSignalAuth:
         prompt = 'Signal Desktop not detected.\n'
         prompt += 'Download and install Signal Desktop BETA version\n'
         prompt += 'After installation, quit Signal Desktop before continuing'
-        while not (os.path.isfile(signal_bin_path) or shutil.which(signal_bin_path)):
+        while not (Path(signal_bin_path).is_file() or shutil.which(signal_bin_path)):
             if self.cb_ask_str != input:
                 self.cb_ask_str(prompt, initialvalue=download_url, cli_show_initialvalue=False)
             else:
@@ -80,8 +81,8 @@ class GetSignalAuth:
             chromedriver_name = 'chromedriver.exe'
         else:
             chromedriver_name = 'chromedriver'
-        chromedriver_path = os.path.abspath(os.path.join(chromedriver_download_dir, chromedriver_name))
-        if not os.path.isfile(chromedriver_path):
+        chromedriver_path = Path(chromedriver_download_dir, chromedriver_name).resolve()
+        if not chromedriver_path.is_file():
             chromedriver_path = shutil.which('chromedriver') # type: ignore[assignment]
 
         if chromedriver_path:
@@ -145,7 +146,7 @@ class GetSignalAuth:
         else:
             chromedriver_zip_path = chromedriver_name
         
-        chromedriver_path = os.path.abspath(os.path.join(chromedriver_download_dir, chromedriver_name))
+        chromedriver_path = Path(chromedriver_download_dir, chromedriver_name).resolve()
 
         with io.BytesIO() as f:
             f.write(requests.get(chromedriver_url).content) # type: ignore[arg-type]
@@ -228,10 +229,10 @@ class GetSignalAuth:
             electron_bin_path = electron_bin_path_beta
             signal_download_url = 'https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta'
 
-        if not (os.path.isfile(signal_bin_path) or shutil.which(signal_bin_path)):
+        if not (Path(signal_bin_path).is_file() or shutil.which(signal_bin_path)):
             self.download_signal_desktop(signal_download_url, signal_bin_path)
         
-        electron_bin_path = shutil.which(electron_bin_path) if not os.path.isfile(electron_bin_path) else electron_bin_path
+        electron_bin_path = shutil.which(electron_bin_path) if not Path(electron_bin_path).is_file() else electron_bin_path
         
         signal_bin_path = signal_bin_path if not shutil.which(signal_bin_path) else shutil.which(signal_bin_path)
         

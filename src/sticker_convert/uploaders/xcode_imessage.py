@@ -2,6 +2,7 @@
 import shutil
 import os
 import copy
+from pathlib import Path
 import json
 import plistlib
 from typing import Optional
@@ -13,6 +14,7 @@ from ..utils.media.format_verify import FormatVerify  # type: ignore
 from ..utils.media.codec_info import CodecInfo  # type: ignore
 from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
 from ..utils.files.sanitize_filename import sanitize_filename  # type: ignore
+from ..utils.files.dir_utils import CURR_DIR
 from ..job_option import CompOption, OutputOption, CredOption # type: ignore
 
 
@@ -23,16 +25,16 @@ class XcodeImessageIconset:
         if self.iconset != {}:
             return
 
-        if os.path.isdir("ios-message-stickers-template"):
+        if (CURR_DIR / "ios-message-stickers-template").is_dir():
             with open(
-                "ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
+                CURR_DIR / "ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
             ) as f:
                 dict = json.load(f)
-        elif os.path.isfile("ios-message-stickers-template.zip"):
-            with zipfile.ZipFile("ios-message-stickers-template.zip", "r") as f:
+        elif (CURR_DIR / "ios-message-stickers-template.zip").is_file():
+            with zipfile.ZipFile((CURR_DIR / "ios-message-stickers-template.zip"), "r") as f:
                 dict = json.loads(
                     f.read(
-                        "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
+                        CURR_DIR / "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
                     ).decode()
                 )
         else:
@@ -107,8 +109,8 @@ class XcodeImessage(UploadBase):
             for src in stickers:
                 self.cb_msg(f"Verifying {src} for creating Xcode iMessage sticker pack")
 
-                src_path = os.path.join(self.in_dir, src)
-                dst_path = os.path.join(self.out_dir, src)
+                src_path = Path(self.in_dir, src)
+                dst_path = Path(self.out_dir, src)
 
                 if res_choice == None:
                     res_choice, _ = CodecInfo.get_file_res(src_path)
@@ -136,20 +138,19 @@ class XcodeImessage(UploadBase):
             self.add_metadata(author, pack_title)
             self.create_xcode_proj(author, pack_title)
 
-            result = os.path.join(self.out_dir, pack_title)
+            result = Path(self.out_dir / pack_title).as_posix()
             self.cb_msg(result)
             urls.append(result)
 
         return urls
 
     def add_metadata(self, author: str, title: str):
-        first_image_path = os.path.join(
-            self.in_dir,
+        first_image_path = Path(self.in_dir,
             [
                 i
                 for i in sorted(os.listdir(self.in_dir))
-                if os.path.isfile(os.path.join(self.in_dir, i)) and i.endswith(".png")
-            ][0],
+                if (self.in_dir / i).is_file() and i.endswith(".png")
+            ][0]
         )
         cover_path = MetadataHandler.get_cover(self.in_dir)
         if cover_path:
@@ -166,8 +167,8 @@ class XcodeImessage(UploadBase):
                 }
             })
 
-            icon_old_path = os.path.join(self.in_dir, icon)
-            icon_new_path = os.path.join(self.out_dir, icon)
+            icon_old_path = self.in_dir / icon
+            icon_new_path = self.out_dir / icon
             if icon in os.listdir(self.in_dir) and not FormatVerify.check_file(
                 icon_old_path, spec=spec_cover
             ):
@@ -182,28 +183,28 @@ class XcodeImessage(UploadBase):
         MetadataHandler.set_metadata(self.out_dir, author=author, title=title)
 
     def create_xcode_proj(self, author: str, title: str):
-        pack_path = os.path.join(self.out_dir, title)
-        if os.path.isfile("ios-message-stickers-template.zip"):
-            with zipfile.ZipFile("ios-message-stickers-template.zip", "r") as f:
+        pack_path = self.out_dir / title
+        if (CURR_DIR / "ios-message-stickers-template.zip").is_file():
+            with zipfile.ZipFile(CURR_DIR / "ios-message-stickers-template.zip", "r") as f:
                 f.extractall(pack_path)
-        elif os.path.isdir("ios-message-stickers-template"):
-            shutil.copytree("ios-message-stickers-template", pack_path)
+        elif (CURR_DIR / "ios-message-stickers-template").is_dir():
+            shutil.copytree(CURR_DIR / "ios-message-stickers-template", pack_path)
         else:
             self.cb_msg(
                 "Failed to create Xcode project: ios-message-stickers-template not found"
             )
 
-        os.remove(os.path.join(pack_path, "README.md"))
+        os.remove(pack_path / "README.md")
         shutil.rmtree(
-            os.path.join(pack_path, "stickers.xcodeproj/project.xcworkspace"),
+            pack_path / "stickers.xcodeproj/project.xcworkspace",
             ignore_errors=True,
         )
         shutil.rmtree(
-            os.path.join(pack_path, "stickers.xcodeproj/xcuserdata"), ignore_errors=True
+            pack_path / "stickers.xcodeproj/xcuserdata", ignore_errors=True
         )
 
         with open(
-            os.path.join(pack_path, "stickers.xcodeproj/project.pbxproj"),
+            pack_path / "stickers.xcodeproj/project.pbxproj",
             encoding="utf-8",
         ) as f:
             pbxproj_data = f.read()
@@ -235,36 +236,33 @@ class XcodeImessage(UploadBase):
         )
 
         with open(
-            os.path.join(pack_path, "stickers.xcodeproj/project.pbxproj"),
+            pack_path / "stickers.xcodeproj/project.pbxproj",
             "w+",
             encoding="utf-8",
         ) as f:
             f.write(pbxproj_data)
 
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack
-        stickers_path = os.path.join(
-            pack_path,
-            "stickers StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack",
-        )
+        stickers_path = pack_path / "stickers StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack"
 
         for i in os.listdir(stickers_path):
             if i.endswith(".sticker"):
-                shutil.rmtree(os.path.join(stickers_path, i))
+                shutil.rmtree(stickers_path / i)
 
         stickers_lst = []
         for i in sorted(os.listdir(self.in_dir)):
             if (
                 CodecInfo.get_file_ext(i) == ".png"
-                and os.path.splitext(i)[0] != "cover"
+                and Path(i).stem != "cover"
                 and i not in self.iconset
             ):
-                sticker_dir = f"{os.path.splitext(i)[0]}.sticker"  # 0.sticker
+                sticker_dir = f"{Path(i).stem}.sticker"  # 0.sticker
                 stickers_lst.append(sticker_dir)
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker
-                sticker_path = os.path.join(stickers_path, sticker_dir)
+                sticker_path = stickers_path / sticker_dir
                 os.mkdir(sticker_path)
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/0.png
-                shutil.copy(os.path.join(self.in_dir, i), os.path.join(sticker_path, i))
+                shutil.copy(self.in_dir / i, sticker_path / i)
 
                 json_content = {
                     "info": {
@@ -275,37 +273,34 @@ class XcodeImessage(UploadBase):
                 }
 
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/Contents.json
-                with open(os.path.join(sticker_path, "Contents.json"), "w+") as f:
+                with open(sticker_path / "Contents.json", "w+") as f:
                     json.dump(json_content, f, indent=2)
 
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/Contents.json
-        with open(os.path.join(stickers_path, "Contents.json")) as f:
+        with open(stickers_path / "Contents.json") as f:
             json_content = json.load(f)
 
         json_content["stickers"] = []
         for i in stickers_lst:
             json_content["stickers"].append({"filename": i})  # type: ignore[attr-defined]
 
-        with open(os.path.join(stickers_path, "Contents.json"), "w+") as f:
+        with open(stickers_path / "Contents.json", "w+") as f:
             json.dump(json_content, f, indent=2)
 
         # packname StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset
-        iconset_path = os.path.join(
-            pack_path,
-            "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset",
-        )
+        iconset_path = pack_path / "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset"
 
         for i in os.listdir(iconset_path):
-            if os.path.splitext(i)[1] == ".png":
-                os.remove(os.path.join(iconset_path, i))
+            if Path(i).suffix == ".png":
+                os.remove(iconset_path / i)
 
         icons_lst = []
         for i in self.iconset:
-            shutil.copy(os.path.join(self.in_dir, i), os.path.join(iconset_path, i))
+            shutil.copy(self.in_dir / i, iconset_path / i)
             icons_lst.append(i)
 
         # packname/Info.plist
-        plist_path = os.path.join(pack_path, "stickers/Info.plist")
+        plist_path = pack_path / "stickers/Info.plist"
         with open(plist_path, "rb") as f:
             plist_dict = plistlib.load(f)
         plist_dict["CFBundleDisplayName"] = title
@@ -314,15 +309,15 @@ class XcodeImessage(UploadBase):
             plistlib.dump(plist_dict, f)
 
         os.rename(
-            os.path.join(pack_path, "stickers"), os.path.join(pack_path, f"{title}")
+            pack_path / "stickers", pack_path / title
         )
         os.rename(
-            os.path.join(pack_path, "stickers StickerPackExtension"),
-            os.path.join(pack_path, f"{title} StickerPackExtension"),
+            pack_path / "stickers StickerPackExtension",
+            pack_path / f"{title} StickerPackExtension",
         )
         os.rename(
-            os.path.join(pack_path, "stickers.xcodeproj"),
-            os.path.join(pack_path, f"{title}.xcodeproj"),
+            pack_path / "stickers.xcodeproj",
+            pack_path / f"{title}.xcodeproj",
         )
 
     @staticmethod

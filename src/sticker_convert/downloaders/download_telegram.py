@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from pathlib import Path
 from typing import Optional
 
 import anyio
@@ -63,10 +64,10 @@ class DownloadTelegram(DownloadBase):
                     connect_timeout=30,
                     pool_timeout=30,
                 )
-                ext = os.path.splitext(sticker.file_path)[-1]
+                ext = Path(sticker.file_path).suffix
                 f_id = str(num).zfill(3)
                 f_name = f_id + ext
-                f_path = os.path.join(self.out_dir, f_name)
+                f_path = Path(self.out_dir, f_name)
                 await sticker.download_to_drive(
                     custom_path=f_path,
                     read_timeout=30,
@@ -86,9 +87,9 @@ class DownloadTelegram(DownloadBase):
                     connect_timeout=30,
                     pool_timeout=30,
                 )
-                cover_ext = os.path.splitext(cover.file_path)[-1]
+                cover_ext = Path(cover.file_path).suffix
                 cover_name = "cover" + cover_ext
-                cover_path = os.path.join(self.out_dir, cover_name)
+                cover_path = Path(self.out_dir, cover_name)
                 await cover.download_to_drive(
                     custom_path=cover_path,
                     read_timeout=30,

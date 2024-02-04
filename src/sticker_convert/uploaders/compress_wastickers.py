@@ -2,6 +2,7 @@
 import shutil
 import os
 import copy
+from pathlib import Path
 import zipfile
 from typing import Optional
 
@@ -72,25 +73,21 @@ class CompressWastickers(UploadBase):
                     else:
                         ext = ".png"
 
-                    dst = os.path.join(tempdir, str(num) + ext)
+                    dst = Path(tempdir, str(num) + ext)
 
                     if (FormatVerify.check_file(src, spec=self.webp_spec) or
                         FormatVerify.check_file(src, spec=self.png_spec)):
                         shutil.copy(src, dst)
                     else:
-                        StickerConvert(src, dst, self.opt_comp_merged, self.cb_msg).convert()
+                        StickerConvert(Path(src), Path(dst), self.opt_comp_merged, self.cb_msg).convert()
 
-                out_f = os.path.join(
-                    self.out_dir,
-                    sanitize_filename(pack_title + ".wastickers"),
-                )
+                out_f = Path(self.out_dir, sanitize_filename(pack_title + ".wastickers")).as_posix()
 
                 self.add_metadata(tempdir, pack_title, author)
                 with zipfile.ZipFile(out_f, "w", zipfile.ZIP_DEFLATED) as zipf:
                     for file in os.listdir(tempdir):
-                        file_path = os.path.join(tempdir, file)
-                        file_name = os.path.basename(file_path)
-                        zipf.write(file_path, arcname=file_name)
+                        file_path = Path(tempdir, file)
+                        zipf.write(file_path, arcname=file_path.stem)
 
             self.cb_msg(out_f)
             urls.append(out_f)
@@ -102,7 +99,7 @@ class CompressWastickers(UploadBase):
         opt_comp_merged.merge(self.spec_cover)
 
         cover_path_old = MetadataHandler.get_cover(self.in_dir)
-        cover_path_new = os.path.join(pack_dir, "100.png")
+        cover_path_new = Path(pack_dir, "100.png")
         if cover_path_old:
             if FormatVerify.check_file(cover_path_old, spec=self.spec_cover):
                 shutil.copy(cover_path_old, cover_path_new)
@@ -115,11 +112,11 @@ class CompressWastickers(UploadBase):
             first_image = [
                 i
                 for i in sorted(os.listdir(self.in_dir))
-                if os.path.isfile(os.path.join(self.in_dir, i))
+                if Path(self.in_dir, i).is_file()
                 and not i.endswith((".txt", ".m4a", ".wastickers"))
             ][0]
             StickerConvert(
-                os.path.join(self.in_dir, f"{first_image}"),
+                Path(self.in_dir, first_image),
                 cover_path_new,
                 opt_comp_merged,
                 self.cb_msg,

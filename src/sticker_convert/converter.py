@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import io
+from pathlib import Path
 from multiprocessing.queues import Queue as QueueType
 from typing import Optional, Union
 from decimal import Decimal, ROUND_HALF_UP
@@ -58,8 +59,8 @@ class StickerConvert:
         'cannot get below limit {} with lowest quality under current settings (Best size: {})')
 
     def __init__(self,
-                 in_f: Union[str, list[str, io.BytesIO]],
-                 out_f: str,
+                 in_f: Union[Path, list[str, io.BytesIO]],
+                 out_f: Path,
                  opt_comp: CompOption,
                  cb_msg: Union[FakeCbMsg, bool] = True):
         
@@ -70,18 +71,16 @@ class StickerConvert:
                 silent = False
             cb_msg = FakeCbMsg(print, silent=silent)
 
-        if isinstance(in_f, str):
+        self.in_f: Union[io.BytesIO, Path]
+        if isinstance(in_f, Path):
             self.in_f = in_f
-            self.in_f_name = os.path.split(in_f)[1]
-            self.in_f_ext = CodecInfo.get_file_ext(in_f)
+            self.in_f_name = self.in_f.name
         else:
             self.in_f = in_f[1]
-            self.in_f_name = os.path.split(in_f[0])[1]
-            self.in_f_ext = CodecInfo.get_file_ext(in_f[0])
+            self.in_f_name = Path(in_f[0]).name
 
         self.codec_info_orig = CodecInfo(self.in_f)
 
-        self.out_f_ext = ""
         valid_formats = []
         for i in opt_comp.format:
             if i == None:
@@ -91,25 +90,22 @@ class StickerConvert:
             else:
                 valid_formats.append(i)
 
+        valid_ext = False
         if len(valid_formats) == 0:
-            self.out_f_ext = os.path.splitext(out_f)[1]
-            self.out_f = out_f
-            self.out_f_name = os.path.split(out_f)[1]
-        else:
-            for i in valid_formats:
-                if out_f.endswith(i):
-                    self.out_f_ext = i
-                    self.out_f = out_f
-                    self.out_f_name = os.path.split(out_f)[1]
-                    break
+            self.out_f = Path(out_f)
+            valid_ext = True
+        elif Path(out_f).suffix in valid_formats:
+            self.out_f = Path(out_f)
+            valid_ext = True
         
-        if self.out_f_ext == "":
+        if not valid_ext:
             if self.codec_info_orig.is_animated or opt_comp.fake_vid:
-                self.out_f_ext = opt_comp.format_vid
+                ext = opt_comp.format_vid
             else:
-                self.out_f_ext = opt_comp.format_img
-            self.out_f = out_f + self.out_f_ext
-            self.out_f_name = os.path.split(self.out_f)[1]
+                ext = opt_comp.format_img
+            self.out_f = out_f.with_suffix(ext)
+        
+        self.out_f_name = self.out_f.name
 
         self.cb_msg = cb_msg
         self.frames_raw: list[np.ndarray] = []
@@ -176,7 +172,7 @@ class StickerConvert:
             self.quality = param[2]
             if param[3] and self.codec_info_orig.fps:
                 self.fps = min(param[3], self.codec_info_orig.fps)
-                if self.out_f_ext == '.gif':
+                if self.out_f.suffix == '.gif':
                     self.fix_gif_fps()
             else:
                 self.fps = 0
@@ -241,9 +237,9 @@ class StickerConvert:
                   result_step: Optional[int] = None
                   ) -> tuple[bool, str, Union[None, bytes, str], int]:
         
-        if os.path.splitext(self.out_f_name)[0] == 'none':
+        if self.out_f.stem == 'none':
             self.out_f = None
-        elif os.path.splitext(self.out_f_name)[0] == 'bytes':
+        elif self.out_f.stem == 'bytes':
             self.out_f = data
         else:
             with open(self.out_f, 'wb+') as f:
@@ -258,9 +254,9 @@ class StickerConvert:
         return True, self.in_f, self.out_f, self.result_size
 
     def frames_import(self):
-        if self.in_f_ext in ('.tgs', '.lottie', '.json'):
+        if self.in_f.suffix in ('.tgs', '.lottie', '.json'):
             self._frames_import_lottie()
-        elif self.in_f_ext in ('.webp', '.apng', 'png'):
+        elif self.in_f.suffix in ('.webp', '.apng', 'png'):
             # ffmpeg do not support webp decoding (yet)
             # ffmpeg could fail to decode apng if file is buggy
             self._frames_import_pillow()
@@ -283,7 +279,7 @@ class StickerConvert:
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
-        with av.open(self.in_f) as container:
+        with av.open(self.in_f.as_posix()) as container:
             context = container.streams.video[0].codec_context
             if context.name == 'vp8':
                 context = CodecContext.create('libvpx', 'r')
@@ -343,7 +339,7 @@ class StickerConvert:
     def _frames_import_lottie(self):
         from rlottie_python import LottieAnimation # type: ignore
         
-        if self.in_f_ext == '.tgs':
+        if self.in_f.suffix == '.tgs':
             anim = LottieAnimation.from_tgs(self.in_f)
         else:
             if isinstance(self.in_f, str):
@@ -433,14 +429,14 @@ class StickerConvert:
 
     def frames_export(self):
         is_animated = len(self.frames_processed) > 1 and self.fps
-        if self.out_f_ext in ('.apng', '.png'):
+        if self.out_f.suffix in ('.apng', '.png'):
             if is_animated:
                 self._frames_export_apng()
             else:
                 self._frames_export_png()
-        elif self.out_f_ext == '.webp' and is_animated:
+        elif self.out_f.suffix == '.webp' and is_animated:
             self._frames_export_webp()
-        elif self.out_f_ext in ('.webm', '.mp4', '.mkv') or is_animated:
+        elif self.out_f.suffix in ('.webm', '.mp4', '.mkv') or is_animated:
             self._frames_export_pyav()
         else:
             self._frames_export_pil()
@@ -449,7 +445,7 @@ class StickerConvert:
         with Image.fromarray(self.frames_processed[0]) as im:
             im.save(
                 self.tmp_f,
-                format=self.out_f_ext.replace('.', ''),
+                format=self.out_f.suffix.replace('.', ''),
                 quality=self.quality
             )
 
@@ -463,15 +459,15 @@ class StickerConvert:
             options['quality'] = str(self.quality)
             options['lossless'] = '0'
 
-        if self.out_f_ext == '.gif':
+        if self.out_f.suffix == '.gif':
             codec = 'gif'
             pixel_format = 'rgb8'
             options['loop'] = '0'
-        elif self.out_f_ext in ('.apng', '.png'):
+        elif self.out_f.suffix in ('.apng', '.png'):
             codec = 'apng'
             pixel_format = 'rgba'
             options['plays'] = '0'
-        elif self.out_f_ext in ('.webp', '.webm', '.mkv'):
+        elif self.out_f.suffix in ('.webp', '.webm', '.mkv'):
             codec = 'libvpx-vp9'
             pixel_format = 'yuva420p'
             options['loop'] = '0'
@@ -480,7 +476,7 @@ class StickerConvert:
             pixel_format = 'yuv420p'
             options['loop'] = '0'
         
-        with av.open(self.tmp_f, 'w', format=self.out_f_ext.replace('.', '')) as output:
+        with av.open(self.tmp_f, 'w', format=self.out_f.suffix.replace('.', '')) as output:
             out_stream = output.add_stream(codec, rate=int(self.fps), options=options)
             out_stream.width = self.res_w
             out_stream.height = self.res_h
@@ -547,9 +543,10 @@ class StickerConvert:
             self.apngasm.add_frame(frame_final)
                         
         with CacheStore.get_cache_store(path=self.opt_comp.cache_dir) as tempdir:
-            self.apngasm.assemble(os.path.join(tempdir, f'out{self.out_f_ext}'))
+            tmp_apng = Path(tempdir, f'out{self.out_f.suffix}')
+            self.apngasm.assemble(tmp_apng.as_posix())
 
-            with open(os.path.join(tempdir, f'out{self.out_f_ext}'), 'rb') as f:
+            with open(tmp_apng, 'rb') as f:
                 self.tmp_f.write(f.read())
 
         self.apngasm.reset()

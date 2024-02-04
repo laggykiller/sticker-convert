@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 import copy
+from pathlib import Path
 from typing import Optional
 
 import anyio
@@ -53,22 +54,18 @@ class UploadSignal(UploadBase):
         for src in stickers:
             self.cb_msg(f"Verifying {src} for uploading to signal")
 
-            src_full_name = os.path.split(src)[-1]
-            src_name = os.path.splitext(src_full_name)[0]
-            ext = os.path.splitext(src_full_name)[-1]
-
             sticker = Sticker()
             sticker.id = pack.nb_stickers
 
-            emoji = emoji_dict.get(src_name, None)
+            emoji = emoji_dict.get(Path(src).stem, None)
             if not emoji:
                 self.cb_msg(
-                    f"Warning: Cannot find emoji for file {src_full_name}, skip uploading this file..."
+                    f"Warning: Cannot find emoji for file {Path(src).name}, skip uploading this file..."
                 )
                 continue
             sticker.emoji = emoji[:1]
 
-            if ext == ".webp":
+            if Path(src).suffix == ".webp":
                 spec_choice = self.webp_spec
             else:
                 spec_choice = self.png_spec
@@ -79,7 +76,7 @@ class UploadSignal(UploadBase):
                 else:
                     dst = "bytes.png"
                 _, _, sticker.image_data, _ = StickerConvert(
-                    src, dst, self.opt_comp_merged, self.cb_msg
+                    Path(src), Path(dst), self.opt_comp_merged, self.cb_msg
                 ).convert()
             else:
                 with open(src, "rb") as f:

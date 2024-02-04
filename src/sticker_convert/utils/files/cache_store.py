@@ -2,6 +2,7 @@
 import os
 import platform
 import shutil
+from pathlib import Path
 from uuid import uuid4
 
 if platform.system() == "Linux":
@@ -16,7 +17,7 @@ from typing import Optional
 
 @contextlib.contextmanager
 def debug_cache_dir(path: str):
-    path_random = os.path.join(path, str(uuid4()))
+    path_random = Path(path, str(uuid4()))
     os.mkdir(path_random)
     try:
         yield path_random

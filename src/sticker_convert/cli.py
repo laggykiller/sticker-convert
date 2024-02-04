@@ -3,6 +3,7 @@ import os
 import math
 from multiprocessing import cpu_count
 import argparse
+from pathlib import Path
 from typing import Optional
 
 from tqdm import tqdm
@@ -13,7 +14,7 @@ from .utils.files.json_manager import JsonManager # type: ignore
 from .utils.auth.get_kakao_auth import GetKakaoAuth # type: ignore
 from .utils.auth.get_signal_auth import GetSignalAuth # type: ignore
 from .utils.auth.get_line_auth import GetLineAuth # type: ignore
-from .utils.files.dir_utils import DirUtils # type: ignore
+from .utils.files.dir_utils import CURR_DIR, CONFIG_DIR # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .__init__ import __version__ # type: ignore
 
@@ -144,7 +145,7 @@ class CLI:
         opt_input = {
             'option': download_option,
             'url': url,
-            'dir': os.path.abspath(args.input_dir) if args.input_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_input')
+            'dir': Path(args.input_dir).resolve() if args.input_dir else CURR_DIR / 'stickers_input'
         }
 
         return opt_input
@@ -163,7 +164,7 @@ class CLI:
         
         opt_output = {
             'option': export_option,
-            'dir': os.path.abspath(args.output_dir) if args.output_dir else os.path.join(DirUtils.get_curr_dir(), 'stickers_output'),
+            'dir': Path(args.output_dir).resolve() if args.output_dir else CURR_DIR / 'stickers_output',
             'title': args.title,
             'author': args.author
         }
@@ -250,7 +251,7 @@ class CLI:
         return opt_comp
 
     def get_opt_cred(self, args) -> dict:
-        creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
+        creds_path = CONFIG_DIR / 'creds.json'
         creds = JsonManager.load_json(creds_path)
         if creds:
             self.cb_msg('Loaded credentials from creds.json')
@@ -314,7 +315,7 @@ class CLI:
                 self.cb_msg('Failed to get Line cookies. Have you logged in the web browser?')
         
         if args.save_cred:
-            creds_path = os.path.join(DirUtils.get_config_dir(), 'creds.json')
+            creds_path = CONFIG_DIR / 'creds.json'
             JsonManager.save_json(creds_path, opt_cred)
             self.cb_msg('Saved credentials to creds.json')
         

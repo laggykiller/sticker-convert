@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import os
+from pathlib import Path
 import mmap
 from typing import Optional
 from decimal import Decimal, ROUND_HALF_UP
@@ -8,7 +8,7 @@ from decimal import Decimal, ROUND_HALF_UP
 from PIL import Image, UnidentifiedImageError
 
 class CodecInfo:
-    def __init__(self, file: str):
+    def __init__(self, file: Path):
         self.file_ext = CodecInfo.get_file_ext(file)
         self.fps, self.frames, self.duration = CodecInfo.get_file_fps_frames_duration(file)
         self.codec = CodecInfo.get_file_codec(file)
@@ -16,7 +16,7 @@ class CodecInfo:
         self.is_animated = True if self.fps > 1 else False
 
     @staticmethod
-    def get_file_fps_frames_duration(file: str) -> tuple[float, int, int]:
+    def get_file_fps_frames_duration(file: Path) -> tuple[float, int, int]:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == ".tgs":
@@ -41,7 +41,7 @@ class CodecInfo:
         return fps, frames, duration
 
     @staticmethod
-    def get_file_fps(file: str) -> float:
+    def get_file_fps(file: Path) -> float:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == ".tgs":
@@ -59,7 +59,7 @@ class CodecInfo:
             return 0
     
     @staticmethod
-    def get_file_frames(file: str, check_anim: bool = False) -> int:
+    def get_file_frames(file: Path, check_anim: bool = False) -> int:
         # If check_anim is True, return value > 1 means the file is animated
         file_ext = CodecInfo.get_file_ext(file)
 
@@ -77,7 +77,7 @@ class CodecInfo:
         return frames
 
     @staticmethod
-    def get_file_duration(file: str) -> int:
+    def get_file_duration(file: Path) -> int:
         # Return duration in miliseconds
         file_ext = CodecInfo.get_file_ext(file)
 
@@ -97,22 +97,31 @@ class CodecInfo:
         return duration
     
     @staticmethod
-    def _get_file_fps_tgs(file: str) -> int:
+    def _get_file_fps_tgs(file: Path) -> int:
         from rlottie_python import LottieAnimation  # type: ignore
+
+        if isinstance(file, Path):
+            file = file.as_posix()
 
         with LottieAnimation.from_tgs(file) as anim:
             return anim.lottie_animation_get_framerate()
 
     @staticmethod    
-    def _get_file_frames_tgs(file: str) -> int:
+    def _get_file_frames_tgs(file: Path) -> int:
         from rlottie_python import LottieAnimation  # type: ignore
+
+        if isinstance(file, Path):
+            file = file.as_posix()
 
         with LottieAnimation.from_tgs(file) as anim:
             return anim.lottie_animation_get_totalframe()
     
     @staticmethod
-    def _get_file_fps_frames_tgs(file: str) -> tuple[int, int]:
+    def _get_file_fps_frames_tgs(file: Path) -> tuple[int, int]:
         from rlottie_python import LottieAnimation  # type: ignore
+
+        if isinstance(file, Path):
+            file = file.as_posix()
 
         with LottieAnimation.from_tgs(file) as anim:
             fps = anim.lottie_animation_get_framerate()
@@ -121,7 +130,7 @@ class CodecInfo:
         return fps, frames
     
     @staticmethod
-    def _get_file_frames_duration_pillow(file: str, frames_only: bool = False) -> tuple[int, int]:
+    def _get_file_frames_duration_pillow(file: Path, frames_only: bool = False) -> tuple[int, int]:
         total_duration = 0
 
         with Image.open(file) as im:
@@ -137,7 +146,7 @@ class CodecInfo:
                 return 1, 0
         
     @staticmethod
-    def _get_file_frames_duration_webp(file: str) -> tuple[int, int]:
+    def _get_file_frames_duration_webp(file: Path) -> tuple[int, int]:
         total_duration = 0
         frames = 0
         
@@ -161,11 +170,14 @@ class CodecInfo:
             return frames, total_duration
     
     @staticmethod
-    def _get_file_frames_duration_av(file: str, frames_to_iterate: Optional[int] = None, frames_only: bool = False) -> tuple[int, int]:
+    def _get_file_frames_duration_av(file: Path, frames_to_iterate: Optional[int] = None, frames_only: bool = False) -> tuple[int, int]:
         import av # type: ignore
 
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
+
+        if isinstance(file, Path):
+            file = file.as_posix()
 
         with av.open(file) as container:
             stream = container.streams.video[0]
@@ -190,7 +202,7 @@ class CodecInfo:
                 return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))
 
     @staticmethod
-    def get_file_codec(file: str) -> Optional[str]:
+    def get_file_codec(file: Path) -> Optional[str]:
         codec = None
 
         file_ext = CodecInfo.get_file_ext(file)
@@ -217,6 +229,9 @@ class CodecInfo:
         
         import av # type: ignore
         from av.error import InvalidDataError
+
+        if isinstance(file, Path):
+            file = file.as_posix()
         
         try:
             with av.open(file) as container:
@@ -228,7 +243,7 @@ class CodecInfo:
         return codec.lower()
 
     @staticmethod
-    def get_file_res(file: str) -> tuple[int, int]:
+    def get_file_res(file: Path) -> tuple[int, int]:
         file_ext = CodecInfo.get_file_ext(file)
 
         if file_ext == ".tgs":
@@ -243,6 +258,9 @@ class CodecInfo:
         else:
             import av # type: ignore
 
+            if isinstance(file, Path):
+                file = file.as_posix()
+
             with av.open(file) as container:
                 stream = container.streams.video[0]
                 width = stream.width
@@ -251,11 +269,11 @@ class CodecInfo:
         return width, height
 
     @staticmethod
-    def get_file_ext(file: str) -> str:
-        return os.path.splitext(file)[-1].lower()
+    def get_file_ext(file: Path) -> str:
+        return Path(file).suffix.lower()
 
     @staticmethod
-    def is_anim(file: str) -> bool:
+    def is_anim(file: Path) -> bool:
         if CodecInfo.get_file_frames(file, check_anim=True) > 1:
             return True
         else:

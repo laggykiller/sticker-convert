@@ -308,7 +308,7 @@
             "min": 0,
             "max": 2000
         },
-        "steps": 8,
+        "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
         "quantize_method": "imagequant",
@@ -353,7 +353,7 @@
             "min": 0,
             "max": 2000
         },
-        "steps": 8,
+        "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
         "quantize_method": "imagequant",
@@ -398,7 +398,7 @@
             "min": 0,
             "max": 2000
         },
-        "steps": 8,
+        "steps": 16,
         "fake_vid": false,
         "scale_filter": "lanczos",
         "quantize_method": "imagequant",
