@@ -607,7 +607,7 @@ class StickerConvert:
             #
             # For GIF, we need to adjust fps such that delay is matching to hundreths of second
             return self._fix_fps_duration(fps, 100)
-        elif self.out_f.suffix in ('.webp', '.apng'):
+        elif self.out_f.suffix in ('.webp', '.apng', '.png'):
             return self._fix_fps_duration(fps, 1000)
         else:
             return self._fix_fps_pyav(fps)
