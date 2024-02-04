@@ -28,7 +28,9 @@ from .uploaders.xcode_imessage import XcodeImessage # type: ignore
 from .converter import StickerConvert # type: ignore
 from .utils.media.codec_info import CodecInfo # type: ignore
 from .utils.files.json_manager import JsonManager # type: ignore
+from .utils.files.dir_utils import RESOURCE_DIR # type: ignore
 from .utils.files.metadata_handler import MetadataHandler # type: ignore
+
 
 class Job:
     def __init__(self,
@@ -130,7 +132,7 @@ class Job:
             error_msg += '[X] Uploading to signal requires uuid and password.\n'
             error_msg += save_to_local_tip
         
-        output_presets = JsonManager.load_json('resources/output.json')
+        output_presets = JsonManager.load_json(RESOURCE_DIR / 'output.json')
 
         input_option = self.opt_input.option
         output_option = self.opt_output.option

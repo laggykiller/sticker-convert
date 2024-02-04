@@ -46,7 +46,6 @@ def _get_curr_dir_if_writable() -> Optional[Path]:
 
     return curr_dir
 
-staticmethod
 def get_curr_dir() -> Path:
     home_dir = Path.home()
     desktop_dir = home_dir / "Desktop"
@@ -60,7 +59,8 @@ def get_curr_dir() -> Path:
     else:
         return fallback_dir
 
-staticmethod
+CURR_DIR = get_curr_dir()
+
 def get_config_dir() -> Path:
     if platform.system() == "Windows":
         fallback_dir = Path(os.path.expandvars("%APPDATA%\\sticker-convert"))
@@ -73,5 +73,24 @@ def get_config_dir() -> Path:
         os.makedirs(fallback_dir, exist_ok=True)
         return fallback_dir
 
-CURR_DIR = get_curr_dir()
 CONFIG_DIR = get_config_dir()
+
+def get_resource_dir() -> Path:
+    dirs = [
+        Path("resources"),
+        Path(CURR_DIR / "resources"),
+        (Path(sys.argv[0]).parent / "resources"),
+        (Path(sys.argv[0]).parent / "sticker_convert/resources"),
+        (Path(__file__).resolve().parent / "../../resources"),
+    ]
+
+    try:
+        dirs.append(Path(__compiled__.containing_dir, "resources"))
+    except NameError:
+        pass
+
+    for dir in dirs:
+        if dir.is_dir():
+            return dir
+
+RESOURCE_DIR = get_resource_dir()

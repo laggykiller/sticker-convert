@@ -7,6 +7,7 @@ from typing import Optional
 
 from ..media.codec_info import CodecInfo  # type: ignore
 from .json_manager import JsonManager  # type: ignore
+from .dir_utils import RESOURCE_DIR # type: ignore
 
 
 class MetadataHandler:
@@ -94,7 +95,7 @@ class MetadataHandler:
         Does not check if metadata provided via user input in GUI or flag options
         metadata = 'title' or 'author'
         """
-        input_presets = JsonManager.load_json("resources/input.json")
+        input_presets = JsonManager.load_json(RESOURCE_DIR / "input.json")
 
         if input_option == "local":
             metadata_file_path = Path(input_dir, f"{metadata}.txt")
@@ -112,7 +113,7 @@ class MetadataHandler:
     @staticmethod
     def check_metadata_required(output_option: str, metadata: str) -> bool:
         # metadata = 'title' or 'author'
-        output_presets = JsonManager.load_json("resources/output.json")
+        output_presets = JsonManager.load_json(RESOURCE_DIR / "output.json")
         return output_presets[output_option]["metadata_requirements"][metadata]
 
     @staticmethod

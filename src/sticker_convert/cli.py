@@ -14,9 +14,10 @@ from .utils.files.json_manager import JsonManager # type: ignore
 from .utils.auth.get_kakao_auth import GetKakaoAuth # type: ignore
 from .utils.auth.get_signal_auth import GetSignalAuth # type: ignore
 from .utils.auth.get_line_auth import GetLineAuth # type: ignore
-from .utils.files.dir_utils import CURR_DIR, CONFIG_DIR # type: ignore
+from .utils.files.dir_utils import CURR_DIR, CONFIG_DIR, RESOURCE_DIR # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .__init__ import __version__ # type: ignore
+
 
 class CLI:
     def __init__(self):
@@ -24,10 +25,10 @@ class CLI:
         self.progress_bar = None
 
     def cli(self):
-        self.help = JsonManager.load_json('resources/help.json')
-        self.input_presets = JsonManager.load_json('resources/input.json')
-        self.compression_presets = JsonManager.load_json('resources/compression.json')
-        self.output_presets = JsonManager.load_json('resources/output.json')
+        self.help = JsonManager.load_json(RESOURCE_DIR / 'help.json')
+        self.input_presets = JsonManager.load_json(RESOURCE_DIR / 'input.json')
+        self.compression_presets = JsonManager.load_json(RESOURCE_DIR / 'compression.json')
+        self.output_presets = JsonManager.load_json(RESOURCE_DIR / 'output.json')
 
         if not (self.help and self.compression_presets and self.input_presets and self.output_presets):
             self.cb_msg('Warning: preset json(s) cannot be found')

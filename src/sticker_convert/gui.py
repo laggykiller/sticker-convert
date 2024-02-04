@@ -20,7 +20,7 @@ from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 from .job import Job # type: ignore
 from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
 from .utils.files.json_manager import JsonManager # type: ignore
-from .utils.files.dir_utils import CURR_DIR, CONFIG_DIR # type: ignore
+from .utils.files.dir_utils import CURR_DIR, CONFIG_DIR, RESOURCE_DIR # type: ignore
 from .utils.files.metadata_handler import MetadataHandler # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .gui_components.gui_utils import GUIUtils # type: ignore
@@ -33,6 +33,7 @@ from .gui_components.frames.output_frame import OutputFrame # type: ignore
 from .gui_components.frames.config_frame import ConfigFrame # type: ignore
 from .gui_components.frames.progress_frame import ProgressFrame # type: ignore
 from .gui_components.frames.control_frame import ControlFrame # type: ignore
+
 
 class GUI(Window):
     def __init__(self):
@@ -201,11 +202,11 @@ class GUI(Window):
             self.cb_msg(msg)
     
     def load_jsons(self):
-        self.help = JsonManager.load_json('resources/help.json')
-        self.input_presets = JsonManager.load_json('resources/input.json')
-        self.compression_presets = JsonManager.load_json('resources/compression.json')
-        self.output_presets = JsonManager.load_json('resources/output.json')
-        self.emoji_list = JsonManager.load_json('resources/emoji.json')
+        self.help = JsonManager.load_json(RESOURCE_DIR / 'help.json')
+        self.input_presets = JsonManager.load_json(RESOURCE_DIR / 'input.json')
+        self.compression_presets = JsonManager.load_json(RESOURCE_DIR / 'compression.json')
+        self.output_presets = JsonManager.load_json(RESOURCE_DIR / 'output.json')
+        self.emoji_list = JsonManager.load_json(RESOURCE_DIR / 'emoji.json')
 
         if not (self.compression_presets and self.input_presets and self.output_presets):
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
