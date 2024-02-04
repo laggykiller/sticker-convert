@@ -499,7 +499,7 @@ class StickerConvert:
         for frame in self.frames_processed:
             pic = webp.WebPPicture.from_numpy(frame)
             enc.encode_frame(pic, timestamp_ms, config=config)
-            timestamp_ms += int(Decimal(1000 / self.fps).quantize(0, ROUND_HALF_UP))
+            timestamp_ms += int(1000 / self.fps)
         anim_data = enc.assemble(timestamp_ms)
         self.tmp_f.write(anim_data.buffer())
     
@@ -523,7 +523,7 @@ class StickerConvert:
         if self.apngasm == None:
             self.apngasm = APNGAsm()
 
-        delay_num = int(Decimal(1000 / self.fps).quantize(0, ROUND_HALF_UP))
+        delay_num = int(1000 / self.fps)
         for i in range(0, image_quant.height, self.res_h):
             with io.BytesIO() as f:
                 crop_dimension = (0, i, image_quant.width, i+self.res_h)
