@@ -5,6 +5,7 @@ from threading import Thread
 from ttkbootstrap import LabelFrame, Frame, Button, Entry, Label # type: ignore
 
 from ...utils.auth.get_kakao_auth import GetKakaoAuth # type: ignore
+from ...job_option import CredOption
 from ..frames.right_clicker import RightClicker # type: ignore
 from .base_window import BaseWindow # type: ignore
 from ..gui_utils import GUIUtils # type: ignore
@@ -81,7 +82,7 @@ class KakaoGetAuthWindow(BaseWindow):
     
     def cb_login_thread(self, *args):
         self.gui.save_creds()
-        m = GetKakaoAuth(opt_cred=self.gui.creds, cb_msg=self.gui.cb_msg, cb_msg_block=self.cb_msg_block_kakao, cb_ask_str=self.cb_ask_str_kakao)
+        m = GetKakaoAuth(opt_cred=CredOption(self.gui.creds), cb_msg=self.gui.cb_msg, cb_msg_block=self.cb_msg_block_kakao, cb_ask_str=self.cb_ask_str_kakao)
 
         auth_token = m.get_cred()
 

@@ -280,7 +280,7 @@ class CLI:
         }
 
         if args.kakao_get_auth:
-            m = GetKakaoAuth(opt_cred=creds, cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_ask_str=self.cb_ask_str)
+            m = GetKakaoAuth(opt_cred=CredOption(creds), cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_ask_str=self.cb_ask_str)
             auth_token = m.get_cred()
 
             if auth_token:
