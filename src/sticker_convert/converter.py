@@ -6,6 +6,7 @@ from multiprocessing.queues import Queue as QueueType
 from fractions import Fraction
 from typing import Optional, Union
 from decimal import Decimal, ROUND_HALF_UP
+import math
 
 import numpy as np
 from PIL import Image
@@ -413,18 +414,29 @@ class StickerConvert:
         else:
             speed_ratio = 1
 
+        # How many frames to advance in original video for each frame of output video
         frame_increment = fps_ratio * speed_ratio
+
+        frames_out_min = None
+        frames_out_max = None
+        if self.opt_comp.duration_min:
+            frames_out_min = math.ceil(self.fps * self.opt_comp.duration_min / 1000)
+        if self.opt_comp.duration_max:
+            frames_out_max = math.floor(self.fps * self.opt_comp.duration_max / 1000)
 
         frame_current = 0
         frame_current_float = 0
         while True:
             frame_current_float += frame_increment
             frame_current = int(Decimal(frame_current_float).quantize(0, ROUND_HALF_UP))
-            if frame_current <= len(frames_in) - 1:
+            if (frame_current <= len(frames_in) - 1
+                and not (frames_out_max and len(frames_out) == frames_out_max)):
+
                 frames_out.append(frames_in[frame_current])
             else:
-                if len(frames_out) == 0:
-                    frames_out.append(frames_in[0])
+                while (len(frames_out) == 0
+                       or (frames_out_min and len(frames_out) < frames_out_min)):
+                    frames_out.append(frames_in[-1])
                 return frames_out
 
     def frames_export(self):
@@ -607,7 +619,7 @@ class StickerConvert:
             #
             # For GIF, we need to adjust fps such that delay is matching to hundreths of second
             return self._fix_fps_duration(fps, 100)
-        elif self.out_f.suffix in ('.webp', '.apng'):
+        elif self.out_f.suffix in ('.webp', '.apng', '.png'):
             return self._fix_fps_duration(fps, 1000)
         else:
             return self._fix_fps_pyav(fps)
