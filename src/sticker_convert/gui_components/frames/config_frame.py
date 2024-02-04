@@ -7,7 +7,7 @@ from ttkbootstrap import LabelFrame, Button, Label, Checkbutton # type: ignore
 
 if TYPE_CHECKING:
     from ..gui import GUI # type: ignore
-from ...utils.files.dir_utils import CONFIG_DIR # type: ignore
+from ...definitions import CONFIG_DIR # type: ignore
 from ...utils.files.run_bin import RunBin # type: ignore
 
 class ConfigFrame(LabelFrame):
@@ -61,14 +61,13 @@ class ConfigFrame(LabelFrame):
             self.gui.cb_msg_block('Restored to default config.')
     
     def cb_open_config_directory(self, *args, **kwargs):
-        config_dir = CONFIG_DIR
-        self.gui.cb_msg(msg=f'Config is located at {config_dir}')
+        self.gui.cb_msg(msg=f'Config is located at {CONFIG_DIR}')
         if platform.system() == 'Windows':
-            os.startfile(config_dir)
+            os.startfile(CONFIG_DIR)
         elif platform.system() == 'Darwin':
-            RunBin.run_cmd(['open', config_dir], silence=True)
+            RunBin.run_cmd(['open', CONFIG_DIR], silence=True)
         else:
-            RunBin.run_cmd(['xdg-open', config_dir], silence=True)
+            RunBin.run_cmd(['xdg-open', CONFIG_DIR], silence=True)
 
     def set_states(self, state: str):
         self.settings_save_cred_cbox.config(state=state)

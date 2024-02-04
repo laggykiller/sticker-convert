@@ -14,7 +14,7 @@ from ..utils.media.format_verify import FormatVerify  # type: ignore
 from ..utils.media.codec_info import CodecInfo  # type: ignore
 from ..utils.files.metadata_handler import MetadataHandler  # type: ignore
 from ..utils.files.sanitize_filename import sanitize_filename  # type: ignore
-from ..utils.files.dir_utils import CURR_DIR
+from ..definitions import ROOT_DIR
 from ..job_option import CompOption, OutputOption, CredOption # type: ignore
 
 
@@ -25,16 +25,16 @@ class XcodeImessageIconset:
         if self.iconset != {}:
             return
 
-        if (CURR_DIR / "ios-message-stickers-template").is_dir():
+        if (ROOT_DIR / "ios-message-stickers-template").is_dir():
             with open(
-                CURR_DIR / "ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
+                ROOT_DIR / "ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
             ) as f:
                 dict = json.load(f)
-        elif (CURR_DIR / "ios-message-stickers-template.zip").is_file():
-            with zipfile.ZipFile((CURR_DIR / "ios-message-stickers-template.zip"), "r") as f:
+        elif (ROOT_DIR / "ios-message-stickers-template.zip").is_file():
+            with zipfile.ZipFile((ROOT_DIR / "ios-message-stickers-template.zip"), "r") as f:
                 dict = json.loads(
                     f.read(
-                        CURR_DIR / "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
+                        ROOT_DIR / "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
                     ).decode()
                 )
         else:
@@ -184,11 +184,11 @@ class XcodeImessage(UploadBase):
 
     def create_xcode_proj(self, author: str, title: str):
         pack_path = self.out_dir / title
-        if (CURR_DIR / "ios-message-stickers-template.zip").is_file():
-            with zipfile.ZipFile(CURR_DIR / "ios-message-stickers-template.zip", "r") as f:
+        if (ROOT_DIR / "ios-message-stickers-template.zip").is_file():
+            with zipfile.ZipFile(ROOT_DIR / "ios-message-stickers-template.zip", "r") as f:
                 f.extractall(pack_path)
-        elif (CURR_DIR / "ios-message-stickers-template").is_dir():
-            shutil.copytree(CURR_DIR / "ios-message-stickers-template", pack_path)
+        elif (ROOT_DIR / "ios-message-stickers-template").is_dir():
+            shutil.copytree(ROOT_DIR / "ios-message-stickers-template", pack_path)
         else:
             self.cb_msg(
                 "Failed to create Xcode project: ios-message-stickers-template not found"

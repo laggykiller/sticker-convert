@@ -20,7 +20,7 @@ from ttkbootstrap.dialogs import Messagebox, Querybox # type: ignore
 from .job import Job # type: ignore
 from .job_option import InputOption, CompOption, OutputOption, CredOption  # type: ignore
 from .utils.files.json_manager import JsonManager # type: ignore
-from .utils.files.dir_utils import CURR_DIR, CONFIG_DIR, RESOURCE_DIR # type: ignore
+from .definitions import ROOT_DIR, DEFAULT_DIR, CONFIG_DIR # type: ignore
 from .utils.files.metadata_handler import MetadataHandler # type: ignore
 from .utils.url_detect import UrlDetect # type: ignore
 from .gui_components.gui_utils import GUIUtils # type: ignore
@@ -41,7 +41,7 @@ class GUI(Window):
         self.init_done = False
         self.load_jsons()
 
-        font_path = CURR_DIR / "resources/NotoColorEmoji.ttf"
+        font_path = ROOT_DIR / "resources/NotoColorEmoji.ttf"
         self.emoji_font = ImageFont.truetype(font_path.as_posix(), 109)
 
         GUIUtils.set_icon(self)
@@ -202,11 +202,11 @@ class GUI(Window):
             self.cb_msg(msg)
     
     def load_jsons(self):
-        self.help = JsonManager.load_json(RESOURCE_DIR / 'help.json')
-        self.input_presets = JsonManager.load_json(RESOURCE_DIR / 'input.json')
-        self.compression_presets = JsonManager.load_json(RESOURCE_DIR / 'compression.json')
-        self.output_presets = JsonManager.load_json(RESOURCE_DIR / 'output.json')
-        self.emoji_list = JsonManager.load_json(RESOURCE_DIR / 'emoji.json')
+        self.help = JsonManager.load_json(ROOT_DIR / 'resources/help.json')
+        self.input_presets = JsonManager.load_json(ROOT_DIR / 'resources/input.json')
+        self.compression_presets = JsonManager.load_json(ROOT_DIR / 'resources/compression.json')
+        self.output_presets = JsonManager.load_json(ROOT_DIR / 'resources/output.json')
+        self.emoji_list = JsonManager.load_json(ROOT_DIR / 'resources/emoji.json')
 
         if not (self.compression_presets and self.input_presets and self.output_presets):
             Messagebox.show_error(message='Warning: json(s) under "resources" directory cannot be found', title='sticker-convert')
@@ -267,7 +267,7 @@ class GUI(Window):
         # Input
         self.default_input_mode = self.settings.get('input', {}).get('option', 'auto')
         self.input_address_var.set(self.settings.get('input', {}).get('url', ''))
-        default_stickers_input_dir = CURR_DIR / 'stickers_input'
+        default_stickers_input_dir = DEFAULT_DIR / 'stickers_input'
         self.input_setdir_var.set(self.settings.get('input', {}).get('dir', default_stickers_input_dir))
         if not Path(self.input_setdir_var.get()).is_dir():
             self.input_setdir_var.set(default_stickers_input_dir)
@@ -285,7 +285,7 @@ class GUI(Window):
         self.default_output_mode = self.settings.get('output', {}).get('option', 'signal')
 
         # Output
-        default_stickers_output_dir = CURR_DIR / 'stickers_output'
+        default_stickers_output_dir = DEFAULT_DIR / 'stickers_output'
         self.output_setdir_var.set(self.settings.get('output', {}).get('dir', default_stickers_output_dir))
         if not Path(self.output_setdir_var.get()).is_dir():
             self.output_setdir_var.set(default_stickers_output_dir)

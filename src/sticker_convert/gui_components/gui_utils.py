@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 import platform
-from pathlib import Path
 from typing import Union, TYPE_CHECKING
 
 from ttkbootstrap import Frame, Canvas, Scrollbar, PhotoImage
 
-from ..utils.files.dir_utils import CURR_DIR
+from ..definitions import ROOT_DIR
 if TYPE_CHECKING:
     from .windows.base_window import BaseWindow  # type: ignore
     from ..gui import GUI  # type: ignore
@@ -15,12 +14,12 @@ if TYPE_CHECKING:
 class GUIUtils:
     @staticmethod
     def set_icon(window: Union["BaseWindow", "GUI"]):
-        window.icon = PhotoImage(file=CURR_DIR/"resources/appicon.png")
+        window.icon = PhotoImage(file=ROOT_DIR/"resources/appicon.png")
         window.iconphoto(1, window.icon)
         if platform.system() == "Darwin":
-            window.iconbitmap(bitmap=CURR_DIR/"resources/appicon.icns")
+            window.iconbitmap(bitmap=ROOT_DIR/"resources/appicon.icns")
         elif platform.system() == "Windows":
-            window.iconbitmap(bitmap=CURR_DIR/"resources/appicon.ico")
+            window.iconbitmap(bitmap=ROOT_DIR/"resources/appicon.ico")
         window.tk.call("wm", "iconphoto", window._w, window.icon)
 
     @staticmethod

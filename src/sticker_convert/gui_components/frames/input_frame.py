@@ -8,7 +8,7 @@ from ttkbootstrap import LabelFrame, OptionMenu, Button, Entry, Label # type: ig
 if TYPE_CHECKING:
     from ...gui import GUI # type: ignore
 from ...utils.url_detect import UrlDetect # type: ignore
-from ...utils.files.dir_utils import CURR_DIR # type: ignore
+from ...definitions import DEFAULT_DIR # type: ignore
 from .right_clicker import RightClicker # type: ignore
 
 class InputFrame(LabelFrame):
@@ -50,7 +50,7 @@ class InputFrame(LabelFrame):
     def cb_set_indir(self, *args):
         orig_input_dir = self.gui.input_setdir_var.get()
         if not Path(orig_input_dir).is_dir():
-            orig_input_dir = CURR_DIR
+            orig_input_dir = DEFAULT_DIR
         input_dir = filedialog.askdirectory(initialdir=orig_input_dir)
         if input_dir:
             self.gui.input_setdir_var.set(input_dir)
