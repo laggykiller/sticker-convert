@@ -161,7 +161,7 @@ class Executor:
             self.work_queue.get()
 
         for process in self.processes:
-            process.terminate()
+            process.close()
             process.join()
         
         self.cleanup()
@@ -208,7 +208,7 @@ class Job:
             self.cb_ask_str
         )
 
-    def start(self) -> bool:
+    def start(self) -> int:
         if Path(self.opt_input.dir).is_dir() == False:
             os.makedirs(self.opt_input.dir)
 
@@ -241,10 +241,11 @@ class Job:
                 break
 
         self.executor.cb("bar", kwargs={"set_progress_mode": 'clear'})
+        self.executor.cleanup()
 
         return code
 
-    def cancel(self):
+    def cancel(self, *args, **kwargs):
         self.executor.kill_workers()
 
     def verify_input(self) -> bool:

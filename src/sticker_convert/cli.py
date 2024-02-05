@@ -109,15 +109,7 @@ class CLI:
 
         signal.signal(signal.SIGINT, job.cancel)
         status = job.start()
-
-        if status == 1:
-            self.cb.msg(msg='An error occured during this run.')
-            exit(1)
-        elif status == 2:
-            self.cb.msg(msg='Job cancelled.')
-            exit(1)
-        
-        exit(0)
+        exit(status)
 
     def get_opt_input(self, args) -> dict:
         download_options = {
