@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
+from multiprocessing.managers import BaseProxy
 from urllib.parse import urlparse
 
 import anyio
@@ -8,6 +9,7 @@ from telegram import Bot
 from telegram.error import TelegramError
 
 from sticker_convert.downloaders.download_base import DownloadBase  # type: ignore
+from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
 from sticker_convert.job_option import CredOption  # type: ignore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
 
@@ -19,11 +21,11 @@ class DownloadTelegram(DownloadBase):
     def download_stickers_telegram(self) -> bool:
         self.token = self.opt_cred.telegram_token
         if self.token == None:
-            self.cb_msg("Download failed: Token required for downloading from telegram")
+            self.cb.put("Download failed: Token required for downloading from telegram")
             return False
 
         if not ("telegram.me" in self.url or "t.me" in self.url):
-            self.cb_msg("Download failed: Unrecognized URL format")
+            self.cb.put("Download failed: Unrecognized URL format")
             return False
         
         self.title = Path(urlparse(self.url).path).name
@@ -42,15 +44,15 @@ class DownloadTelegram(DownloadBase):
                     pool_timeout=30,
                 )
             except TelegramError as e:
-                self.cb_msg(
+                self.cb.put(
                     f"Failed to download telegram sticker set {self.title} due to: {e}"
                 )
                 return False
 
-            if self.cb_bar:
-                self.cb_bar(
-                    set_progress_mode="determinate", steps=len(sticker_set.stickers)
-                )
+            self.cb.put(("bar", None, {
+                "set_progress_mode": "determinate",
+                "steps": len(sticker_set.stickers)
+            }))
 
             emoji_dict = {}
             for num, i in enumerate(sticker_set.stickers):
@@ -72,9 +74,8 @@ class DownloadTelegram(DownloadBase):
                     pool_timeout=30,
                 )
                 emoji_dict[f_id] = i.emoji
-                self.cb_msg(f"Downloaded {f_name}")
-                if self.cb_bar:
-                    self.cb_bar(update_bar=True)
+                self.cb.put(f"Downloaded {f_name}")
+                self.cb.put("update_bar")
 
             if sticker_set.thumbnail:
                 cover = await sticker_set.thumbnail.get_file(
@@ -93,7 +94,7 @@ class DownloadTelegram(DownloadBase):
                     connect_timeout=30,
                     pool_timeout=30,
                 )
-                self.cb_msg(f"Downloaded {cover_name}")
+                self.cb.put(f"Downloaded {cover_name}")
 
         MetadataHandler.set_metadata(
             self.out_dir, title=self.title, emoji_dict=emoji_dict
@@ -105,11 +106,10 @@ class DownloadTelegram(DownloadBase):
         url: str,
         out_dir: str,
         opt_cred: Optional[CredOption] = None,
-        cb_msg=print,
-        cb_msg_block=input,
-        cb_bar=None,
+        cb: Union[BaseProxy, Callback, None] = None,
+        cb_return: Optional[CallbackReturn] = None,
     ) -> bool:
         downloader = DownloadTelegram(
-            url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar
+            url, out_dir, opt_cred, cb, cb_return
         )
         return downloader.download_stickers_telegram()

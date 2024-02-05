@@ -4,7 +4,7 @@ import math
 import os
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
-from multiprocessing.queues import Queue as QueueType
+from multiprocessing.managers import BaseProxy
 from pathlib import Path
 from typing import Optional, Union
 
@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 
 from sticker_convert.job_option import CompOption
-from sticker_convert.utils.fake_cb_msg import FakeCbMsg  # type: ignore
+from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
 from sticker_convert.utils.files.cache_store import CacheStore  # type: ignore
 from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
 from sticker_convert.utils.media.format_verify import FormatVerify  # type: ignore
@@ -65,14 +65,13 @@ class StickerConvert:
                  in_f: Union[Path, list[str, io.BytesIO]],
                  out_f: Path,
                  opt_comp: CompOption,
-                 cb_msg: Union[FakeCbMsg, bool] = True):
+                 cb: Union[BaseProxy, Callback, None] = None,
+                 cb_return: Optional[CallbackReturn] = None
+                 ):
         
-        if not isinstance(cb_msg, QueueType):
-            if cb_msg == False:
-                silent = True
-            else:
-                silent = False
-            cb_msg = FakeCbMsg(print, silent=silent)
+        if not cb:
+            cb = Callback(silent=True)
+            cb_return = CallbackReturn()
 
         self.in_f: Union[io.BytesIO, Path]
         if isinstance(in_f, Path):
@@ -106,7 +105,7 @@ class StickerConvert:
         
         self.out_f_name = self.out_f.name
 
-        self.cb_msg = cb_msg
+        self.cb = cb
         self.frames_raw: list[np.ndarray] = []
         self.frames_processed: list[np.ndarray] = []
         self.opt_comp = opt_comp
@@ -127,14 +126,27 @@ class StickerConvert:
         self.result_step = None
 
         self.apngasm = None
+    
+    @staticmethod
+    def convert(in_f: Union[Path, list[str, io.BytesIO]],
+                out_f: Path,
+                opt_comp: CompOption,
+                cb: Union[BaseProxy, Callback, None] = None,
+                cb_return: Optional[CallbackReturn] = None
+        ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
 
-    def convert(self) -> tuple[bool, Path, Union[None, bytes, Path], int]:
+        sticker = StickerConvert(in_f, out_f, opt_comp, cb, cb_return)
+        result = sticker._convert()
+        cb.put("update_bar")
+        return result
+
+    def _convert(self):
         if (FormatVerify.check_format(self.in_f, fmt=self.opt_comp.format, file_info=self.codec_info_orig) and
             FormatVerify.check_file_res(self.in_f, res=self.opt_comp.res, file_info=self.codec_info_orig) and
             FormatVerify.check_file_fps(self.in_f, fps=self.opt_comp.fps, file_info=self.codec_info_orig) and
             FormatVerify.check_file_size(self.in_f, size=self.opt_comp.size_max, file_info=self.codec_info_orig) and
             FormatVerify.check_file_duration(self.in_f, duration=self.opt_comp.duration, file_info=self.codec_info_orig)):
-            self.cb_msg.put(self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name))
+            self.cb.put((self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name)))
 
             with open(self.in_f, 'rb') as f:
                 self.result = f.read()
@@ -142,7 +154,7 @@ class StickerConvert:
             
             return self.compress_done(self.result)
 
-        self.cb_msg.put(self.MSG_START_COMP.format(self.in_f_name, self.out_f_name))
+        self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
 
         steps_list = []
         for step in range(self.opt_comp.steps, -1, -1):
@@ -183,7 +195,7 @@ class StickerConvert:
                     self.quality, int(self.fps), self.color, 
                     step_lower, step_current, step_upper
                 )
-            self.cb_msg.put(msg)
+            self.cb.put(msg)
             
             self.frames_processed = self.frames_drop(self.frames_raw)
             self.frames_processed = self.frames_resize(self.frames_processed)
@@ -220,13 +232,13 @@ class StickerConvert:
         msg = self.MSG_REDO_COMP.format(
                 sign, self.in_f_name, self.out_f_name, self.size, sign, self.size_max
             )
-        self.cb_msg.put(msg)
+        self.cb.put(msg)
 
     def compress_fail(self) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         msg = self.MSG_FAIL_COMP.format(
             self.in_f_name, self.out_f_name, self.size_max, self.size
         )
-        self.cb_msg.put(msg)
+        self.cb.put(msg)
 
         return False, self.in_f, self.out_f, self.size
 
@@ -247,7 +259,7 @@ class StickerConvert:
             msg = self.MSG_DONE_COMP.format(
                 self.in_f_name, self.out_f_name, self.result_size, result_step
             )
-            self.cb_msg.put(msg)
+            self.cb.put(msg)
         
         return True, self.in_f, self.out_f, self.result_size
 

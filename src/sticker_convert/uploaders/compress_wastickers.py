@@ -3,13 +3,15 @@ import copy
 import os
 import shutil
 import zipfile
+from multiprocessing.managers import BaseProxy
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
 
 from sticker_convert.converter import StickerConvert  # type: ignore
 from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
                                         OutputOption)
 from sticker_convert.uploaders.upload_base import UploadBase  # type: ignore
+from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
 from sticker_convert.utils.files.cache_store import CacheStore  # type: ignore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename  # type: ignore
@@ -38,7 +40,7 @@ class CompressWastickers(UploadBase):
 
         self.webp_spec = copy.deepcopy(base_spec)
         self.webp_spec.format = ".webp"
-        self.webp_spec.animated = None if self.fake_vid else True
+        self.webp_spec.animated = None if self.opt_comp.fake_vid else True
 
         self.png_spec = copy.deepcopy(base_spec)
         self.png_spec.format = ".png"
@@ -50,15 +52,15 @@ class CompressWastickers(UploadBase):
     def compress_wastickers(self) -> list[str]:
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(
-            self.in_dir,
+            self.opt_output.dir,
             title=self.opt_output.title,
             author=self.opt_output.author,
         )
         packs = MetadataHandler.split_sticker_packs(
-            self.in_dir,
+            self.opt_output.dir,
             title=title,
             file_per_pack=30,
-            separate_image_anim=not self.fake_vid,
+            separate_image_anim=not self.opt_comp.fake_vid,
         )
 
         for pack_title, stickers in packs.items():
@@ -67,9 +69,9 @@ class CompressWastickers(UploadBase):
                 path=self.opt_comp.cache_dir
             ) as tempdir:
                 for num, src in enumerate(stickers):
-                    self.cb_msg(f"Verifying {src} for compressing into .wastickers")
+                    self.cb.put(f"Verifying {src} for compressing into .wastickers")
 
-                    if self.fake_vid or CodecInfo.is_anim(src):
+                    if self.opt_comp.fake_vid or CodecInfo.is_anim(src):
                         ext = ".webp"
                     else:
                         ext = ".png"
@@ -80,9 +82,9 @@ class CompressWastickers(UploadBase):
                         FormatVerify.check_file(src, spec=self.png_spec)):
                         shutil.copy(src, dst)
                     else:
-                        StickerConvert(Path(src), Path(dst), self.opt_comp_merged, self.cb_msg).convert()
+                        StickerConvert.convert(Path(src), Path(dst), self.opt_comp_merged, self.cb, self.cb_return)
 
-                out_f = Path(self.out_dir, sanitize_filename(pack_title + ".wastickers")).as_posix()
+                out_f = Path(self.opt_output.dir, sanitize_filename(pack_title + ".wastickers")).as_posix()
 
                 self.add_metadata(tempdir, pack_title, author)
                 with zipfile.ZipFile(out_f, "w", zipfile.ZIP_DEFLATED) as zipf:
@@ -90,7 +92,7 @@ class CompressWastickers(UploadBase):
                         file_path = Path(tempdir, file)
                         zipf.write(file_path, arcname=file_path.stem)
 
-            self.cb_msg(out_f)
+            self.cb.put((out_f))
             urls.append(out_f)
 
         return urls
@@ -99,29 +101,30 @@ class CompressWastickers(UploadBase):
         opt_comp_merged = copy.deepcopy(self.opt_comp)
         opt_comp_merged.merge(self.spec_cover)
 
-        cover_path_old = MetadataHandler.get_cover(self.in_dir)
+        cover_path_old = MetadataHandler.get_cover(self.opt_output.dir)
         cover_path_new = Path(pack_dir, "100.png")
         if cover_path_old:
             if FormatVerify.check_file(cover_path_old, spec=self.spec_cover):
                 shutil.copy(cover_path_old, cover_path_new)
             else:
-                StickerConvert(
-                    cover_path_old, cover_path_new, opt_comp_merged, self.cb_msg
-                ).convert()
+                StickerConvert.convert(
+                    cover_path_old, cover_path_new, opt_comp_merged, self.cb, self.cb_return
+                )
         else:
             # First image in the directory, extracting first frame
             first_image = [
                 i
-                for i in sorted(os.listdir(self.in_dir))
-                if Path(self.in_dir, i).is_file()
+                for i in sorted(os.listdir(self.opt_output.dir))
+                if Path(self.opt_output.dir, i).is_file()
                 and not i.endswith((".txt", ".m4a", ".wastickers"))
             ][0]
-            StickerConvert(
-                Path(self.in_dir, first_image),
+            StickerConvert.convert(
+                Path(self.opt_output.dir, first_image),
                 cover_path_new,
                 opt_comp_merged,
-                self.cb_msg,
-            ).convert()
+                self.cb,
+                self.cb_return,
+            )
 
         MetadataHandler.set_metadata(pack_dir, author=author, title=title)
 
@@ -130,21 +133,14 @@ class CompressWastickers(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb_msg=print,
-        cb_msg_block=input,
-        cb_ask_bool=input,
-        cb_bar=None,
-        out_dir: Optional[str] = None,
-        **kwargs,
+        cb: Union[BaseProxy, Callback, None] = None,
+        cb_return: Optional[CallbackReturn] = None
     ) -> list[str]:
         exporter = CompressWastickers(
             opt_output,
             opt_comp,
             opt_cred,
-            cb_msg,
-            cb_msg_block,
-            cb_ask_bool,
-            cb_bar,
-            out_dir,
+            cb,
+            cb_return
         )
         return exporter.compress_wastickers()

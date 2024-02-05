@@ -45,8 +45,6 @@ class GetSignalAuth:
         self.cb_ask_str = cb_ask_str
         self.cb_msg = cb_msg
 
-        self.launch_signal_desktop()
-
     def download_signal_desktop(self, download_url: str, signal_bin_path: str):
         webbrowser.open(download_url)
 
@@ -178,6 +176,11 @@ class GetSignalAuth:
         self.driver = webdriver.Chrome(options=options, service=service)
 
     def get_cred(self) -> tuple[Optional[str], Optional[str]]:
+        success = self.launch_signal_desktop()
+
+        if not success:
+            return None, None
+
         # https://stackoverflow.com/a/73456344
         uuid, password = None, None
         try:
@@ -196,7 +199,7 @@ class GetSignalAuth:
         self.cb_msg('Closing Signal Desktop')
         self.driver.quit()
 
-    def launch_signal_desktop(self):
+    def launch_signal_desktop(self) -> bool:
         if platform.system() == 'Windows':
             signal_bin_path_prod = os.path.expandvars("%localappdata%/Programs/signal-desktop/Signal.exe")
             signal_bin_path_beta = os.path.expandvars("%localappdata%/Programs/signal-desktop-beta/Signal Beta.exe")
@@ -231,7 +234,10 @@ class GetSignalAuth:
             signal_download_url = 'https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta'
 
         if not (Path(signal_bin_path).is_file() or shutil.which(signal_bin_path)):
-            self.download_signal_desktop(signal_download_url, signal_bin_path)
+            success = self.download_signal_desktop(signal_download_url, signal_bin_path)
+        
+            if not success:
+                return False
         
         electron_bin_path = shutil.which(electron_bin_path) if not Path(electron_bin_path).is_file() else electron_bin_path
         
@@ -242,7 +248,7 @@ class GetSignalAuth:
             self.cb_msg(f'Signal Desktop is using chrome version {major_version}')
         else:
             self.cb_msg('Unable to determine Signal Desktop chrome version')
-            return
+            return False
         
         chromedriver_path, local_chromedriver_version = self.get_local_chromedriver(chromedriver_download_dir=self.chromedriver_download_dir)
         if chromedriver_path and local_chromedriver_version == major_version:
@@ -251,10 +257,12 @@ class GetSignalAuth:
             chromedriver_path = self.download_chromedriver(major_version, chromedriver_download_dir=self.chromedriver_download_dir)
             if chromedriver_path == '':
                 self.cb_msg('Unable to download suitable chromedriver')
-                return
+                return False
 
         self.cb_msg('Killing all Signal Desktop processes')
         self.killall_signal()
 
         self.cb_msg('Starting Signal Desktop with Selenium')
         self.launch_signal(signal_bin_path, signal_user_data_dir, chromedriver_path)
+
+        return True

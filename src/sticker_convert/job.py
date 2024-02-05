@@ -5,11 +5,11 @@ import os
 import shutil
 import traceback
 from datetime import datetime
-from multiprocessing import Process, Queue, Value
-from multiprocessing.queues import Queue as QueueType
+from multiprocessing import Process, Value
+from multiprocessing.managers import BaseProxy, SyncManager
 from pathlib import Path
 from threading import Thread
-from typing import Optional
+from typing import Optional, Callable, Union
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert  # type: ignore
@@ -25,16 +25,167 @@ from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.uploaders.upload_signal import UploadSignal  # type: ignore
 from sticker_convert.uploaders.upload_telegram import UploadTelegram  # type: ignore
 from sticker_convert.uploaders.xcode_imessage import XcodeImessage  # type: ignore
+from sticker_convert.utils.callback import CallbackReturn  # type: ignore
 from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
 from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
+
+work_queue_type: BaseProxy[Optional[tuple]]
+results_queue_type: BaseProxy[
+    Union[
+        tuple[
+            Optional[str],
+            Optional[tuple],
+            Optional[dict]],
+        str,
+        None
+        ]
+    ]
+cb_queue_type: BaseProxy[Optional[tuple[str, tuple]]]
+
+class Executor:
+    def __init__(self,
+                cb_msg: Callable,
+                cb_msg_block: Callable,
+                cb_bar: Callable,
+                cb_ask_bool: Callable,
+                cb_ask_str: Callable):
+        
+        self.cb_msg = cb_msg
+        self.cb_msg_block = cb_msg_block
+        self.cb_bar = cb_bar
+        self.cb_ask_bool = cb_ask_bool
+        self.cb_ask_str = cb_ask_str
+        
+        self.manager = SyncManager()
+        self.manager.start()
+        self.work_queue: work_queue_type = self.manager.Queue()
+        self.results_queue: results_queue_type = self.manager.Queue()
+        self.cb_queue: cb_queue_type = self.manager.Queue()
+        self.cb_return = CallbackReturn()
+        self.processes: list[Process] = []
+
+        self.is_cancel_job = Value('i', 0)
+
+    def cb_thread(
+            self,
+            cb_queue: work_queue_type,
+            cb_return: CallbackReturn
+            ):
+        for i in iter(cb_queue.get, None): # type: ignore[misc]
+            if isinstance(i, tuple):
+                action = i[0]
+                if len(i) >= 2:
+                    args = i[1] if i[1] else tuple()
+                else:
+                    args = tuple()
+                if len(i) >= 3:
+                    kwargs = i[2] if i[2] else dict()
+                else:
+                    kwargs = dict()
+            else:
+                action = i
+                args = tuple()
+                kwargs = dict()
+            if action == "msg":
+                self.cb_msg(*args, **kwargs)
+            elif action == "bar":
+                self.cb_bar(*args, **kwargs)
+            elif action == "update_bar":
+                self.cb_bar(update_bar=True)
+            elif action == "msg_block":
+                cb_return.set_response(self.cb_msg_block(*args, **kwargs))
+            elif action == "ask_bool":
+                cb_return.set_response(self.cb_ask_bool(*args, **kwargs))
+            elif action == "ask_str":
+                cb_return.set_response(self.cb_ask_str(*args, **kwargs))
+            else:
+                self.cb_msg(action)
+
+    @staticmethod
+    def worker(
+        work_queue: work_queue_type, 
+        results_queue: results_queue_type, 
+        cb_queue: cb_queue_type,
+        cb_return: CallbackReturn
+        ):
+
+        for work_func, work_args in iter(work_queue.get, None):
+            try:
+                results = work_func(*work_args, cb_queue, cb_return) # type: ignore
+                results_queue.put(results)
+            except Exception:
+                e = '##### EXCEPTION #####\n'
+                e += 'Function: ' + repr(work_func) + '\n'
+                e += 'Arguments: ' + repr(work_args) + '\n'
+                e += traceback.format_exc()
+                e += '#####################'
+                cb_queue.put(e)
+        work_queue.put(None)
+
+    def start_workers(self, processes: int = 1):
+        # Would contain None from previous run
+        while not self.work_queue.empty():
+            self.work_queue.get()
+
+        Thread(target=self.cb_thread, args=(self.cb_queue, self.cb_return,)).start()
+
+        for _ in range(processes):
+            process = Process(
+                target=Executor.worker,
+                args=(self.work_queue, self.results_queue, self.cb_queue, self.cb_return),
+                daemon=True
+            )
+
+            process.start()
+            self.processes.append(process)
+
+    def add_work(self, work_func: Callable, work_args: tuple):
+        self.work_queue.put((work_func, work_args))
+
+    def join_workers(self):
+        self.work_queue.put(None)
+        try:
+            for process in self.processes:
+                process.join()
+        except KeyboardInterrupt:
+            pass
+        
+        self.results_queue.put(None)
+
+        self.process = []
+
+    def kill_workers(self, *args, **kwargs):
+        self.is_cancel_job.value = 1
+        while not self.work_queue.empty():
+            self.work_queue.get()
+
+        for process in self.processes:
+            process.terminate()
+            process.join()
+        
+        self.cleanup()
+    
+    def cleanup(self):
+        self.cb_queue.put(None)
+
+    def get_result(self) -> tuple:
+        for result in iter(self.results_queue.get, None):
+            yield result
+    
+    def cb(self, action: Optional[str], args: Optional[tuple] = None, kwargs: Optional[dict] = None):
+        self.cb_queue.put((action, args, kwargs))
 
 
 class Job:
     def __init__(self,
         opt_input: InputOption, opt_comp: CompOption,
         opt_output: OutputOption, opt_cred: CredOption, 
-        cb_msg, cb_msg_block, cb_bar, cb_ask_bool):
+        cb_msg: Callable,
+        cb_msg_block: Callable,
+        cb_bar: Callable,
+        cb_ask_bool: Callable,
+        cb_ask_str: Callable):
 
         self.opt_input = opt_input
         self.opt_comp = opt_comp
@@ -44,26 +195,27 @@ class Job:
         self.cb_msg_block = cb_msg_block
         self.cb_bar = cb_bar
         self.cb_ask_bool = cb_ask_bool
+        self.cb_ask_str = cb_ask_str
 
         self.compress_fails: list[str] = []
         self.out_urls: list[str] = []
 
-        self.jobs_queue: QueueType[Optional[tuple[Path, Path, CompOption]]] = Queue()
-        self.results_queue: QueueType[Optional[tuple[bool, Path, Path, int]]] = Queue()
-        self.cb_msg_queue: QueueType[Optional[str]] = Queue()
-        self.processes: list[Process] = []
+        self.executor = Executor(
+            self.cb_msg,
+            self.cb_msg_block,
+            self.cb_bar,
+            self.cb_ask_bool,
+            self.cb_ask_str
+        )
 
-        self.is_cancel_job = Value('i', 0)
-
+    def start(self) -> bool:
         if Path(self.opt_input.dir).is_dir() == False:
             os.makedirs(self.opt_input.dir)
 
         if Path(self.opt_output.dir).is_dir() == False:
             os.makedirs(self.opt_output.dir)
-
-    def start(self) -> bool:
-        self.cb_bar(set_progress_mode='indeterminate')
-        self.cb_msg(cls=True)
+            
+        self.executor.cb("msg", kwargs={"cls": True})
 
         tasks = (
             self.verify_input,
@@ -74,14 +226,26 @@ class Job:
             self.report
         )
 
+        code = 0
         for task in tasks:
+            self.executor.cb("bar", kwargs={"set_progress_mode": "indeterminate"})
             success = task()
-            if self.is_cancel_job.value == 1:
-                return 2
-            if not success:
-                return 1
 
-        return 0
+            if self.executor.is_cancel_job.value == 1:
+                code = 2
+                self.executor.cb('Job cancelled.')
+                break
+            elif not success:
+                code = 1
+                self.executor.cb('An error occured during this run.')
+                break
+
+        self.executor.cb("bar", kwargs={"set_progress_mode": 'clear'})
+
+        return code
+
+    def cancel(self):
+        self.executor.kill_workers()
 
     def verify_input(self) -> bool:
         info_msg = ''
@@ -155,10 +319,10 @@ class Job:
                         info_msg += f'    Using {metadata} provided by input source\n'
         
         if info_msg != '':
-            self.cb_msg(info_msg)
+            self.executor.cb(info_msg)
 
         if error_msg != '':
-            self.cb_msg(error_msg)
+            self.executor.cb(error_msg)
             return False
         
         # Check if preset not equal to export option
@@ -174,7 +338,7 @@ class Job:
             msg += 'You may continue, but the files will need to be compressed again before export\n'
             msg += 'You are recommended to choose the matching option for compression and output. Continue?'
 
-            response = self.cb_ask_bool(msg)
+            response = self.executor.cb("ask_bool", (msg,))
 
             if response == False:
                 return False
@@ -211,12 +375,12 @@ class Job:
             msg += 'You are adviced to read documentations.\n'
             msg += 'If you continue, you will only download static stickers. Continue?'
 
-            response = self.cb_ask_bool(msg)
+            response = self.executor.cb("ask_bool", (msg,))
 
             if response == False:
                 return False
             
-            response = self.cb_ask_bool(msg)
+            response = self.executor.cb("ask_bool", (msg,))
 
             if response == False:
                 return False
@@ -235,12 +399,12 @@ class Job:
         out_dir_files = [i for i in os.listdir(self.opt_output.dir) if not i.startswith('archive_')]
 
         if self.opt_input.option == 'local':
-            self.cb_msg('Skip moving old files in input directory as input source is local')
+            self.executor.cb('Skip moving old files in input directory as input source is local')
         elif len(in_dir_files) == 0:
-            self.cb_msg('Skip moving old files in input directory as input source is empty')
+            self.executor.cb('Skip moving old files in input directory as input source is empty')
         else:
             archive_dir = Path(self.opt_input.dir, dir_name)
-            self.cb_msg(f"Moving old files in input directory to {archive_dir} as input source is not local")
+            self.executor.cb(f"Moving old files in input directory to {archive_dir} as input source is not local")
             os.makedirs(archive_dir)
             for i in in_dir_files:
                 old_path = Path(self.opt_input.dir, i)
@@ -248,12 +412,12 @@ class Job:
                 shutil.move(old_path, new_path)
 
         if self.opt_comp.no_compress:
-            self.cb_msg('Skip moving old files in output directory as no_compress is True')
+            self.executor.cb('Skip moving old files in output directory as no_compress is True')
         elif len(out_dir_files) == 0:
-            self.cb_msg('Skip moving old files in output directory as output source is empty')
+            self.executor.cb('Skip moving old files in output directory as output source is empty')
         else:
             archive_dir = Path(self.opt_output.dir, dir_name)
-            self.cb_msg(f"Moving old files in output directory to {archive_dir}")
+            self.executor.cb(f"Moving old files in output directory to {archive_dir}")
             os.makedirs(archive_dir)
             for i in out_dir_files:
                 old_path = Path(self.opt_output.dir, i)
@@ -278,34 +442,45 @@ class Job:
             downloaders.append(DownloadKakao.start)
         
         if len(downloaders) > 0:
-            self.cb_msg('Downloading...')
+            self.executor.cb('Downloading...')
         else:
-            self.cb_msg('Nothing to download')
+            self.executor.cb('Nothing to download')
             return True
         
+        self.executor.start_workers(processes=1)
+
         for downloader in downloaders:
-            success = downloader(
-                url=self.opt_input.url, 
-                out_dir=self.opt_input.dir, 
-                opt_cred=self.opt_cred,
-                cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_bar=self.cb_bar)
-            self.cb_bar(set_progress_mode='indeterminate')
-            if success == False:
+            self.executor.add_work(
+                work_func=downloader,
+                work_args=(
+                    self.opt_input.url, 
+                    self.opt_input.dir, 
+                    self.opt_cred
+                )
+            )
+        
+        self.executor.join_workers()
+
+        # Return False if any of the job returns failure
+        for result in self.executor.get_result():
+            if result == False:
                 return False
+
+        self.executor.cleanup()
 
         return True
 
     def compress(self) -> bool:
         if self.opt_comp.no_compress == True:
-            self.cb_msg('no_compress is set to True, skip compression')
+            self.executor.cb('no_compress is set to True, skip compression')
             in_dir_files = [i for i in sorted(os.listdir(self.opt_input.dir)) if Path(self.opt_input.dir, i).is_file()]
             out_dir_files = [i for i in sorted(os.listdir(self.opt_output.dir)) if Path(self.opt_output.dir, i).is_file()]
             if len(in_dir_files) == 0:
-                self.cb_msg('Input directory is empty, nothing to copy to output directory')
+                self.executor.cb('Input directory is empty, nothing to copy to output directory')
             elif len(out_dir_files) != 0:
-                self.cb_msg('Output directory is not empty, not copying files from input directory')
+                self.executor.cb('Output directory is not empty, not copying files from input directory')
             else:
-                self.cb_msg('Output directory is empty, copying files from input directory')
+                self.executor.cb('Output directory is empty, copying files from input directory')
                 for i in in_dir_files:
                     src_f = Path(self.opt_input.dir, i)
                     dst_f = Path(self.opt_output.dir, i)
@@ -334,98 +509,35 @@ class Job:
 
         in_fs_count = len(in_fs)
 
-        self.cb_msg(msg)
-        self.cb_bar(set_progress_mode='determinate', steps=in_fs_count)
+        self.executor.cb(msg)
+        self.executor.cb("bar", kwargs={'set_progress_mode': 'determinate', 'steps': in_fs_count})
 
-        Thread(target=self.cb_msg_thread, args=(self.cb_msg_queue,)).start()
-        Thread(target=self.processes_watcher_thread, args=(self.results_queue,)).start()
-
-        for i in range(min(self.opt_comp.processes, in_fs_count)):
-            process = Process(
-                target=Job.compress_worker,
-                args=(
-                    self.jobs_queue,
-                    self.results_queue,
-                    self.cb_msg_queue
-                ),
-                daemon=True
-            )
-
-            process.start()
-            self.processes.append(process)
+        self.executor.start_workers(processes=min(self.opt_comp.processes, in_fs_count))
 
         for i in in_fs:
             in_f = input_dir / i
             out_f = output_dir / Path(i).stem
 
-            self.jobs_queue.put((in_f, out_f, self.opt_comp))
+            self.executor.add_work(
+                work_func=StickerConvert.convert,
+                work_args=(in_f, out_f, self.opt_comp)
+            )
 
-        self.jobs_queue.put(None)
+        self.executor.join_workers()
 
-        for process in self.processes:
-            process.join()
+        # Return False if any of the job returns failure
+        for result in self.executor.get_result():
+            if result[0] == False:
+                return False
         
-        self.results_queue.put(None)
-        self.cb_msg_queue.put(None)
-
-        exception_exist = False
-
-        if exception_exist:
-            return False
-
         return True
-    
-    def processes_watcher_thread(
-            self, 
-            results_queue: QueueType[Optional[tuple[bool, Path, Path, int]]]
-            ):
-        
-        for (success, in_f, out_f, size) in iter(results_queue.get, None): # type: ignore[misc]
-            if success == False: # type: ignore
-                self.compress_fails.append(in_f.as_posix()) # type: ignore[has-type]
-
-            self.cb_bar(update_bar=True)
-    
-    def cb_msg_thread(
-            self, 
-            cb_msg_queue: QueueType[Optional[str]]
-            ):
-        
-        for msg in iter(cb_msg_queue.get, None): # type: ignore
-            self.cb_msg(msg)
-
-    @staticmethod
-    def compress_worker(
-        jobs_queue: QueueType[Optional[tuple[Path, Path, CompOption]]], 
-        results_queue: QueueType[Optional[tuple[bool, Path, Path, int]]], 
-        cb_msg_queue: QueueType[Optional[str]]
-        ):
-
-        for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None): # type: ignore[misc]
-            try:
-                sticker = StickerConvert(in_f, out_f, opt_comp, cb_msg_queue) # type: ignore
-                success, in_f, out_f, size = sticker.convert()
-                del sticker
-                results_queue.put((success, in_f, out_f, size))
-            except Exception:
-                e = '##### EXCEPTION #####\n'
-                e += f"Input file: {in_f}\n"
-                e += f"Output file: {out_f}\n"
-                e += traceback.format_exc()
-                e += '#####################'
-                results_queue.put((False, in_f, out_f, 0))
-                cb_msg_queue.put(e)
-
-        jobs_queue.put(None)
 
     def export(self) -> bool:
-        self.cb_bar(set_progress_mode='indeterminate')
-
         if self.opt_output.option == 'local':
-            self.cb_msg('Saving to local directory only, nothing to export')
+            self.executor.cb('Saving to local directory only, nothing to export')
             return True
         
-        self.cb_msg('Exporting...')
+        self.executor.cb('Exporting...')
 
         exporters: list[UploadBase] = []
 
@@ -443,19 +555,31 @@ class Job:
 
         if self.opt_output.option == 'imessage':
             exporters.append(XcodeImessage.start)
-        
+
+        self.executor.start_workers(processes=1)
+
         for exporter in exporters:
-            self.out_urls += exporter(
-                opt_output=self.opt_output, opt_comp=self.opt_comp, opt_cred=self.opt_cred, 
-                cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_ask_bool=self.cb_ask_bool, cb_bar=self.cb_bar)
-        
+            self.executor.add_work(
+                work_func=exporter,
+                work_args=(
+                    self.opt_output, 
+                    self.opt_comp, 
+                    self.opt_cred
+                )
+            )
+
+        self.executor.join_workers()
+
+        for result in self.executor.get_result():
+            self.out_urls.extend(result)
+
         if self.out_urls:
             with open(Path(self.opt_output.dir, 'export-result.txt'), 'w+') as f:
                 f.write('\n'.join(self.out_urls))
         else:
-            self.cb_msg('An error occured while exporting stickers')
+            self.executor.cb('An error occured while exporting stickers')
             return False
-                
+        
         return True
     
     def report(self) -> bool:
@@ -465,7 +589,7 @@ class Job:
         msg += '\n'
 
         if self.compress_fails != []:
-            msg += f'Warning: Coudl not compress the following {len(self.compress_fails)} file{"s" if len(self.compress_fails) > 1 else ""}:\n'
+            msg += f'Warning: Could not compress the following {len(self.compress_fails)} file{"s" if len(self.compress_fails) > 1 else ""}:\n'
             msg += "\n".join(self.compress_fails)
             msg += '\n'
             msg += '\nConsider adjusting compression parameters'
@@ -477,6 +601,6 @@ class Job:
         else:
             msg += 'Export result: None'
 
-        self.cb_msg(msg)
+        self.executor.cb(msg)
 
         return True

@@ -3,9 +3,7 @@ import argparse
 import math
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Optional
-
-from tqdm import tqdm
+import signal
 
 from sticker_convert.__init__ import __version__  # type: ignore
 from sticker_convert.definitions import (CONFIG_DIR,  # type: ignore
@@ -16,14 +14,14 @@ from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
 from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth  # type: ignore
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth  # type: ignore
 from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth  # type: ignore
+from sticker_convert.utils.callback import Callback  # type: ignore
 from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
 from sticker_convert.utils.url_detect import UrlDetect  # type: ignore
 
 
 class CLI:
     def __init__(self):
-        self.no_confirm = False
-        self.progress_bar = None
+        self.cb = Callback()
 
     def cli(self):
         self.help = JsonManager.load_json(ROOT_DIR / 'resources/help.json')
@@ -32,7 +30,7 @@ class CLI:
         self.output_presets = JsonManager.load_json(ROOT_DIR / 'resources/output.json')
 
         if not (self.help and self.compression_presets and self.input_presets and self.output_presets):
-            self.cb_msg('Warning: preset json(s) cannot be found')
+            self.cb.msg('Warning: preset json(s) cannot be found')
             return
 
         parser = argparse.ArgumentParser(description='CLI for stickers-convert', formatter_class=argparse.RawTextHelpFormatter)
@@ -97,7 +95,7 @@ class CLI:
 
         args = parser.parse_args()
         
-        self.no_confirm = args.no_confirm
+        self.cb.no_confirm = args.no_confirm
 
         self.opt_input = InputOption(self.get_opt_input(args))
         self.opt_output = OutputOption(self.get_opt_output(args))
@@ -106,16 +104,17 @@ class CLI:
 
         job = Job(
             self.opt_input, self.opt_comp, self.opt_output, self.opt_cred, 
-            self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
+            self.cb.msg, self.cb.msg_block, self.cb.bar, self.cb.ask_bool, self.cb.ask_str
         )
 
+        signal.signal(signal.SIGINT, job.cancel)
         status = job.start()
 
         if status == 1:
-            self.cb_msg(msg='An error occured during this run.')
+            self.cb.msg(msg='An error occured during this run.')
             exit(1)
         elif status == 2:
-            self.cb_msg(msg='Job cancelled.')
+            self.cb.msg(msg='Job cancelled.')
             exit(1)
         
         exit(0)
@@ -139,9 +138,9 @@ class CLI:
         
         if download_option == 'auto':
             download_option = UrlDetect.detect(url)
-            self.cb_msg(f'Detected URL input source: {download_option}')
+            self.cb.msg(f'Detected URL input source: {download_option}')
             if not download_option:
-                self.cb_msg(f'Error: Unrecognied URL input source for url: {url}')
+                self.cb.msg(f'Error: Unrecognied URL input source for url: {url}')
                 exit()
 
         opt_input = {
@@ -192,13 +191,13 @@ class CLI:
             if output_option == 'local':
                 preset = 'custom'
                 args.no_compress = True
-                self.cb_msg('Auto compression option set to no_compress (Reason: Export to local directory only)')
+                self.cb.msg('Auto compression option set to no_compress (Reason: Export to local directory only)')
             elif output_option == 'imessage':
                 preset = 'imessage_small'
-                self.cb_msg(f'Auto compression option set to {preset}')
+                self.cb.msg(f'Auto compression option set to {preset}')
             else:
                 preset = output_option
-                self.cb_msg(f'Auto compression option set to {preset}')
+                self.cb.msg(f'Auto compression option set to {preset}')
 
         opt_comp = {
             'preset': preset,
@@ -256,7 +255,7 @@ class CLI:
         creds_path = CONFIG_DIR / 'creds.json'
         creds = JsonManager.load_json(creds_path)
         if creds:
-            self.cb_msg('Loaded credentials from creds.json')
+            self.cb.msg('Loaded credentials from creds.json')
         else:
             creds = {}
 
@@ -282,7 +281,7 @@ class CLI:
         }
 
         if args.kakao_get_auth:
-            m = GetKakaoAuth(opt_cred=CredOption(creds), cb_msg=self.cb_msg, cb_msg_block=self.cb_msg_block, cb_ask_str=self.cb_ask_str)
+            m = GetKakaoAuth(opt_cred=CredOption(creds), cb_msg=self.cb.msg, cb_msg_block=self.cb.msg_block, cb_ask_str=self.cb.ask_str)
             auth_token = m.get_cred()
 
             if auth_token:
@@ -291,7 +290,7 @@ class CLI:
                 self.cb_msg(f'Got auth_token successfully: {auth_token}')
         
         if args.signal_get_auth:
-            m = GetSignalAuth(cb_msg=self.cb_msg, cb_ask_str=self.cb_ask_str)
+            m = GetSignalAuth(cb_msg=self.cb.msg, cb_ask_str=self.cb.ask_str)
 
             uuid, password = None, None
             while True:
@@ -305,85 +304,21 @@ class CLI:
                     break
         
         if args.line_get_auth:
-            m = GetLineAuth(cb_msg=self.cb_msg, cb_ask_str=self.cb_ask_str)
+            m = GetLineAuth(cb_msg=self.cb.msg, cb_ask_str=self.cb.ask_str)
 
             line_cookies = m.get_cred()
 
             if line_cookies:
                 opt_cred['line']['cookies'] = line_cookies
             
-                self.cb_msg('Got Line cookies successfully')
+                self.cb.msg('Got Line cookies successfully')
             else:
-                self.cb_msg('Failed to get Line cookies. Have you logged in the web browser?')
+                self.cb.msg('Failed to get Line cookies. Have you logged in the web browser?')
         
         if args.save_cred:
             creds_path = CONFIG_DIR / 'creds.json'
             JsonManager.save_json(creds_path, opt_cred)
-            self.cb_msg('Saved credentials to creds.json')
+            self.cb.msg('Saved credentials to creds.json')
         
         return opt_cred
     
-    def cb_ask_str(self, msg: Optional[str] = None, initialvalue: Optional[str] = None, cli_show_initialvalue: bool = True) -> str:
-        self.cb_msg(msg)
-
-        hint = ''
-        if cli_show_initialvalue and initialvalue:
-            hint = f' [Default: {initialvalue}]'
-
-        response = input(f'Enter your response and press enter{hint} > ')
-
-        if initialvalue and not response:
-            response = initialvalue
-        
-        return response
-
-    def cb_ask_bool(self, question: str, parent=None) -> bool:
-        self.cb_msg(question)
-
-        if self.no_confirm:
-            self.cb_msg('"--no-confirm" flag is set. Continue with this run without asking questions')
-            return True
-        else:
-            self.cb_msg('If you do not want to get asked by this question, add "--no-confirm" flag')
-            self.cb_msg()
-            result = input('Continue? [y/N] > ')
-            if result.lower() != 'y':
-                self.cb_msg('Cancelling this run')
-                return False
-            else:
-                return True
-    
-    def cb_msg(self, *args, **kwargs):
-        msg = kwargs.get('msg')
-        file = kwargs.get('file')
-
-        if not msg and len(args) == 1:
-            msg = str(args[0])
-
-        if msg:
-            if self.progress_bar:
-                self.progress_bar.write(msg)
-            elif file:
-                print(msg, file=file)
-            else:
-                print(msg)
-
-    def cb_msg_block(self, *args, **kwargs):
-        if len(args) > 0:
-            msg = ' '.join(str(i) for i in args)
-            self.cb_msg(msg)
-        if not self.no_confirm:
-            input('Press Enter to continue...')
-    
-    def cb_bar(self, set_progress_mode: Optional[str] = None, steps: Optional[int] = None, update_bar: bool = False):
-        if update_bar:
-            self.progress_bar.update()
-        elif set_progress_mode == 'determinate':
-            self.progress_bar = tqdm(total=steps)
-        elif set_progress_mode == 'indeterminate':
-            if self.progress_bar:
-                self.progress_bar.close()
-                self.progress_bar = None
-        elif set_progress_mode == 'clear':
-            if self.progress_bar:
-                self.progress_bar.reset()

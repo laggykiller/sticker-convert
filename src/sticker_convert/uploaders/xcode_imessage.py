@@ -6,13 +6,15 @@ import plistlib
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
+from multiprocessing.managers import BaseProxy
 
 from sticker_convert.converter import StickerConvert  # type: ignore
 from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
                                         OutputOption)
 from sticker_convert.uploaders.upload_base import UploadBase  # type: ignore
+from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename  # type: ignore
 from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
@@ -92,14 +94,14 @@ class XcodeImessage(UploadBase):
     def create_imessage_xcode(self) -> list[str]:
         urls = []
         title, author, emoji_dict = MetadataHandler.get_metadata(
-            self.in_dir,
+            self.opt_output.dir,
             title=self.opt_output.title,
             author=self.opt_output.author,
         )
         author = author.replace(" ", "_")
         title = title.replace(" ", "_")
         packs = MetadataHandler.split_sticker_packs(
-            self.in_dir, title=title, file_per_pack=100, separate_image_anim=False
+            self.opt_output.dir, title=title, file_per_pack=100, separate_image_anim=False
         )
 
         res_choice = None
@@ -108,13 +110,12 @@ class XcodeImessage(UploadBase):
             pack_title = sanitize_filename(pack_title)
 
             for src in stickers:
-                self.cb_msg(f"Verifying {src} for creating Xcode iMessage sticker pack")
+                self.cb.put(f"Verifying {src} for creating Xcode iMessage sticker pack")
 
-                src_path = Path(self.in_dir, src)
-                dst_path = Path(self.out_dir, src)
+                fpath = Path(self.opt_output.dir, src)
 
                 if res_choice == None:
-                    res_choice, _ = CodecInfo.get_file_res(src_path)
+                    res_choice, _ = CodecInfo.get_file_res(fpath)
                     res_choice = res_choice if res_choice != None else 300
 
                     if res_choice == 618:
@@ -128,32 +129,27 @@ class XcodeImessage(UploadBase):
                     opt_comp_merged = copy.deepcopy(self.opt_comp)
                     opt_comp_merged.merge(spec_choice)
 
-                if FormatVerify.check_file(src, spec=spec_choice):
-                    if src_path != dst_path:
-                        shutil.copy(src_path, dst_path)
-                else:
-                    StickerConvert(
-                        src_path, dst_path, opt_comp_merged, self.cb_msg
-                    ).convert()
+                if not FormatVerify.check_file(src, spec=spec_choice):
+                    StickerConvert.convert(fpath, fpath, opt_comp_merged, self.cb, self.cb_return)
 
             self.add_metadata(author, pack_title)
             self.create_xcode_proj(author, pack_title)
 
-            result = Path(self.out_dir / pack_title).as_posix()
-            self.cb_msg(result)
+            result = Path(self.opt_output.dir / pack_title).as_posix()
+            self.cb.put(result)
             urls.append(result)
 
         return urls
 
     def add_metadata(self, author: str, title: str):
-        first_image_path = Path(self.in_dir,
+        first_image_path = Path(self.opt_output.dir,
             [
                 i
-                for i in sorted(os.listdir(self.in_dir))
-                if (self.in_dir / i).is_file() and i.endswith(".png")
+                for i in sorted(os.listdir(self.opt_output.dir))
+                if (self.opt_output.dir / i).is_file() and i.endswith(".png")
             ][0]
         )
-        cover_path = MetadataHandler.get_cover(self.in_dir)
+        cover_path = MetadataHandler.get_cover(self.opt_output.dir)
         if cover_path:
             icon_source = cover_path
         else:
@@ -168,30 +164,25 @@ class XcodeImessage(UploadBase):
                 }
             })
 
-            icon_old_path = self.in_dir / icon
-            icon_new_path = self.out_dir / icon
-            if icon in os.listdir(self.in_dir) and not FormatVerify.check_file(
-                icon_old_path, spec=spec_cover
+            icon_path = self.opt_output.dir / icon
+            if icon in os.listdir(self.opt_output.dir) and not FormatVerify.check_file(
+                icon_path, spec=spec_cover
             ):
-                StickerConvert(
-                    icon_old_path, icon_new_path, spec_cover, self.cb_msg
-                ).convert()
+                StickerConvert.convert(icon_path, icon_path, spec_cover, self.cb, self.cb_return)
             else:
-                StickerConvert(
-                    icon_source, icon_new_path, spec_cover, self.cb_msg
-                ).convert()
+                StickerConvert.convert(icon_source, icon_path, spec_cover, self.cb, self.cb_return)
 
-        MetadataHandler.set_metadata(self.out_dir, author=author, title=title)
+        MetadataHandler.set_metadata(self.opt_output.dir, author=author, title=title)
 
     def create_xcode_proj(self, author: str, title: str):
-        pack_path = self.out_dir / title
+        pack_path = self.opt_output.dir / title
         if (ROOT_DIR / "ios-message-stickers-template.zip").is_file():
             with zipfile.ZipFile(ROOT_DIR / "ios-message-stickers-template.zip", "r") as f:
                 f.extractall(pack_path)
         elif (ROOT_DIR / "ios-message-stickers-template").is_dir():
             shutil.copytree(ROOT_DIR / "ios-message-stickers-template", pack_path)
         else:
-            self.cb_msg(
+            self.cb.put(
                 "Failed to create Xcode project: ios-message-stickers-template not found"
             )
 
@@ -251,7 +242,7 @@ class XcodeImessage(UploadBase):
                 shutil.rmtree(stickers_path / i)
 
         stickers_lst = []
-        for i in sorted(os.listdir(self.in_dir)):
+        for i in sorted(os.listdir(self.opt_output.dir)):
             if (
                 CodecInfo.get_file_ext(i) == ".png"
                 and Path(i).stem != "cover"
@@ -263,7 +254,7 @@ class XcodeImessage(UploadBase):
                 sticker_path = stickers_path / sticker_dir
                 os.mkdir(sticker_path)
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/0.png
-                shutil.copy(self.in_dir / i, sticker_path / i)
+                shutil.copy(self.opt_output.dir / i, sticker_path / i)
 
                 json_content = {
                     "info": {
@@ -297,7 +288,7 @@ class XcodeImessage(UploadBase):
 
         icons_lst = []
         for i in self.iconset:
-            shutil.copy(self.in_dir / i, iconset_path / i)
+            shutil.copy(self.opt_output.dir / i, iconset_path / i)
             icons_lst.append(i)
 
         # packname/Info.plist
@@ -326,21 +317,15 @@ class XcodeImessage(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb_msg=print,
-        cb_msg_block=input,
-        cb_ask_bool=input,
-        cb_bar=None,
-        out_dir: Optional[str] = None,
+        cb: Union[BaseProxy, Callback, None] = None,
+        cb_return: Optional[CallbackReturn] = None,
         **kwargs,
     ) -> list[str]:
         exporter = XcodeImessage(
             opt_output,
             opt_comp,
             opt_cred,
-            cb_msg,
-            cb_msg_block,
-            cb_ask_bool,
-            cb_bar,
-            out_dir,
+            cb,
+            cb_return
         )
         return exporter.create_imessage_xcode()

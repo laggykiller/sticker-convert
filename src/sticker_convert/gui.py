@@ -3,15 +3,13 @@ import math
 import os
 import platform
 import sys
-import time
 from functools import partial
-from multiprocessing import cpu_count
+from multiprocessing import cpu_count, Event
 from pathlib import Path
-from queue import Queue
+import signal
 from threading import Lock, Thread, current_thread, main_thread
-from typing import Any, Optional
+from typing import Any, Optional, Callable
 from urllib.parse import urlparse
-from uuid import uuid4
 
 from PIL import ImageFont
 from ttkbootstrap import (BooleanVar, DoubleVar, IntVar,  # type: ignore
@@ -68,7 +66,7 @@ class GUI(Window):
         self.warn_tkinter_bug()
         GUIUtils.finalize_window(self)
 
-        self.after(500, self.poll_actions)
+        self.bind("<<exec_in_main>>", self.exec_in_main)
     
     def __enter__(self):
         return self
@@ -166,9 +164,9 @@ class GUI(Window):
         # Other
         self.msg_lock = Lock()
         self.bar_lock = Lock()
-        self.response_dict_lock = Lock()
-        self.response_dict = {}
-        self.action_queue = Queue()
+        self.response_event = Event()
+        self.response = None
+        self.action: Optional[Callable] = None
         self.job = None
 
     def init_frames(self):
@@ -336,6 +334,27 @@ class GUI(Window):
             return selection
     
     def start_job(self):
+        self.save_config()
+        if self.settings_save_cred_var.get() == True:
+            self.save_creds()
+        else:
+            self.delete_creds()
+
+        self.control_frame.start_btn.config(text='Cancel', bootstyle='danger')
+        self.set_inputs('disabled')
+    
+        opt_input = InputOption(self.get_opt_input())
+        opt_output = OutputOption(self.get_opt_output())
+        opt_comp = CompOption(self.get_opt_comp())
+        opt_cred = CredOption(self.get_opt_cred())
+        
+        self.job = Job(
+            opt_input, opt_comp, opt_output, opt_cred, 
+            self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool, self.cb_ask_str
+            )
+        
+        signal.signal(signal.SIGINT, self.job.cancel)
+        
         Thread(target=self.start_process, daemon=True).start()
     
     def get_opt_input(self) -> dict:
@@ -427,49 +446,18 @@ class GUI(Window):
         }
 
     def start_process(self):
-        self.save_config()
-        if self.settings_save_cred_var.get() == True:
-            self.save_creds()
-        else:
-            self.delete_creds()
-
-        self.control_frame.start_btn.config(text='Cancel', bootstyle='danger')
-        self.set_inputs('disabled')
-    
-        opt_input = InputOption(self.get_opt_input())
-        opt_output = OutputOption(self.get_opt_output())
-        opt_comp = CompOption(self.get_opt_comp())
-        opt_cred = CredOption(self.get_opt_cred())
-        
-        self.job = Job(
-            opt_input, opt_comp, opt_output, opt_cred, 
-            self.cb_msg, self.cb_msg_block, self.cb_bar, self.cb_ask_bool
-            )
-        
         status = self.job.start()
-
         self.job = None
-
-        if status == 1:
-            self.cb_msg(msg='An error occured during this run.')
-        elif status == 2:
-            self.cb_msg(msg='Job cancelled.')
 
         self.stop_job()
     
     def stop_job(self):
-        self.progress_frame.update_progress_bar(set_progress_mode='clear')
         self.set_inputs('normal')
         self.control_frame.start_btn.config(text='Start', bootstyle='default')
     
     def cancel_job(self):
         self.cb_msg(msg='Cancelling job...')
-        self.job.is_cancel_job.value = 1
-        while not self.job.jobs_queue.empty():
-            self.job.jobs_queue.get()
-        for process in self.job.processes:
-            process.terminate()
-            process.join()
+        self.job.cancel()
 
     def set_inputs(self, state: str):
         # state: 'normal', 'disabled'
@@ -484,51 +472,29 @@ class GUI(Window):
             self.input_frame.cb_input_option()
             self.comp_frame.cb_no_compress()
     
-    def poll_actions(self):
-        if self.action_queue.empty():
-            self.after(500, self.poll_actions)
-            return
-        
-        action = self.action_queue.get_nowait()
-        response_id = action[0]
-        response = action[1]()
-        if response_id:
-            with self.response_dict_lock:
-                self.response_dict[response_id] = response
-
-        self.after(500, self.poll_actions)
-    
-    def get_response_from_id(self, response_id: str) -> Any:
-        # If executed from main thread, need to poll_actions() manually as it got blocked
-        if current_thread() is main_thread():
-            self.poll_actions()
-
-        while response_id not in self.response_dict:
-            time.sleep(0.1)
-        
-        with self.response_dict_lock:
-            response = self.response_dict[response_id]
-            del self.response_dict[response_id]
-
-        return response
-
-    def exec_in_main(self, action) -> Any:
-        response_id = str(uuid4())
-        self.action_queue.put([response_id, action])
-        response = self.get_response_from_id(response_id)
-        return response
+    def exec_in_main(self, evt) -> Any:
+        self.response = self.action()
+        self.response_event.set()
     
     def cb_ask_str(self, 
                    question: str, 
                    initialvalue: Optional[str] = None, 
                    cli_show_initialvalue: bool = True, 
                    parent: Optional[object] = None) -> str:
-        return self.exec_in_main(partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent))
+        self.action = partial(Querybox.get_string, question, title='sticker-convert', initialvalue=initialvalue, parent=parent)
+        self.event_generate("<<exec_in_main>>")
+        self.response_event.wait()
+        self.response_event.clear()
+
+        return self.response
 
     def cb_ask_bool(self, question, parent=None) -> bool:
-        response = self.exec_in_main(partial(Messagebox.yesno, question, title='sticker-convert', parent=parent))
+        self.action = partial(Messagebox.yesno, question, title='sticker-convert', parent=parent)
+        self.event_generate("<<exec_in_main>>")
+        self.response_event.wait()
+        self.response_event.clear()
 
-        if response == 'Yes':
+        if self.response == 'Yes':
             return True
         return False
 
@@ -542,7 +508,12 @@ class GUI(Window):
                      *args, **kwargs):
         if message == None and len(args) > 0:
             message = ' '.join(str(i) for i in args)
-        self.exec_in_main(partial(Messagebox.show_info, message, title='sticker-convert', parent=parent))
+        self.action = partial(Messagebox.show_info, message, title='sticker-convert', parent=parent)
+        self.event_generate("<<exec_in_main>>")
+        self.response_event.wait()
+        self.response_event.clear()
+
+        return self.response
     
     def cb_bar(self, *args, **kwargs):
         with self.bar_lock:

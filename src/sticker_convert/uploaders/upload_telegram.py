@@ -2,7 +2,8 @@
 import copy
 import re
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
+from multiprocessing.managers import BaseProxy
 
 import anyio
 from telegram import Bot, InputSticker, Sticker
@@ -12,6 +13,7 @@ from sticker_convert.converter import StickerConvert  # type: ignore
 from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
                                         OutputOption)
 from sticker_convert.uploaders.upload_base import UploadBase  # type: ignore
+from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
 from sticker_convert.utils.media.format_verify import FormatVerify  # type: ignore
 
@@ -41,7 +43,7 @@ class UploadTelegram(UploadBase):
         self.webm_spec = copy.deepcopy(base_spec)
         self.webm_spec.format = ".webm"
         self.webm_spec.fps_max = 30
-        self.webm_spec.animated = None if self.fake_vid else True
+        self.webm_spec.animated = None if self.opt_comp.fake_vid else True
 
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
         self.opt_comp_merged.merge(base_spec)
@@ -97,33 +99,34 @@ class UploadTelegram(UploadBase):
                 pack_exists = False
 
             if pack_exists == True:
-                response = self.cb_ask_bool(
-                    f"Warning: Pack {pack_short_name} already exists.\nDelete all stickers in pack?"
+                self.cb.put("ask_bool", 
+                    (f"Warning: Pack {pack_short_name} already exists.\nDelete all stickers in pack?",)
                 )
+                response = self.cb_return.get_response()
                 if response == True:
-                    self.cb_msg(f"Deleting all stickers from pack {pack_short_name}")
+                    self.cb.put(f"Deleting all stickers from pack {pack_short_name}")
                     try:
                         for i in sticker_set.stickers:
                             await bot.delete_sticker_from_set(i.file_id)
                     except TelegramError as e:
-                        self.cb_msg(
+                        self.cb.put(
                             f"Cannot delete sticker {i.file_id} from {pack_short_name} due to {e}"
                         )
                 else:
-                    self.cb_msg(f"Not deleting existing pack {pack_short_name}")
+                    self.cb.put(f"Not deleting existing pack {pack_short_name}")
 
             for src in stickers:
-                self.cb_msg(f"Verifying {src} for uploading to telegram")
+                self.cb.put(f"Verifying {src} for uploading to telegram")
 
                 emoji = emoji_dict.get(Path(src).stem, None)
                 if emoji:
                     if len(emoji) > 20:
-                        self.cb_msg(
+                        self.cb.put(
                             f"Warning: {len(emoji)} emoji for file {Path(src).name}, exceeding limit of 20, keep first 20 only..."
                         )
                     emoji_list = [*emoji][:20]
                 else:
-                    self.cb_msg(
+                    self.cb.put(
                         f"Warning: Cannot find emoji for file {Path(src).name}, skip uploading this file..."
                     )
                     continue
@@ -153,9 +156,9 @@ class UploadTelegram(UploadBase):
                     with open(src, "rb") as f:
                         sticker_bytes = f.read()
                 else:
-                    _, _, sticker_bytes, _ = StickerConvert(
-                        Path(src), Path(f"bytes{ext}"), self.opt_comp_merged, self.cb_msg
-                    ).convert()
+                    _, _, sticker_bytes, _ = StickerConvert.convert(
+                        Path(src), Path(f"bytes{ext}"), self.opt_comp_merged, self.cb, self.cb_return
+                    )
 
                 sticker = InputSticker(sticker=sticker_bytes, emoji_list=emoji_list)
 
@@ -177,25 +180,25 @@ class UploadTelegram(UploadBase):
                             sticker=sticker,
                         )
                 except TelegramError as e:
-                    self.cb_msg(
+                    self.cb.put(
                         f"Cannot upload sticker {src} in {pack_short_name} due to {e}"
                     )
                     continue
 
-                self.cb_msg(f"Uploaded {src}")
+                self.cb.put(f"Uploaded {src}")
 
-            cover_path = MetadataHandler.get_cover(self.in_dir)
+            cover_path = MetadataHandler.get_cover(self.opt_output.dir)
             if cover_path:
                 if FormatVerify.check_file(cover_path, spec=cover_spec_choice):
                     with open(cover_path, "rb") as f:
                         thumbnail_bytes = f.read()
                 else:
-                    _, _, thumbnail_bytes, _ = StickerConvert(
+                    _, _, thumbnail_bytes, _ = StickerConvert.convert(
                         cover_path,
                         Path(f"bytes{ext}"),
                         self.opt_comp_cover_merged,
-                        self.cb_msg,
-                    ).convert()
+                        self.cb,
+                    )
 
                 try:
                     await bot.set_sticker_set_thumbnail(
@@ -204,7 +207,7 @@ class UploadTelegram(UploadBase):
                         thumbnail=thumbnail_bytes,
                     )
                 except TelegramError as e:
-                    self.cb_msg(
+                    self.cb.put(
                         f"Cannot upload cover (thumbnail) for {pack_short_name} due to {e}"
                     )
 
@@ -218,11 +221,11 @@ class UploadTelegram(UploadBase):
         urls = []
 
         if not self.opt_cred.telegram_token:
-            self.cb_msg("Token required for uploading to telegram")
+            self.cb.put("Token required for uploading to telegram")
             return urls
 
         title, author, emoji_dict = MetadataHandler.get_metadata(
-            self.in_dir,
+            self.opt_output.dir,
             title=self.opt_output.title,
             author=self.opt_output.author,
         )
@@ -230,35 +233,36 @@ class UploadTelegram(UploadBase):
             raise TypeError("title cannot be", title)
         if emoji_dict == None:
             msg_block = "emoji.txt is required for uploading signal stickers\n"
-            msg_block += f"emoji.txt generated for you in {self.in_dir}\n"
+            msg_block += f"emoji.txt generated for you in {self.opt_output.dir}\n"
             msg_block += (
                 f'Default emoji is set to {self.opt_comp.default_emoji}.\n'
             )
             msg_block += "Please edit emoji.txt now, then continue"
             MetadataHandler.generate_emoji_file(
-                dir=self.in_dir, default_emoji=self.opt_comp.default_emoji
+                dir=self.opt_output.dir, default_emoji=self.opt_comp.default_emoji
             )
 
-            self.cb_msg_block(msg_block)
+            self.cb.put(("msg_block", (msg_block,)))
+            self.cb_return.get_response()
 
             title, author, emoji_dict = MetadataHandler.get_metadata(
-                self.in_dir,
+                self.opt_output.dir,
                 title=self.opt_output.title,
                 author=self.opt_output.author,
             )
 
         packs = MetadataHandler.split_sticker_packs(
-            self.in_dir,
+            self.opt_output.dir,
             title=title,
             file_per_anim_pack=50,
             file_per_image_pack=120,
-            separate_image_anim=not self.fake_vid,
+            separate_image_anim=not self.opt_comp.fake_vid,
         )
 
         for pack_title, stickers in packs.items():
-            self.cb_msg(f"Uploading pack {pack_title}")
+            self.cb.put(f"Uploading pack {pack_title}")
             result = anyio.run(self.upload_pack, pack_title, stickers, emoji_dict)
-            self.cb_msg(result)
+            self.cb.put((result))
             urls.append(result)
 
         return urls
@@ -268,21 +272,15 @@ class UploadTelegram(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb_msg=print,
-        cb_msg_block=input,
-        cb_ask_bool=input,
-        cb_bar=None,
-        out_dir: Optional[str] = None,
+        cb: Union[BaseProxy, Callback, None] = None,
+        cb_return: Optional[CallbackReturn] = None,
         **kwargs,
     ) -> list[str]:
         exporter = UploadTelegram(
             opt_output,
             opt_comp,
             opt_cred,
-            cb_msg,
-            cb_msg_block,
-            cb_ask_bool,
-            cb_bar,
-            out_dir,
+            cb,
+            cb_return,
         )
         return exporter.upload_stickers_telegram()

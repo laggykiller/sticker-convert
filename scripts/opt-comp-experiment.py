@@ -88,9 +88,9 @@ def generate_random_png(res: int, out_f: Path):
 
 def compress_worker(jobs_queue: Queue, results_queue: Queue):
     for (in_f, out_f, opt_comp) in iter(jobs_queue.get, None):
-        sticker = StickerConvert(in_f=in_f, out_f=out_f, opt_comp=opt_comp, cb_msg=False)
-        success, in_f, out_f, size = sticker.convert()
-        del sticker
+        success, in_f, out_f, size = StickerConvert.convert(
+            in_f=in_f, out_f=out_f, opt_comp=opt_comp
+        )
         results_queue.put((success, size, opt_comp.fps_max, opt_comp.res_w_max, opt_comp.quality, opt_comp.color))
     
     jobs_queue.put(None)

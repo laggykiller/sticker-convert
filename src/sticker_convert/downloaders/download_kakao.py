@@ -5,13 +5,15 @@ import io
 import json
 import zipfile
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Union
+from multiprocessing.managers import BaseProxy
 from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
 
 from sticker_convert.downloaders.download_base import DownloadBase  # type: ignore
+from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
 from sticker_convert.job_option import CredOption  # type: ignore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao  # type: ignore
@@ -118,7 +120,7 @@ class DownloadKakao(DownloadBase):
             if item_code:
                 return self.download_animated(item_code)
             else:
-                self.cb_msg(
+                self.cb.put(
                     "Download failed: Cannot download metadata for sticker pack"
                 )
                 return False
@@ -130,11 +132,11 @@ class DownloadKakao(DownloadBase):
             if auth_token:
                 self.pack_title = MetadataKakao.get_title_from_id(item_code, auth_token)  # type: ignore[arg-type]
                 if not self.pack_title:
-                    self.cb_msg("Warning: Cannot get pack_title with auth_token.")
-                    self.cb_msg(
+                    self.cb.put("Warning: Cannot get pack_title with auth_token.")
+                    self.cb.put(
                         "Is auth_token invalid / expired? Try to regenerate it."
                     )
-                    self.cb_msg("Continuing without getting pack_title")
+                    self.cb.put("Continuing without getting pack_title")
 
             return self.download_animated(item_code)  # type: ignore[arg-type]
 
@@ -147,7 +149,7 @@ class DownloadKakao(DownloadBase):
             ) = MetadataKakao.get_info_from_pack_title(self.pack_title)
 
             if not thumbnail_urls:
-                self.cb_msg(
+                self.cb.put(
                     "Download failed: Cannot download metadata for sticker pack"
                 )
                 return False
@@ -160,14 +162,15 @@ class DownloadKakao(DownloadBase):
                     msg = "Warning: Cannot get item code.\n"
                     msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
                     msg += "Continue to download static stickers instead?"
-                    response = self.cb_msg_block(msg)
+                    self.cb.put(("msg_block", (msg,)))
+                    response = self.cb_return.get_response()
                     if response == False:
                         return False
 
             return self.download_static(thumbnail_urls)
 
         else:
-            self.cb_msg("Download failed: Unrecognized URL")
+            self.cb.put("Download failed: Unrecognized URL")
             return False
 
     def download_static(self, thumbnail_urls: str) -> bool:
@@ -194,34 +197,35 @@ class DownloadKakao(DownloadBase):
 
         zip_file = self.download_file(pack_url)
         if zip_file:
-            self.cb_msg(f"Downloaded {pack_url}")
+            self.cb.put(f"Downloaded {pack_url}")
         else:
-            self.cb_msg(f"Cannot download {pack_url}")
+            self.cb.put(f"Cannot download {pack_url}")
             return False
 
         with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
-            self.cb_msg("Unzipping...")
-            if self.cb_bar:
-                self.cb_bar(set_progress_mode="determinate", steps=len(zf.namelist()))
+            self.cb.put("Unzipping...")
+            self.cb.put(("bar", None, {
+                "set_progress_mode": "determinate",
+                "steps": len(zf.namelist())
+            }))
 
             for num, f_path in enumerate(sorted(zf.namelist())):
                 ext = Path(f_path).suffix
 
                 if ext in (".gif", ".webp"):
                     data = DecryptKakao.xor_data(zf.read(f_path))
-                    self.cb_msg(f"Decrypted {f_path}")
+                    self.cb.put(f"Decrypted {f_path}")
                 else:
                     data = zf.read(f_path)
-                    self.cb_msg(f"Read {f_path}")
+                    self.cb.put(f"Read {f_path}")
 
                 out_path = Path(self.out_dir, str(num).zfill(3) + ext)
                 with open(out_path, "wb") as f:
                     f.write(data)
 
-                if self.cb_bar:
-                    self.cb_bar(update_bar=True)
+                self.cb.put("update_bar")
 
-        self.cb_msg(f"Finished getting {pack_url}")
+        self.cb.put(f"Finished getting {pack_url}")
 
         return True
 
@@ -230,9 +234,8 @@ class DownloadKakao(DownloadBase):
         url: str,
         out_dir: str,
         opt_cred: Optional[CredOption] = None,
-        cb_msg=print,
-        cb_msg_block=input,
-        cb_bar=None,
+        cb: Union[BaseProxy, Callback, None] = None,
+        cb_return: Optional[CallbackReturn] = None,
     ) -> bool:
-        downloader = DownloadKakao(url, out_dir, opt_cred, cb_msg, cb_msg_block, cb_bar)
+        downloader = DownloadKakao(url, out_dir, opt_cred, cb, cb_return)
         return downloader.download_stickers_kakao()
