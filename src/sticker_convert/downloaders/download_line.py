@@ -193,7 +193,7 @@ class DownloadLine(DownloadBase):
     def decompress(self, zf: zipfile.ZipFile, f_path: str, num: int, prefix: str = '', suffix: str = ''):
         data = zf.read(f_path)
         ext = Path(f_path).suffix
-        if ext == '.png' and int(self.pack_id) < 775:
+        if ext == '.png' and not self.is_emoji and int() < 775:
             data = ApplePngNormalize.normalize(data)
         self.cb.put(f'Read {f_path}')
         
