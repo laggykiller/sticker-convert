@@ -14,8 +14,10 @@ def get_root_dir() -> Path:
             return root_dir
         i += 1
 
+
 # Directory that can read program resources
 ROOT_DIR = get_root_dir()
+
 
 def get_root_dir_exe() -> Path:
     if appimage_path := os.getenv("APPIMAGE"):
@@ -27,11 +29,13 @@ def get_root_dir_exe() -> Path:
         and ".app/Contents/MacOS" in ROOT_DIR.as_posix()
     ):
         return (ROOT_DIR / "../../../").resolve()
-    
+
     return ROOT_DIR
+
 
 # Directory that contains .exe/.app/.appimage
 ROOT_DIR_EXE = get_root_dir_exe()
+
 
 def check_root_dir_exe_writable() -> bool:
     if (
@@ -47,7 +51,9 @@ def check_root_dir_exe_writable() -> bool:
     else:
         return True
 
+
 ROOT_DIR_EXE_WRITABLE = check_root_dir_exe_writable()
+
 
 def get_default_dir() -> Path:
     if ROOT_DIR_EXE_WRITABLE:
@@ -60,8 +66,10 @@ def get_default_dir() -> Path:
         else:
             return home_dir
 
+
 # Default directory for stickers_input and stickers_output
 DEFAULT_DIR = get_default_dir()
+
 
 def get_config_dir() -> Path:
     if platform.system() == "Windows":
@@ -74,6 +82,7 @@ def get_config_dir() -> Path:
     else:
         os.makedirs(fallback_dir, exist_ok=True)
         return fallback_dir
+
 
 # Directory for saving configs
 CONFIG_DIR = get_config_dir()

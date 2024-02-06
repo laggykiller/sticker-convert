@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
-from multiprocessing.managers import BaseProxy
+from queue import Queue
+from typing import Union, Optional
 
-from typing import Optional, Union
+from sticker_convert.job_option import CompOption, CredOption, OutputOption
+from sticker_convert.utils.callback import Callback, CallbackReturn
 
-from sticker_convert.job_option import (CompOption, CredOption,  # type: ignore
-                                        OutputOption)
-from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
 
 class UploadBase:
     def __init__(
@@ -13,8 +12,17 @@ class UploadBase:
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: Union[BaseProxy, Callback, None] = None,
-        cb_return: Optional[CallbackReturn] = None
+        cb: Union[
+            Queue[
+                Union[
+                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
+                    str,
+                    None,
+                ]
+            ],
+            Callback,
+        ],
+        cb_return: CallbackReturn,
     ):
         if not cb:
             cb = Callback(silent=True)

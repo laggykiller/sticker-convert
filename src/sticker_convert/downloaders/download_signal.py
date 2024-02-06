@@ -1,45 +1,51 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from typing import Optional, Union
-from multiprocessing.managers import BaseProxy
+from queue import Queue
+from typing import Optional, Union, Any
 
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.errors import SignalException  # type: ignore
 from signalstickers_client.models import StickerPack  # type: ignore
 
-from sticker_convert.downloaders.download_base import DownloadBase  # type: ignore
-from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore
-from sticker_convert.job_option import CredOption  # type: ignore
-from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
-from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
+from sticker_convert.downloaders.download_base import DownloadBase
+from sticker_convert.job_option import CredOption
+from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.media.codec_info import CodecInfo
 
 
 class DownloadSignal(DownloadBase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args: Any, **kwargs: Any):
         super(DownloadSignal, self).__init__(*args, **kwargs)
 
     @staticmethod
     async def get_pack(pack_id: str, pack_key: str) -> StickerPack:
         async with StickersClient() as client:
-            pack = await client.get_pack(pack_id, pack_key)
+            pack = await client.get_pack(pack_id, pack_key)  # type: ignore
 
         return pack
 
     def save_stickers(self, pack: StickerPack):
-        self.cb.put(("bar", None, {
-            "set_progress_mode": "determinate",
-            "steps": len(pack.stickers)
-        }))
+        self.cb.put(
+            (
+                "bar",
+                None,
+                {
+                    "set_progress_mode": "determinate",
+                    "steps": len(pack.stickers),  # type: ignore
+                },
+            )
+        )
 
-        emoji_dict = {}
-        for sticker in pack.stickers:
-            f_id = str(sticker.id).zfill(3)
+        emoji_dict: dict[str, str] = {}
+        for sticker in pack.stickers:  # type: ignore
+            f_id = str(sticker.id).zfill(3)  # type: ignore
             f_path = Path(self.out_dir, f_id)
             with open(f_path, "wb") as f:
-                f.write(sticker.image_data)
+                f.write(sticker.image_data)  # type: ignore
 
-            emoji_dict[f_id] = sticker.emoji
+            emoji_dict[f_id] = sticker.emoji  # type: ignore
 
             codec = CodecInfo.get_file_codec(f_path)
             if codec == "":
@@ -69,6 +75,8 @@ class DownloadSignal(DownloadBase):
             pack = anyio.run(DownloadSignal.get_pack, pack_id, pack_key)
         except SignalException as e:
             self.cb.put(f"Failed to download pack due to {repr(e)}")
+            return False
+
         self.save_stickers(pack)
 
         return True
@@ -77,11 +85,18 @@ class DownloadSignal(DownloadBase):
     def start(
         url: str,
         out_dir: Path,
-        opt_cred: Optional[CredOption] = None,
-        cb: Union[BaseProxy, Callback, None] = None,
-        cb_return: Optional[CallbackReturn] = None,
+        opt_cred: Optional[CredOption],
+        cb: Union[
+            Queue[
+                Union[
+                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
+                    str,
+                    None,
+                ]
+            ],
+            Callback,
+        ],
+        cb_return: CallbackReturn,
     ) -> bool:
-        downloader = DownloadSignal(
-            url, out_dir, opt_cred, cb, cb_return
-        )
+        downloader = DownloadSignal(url, out_dir, opt_cred, cb, cb_return)
         return downloader.download_stickers_signal()

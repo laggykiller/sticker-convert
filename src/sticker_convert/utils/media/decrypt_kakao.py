@@ -7,6 +7,7 @@ https://github.com/blluv/KakaoTalkEmoticonDownloader
 https://github.com/star-39/moe-sticker-bot
 """
 
+
 class DecryptKakao:
     @staticmethod
     def generate_lfsr(key: str) -> list[int]:
@@ -31,7 +32,7 @@ class DecryptKakao:
         return seq
 
     @staticmethod
-    def xor_byte(b: int, seq: list) -> int:
+    def xor_byte(b: int, seq: list[int]) -> int:
         flag1 = 1
         flag2 = 0
         result = 0
@@ -66,4 +67,3 @@ class DecryptKakao:
         for i in range(0, 128):
             dat[i] = DecryptKakao.xor_byte(dat[i], s)
         return bytes(dat)
-

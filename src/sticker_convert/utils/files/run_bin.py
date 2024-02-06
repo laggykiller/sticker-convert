@@ -3,14 +3,14 @@ import platform
 import shutil
 import subprocess
 from pathlib import Path
-from typing import AnyStr, Union
+from typing import Union, Callable, Any
 
 
 class RunBin:
     @staticmethod
     def get_bin(
-        bin: str, silent: bool = False, cb_msg=print
-    ) -> Union[str, AnyStr, None]:
+        bin: str, silent: bool = False, cb_msg: Callable[..., Any] = print
+    ) -> Union[str, None]:
         if Path(bin).is_file():
             return bin
 
@@ -18,27 +18,27 @@ class RunBin:
             bin = bin + ".exe"
 
         which_result = shutil.which(bin)
-        if which_result != None:
-            return Path(which_result).resolve()  # type: ignore[type-var]
-        elif silent == False:
+        if which_result is not None:
+            return str(Path(which_result).resolve())
+        elif silent is False:
             cb_msg(f"Warning: Cannot find binary file {bin}")
 
         return None
 
     @staticmethod
     def run_cmd(
-        cmd_list: list[str], silence: bool = False, cb_msg=print
-    ) -> Union[bool, str]:
-        bin_path = RunBin.get_bin(cmd_list[0])  # type: ignore[assignment]
+        cmd_list: list[str], silence: bool = False, cb_msg: Callable[..., Any] = print
+    ) -> tuple[bool, str]:
+        bin_path = RunBin.get_bin(cmd_list[0])
 
         if bin_path:
             cmd_list[0] = bin_path
         else:
-            if silence == False:
+            if silence is False:
                 cb_msg(
                     f"Error while executing {' '.join(cmd_list)} : Command not found"
                 )
-            return False
+            return False, ""
 
         # sp = subprocess.Popen(cmd_list, stdout=subprocess.DEVNULL, stderr=subprocess.STDOUT)
         sp = subprocess.run(
@@ -51,8 +51,8 @@ class RunBin:
         output_str = sp.stdout.decode()
         error_str = sp.stderr.decode()
 
-        if silence == False and error_str != "":
+        if silence is False and error_str != "":
             cb_msg(f"Error while executing {' '.join(cmd_list)} : {error_str}")
-            return False
+            return False, ""
 
-        return output_str
+        return True, output_str

@@ -15,9 +15,28 @@ def sanitize_filename(filename: str) -> str:
     """
     blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "\0"]
     reserved = [
-        "CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5",
-        "COM6", "COM7", "COM8", "COM9", "LPT1", "LPT2", "LPT3", "LPT4", "LPT5",
-        "LPT6", "LPT7", "LPT8", "LPT9",
+        "CON",
+        "PRN",
+        "AUX",
+        "NUL",
+        "COM1",
+        "COM2",
+        "COM3",
+        "COM4",
+        "COM5",
+        "COM6",
+        "COM7",
+        "COM8",
+        "COM9",
+        "LPT1",
+        "LPT2",
+        "LPT3",
+        "LPT4",
+        "LPT5",
+        "LPT6",
+        "LPT7",
+        "LPT8",
+        "LPT9",
     ]  # Reserved words on Windows
     filename = "".join(c if c not in blacklist else "_" for c in filename)
     # Remove all charcters below code point 32

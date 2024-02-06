@@ -2,15 +2,27 @@ import json
 import os
 import shutil
 import subprocess
+from subprocess import CompletedProcess
 from pathlib import Path
+from typing import Any
 
-import pytest
+import pytest  # type: ignore
 
-PYTHON_EXE = shutil.which('python3') if shutil.which('python3') else shutil.which('python')
-SRC_DIR = Path(__file__).resolve().parent / '../src'
-SAMPLE_DIR = Path(__file__).resolve().parent / 'samples'
-COMPRESSION_JSON_PATH = SRC_DIR / 'sticker_convert/resources/compression.json'
-CREDS_JSON_PATH = SRC_DIR / 'sticker_convert/creds.json'
+
+def get_python_path() -> str:
+    path = shutil.which("python3")
+    if not path:
+        shutil.which("python")
+    if not path:
+        raise RuntimeError("Cannot find python executable")
+    return path
+
+
+PYTHON_EXE = get_python_path()
+SRC_DIR = Path(__file__).resolve().parent / "../src"
+SAMPLE_DIR = Path(__file__).resolve().parent / "samples"
+COMPRESSION_JSON_PATH = SRC_DIR / "sticker_convert/resources/compression.json"
+CREDS_JSON_PATH = SRC_DIR / "sticker_convert/creds.json"
 
 with open(COMPRESSION_JSON_PATH) as f:
     COMPRESSION_DICT = json.load(f)
@@ -26,14 +38,15 @@ if CREDS_JSON_PATH.is_file():
         KAKAO_TOKEN = CREDS_JSON_DICT.get("kakao", {}).get("auth_token")
         LINE_COOKIES = CREDS_JSON_DICT.get("line", {}).get("cookies")
 else:
-    SIGNAL_UUID = os.environ.get("SIGNAL_UUID")
-    SIGNAL_PASSWORD = os.environ.get("SIGNAL_PASSWORD")
-    TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
-    TELEGRAM_USERID = os.environ.get("TELEGRAM_USERID")
-    KAKAO_TOKEN = os.environ.get("KAKAO_TOKEN")
-    LINE_COOKIES = os.environ.get("LINE_COOKIES")
+    SIGNAL_UUID = os.environ.get("SIGNAL_UUID")  # type: ignore
+    SIGNAL_PASSWORD = os.environ.get("SIGNAL_PASSWORD")  # type: ignore
+    TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")  # type: ignore
+    TELEGRAM_USERID = os.environ.get("TELEGRAM_USERID")  # type: ignore
+    KAKAO_TOKEN = os.environ.get("KAKAO_TOKEN")  # type: ignore
+    LINE_COOKIES = os.environ.get("LINE_COOKIES")  # type: ignore
 
-def run_cmd(cmd, **kwargs):
-    result = subprocess.run(cmd, **kwargs)
 
-    assert result.returncode == 0
+def run_cmd(cmd: list[str], **kwargs: Any):
+    result: CompletedProcess[Any] = subprocess.run(cmd, **kwargs)  # type: ignore
+
+    assert result.returncode == 0  # type: ignore

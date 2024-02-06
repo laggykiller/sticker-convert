@@ -4,29 +4,29 @@ from __future__ import annotations
 import platform
 from typing import TYPE_CHECKING, Union
 
-from ttkbootstrap import Canvas, Frame, PhotoImage, Scrollbar
+from ttkbootstrap import Canvas, Frame, PhotoImage, Scrollbar  # type: ignore
 
 from sticker_convert.definitions import ROOT_DIR
 
 if TYPE_CHECKING:
-    from sticker_convert.gui import GUI  # type: ignore
-    from sticker_convert.gui_components.windows.base_window import     BaseWindow  # type: ignore
+    from sticker_convert.gui import GUI
+    from sticker_convert.gui_components.windows.base_window import BaseWindow
 
 
 class GUIUtils:
     @staticmethod
     def set_icon(window: Union["BaseWindow", "GUI"]):
-        window.icon = PhotoImage(file=ROOT_DIR/"resources/appicon.png")
-        window.iconphoto(1, window.icon)
+        window.icon = PhotoImage(file=ROOT_DIR / "resources/appicon.png")  # type: ignore
+        window.iconphoto(1, window.icon)  # type: ignore
         if platform.system() == "Darwin":
-            window.iconbitmap(bitmap=ROOT_DIR/"resources/appicon.icns")
+            window.iconbitmap(bitmap=ROOT_DIR / "resources/appicon.icns")  # type: ignore
         elif platform.system() == "Windows":
-            window.iconbitmap(bitmap=ROOT_DIR/"resources/appicon.ico")
-        window.tk.call("wm", "iconphoto", window._w, window.icon)
+            window.iconbitmap(bitmap=ROOT_DIR / "resources/appicon.ico")  # type: ignore
+        window.tk.call("wm", "iconphoto", window._w, window.icon)  # type: ignore
 
     @staticmethod
     def create_scrollable_frame(
-        window: Union["BaseWindow", "GUI"]
+        window: Union["BaseWindow", "GUI"],
     ) -> tuple[Frame, Frame, Canvas, Scrollbar, Scrollbar, Frame]:
         main_frame = Frame(window)
         main_frame.pack(fill="both", expand=1)
@@ -38,11 +38,13 @@ class GUIUtils:
         canvas.pack(side="left", fill="both", expand=1)
 
         x_scrollbar = Scrollbar(
-            horizontal_scrollbar_frame, orient="horizontal", command=canvas.xview
+            horizontal_scrollbar_frame,
+            orient="horizontal",
+            command=canvas.xview,  # type: ignore
         )
         x_scrollbar.pack(side="bottom", fill="x")
 
-        y_scrollbar = Scrollbar(main_frame, orient="vertical", command=canvas.yview)
+        y_scrollbar = Scrollbar(main_frame, orient="vertical", command=canvas.yview)  # type: ignore
         y_scrollbar.pack(side="right", fill="y")
 
         canvas.configure(xscrollcommand=x_scrollbar.set)
@@ -65,7 +67,7 @@ class GUIUtils:
 
     @staticmethod
     def finalize_window(window: Union["GUI", "BaseWindow"]):
-        window.attributes("-alpha", 0)
+        window.attributes("-alpha", 0)  # type: ignore
 
         screen_width = window.winfo_screenwidth()
         screen_height = window.winfo_screenwidth()
@@ -91,6 +93,6 @@ class GUIUtils:
 
         window.place_window_center()
 
-        window.attributes("-alpha", 1)
+        window.attributes("-alpha", 1)  # type: ignore
 
         window.focus_force()

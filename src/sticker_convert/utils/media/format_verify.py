@@ -1,41 +1,52 @@
 #!/usr/bin/env python3
+import io
 import os
 from pathlib import Path
 from typing import Optional, Union
 
-from sticker_convert.job_option import CompOption  # type: ignore
-from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
+from sticker_convert.job_option import CompOption
+from sticker_convert.utils.media.codec_info import CodecInfo
 
 
 class FormatVerify:
     @staticmethod
-    def check_file(file: Path, spec: CompOption) -> bool:
-        if FormatVerify.check_presence(file) == False:
+    def check_file(file: Union[Path, io.BytesIO], spec: CompOption) -> bool:
+        if FormatVerify.check_presence(file) is False:
             return False
 
         file_info = CodecInfo(file)
 
         return (
-            FormatVerify.check_file_res(file, res=spec.res, square=spec.square, file_info=file_info)
+            FormatVerify.check_file_res(
+                file, res=spec.res, square=spec.square, file_info=file_info
+            )
             and FormatVerify.check_file_fps(file, fps=spec.fps, file_info=file_info)
-            and FormatVerify.check_file_duration(file, duration=spec.duration, file_info=file_info)
-            and FormatVerify.check_file_size(file, size=spec.size_max, file_info=file_info)
-            and FormatVerify.check_animated(file, animated=spec.animated, file_info=file_info)
+            and FormatVerify.check_file_duration(
+                file, duration=spec.duration, file_info=file_info
+            )
+            and FormatVerify.check_file_size(
+                file, size=spec.size_max, file_info=file_info
+            )
+            and FormatVerify.check_animated(
+                file, animated=spec.animated, file_info=file_info
+            )
             and FormatVerify.check_format(file, fmt=spec.format, file_info=file_info)
         )
 
     @staticmethod
-    def check_presence(file: Path) -> bool:
-        return Path(file).is_file()
+    def check_presence(file: Union[Path, io.BytesIO]) -> bool:
+        if isinstance(file, Path):
+            return Path(file).is_file()
+        else:
+            return True
 
     @staticmethod
     def check_file_res(
-        file: Path,
-        res: Optional[list[list[int]]] = None,
+        file: Union[Path, io.BytesIO],
+        res: list[list[Optional[int]]],
         square: Optional[bool] = None,
-        file_info: Optional[CodecInfo] = None
+        file_info: Optional[CodecInfo] = None,
     ) -> bool:
-        
         if file_info:
             file_width, file_height = file_info.res
         else:
@@ -57,10 +68,10 @@ class FormatVerify:
 
     @staticmethod
     def check_file_fps(
-        file: Path,fps: Optional[list[int]],
-        file_info: Optional[CodecInfo] = None
+        file: Union[Path, io.BytesIO],
+        fps: list[Optional[int]],
+        file_info: Optional[CodecInfo] = None,
     ) -> bool:
-        
         if file_info:
             file_fps = file_info.fps
         else:
@@ -72,14 +83,13 @@ class FormatVerify:
             return False
 
         return True
-    
+
     @staticmethod
     def check_file_duration(
-        file: Path,
-        duration: Optional[list[str]] = None,
-        file_info: Optional[CodecInfo] = None
+        file: Union[Path, io.BytesIO],
+        duration: list[Optional[int]],
+        file_info: Optional[CodecInfo] = None,
     ) -> bool:
-        
         if file_info:
             file_duration = file_info.duration
         else:
@@ -96,28 +106,31 @@ class FormatVerify:
 
     @staticmethod
     def check_file_size(
-        file: Path,
-        size: Optional[list[int]] = None,
-        file_info: Optional[CodecInfo] = None
+        file: Union[Path, io.BytesIO],
+        size: list[Optional[int]],
+        file_info: Optional[CodecInfo] = None,
     ) -> bool:
-        
-        file_size = os.path.getsize(file)
+        if isinstance(file, Path):
+            file_size = os.path.getsize(file)
+        else:
+            file_size = file.getbuffer().nbytes
+
         if file_info:
             file_animated = file_info.is_animated
         else:
             file_animated = CodecInfo.is_anim(file)
 
         if (
-            file_animated == True
+            file_animated is True
             and size
-            and size[1] != None
+            and size[1] is not None
             and file_size > size[1]
         ):
             return False
         if (
-            file_animated == False
+            file_animated is False
             and size
-            and size[0] != None
+            and size[0] is not None
             and file_size > size[0]
         ):
             return False
@@ -126,35 +139,36 @@ class FormatVerify:
 
     @staticmethod
     def check_animated(
-        file: Path,
+        file: Union[Path, io.BytesIO],
         animated: Optional[bool] = None,
-        file_info: Optional[CodecInfo] = None
+        file_info: Optional[CodecInfo] = None,
     ) -> bool:
-        
         if file_info:
             file_animated = file_info.is_animated
         else:
             file_animated = CodecInfo.is_anim(file)
 
-        if animated != None and file_animated != animated:
+        if animated is not None and file_animated != animated:
             return False
 
         return True
 
     @staticmethod
     def check_format(
-        file: Path,
-        fmt: list[Union[list[str], str, None]] = None,
-        file_info: Optional[CodecInfo] = None
+        file: Union[Path, io.BytesIO],
+        fmt: list[list[str]],
+        file_info: Optional[CodecInfo] = None,
     ):
-        
         if file_info:
             file_animated = file_info.is_animated
             file_ext = file_info.file_ext
         else:
             file_animated = CodecInfo.is_anim(file)
-            file_ext = CodecInfo.get_file_ext(file)
-        
+            if isinstance(file, Path):
+                file_ext = CodecInfo.get_file_ext(file)
+            else:
+                file_ext = "." + CodecInfo.get_file_codec(file)
+
         jpg_exts = (".jpg", ".jpeg")
         png_exts = (".png", ".apng")
 
@@ -163,27 +177,13 @@ class FormatVerify:
         else:
             valid_fmt = fmt[0]
 
-        if isinstance(valid_fmt, str):
-            if file_ext == valid_fmt:
-                return True
-            elif file_ext in jpg_exts and valid_fmt in jpg_exts:
-                return True
-            elif file_ext in png_exts and valid_fmt in png_exts:
-                return True
-            else:
-                return False
-            
-        elif isinstance(valid_fmt, list):
-            if file_ext in valid_fmt:
-                return True
-            elif file_ext in jpg_exts and (".jpg" in valid_fmt or ".jpeg" in valid_fmt):
-                return True
-            elif file_ext in png_exts and (".png" in valid_fmt or ".apng" in valid_fmt):
-                return True
-            else:
-                return False
-            
-        elif valid_fmt == None:
-            return False
+        if len(valid_fmt) == 0:
+            return True
+        elif file_ext in valid_fmt:
+            return True
+        elif file_ext in jpg_exts and (".jpg" in valid_fmt or ".jpeg" in valid_fmt):
+            return True
+        elif file_ext in png_exts and (".png" in valid_fmt or ".apng" in valid_fmt):
+            return True
         else:
-            raise TypeError(f"valid_fmt should be either str, list or None. {valid_fmt} was given")
+            return False
