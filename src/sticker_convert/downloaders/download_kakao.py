@@ -232,7 +232,7 @@ class DownloadKakao(DownloadBase):
     @staticmethod
     def start(
         url: str,
-        out_dir: str,
+        out_dir: Path,
         opt_cred: Optional[CredOption] = None,
         cb: Union[BaseProxy, Callback, None] = None,
         cb_return: Optional[CallbackReturn] = None,

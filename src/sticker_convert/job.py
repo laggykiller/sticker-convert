@@ -8,6 +8,7 @@ from datetime import datetime
 from multiprocessing import Process, Value
 from multiprocessing.managers import BaseProxy, SyncManager
 from pathlib import Path
+import platform
 from threading import Thread
 from typing import Optional, Callable, Union
 from urllib.parse import urlparse
@@ -24,7 +25,7 @@ from sticker_convert.uploaders.compress_wastickers import CompressWastickers  # 
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.uploaders.upload_signal import UploadSignal  # type: ignore
 from sticker_convert.uploaders.upload_telegram import UploadTelegram  # type: ignore
-from sticker_convert.uploaders.xcode_imessage import XcodeImessage  # type: ignore
+from sticker_convert.uploaders.xcode_imessage import XcodeImessage, XcodeImessageIconset  # type: ignore
 from sticker_convert.utils.callback import CallbackReturn  # type: ignore
 from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler  # type: ignore
@@ -66,6 +67,8 @@ class Executor:
         self.processes: list[Process] = []
 
         self.is_cancel_job = Value('i', 0)
+
+        Thread(target=self.cb_thread, args=(self.cb_queue, self.cb_return,)).start()
 
     def cb_thread(
             self,
@@ -128,8 +131,6 @@ class Executor:
         while not self.work_queue.empty():
             self.work_queue.get()
 
-        Thread(target=self.cb_thread, args=(self.cb_queue, self.cb_return,)).start()
-
         for _ in range(processes):
             process = Process(
                 target=Executor.worker,
@@ -161,7 +162,10 @@ class Executor:
             self.work_queue.get()
 
         for process in self.processes:
-            process.close()
+            if platform.system() == "Windows":
+                process.terminate()
+            else:
+                process.close()
             process.join()
         
         self.cleanup()
@@ -187,20 +191,20 @@ class Job:
         cb_ask_bool: Callable,
         cb_ask_str: Callable):
 
-        self.opt_input = opt_input
-        self.opt_comp = opt_comp
-        self.opt_output = opt_output
-        self.opt_cred = opt_cred
-        self.cb_msg = cb_msg
-        self.cb_msg_block = cb_msg_block
-        self.cb_bar = cb_bar
-        self.cb_ask_bool = cb_ask_bool
-        self.cb_ask_str = cb_ask_str
+        self.opt_input: InputOption = opt_input
+        self.opt_comp: CompOption = opt_comp
+        self.opt_output: OutputOption = opt_output
+        self.opt_cred: CredOption = opt_cred
+        self.cb_msg: Callable = cb_msg
+        self.cb_msg_block: Callable = cb_msg_block
+        self.cb_bar: Callable = cb_bar
+        self.cb_ask_bool: Callable = cb_ask_bool
+        self.cb_ask_str: Callable = cb_ask_str
 
         self.compress_fails: list[str] = []
         self.out_urls: list[str] = []
 
-        self.executor = Executor(
+        self.executor: Executor = Executor(
             self.cb_msg,
             self.cb_msg_block,
             self.cb_bar,
@@ -339,7 +343,8 @@ class Job:
             msg += 'You may continue, but the files will need to be compressed again before export\n'
             msg += 'You are recommended to choose the matching option for compression and output. Continue?'
 
-            response = self.executor.cb("ask_bool", (msg,))
+            self.executor.cb("ask_bool", (msg,))
+            response = self.executor.cb_return.get_response()
 
             if response == False:
                 return False
@@ -376,16 +381,53 @@ class Job:
             msg += 'You are adviced to read documentations.\n'
             msg += 'If you continue, you will only download static stickers. Continue?'
 
-            response = self.executor.cb("ask_bool", (msg,))
-
-            if response == False:
-                return False
-            
-            response = self.executor.cb("ask_bool", (msg,))
+            self.executor.cb("ask_bool", (msg,))
+            response = self.executor.cb_return.get_response()
 
             if response == False:
                 return False
         
+        # Warn about in/output directories that might contain other files
+        # Directory is safe if the name is stickers_input/stickers_output, or
+        # all contents are related to sticker-convert
+        for path_type, path, default_name in (
+            ("Input", self.opt_input.dir, "stickers_input"),
+            ("Output", self.opt_output.dir, "stickers_output")
+            ):
+            
+            if (path_type == "Input" and
+               (path.name == "stickers_input" or
+                self.opt_input.option == "local" or
+                not any(path.iterdir()))):
+
+                continue
+            elif (path_type == "Output" and
+                  (path.name == "stickers_output" or
+                  self.opt_comp.no_compress or
+                  not any(path.iterdir()))):
+                
+                continue
+                
+            related_files = MetadataHandler.get_files_related_to_sticker_convert(path)
+            if any([
+                i for i in path.iterdir()
+                if i not in related_files]):
+                
+                msg = 'WARNING: {} directory is set to {}.\n'
+                msg += 'It does not have default name of "{}",\n'
+                msg += 'and It seems like it contains PERSONAL DATA.\n'
+                msg += 'During execution, contents of this directory\n'
+                msg += 'maybe MOVED to "archive_*".\n'
+                msg += 'THIS MAY CAUSE DAMAGE TO YOUR DATA. Continue?'
+
+                self.executor.cb("ask_bool", (msg.format(path_type, path, default_name),))
+                response = self.executor.cb_return.get_response()
+
+                if response == False:
+                    return False
+                
+                break
+
         return True
 
     def cleanup(self) -> bool:
@@ -396,8 +438,8 @@ class Job:
         timestamp = datetime.now().strftime('%Y-%d-%m_%H-%M-%S')
         dir_name = 'archive_' + timestamp
 
-        in_dir_files = [i for i in os.listdir(self.opt_input.dir) if not i.startswith('archive_')]
-        out_dir_files = [i for i in os.listdir(self.opt_output.dir) if not i.startswith('archive_')]
+        in_dir_files = MetadataHandler.get_files_related_to_sticker_convert(self.opt_input.dir, include_archive=False)
+        out_dir_files = MetadataHandler.get_files_related_to_sticker_convert(self.opt_output.dir, include_archive=False)
 
         if self.opt_input.option == 'local':
             self.executor.cb('Skip moving old files in input directory as input source is local')
@@ -406,11 +448,10 @@ class Job:
         else:
             archive_dir = Path(self.opt_input.dir, dir_name)
             self.executor.cb(f"Moving old files in input directory to {archive_dir} as input source is not local")
-            os.makedirs(archive_dir)
-            for i in in_dir_files:
-                old_path = Path(self.opt_input.dir, i)
-                new_path = archive_dir / i
-                shutil.move(old_path, new_path)
+            archive_dir.mkdir(exist_ok=True)
+            for old_path in in_dir_files:
+                new_path = Path(archive_dir, old_path.name)
+                old_path.rename(new_path)
 
         if self.opt_comp.no_compress:
             self.executor.cb('Skip moving old files in output directory as no_compress is True')
@@ -420,10 +461,9 @@ class Job:
             archive_dir = Path(self.opt_output.dir, dir_name)
             self.executor.cb(f"Moving old files in output directory to {archive_dir}")
             os.makedirs(archive_dir)
-            for i in out_dir_files:
-                old_path = Path(self.opt_output.dir, i)
-                new_path = archive_dir / i
-                shutil.move(old_path, new_path)
+            for old_path in out_dir_files:
+                new_path = Path(archive_dir, old_path.name)
+                old_path.rename(new_path)
         
         return True
 
@@ -474,8 +514,8 @@ class Job:
     def compress(self) -> bool:
         if self.opt_comp.no_compress == True:
             self.executor.cb('no_compress is set to True, skip compression')
-            in_dir_files = [i for i in sorted(os.listdir(self.opt_input.dir)) if Path(self.opt_input.dir, i).is_file()]
-            out_dir_files = [i for i in sorted(os.listdir(self.opt_output.dir)) if Path(self.opt_output.dir, i).is_file()]
+            in_dir_files = [i for i in sorted(self.opt_input.dir.iterdir()) if Path(self.opt_input.dir, i).is_file()]
+            out_dir_files = [i for i in sorted(self.opt_output.dir.iterdir()) if Path(self.opt_output.dir, i).is_file()]
             if len(in_dir_files) == 0:
                 self.executor.cb('Input directory is empty, nothing to copy to output directory')
             elif len(out_dir_files) != 0:
@@ -496,7 +536,7 @@ class Job:
 
         # .txt: emoji.txt, title.txt
         # .m4a: line sticker sound effects
-        for i in sorted(os.listdir(input_dir)):
+        for i in sorted(input_dir.iterdir()):
             in_f = input_dir / i
             
             if not in_f.is_file():

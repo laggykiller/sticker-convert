@@ -28,7 +28,7 @@ def _run_sticker_convert(fmt: str, tmp_path: Path):
         '--vid-format', fmt
     ], cwd=SRC_DIR)
 
-    for i in os.listdir(SAMPLE_DIR):
+    for i in SAMPLE_DIR.iterdir():
         preset_dict = COMPRESSION_DICT.get("custom")
         if i.startswith("static_") and preset_dict.get("fake_vid") == False:
             size_max = preset_dict.get("size_max").get("img")

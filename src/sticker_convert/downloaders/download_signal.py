@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import os
 from pathlib import Path
 from typing import Optional, Union
 from multiprocessing.managers import BaseProxy
@@ -47,8 +46,8 @@ class DownloadSignal(DownloadBase):
                 msg = f"Warning: Downloaded {f_path} but cannot get file codec"
                 self.cb.put(msg)
             else:
-                f_path_new = f"{f_path}.{codec}"
-                os.rename(f_path, f_path_new)
+                f_path_new = Path(f"{f_path}.{codec}")
+                f_path.rename(f_path_new)
                 msg = f"Downloaded {f_id}.{codec}"
                 self.cb.put(msg)
 
@@ -77,7 +76,7 @@ class DownloadSignal(DownloadBase):
     @staticmethod
     def start(
         url: str,
-        out_dir: str,
+        out_dir: Path,
         opt_cred: Optional[CredOption] = None,
         cb: Union[BaseProxy, Callback, None] = None,
         cb_return: Optional[CallbackReturn] = None,

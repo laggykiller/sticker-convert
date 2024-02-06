@@ -34,7 +34,7 @@ def _run_sticker_convert(tmp_path: Path, preset: str, export: str):
 
     run_cmd(cmd, cwd=SRC_DIR)
 
-    for i in os.listdir(SAMPLE_DIR):
+    for i in SAMPLE_DIR.iterdir():
         preset_dict.get("size_max").get("img")
 
         if i.startswith("static_") and preset_dict.get("fake_vid") == False:

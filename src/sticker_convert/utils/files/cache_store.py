@@ -27,8 +27,8 @@ def debug_cache_dir(path: str):
 
 class CacheStore:
     @staticmethod
-    def get_cache_store(path: Optional[str] = None):
+    def get_cache_store(path: Optional[str] = None) -> Path:
         if path:
             return debug_cache_dir(path)
         else:
-            return tempfile.TemporaryDirectory()
+            return Path(tempfile.TemporaryDirectory())

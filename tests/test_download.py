@@ -36,14 +36,14 @@ def _run_sticker_convert(
     for i in range(expected_file_count):
         for fmt in expected_file_formats:
             fname = str(i).zfill(3) + fmt
-            assert fname in os.listdir(input_dir)
+            assert fname in input_dir.iterdir()
     
     if with_title:
-        assert "title.txt" in os.listdir(input_dir)
+        assert "title.txt" in input_dir.iterdir()
     if with_author:
-        assert "author.txt" in os.listdir(input_dir)
+        assert "author.txt" in input_dir.iterdir()
     if with_emoji:
-        assert "emoji.txt" in os.listdir(input_dir)
+        assert "emoji.txt" in input_dir.iterdir()
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 def test_download_signal_static_png(tmp_path):

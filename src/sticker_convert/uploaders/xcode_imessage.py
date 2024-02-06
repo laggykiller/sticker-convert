@@ -22,7 +22,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify  # type: igno
 
 
 class XcodeImessageIconset:
-    iconset = {}
+    iconset: dict[str, tuple[int, int]] = {}
 
     def __init__(self):
         if self.iconset != {}:
@@ -145,7 +145,7 @@ class XcodeImessage(UploadBase):
         first_image_path = Path(self.opt_output.dir,
             [
                 i
-                for i in sorted(os.listdir(self.opt_output.dir))
+                for i in sorted(self.opt_output.dir.iterdir())
                 if (self.opt_output.dir / i).is_file() and i.endswith(".png")
             ][0]
         )
@@ -165,7 +165,7 @@ class XcodeImessage(UploadBase):
             })
 
             icon_path = self.opt_output.dir / icon
-            if icon in os.listdir(self.opt_output.dir) and not FormatVerify.check_file(
+            if icon in self.opt_output.dir.iterdir() and not FormatVerify.check_file(
                 icon_path, spec=spec_cover
             ):
                 StickerConvert.convert(icon_path, icon_path, spec_cover, self.cb, self.cb_return)
@@ -237,12 +237,12 @@ class XcodeImessage(UploadBase):
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack
         stickers_path = pack_path / "stickers StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack"
 
-        for i in os.listdir(stickers_path):
+        for i in stickers_path.iterdir():
             if i.endswith(".sticker"):
                 shutil.rmtree(stickers_path / i)
 
         stickers_lst = []
-        for i in sorted(os.listdir(self.opt_output.dir)):
+        for i in sorted(self.opt_output.dir.iterdir()):
             if (
                 CodecInfo.get_file_ext(i) == ".png"
                 and Path(i).stem != "cover"
@@ -282,7 +282,7 @@ class XcodeImessage(UploadBase):
         # packname StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset
         iconset_path = pack_path / "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset"
 
-        for i in os.listdir(iconset_path):
+        for i in iconset_path.iterdir():
             if Path(i).suffix == ".png":
                 os.remove(iconset_path / i)
 
@@ -300,17 +300,9 @@ class XcodeImessage(UploadBase):
         with open(plist_path, "wb+") as f:
             plistlib.dump(plist_dict, f)
 
-        os.rename(
-            pack_path / "stickers", pack_path / title
-        )
-        os.rename(
-            pack_path / "stickers StickerPackExtension",
-            pack_path / f"{title} StickerPackExtension",
-        )
-        os.rename(
-            pack_path / "stickers.xcodeproj",
-            pack_path / f"{title}.xcodeproj",
-        )
+        Path(pack_path, "stickers").rename(Path(pack_path, title))
+        Path(pack_path, "stickers StickerPackExtension").rename(Path(pack_path, f"{title} StickerPackExtension"))
+        Path(pack_path, "stickers.xcodeproj").rename(Path(pack_path, f"{title}.xcodeproj"))
 
     @staticmethod
     def start(

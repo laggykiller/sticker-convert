@@ -324,7 +324,7 @@ class DownloadLine(DownloadBase):
         return name_text_key
 
     def combine_custom_text(self):
-        for i in sorted(os.listdir(self.out_dir)):
+        for i in sorted(self.out_dir.iterdir()):
             if i.endswith('-text.png'):
                 base_path = Path(self.out_dir, i.replace('-text.png', '.png'))
                 text_path = Path(self.out_dir, i)
@@ -394,7 +394,7 @@ class DownloadLine(DownloadBase):
     @staticmethod
     def start(
         url: str,
-        out_dir: str,
+        out_dir: Path,
         opt_cred: Optional[CredOption] = None,
         cb: Union[BaseProxy, Callback, None] = None,
         cb_return: Optional[CallbackReturn] = None,

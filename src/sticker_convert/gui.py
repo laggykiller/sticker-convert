@@ -575,7 +575,7 @@ class GUI(Window):
             self.output_frame.output_setdir_entry.config(bootstyle='default')
 
         if (MetadataHandler.check_metadata_required(output_option, 'title') and
-            not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'title') and
+            not MetadataHandler.check_metadata_provided(Path(self.input_setdir_var.get()), input_option, 'title') and
             not self.title_var.get()):
 
             self.output_frame.title_entry.config(bootstyle='warning')
@@ -583,7 +583,7 @@ class GUI(Window):
             self.output_frame.title_entry.config(bootstyle='default')
 
         if (MetadataHandler.check_metadata_required(output_option, 'author') and
-            not MetadataHandler.check_metadata_provided(self.input_setdir_var.get(), input_option, 'author') and
+            not MetadataHandler.check_metadata_provided(Path(self.input_setdir_var.get()), input_option, 'author') and
             not self.author_var.get()):
             
             self.output_frame.author_entry.config(bootstyle='warning')

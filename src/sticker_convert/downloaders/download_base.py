@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 from __future__ import annotations
+from pathlib import Path
 from multiprocessing.managers import BaseProxy
 
 from typing import Optional, Union
@@ -13,7 +14,7 @@ class DownloadBase:
     def __init__(
         self,
         url: str,
-        out_dir: str,
+        out_dir: Path,
         opt_cred: Optional[CredOption] = None,
         cb: Union[BaseProxy, Callback, None] = None,
         cb_return: Optional[CallbackReturn] = None,
@@ -23,11 +24,11 @@ class DownloadBase:
             cb = Callback(silent=True)
             cb_return = CallbackReturn()
 
-        self.url = url
-        self.out_dir = out_dir
-        self.opt_cred = opt_cred
-        self.cb = cb
-        self.cb_return = cb_return
+        self.url: str = url
+        self.out_dir: Path = out_dir
+        self.opt_cred: Optional[CredOption] = opt_cred
+        self.cb: Union[BaseProxy, Callback, None] = cb
+        self.cb_return: Optional[CallbackReturn] = cb_return
 
     def download_multiple_files(
         self, targets: list[tuple[str, str]], retries: int = 3, **kwargs

@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 from typing import Optional
 
@@ -11,10 +10,48 @@ from sticker_convert.utils.files.json_manager import JsonManager  # type: ignore
 from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
 
 
+def check_if_xcodeproj(path: Path) -> bool:
+    if not path.is_dir():
+        return False
+    for i in path.iterdir():
+        if i.suffix == ".xcodeproj":
+            return True
+    return False
+
+
 class MetadataHandler:
     @staticmethod
-    def get_stickers_present(dir: str) -> list[str]:
-        from sticker_convert.uploaders.xcode_imessage import         XcodeImessageIconset  # type: ignore
+    def get_files_related_to_sticker_convert(dir: Path, include_archive: bool = True) -> list[Path]:
+        from sticker_convert.uploaders.xcode_imessage import XcodeImessageIconset  # type: ignore
+
+        xcode_iconset = XcodeImessageIconset().iconset
+        related_extensions = (
+            ".png", ".apng", ".jpg", ".jpeg", ".gif",
+            ".tgs", ".lottie", ".json",
+            ".mp4", ".mkv", ".mov", ".webm", ".webp", ".avi",
+            ".m4a", ".wastickers"
+        )
+        related_name = (
+            "title.txt", "author.txt", "emoji.txt",
+            'export-result.txt', ".DS_Store", "._.DS_Store"
+        )
+
+        files = [
+            i
+            for i in sorted(dir.iterdir())
+            if i.stem in related_name or
+            i.name in xcode_iconset or
+            i.suffix in related_extensions or
+            (include_archive and i.name.startswith('archive_')) or
+            check_if_xcodeproj(i)
+        ]
+
+        return files
+
+
+    @staticmethod
+    def get_stickers_present(dir: Path) -> list[Path]:
+        from sticker_convert.uploaders.xcode_imessage import XcodeImessageIconset  # type: ignore
 
         blacklist_prefix = ('cover',)
         blacklist_suffix = (".txt", ".m4a", ".wastickers", ".DS_Store", "._.DS_Store")
@@ -22,18 +59,18 @@ class MetadataHandler:
         
         stickers_present = [
             i
-            for i in sorted(os.listdir(dir))
+            for i in sorted(dir.iterdir())
             if Path(dir, i).is_file() and
-            not i.startswith(blacklist_prefix) and
-            not i.endswith(blacklist_suffix) and
-            not i in xcode_iconset
+            not i.name.startswith(blacklist_prefix) and
+            not i.suffix in blacklist_suffix and
+            not i.name in xcode_iconset
         ]
 
         return stickers_present
 
     @staticmethod
-    def get_cover(dir: str) -> Optional[Path]:
-        stickers_present = sorted(os.listdir(dir))
+    def get_cover(dir: Path) -> Optional[Path]:
+        stickers_present = sorted(dir.iterdir())
         for i in stickers_present:
             if Path(i).stem == "cover":
                 return Path(dir, i)
@@ -42,7 +79,7 @@ class MetadataHandler:
 
     @staticmethod
     def get_metadata(
-        dir: str,
+        dir: Path,
         title: Optional[str] = None,
         author: Optional[str] = None,
         emoji_dict: Optional[dict[str, str]] = None,
@@ -66,7 +103,7 @@ class MetadataHandler:
 
     @staticmethod
     def set_metadata(
-        dir: str,
+        dir: Path,
         title: Optional[str] = None,
         author: Optional[str] = None,
         emoji_dict: Optional[dict[str, str]] = None,
@@ -88,7 +125,7 @@ class MetadataHandler:
 
     @staticmethod
     def check_metadata_provided(
-        input_dir: str, input_option: str, metadata: str
+        input_dir: Path, input_option: str, metadata: str
     ) -> bool:
         """
         Check if metadata provided via .txt file (if from local)
@@ -118,7 +155,7 @@ class MetadataHandler:
         return output_presets[output_option]["metadata_requirements"][metadata]
 
     @staticmethod
-    def generate_emoji_file(dir: str, default_emoji: str = ""):
+    def generate_emoji_file(dir: Path, default_emoji: str = ""):
         emoji_path = Path(dir, "emoji.txt")
         emoji_dict = None
         if emoji_path.is_file():
@@ -126,7 +163,7 @@ class MetadataHandler:
                 emoji_dict = json.load(f)
 
         emoji_dict_new = {}
-        for file in sorted(os.listdir(dir)):
+        for file in sorted(dir.iterdir()):
             if not Path(dir, file).is_file() and CodecInfo.get_file_ext(
                 file
             ) in (".txt", ".m4a"):
@@ -142,7 +179,7 @@ class MetadataHandler:
 
     @staticmethod
     def split_sticker_packs(
-        dir: str,
+        dir: Path,
         title: str,
         file_per_pack: Optional[int] = None,
         file_per_anim_pack: Optional[int] = None,
@@ -177,7 +214,7 @@ class MetadataHandler:
             image_present = False
 
             for processed, file in enumerate(stickers_present):
-                file_path = Path(dir, file)
+                file_path = dir / file
 
                 if CodecInfo.is_anim(file_path):
                     anim_stickers.append(file_path)

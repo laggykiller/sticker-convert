@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import copy
-import os
 import shutil
 import zipfile
 from multiprocessing.managers import BaseProxy
@@ -88,7 +87,7 @@ class CompressWastickers(UploadBase):
 
                 self.add_metadata(tempdir, pack_title, author)
                 with zipfile.ZipFile(out_f, "w", zipfile.ZIP_DEFLATED) as zipf:
-                    for file in os.listdir(tempdir):
+                    for file in tempdir.iterdir():
                         file_path = Path(tempdir, file)
                         zipf.write(file_path, arcname=file_path.stem)
 
@@ -97,7 +96,7 @@ class CompressWastickers(UploadBase):
 
         return urls
 
-    def add_metadata(self, pack_dir: str, title: str, author: str):
+    def add_metadata(self, pack_dir: Path, title: str, author: str):
         opt_comp_merged = copy.deepcopy(self.opt_comp)
         opt_comp_merged.merge(self.spec_cover)
 
@@ -114,7 +113,7 @@ class CompressWastickers(UploadBase):
             # First image in the directory, extracting first frame
             first_image = [
                 i
-                for i in sorted(os.listdir(self.opt_output.dir))
+                for i in sorted(self.opt_output.dir.iterdir())
                 if Path(self.opt_output.dir, i).is_file()
                 and not i.endswith((".txt", ".m4a", ".wastickers"))
             ][0]

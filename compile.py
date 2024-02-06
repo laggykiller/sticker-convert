@@ -22,12 +22,12 @@ def osx_run_in_venv(cmd, get_stdout=False):
     else:
         return subprocess.run(sh_cmd + [venv_cmd + cmd])
 
-def search_wheel_in_dir(package: str, dir: str):
-    for i in os.listdir(dir):
+def search_wheel_in_dir(package: str, dir: Path):
+    for i in dir.iterdir():
         if i.startswith(package):
             return i
 
-def copy_if_universal(wheel_name: str, in_dir: str, out_dir: str):
+def copy_if_universal(wheel_name: str, in_dir: Path, out_dir: Path):
     if wheel_name.endswith('universal2.whl') or wheel_name.endswith('any.whl'):
         src_path = Path(in_dir, wheel_name)
         dst_path = Path(
@@ -42,8 +42,8 @@ def copy_if_universal(wheel_name: str, in_dir: str, out_dir: str):
     else:
         return False
 
-def create_universal_wheels(in_dir1, in_dir2, out_dir):
-    for wheel_name_1 in os.listdir(in_dir1):
+def create_universal_wheels(in_dir1: Path, in_dir2: Path, out_dir: Path):
+    for wheel_name_1 in in_dir1.iterdir():
         package = wheel_name_1.split('-')[0]
         wheel_name_2 = search_wheel_in_dir(package, in_dir2)
         if copy_if_universal(wheel_name_1, in_dir1, out_dir):
@@ -53,16 +53,16 @@ def create_universal_wheels(in_dir1, in_dir2, out_dir):
         
         wheel_path_1 = Path(in_dir1, wheel_name_1)
         wheel_path_2 = Path(in_dir2, wheel_name_2)
-        subprocess.run(['delocate-fuse', wheel_path_1, wheel_path_2, '-w', out_dir])
+        subprocess.run(['delocate-fuse', wheel_path_1, wheel_path_2, '-w', str(out_dir)])
         print(f'Created universal wheel {wheel_path_1} {wheel_path_2}')
 
-    for wheel_name in os.listdir(out_dir):
+    for wheel_name in out_dir.iterdir():
         wheel_name_new = wheel_name.replace('x86_64', 'universal2').replace('arm64', 'universal2')
 
         src_path = Path(out_dir, wheel_name)
         dst_path = Path(out_dir, wheel_name_new)
 
-        os.rename(src_path, dst_path)
+        src_path.rename(dst_path)
         print(f'Renamed universal wheel {dst_path}')
 
 def osx_install_universal2_dep():
@@ -70,14 +70,14 @@ def osx_install_universal2_dep():
     shutil.rmtree('wheel_x64', ignore_errors=True)
     shutil.rmtree('wheel_universal2', ignore_errors=True)
 
-    os.mkdir('wheel_arm')
-    os.mkdir('wheel_x64')
-    os.mkdir('wheel_universal2')
+    Path('wheel_arm').mkdir()
+    Path('wheel_x64').mkdir()
+    Path('wheel_universal2').mkdir()
 
     osx_run_in_venv('python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm')
     osx_run_in_venv('python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64')
 
-    create_universal_wheels('./wheel_arm', './wheel_x64', 'wheel_universal2')
+    create_universal_wheels(Path('./wheel_arm'), Path('./wheel_x64'), Path('wheel_universal2'))
     osx_run_in_venv('python -m pip install --require-virtualenv ./wheel_universal2/*')
 
 def nuitka(python_bin, arch):
@@ -115,19 +115,21 @@ def nuitka(python_bin, arch):
         subprocess.run(cmd_list, shell=True)
 
 def win_patch():
-    for i in os.listdir('sticker-convert.dist/av.libs'):
+    for i in Path('sticker-convert.dist/av.libs').iterdir():
         file_path = Path('sticker-convert.dist', i)
         if file_path.is_file():
             os.remove(file_path)
 
 def osx_patch():
     # https://github.com/pyinstaller/pyinstaller/issues/5154#issuecomment-1567603461
-    os.rename('sticker-convert.app/Contents/MacOS/sticker-convert', 'sticker-convert.app/Contents/MacOS/sticker-convert-cli')
-    with open('sticker-convert.app/Contents/MacOS/sticker-convert', 'w+') as f:
+    sticker_bin = Path('sticker-convert.app/Contents/MacOS/sticker-convert')
+    sticker_bin_cli = Path('sticker-convert.app/Contents/MacOS/sticker-convert-cli')
+    sticker_bin.rename(sticker_bin_cli)
+    with open(sticker_bin, 'w+') as f:
         f.write('#!/bin/bash\n')
         f.write('cd "$(dirname "$0")"\n')
         f.write('open ./sticker-convert-cli')
-    os.chmod('sticker-convert.app/Contents/MacOS/sticker-convert', 0o744)
+    os.chmod(sticker_bin, 0o744)
 
     osx_run_in_venv('codesign --force --deep -s - sticker-convert.app')
 
