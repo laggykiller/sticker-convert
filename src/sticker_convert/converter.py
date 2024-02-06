@@ -81,7 +81,7 @@ class StickerConvert:
             self.in_f = in_f[1]
             self.in_f_name = Path(in_f[0]).name
 
-        self.codec_info_orig = CodecInfo(self.in_f)
+        self.codec_info_orig: CodecInfo = CodecInfo(self.in_f)
 
         valid_formats = []
         for i in opt_comp.format:
@@ -103,27 +103,27 @@ class StickerConvert:
                 ext = opt_comp.format_img
             self.out_f = out_f.with_suffix(ext)
         
-        self.out_f_name = self.out_f.name
+        self.out_f_name: str = self.out_f.name
 
         self.cb = cb
         self.frames_raw: list[np.ndarray] = []
         self.frames_processed: list[np.ndarray] = []
-        self.opt_comp = opt_comp
+        self.opt_comp: CompOption = opt_comp
         if not self.opt_comp.steps:
             self.opt_comp.steps = 1
 
-        self.size = 0
-        self.size_max = None
-        self.res_w = None
-        self.res_h = None
-        self.quality = None
-        self.fps = None
-        self.color = None
+        self.size: Optional[None] = 0
+        self.size_max: Optional[None] = None
+        self.res_w: Optional[None] = None
+        self.res_h: Optional[None] = None
+        self.quality: Optional[None] = None
+        self.fps: Optional[None] = None
+        self.color: Optional[None] = None
 
-        self.tmp_f = None
-        self.result = None
-        self.result_size = 0
-        self.result_step = None
+        self.tmp_f: Optional[io.BytesIO] = None
+        self.result: Optional[bytes] = None
+        self.result_size: int = 0
+        self.result_step: Optional[int] = None
 
         self.apngasm = None
     

@@ -16,8 +16,8 @@ class BaseOption:
 
 class InputOption(BaseOption):
     def __init__(self, input_config_dict: dict):
-        self.option: str = input_config_dict.get('option')
-        self.url: str = input_config_dict.get('url')
+        self.option: Optional[str] = input_config_dict.get('option')
+        self.url: Optional[str] = input_config_dict.get('url')
         self.dir: Path = Path(input_config_dict.get('dir'))
         
     def to_dict(self) -> dict:
@@ -29,38 +29,38 @@ class InputOption(BaseOption):
 
 class CompOption(BaseOption):
     def __init__(self, comp_config_dict: dict):
-        self.preset = comp_config_dict.get('preset')
+        self.preset: Optional[str] = comp_config_dict.get('preset')
 
-        size_max = comp_config_dict.get('size_max')
+        size_max: Union[dict, int, None] = comp_config_dict.get('size_max')
         if isinstance(size_max, dict):
-            self.size_max_img = to_int(size_max.get('img'))
-            self.size_max_vid = to_int(size_max.get('vid'))
+            self.size_max_img: Optional[int] = to_int(size_max.get('img'))
+            self.size_max_vid: Optional[int] = to_int(size_max.get('vid'))
         else:
-            self.size_max_img = to_int(size_max)
-            self.size_max_vid = to_int(size_max)
+            self.size_max_img: Optional[int] = to_int(size_max)
+            self.size_max_vid: Optional[int] = to_int(size_max)
         
-        fmt = comp_config_dict.get('format')
+        fmt: Union[dict, list, str, None] = comp_config_dict.get('format')
         if isinstance(fmt, dict):
-            self.format_img = fmt.get('img')
-            self.format_vid = fmt.get('vid')
+            self.format_img: Optional[str] = fmt.get('img')
+            self.format_vid: Optional[str] = fmt.get('vid')
         else:
-            self.format_img = fmt
-            self.format_vid = fmt
+            self.format_img: Optional[str] = fmt
+            self.format_vid: Optional[str] = fmt
         
-        fps = comp_config_dict.get('fps')
+        fps: Union[dict, int, None] = comp_config_dict.get('fps')
         if isinstance(fps, dict):
-            self.fps_min = to_int(fps.get('min'))
-            self.fps_max = to_int(fps.get('max'))
-            self.fps_power = fps.get('power') if fps.get('power') else -0.5
+            self.fps_min: Optional[int] = to_int(fps.get('min'))
+            self.fps_max: Optional[int] = to_int(fps.get('max'))
+            self.fps_power: float = fps.get('power') if fps.get('power') else -0.5
         else:
-            self.fps_min = to_int(fps)
-            self.fps_max = to_int(fps)
-            self.fps_power = -0.5
+            self.fps_min: Optional[int] = to_int(fps)
+            self.fps_max: Optional[int] = to_int(fps)
+            self.fps_power: float = -0.5
         
-        self.res_w_min = None
-        self.res_w_max = None
-        self.res_h_min = None
-        self.res_h_max = None
+        self.res_w_min: Optional[int] = None
+        self.res_w_max: Optional[int] = None
+        self.res_h_min: Optional[int] = None
+        self.res_h_max: Optional[int] = None
         if isinstance(res := comp_config_dict.get('res'), dict):
             if res_w := res.get('w'):
                 if isinstance(res_w, dict):
@@ -90,54 +90,54 @@ class CompOption(BaseOption):
                 else:
                     self.res_w_max = res_max
                     self.res_h_max = res_max
-            self.res_power = res.get('power') if res.get('power') else 3.0
+            self.res_power: float = res.get('power') if res.get('power') else 3.0
         else:
             self.res_w_min = to_int(res)
             self.res_w_max = to_int(res)
             self.res_h_min = to_int(res)
             self.res_h_max = to_int(res)
-            self.res_power = 3.0
+            self.res_power: float = 3.0
         
-        quality = comp_config_dict.get('quality')
+        quality: Union[dict, int, None] = comp_config_dict.get('quality')
         if isinstance(quality, dict):
-            self.quality_min = to_int(quality.get('min'))
-            self.quality_max = to_int(quality.get('max'))
-            self.quality_power = quality.get('power') if quality.get('power') else 5.0
+            self.quality_min: Optional[int] = to_int(quality.get('min'))
+            self.quality_max: Optional[int] = to_int(quality.get('max'))
+            self.quality_power: float = quality.get('power') if quality.get('power') else 5.0
         else:
-            self.quality_min = to_int(quality)
-            self.quality_max = to_int(quality)
-            self.quality_power = 5.0
+            self.quality_min: Optional[int] = to_int(quality)
+            self.quality_max: Optional[int] = to_int(quality)
+            self.quality_power: float = 5.0
         
-        color = comp_config_dict.get('color')
+        color: Union[dict, int, None] = comp_config_dict.get('color')
         if isinstance(color, dict):
-            self.color_min = to_int(color.get('min'))
-            self.color_max = to_int(color.get('max'))
-            self.color_power = color.get('power') if color.get('power') else 3.0
+            self.color_min: Optional[int] = to_int(color.get('min'))
+            self.color_max: Optional[int] = to_int(color.get('max'))
+            self.color_power: float = color.get('power') if color.get('power') else 3.0
         else:
-            self.color_min = to_int(color)
-            self.color_max = to_int(color)
-            self.color_power = 3.0
+            self.color_min: Optional[int] = to_int(color)
+            self.color_max: Optional[int] = to_int(color)
+            self.color_power: float = 3.0
         
-        duration = comp_config_dict.get('duration')
+        duration: Union[dict, int, None] = comp_config_dict.get('duration')
         if isinstance(duration, dict):
-            self.duration_min = to_int(duration.get('min'))
-            self.duration_max = to_int(duration.get('max'))
+            self.duration_min: Optional[int] = to_int(duration.get('min'))
+            self.duration_max: Optional[int] = to_int(duration.get('max'))
         else:
-            self.duration_min = to_int(duration)
-            self.duration_max = to_int(duration)
+            self.duration_min: Optional[int] = to_int(duration)
+            self.duration_max: Optional[int] = to_int(duration)
         
-        self.steps = to_int(comp_config_dict.get('steps'))
-        self.fake_vid = comp_config_dict.get('fake_vid')
-        self.quantize_method = comp_config_dict.get('quantize_method', 'imagequant')
-        self.scale_filter = comp_config_dict.get('scale_filter', 'lanczos')
-        self.cache_dir = comp_config_dict.get('cache_dir')
-        self.default_emoji = comp_config_dict.get('default_emoji')
-        self.no_compress = comp_config_dict.get('no_compress')
-        self.processes = to_int(comp_config_dict.get('processes'))
+        self.steps: Optional[int] = to_int(comp_config_dict.get('steps'))
+        self.fake_vid: Optional[bool] = comp_config_dict.get('fake_vid')
+        self.quantize_method: Optional[str] = comp_config_dict.get('quantize_method', 'imagequant')
+        self.scale_filter: Optional[str] = comp_config_dict.get('scale_filter', 'lanczos')
+        self.cache_dir: Optional[str] = comp_config_dict.get('cache_dir')
+        self.default_emoji: Optional[str] = comp_config_dict.get('default_emoji')
+        self.no_compress: Optional[bool] = comp_config_dict.get('no_compress')
+        self.processes: Optional[int] = to_int(comp_config_dict.get('processes'))
 
         # Only used for format verification
-        self.animated = comp_config_dict.get('animated')
-        self.square = comp_config_dict.get('square')
+        self.animated: Optional[bool] = comp_config_dict.get('animated')
+        self.square: Optional[bool] = comp_config_dict.get('square')
 
     def to_dict(self) -> dict:
         return {
@@ -269,10 +269,10 @@ class CompOption(BaseOption):
 
 class OutputOption(BaseOption):
     def __init__(self, output_config_dict: dict):
-        self.option: str = output_config_dict.get('option')
-        self.dir: Path = Path(output_config_dict.get('dir'))
-        self.title: str = output_config_dict.get('title')
-        self.author: str = output_config_dict.get('author')
+        self.option: Optional[str] = output_config_dict.get('option')
+        self.dir: Optional[Path] = Path(output_config_dict.get('dir'))
+        self.title: Optional[str] = output_config_dict.get('title')
+        self.author: Optional[str] = output_config_dict.get('author')
     
     def to_dict(self) -> dict:
         return {
@@ -284,16 +284,16 @@ class OutputOption(BaseOption):
     
 class CredOption(BaseOption):
     def __init__(self, cred_config_dict: dict):
-        self.signal_uuid = cred_config_dict.get('signal', {}).get('uuid')
-        self.signal_password = cred_config_dict.get('signal', {}).get('password')
-        self.telegram_token = cred_config_dict.get('telegram', {}).get('token')
-        self.telegram_userid = cred_config_dict.get('telegram', {}).get('userid')
-        self.kakao_auth_token = cred_config_dict.get('kakao', {}).get('auth_token')
-        self.kakao_username = cred_config_dict.get('kakao', {}).get('username')
-        self.kakao_password = cred_config_dict.get('kakao', {}).get('password')
-        self.kakao_country_code = cred_config_dict.get('kakao', {}).get('country_code')
-        self.kakao_phone_number = cred_config_dict.get('kakao', {}).get('phone_number')
-        self.line_cookies = cred_config_dict.get('line', {}).get('cookies')
+        self.signal_uuid: Optional[str] = cred_config_dict.get('signal', {}).get('uuid')
+        self.signal_password: Optional[str] = cred_config_dict.get('signal', {}).get('password')
+        self.telegram_token: Optional[str] = cred_config_dict.get('telegram', {}).get('token')
+        self.telegram_userid: Optional[str] = cred_config_dict.get('telegram', {}).get('userid')
+        self.kakao_auth_token: Optional[str] = cred_config_dict.get('kakao', {}).get('auth_token')
+        self.kakao_username: Optional[str] = cred_config_dict.get('kakao', {}).get('username')
+        self.kakao_password: Optional[str] = cred_config_dict.get('kakao', {}).get('password')
+        self.kakao_country_code: Optional[str] = cred_config_dict.get('kakao', {}).get('country_code')
+        self.kakao_phone_number: Optional[str] = cred_config_dict.get('kakao', {}).get('phone_number')
+        self.line_cookies: Optional[str] = cred_config_dict.get('line', {}).get('cookies')
 
     def to_dict(self) -> dict:
         return {
