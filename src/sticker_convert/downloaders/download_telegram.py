@@ -19,7 +19,7 @@ class DownloadTelegram(DownloadBase):
         super(DownloadTelegram, self).__init__(*args, **kwargs)
 
     def download_stickers_telegram(self) -> bool:
-        self.token = self.opt_cred.telegram_token.strip()
+        self.token = self.opt_cred.telegram_token
         if self.token == None:
             self.cb.put("Download failed: Token required for downloading from telegram")
             return False
@@ -33,7 +33,7 @@ class DownloadTelegram(DownloadBase):
         return anyio.run(self.save_stickers)
 
     async def save_stickers(self) -> bool:
-        bot = Bot(self.token)
+        bot = Bot(self.token.strip())
         async with bot:
             try:
                 sticker_set = await bot.get_sticker_set(

@@ -75,7 +75,7 @@ class UploadTelegram(UploadBase):
     async def upload_pack(
         self, pack_title: str, stickers: list[str], emoji_dict: dict[str, str]
     ) -> str:
-        bot = Bot(self.opt_cred.telegram_token)
+        bot = Bot(self.opt_cred.telegram_token.strip())
 
         async with bot:
             pack_short_name = (
@@ -220,8 +220,8 @@ class UploadTelegram(UploadBase):
     def upload_stickers_telegram(self) -> list[str]:
         urls = []
 
-        if not self.opt_cred.telegram_token:
-            self.cb.put("Token required for uploading to telegram")
+        if not (self.opt_cred.telegram_token and self.opt_cred.telegram_userid):
+            self.cb.put("Token and userid required for uploading to telegram")
             return urls
 
         title, author, emoji_dict = MetadataHandler.get_metadata(
