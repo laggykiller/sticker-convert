@@ -165,6 +165,85 @@ class StickerConvert:
         return result
 
     def _convert(self):
+        result = self.check_if_compatible()
+        if result:
+            self.compress_done(result)
+
+        self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
+
+        steps_list = self.generate_steps_list()
+
+        step_lower = 0
+        step_upper = self.opt_comp.steps
+
+        if self.opt_comp.size_max == [None, None]:
+            # No limit to size, create the best quality result
+            step_current = 0
+        else:
+            step_current = round((step_lower + step_upper) / 2)
+
+        if self.codec_info_orig.is_animated is True:
+            self.size_max = self.opt_comp.size_max_vid
+        else:
+            self.size_max = self.opt_comp.size_max_img
+
+        self.frames_import()
+        while True:
+            param = steps_list[step_current]
+            self.res_w = param[0]
+            self.res_h = param[1]
+            self.quality = param[2]
+            if param[3] and self.codec_info_orig.fps:
+                fps_tmp = min(param[3], self.codec_info_orig.fps)
+                self.fps = self.fix_fps(fps_tmp)
+            else:
+                self.fps = Fraction(0)
+            self.color = param[4]
+
+            self.tmp_f = BytesIO()
+            msg = self.MSG_COMP.format(
+                self.in_f_name,
+                self.out_f_name,
+                self.res_w,
+                self.res_h,
+                self.quality,
+                int(self.fps),
+                self.color,
+                step_lower,
+                step_current,
+                step_upper,
+            )
+            self.cb.put(msg)
+
+            self.frames_processed = self.frames_drop(self.frames_raw)
+            self.frames_processed = self.frames_resize(self.frames_processed)
+            self.frames_export()
+
+            self.tmp_f.seek(0)
+            self.size = self.tmp_f.getbuffer().nbytes
+
+            if not self.size_max or (
+                self.size <= self.size_max and self.size >= self.result_size
+            ):
+                self.result = self.tmp_f.read()
+                self.result_size = self.size
+                self.result_step = step_current
+
+            if step_upper - step_lower > 1:
+                if self.size <= self.size_max:  # type: ignore
+                    sign = "<"
+                    step_upper = step_current
+                else:
+                    sign = ">"
+                    step_lower = step_current
+                step_current = int((step_lower + step_upper) / 2)
+                self.recompress(sign)
+            elif self.result or not self.size_max:
+                return self.compress_done(self.result, self.result_step)  # type: ignore
+            else:
+                return self.compress_fail()
+
+    def check_if_compatible(self) -> Optional[bytes]:
         if (
             FormatVerify.check_format(
                 self.in_f, fmt=self.opt_comp.format, file_info=self.codec_info_orig
@@ -188,16 +267,17 @@ class StickerConvert:
 
             if isinstance(self.in_f, Path):
                 with open(self.in_f, "rb") as f:
-                    self.result = f.read()
+                    result = f.read()
                 self.result_size = os.path.getsize(self.in_f)
             else:
-                self.result = self.in_f.read()
+                result = self.in_f.read()
                 self.result_size = self.in_f.getbuffer().nbytes
 
-            return self.compress_done(self.result)
+            return result
+        else:
+            return None
 
-        self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
-
+    def generate_steps_list(self) -> list[tuple[Optional[int], ...]]:
         steps_list: list[tuple[Optional[int], ...]] = []
         for step in range(self.opt_comp.steps, -1, -1):
             steps_list.append(
@@ -242,74 +322,7 @@ class StickerConvert:
                 )
             )
 
-        step_lower = 0
-        step_upper = self.opt_comp.steps
-
-        if self.opt_comp.size_max == [None, None]:
-            # No limit to size, create the best quality result
-            step_current = 0
-        else:
-            step_current = round((step_lower + step_upper) / 2)
-
-        self.frames_import()
-        while True:
-            param = steps_list[step_current]
-            self.res_w = param[0]
-            self.res_h = param[1]
-            self.quality = param[2]
-            if param[3] and self.codec_info_orig.fps:
-                fps_tmp = min(param[3], self.codec_info_orig.fps)
-                self.fps = self.fix_fps(fps_tmp)
-            else:
-                self.fps = Fraction(0)
-            self.color = param[4]
-
-            self.tmp_f = BytesIO()
-            msg = self.MSG_COMP.format(
-                self.in_f_name,
-                self.out_f_name,
-                self.res_w,
-                self.res_h,
-                self.quality,
-                int(self.fps),
-                self.color,
-                step_lower,
-                step_current,
-                step_upper,
-            )
-            self.cb.put(msg)
-
-            self.frames_processed = self.frames_drop(self.frames_raw)
-            self.frames_processed = self.frames_resize(self.frames_processed)
-            self.frames_export()
-
-            self.tmp_f.seek(0)
-            self.size = self.tmp_f.getbuffer().nbytes
-            if self.codec_info_orig.is_animated is True:
-                self.size_max = self.opt_comp.size_max_vid
-            else:
-                self.size_max = self.opt_comp.size_max_img
-
-            if not self.size_max or (
-                self.size <= self.size_max and self.size >= self.result_size
-            ):
-                self.result = self.tmp_f.read()
-                self.result_size = self.size
-                self.result_step = step_current
-
-            if step_upper - step_lower > 1:
-                if self.size <= self.size_max:  # type: ignore
-                    sign = "<"
-                    step_upper = step_current
-                else:
-                    sign = ">"
-                    step_lower = step_current
-                step_current = int((step_lower + step_upper) / 2)
-                self.recompress(sign)
-            elif self.result or not self.size_max:
-                return self.compress_done(self.result, self.result_step)  # type: ignore
-            else:
-                return self.compress_fail()
+        return steps_list
 
     def recompress(self, sign: str):
         msg = self.MSG_REDO_COMP.format(
