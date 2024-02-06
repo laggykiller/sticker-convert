@@ -136,9 +136,15 @@ class Executor:
                 results = work_func(*work_args, cb_queue, cb_return)  # type: ignore
                 results_queue.put(results)
             except Exception:
+                arg_dump: list[Any] = []
+                for i in work_args:
+                    if isinstance(i, CredOption):
+                        arg_dump.append("CredOption(REDACTED)")
+                    else:
+                        arg_dump.append(i)
                 e = "##### EXCEPTION #####\n"
                 e += "Function: " + repr(work_func) + "\n"
-                e += "Arguments: " + repr(work_args) + "\n"
+                e += "Arguments: " + repr(arg_dump) + "\n"
                 e += traceback.format_exc()
                 e += "#####################"
                 cb_queue.put(e)
