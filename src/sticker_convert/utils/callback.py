@@ -1,52 +1,34 @@
 #!/usr/bin/env python3
-from abc import ABC
-import copy
-from multiprocessing import Event
+from queue import Queue
+from multiprocessing.managers import SyncManager
 from typing import Callable, Optional, Union, Any
 
 from tqdm import tqdm
 
 
-class DummyCallbackReturn(ABC):
-    def set_response(self, response: Any):
-        pass
-
-    def get_response(self):
-        pass
-
-
-class CallbackReturn(DummyCallbackReturn):
+class CallbackReturn:
     def __init__(self):
-        self.response_event = Event()
-        self.response = None
+        self.manager = SyncManager()
+        self.manager.start()
+        
+        self.response_event = self.manager.Event()
+        self.response_queue: Queue[Any] = self.manager.Queue()
 
     def set_response(self, response: Any):
-        self.response = response
+        self.response_queue.put(response)
         self.response_event.set()
 
     def get_response(self):
         self.response_event.wait()
 
-        response = copy.deepcopy(self.response)
-        self.response = None
+        response = self.response_queue.get()
 
         self.response_event.clear()
 
         return response
 
 
-class DummyCallback(ABC):
-    def put(
-        self,
-        i: Union[
-            tuple[Optional[str], Optional[tuple[Any, ...]], Optional[dict[str, Any]]],
-            str,
-        ],
-    ) -> Union[str, bool, None]:
-        pass
-
-
-class Callback(DummyCallback):
+class Callback:
     def __init__(
         self,
         msg: Optional[Callable[..., None]] = None,
@@ -146,12 +128,11 @@ class Callback(DummyCallback):
             return True
         else:
             self.msg(
-                'If you do not want to get asked by this question, add "--no-confirm" flag'
+                '[If you do not want to get asked by this question, add "--no-confirm" flag]'
             )
             self.msg()
             result = input("Continue? [y/N] > ")
             if result.lower() != "y":
-                self.msg("Cancelling this run")
                 return False
             else:
                 return True

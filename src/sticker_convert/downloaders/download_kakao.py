@@ -175,7 +175,7 @@ class DownloadKakao(DownloadBase):
                     msg = "Warning: Cannot get item code.\n"
                     msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
                     msg += "Continue to download static stickers instead?"
-                    self.cb.put(("msg_block", (msg,), None))
+                    self.cb.put(("ask_bool", (msg,), None))
                     if self.cb_return:
                         response = self.cb_return.get_response()
                     else:
