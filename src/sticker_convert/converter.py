@@ -158,7 +158,7 @@ class StickerConvert:
             Callback,
         ],
         cb_return: CallbackReturn,
-    ) -> tuple[bool, Union[BytesIO, Path], Union[None, bytes, Path], int]:
+    ) -> tuple[bool, Union[None, BytesIO, Path], Union[None, bytes, Path], int]:
         sticker = StickerConvert(in_f, out_f, opt_comp, cb)
         result = sticker._convert()
         cb.put("update_bar")
@@ -342,7 +342,7 @@ class StickerConvert:
 
     def compress_done(
         self, data: bytes, result_step: Optional[int] = None
-    ) -> tuple[bool, Union[BytesIO, Path], Union[None, bytes, Path], int]:
+    ) -> tuple[bool, Union[None, BytesIO, Path], Union[None, bytes, Path], int]:
         if self.out_f.stem == "none":
             out_f = None
         elif self.out_f.stem == "bytes":

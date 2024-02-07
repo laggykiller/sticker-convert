@@ -6,8 +6,6 @@ from subprocess import CompletedProcess
 from pathlib import Path
 from typing import Any
 
-import pytest  # type: ignore
-
 
 def get_python_path() -> str:
     path = shutil.which("python3")

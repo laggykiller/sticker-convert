@@ -25,9 +25,9 @@ from tqdm import tqdm
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append("../src")
 
-from sticker_convert.converter import StickerConvert
-from sticker_convert.job_option import CompOption
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.converter import StickerConvert  # noqa: E402
+from sticker_convert.job_option import CompOption  # noqa: E402
+from sticker_convert.utils.callback import Callback, CallbackReturn  # noqa: E402
 
 processes_max = math.ceil(cpu_count() / 2)
 

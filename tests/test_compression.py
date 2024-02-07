@@ -2,14 +2,13 @@ import os
 import sys
 from pathlib import Path
 
-import pytest  # type: ignore
 
 from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SRC_DIR, run_cmd
 
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append("../src")
 
-from sticker_convert.utils.media.codec_info import CodecInfo
+from sticker_convert.utils.media.codec_info import CodecInfo  # noqa: E402
 
 SIZE_MAX_IMG = COMPRESSION_DICT.get("custom").get("size_max").get("img")
 SIZE_MAX_VID = COMPRESSION_DICT.get("custom").get("size_max").get("vid")

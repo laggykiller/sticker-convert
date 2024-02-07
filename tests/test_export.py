@@ -20,7 +20,7 @@ from tests.common import (
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append("../src")
 
-from sticker_convert.utils.media.codec_info import CodecInfo
+from sticker_convert.utils.media.codec_info import CodecInfo  # noqa: E402
 
 TEST_UPLOAD = os.environ.get("TEST_UPLOAD")
 
@@ -163,7 +163,7 @@ def test_upload_telegram_emoji(tmp_path):  # type: ignore
 def test_export_wastickers(tmp_path):  # type: ignore
     _run_sticker_convert(tmp_path, "whatsapp", "whatsapp")  # type: ignore
 
-    wastickers_path = Path(tmp_path, f"sticker-convert-test.wastickers")  # type: ignore
+    wastickers_path = Path(tmp_path, "sticker-convert-test.wastickers")  # type: ignore
     assert Path(wastickers_path).is_file()
 
 

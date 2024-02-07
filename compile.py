@@ -28,7 +28,7 @@ def get_arch() -> str:
                 arch = k
                 break
 
-    if arch == None:
+    if arch is None:
         arch = platform.machine().lower()
 
     return arch
@@ -64,9 +64,9 @@ def copy_if_universal(wheel_name: Path, in_dir: Path, out_dir: Path) -> bool:
         src_path = Path(in_dir, wheel_name.name)
         dst_path = Path(
             out_dir,
-            wheel_name.name
-            .replace("x86_64", "universal2")
-            .replace("arm64", "universal2"),
+            wheel_name.name.replace("x86_64", "universal2").replace(
+                "arm64", "universal2"
+            ),
         )
 
         shutil.copy(src_path, dst_path)
