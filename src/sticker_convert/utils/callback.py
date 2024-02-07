@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from queue import Queue
-from multiprocessing.managers import SyncManager
+from multiprocessing import Queue, Event
 from typing import Callable, Optional, Union, Any
 
 from tqdm import tqdm
@@ -8,11 +8,8 @@ from tqdm import tqdm
 
 class CallbackReturn:
     def __init__(self):
-        self.manager = SyncManager()
-        self.manager.start()
-
-        self.response_event = self.manager.Event()
-        self.response_queue: Queue[Any] = self.manager.Queue()
+        self.response_event = Event()
+        self.response_queue: Queue[Any] = Queue()
 
     def set_response(self, response: Any):
         self.response_queue.put(response)
