@@ -10,7 +10,7 @@ class CallbackReturn:
     def __init__(self):
         self.manager = SyncManager()
         self.manager.start()
-        
+
         self.response_event = self.manager.Event()
         self.response_queue: Queue[Any] = self.manager.Queue()
 
