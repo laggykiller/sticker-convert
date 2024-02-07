@@ -61,10 +61,10 @@ def copy_if_universal(wheel_name: Path, in_dir: Path, out_dir: Path) -> bool:
     if wheel_name.name.endswith("universal2.whl") or wheel_name.name.endswith(
         "any.whl"
     ):
-        src_path = Path(in_dir, wheel_name)
+        src_path = Path(in_dir, wheel_name.name)
         dst_path = Path(
             out_dir,
-            str(wheel_name)
+            wheel_name.name
             .replace("x86_64", "universal2")
             .replace("arm64", "universal2"),
         )
@@ -84,19 +84,19 @@ def create_universal_wheels(in_dir1: Path, in_dir2: Path, out_dir: Path):
         if copy_if_universal(wheel_name_2, in_dir2, out_dir):
             continue
 
-        wheel_path_1 = Path(in_dir1, wheel_name_1)
-        wheel_path_2 = Path(in_dir2, wheel_name_2)
+        wheel_path_1 = Path(in_dir1, wheel_name_1.name)
+        wheel_path_2 = Path(in_dir2, wheel_name_2.name)
         subprocess.run(
             ["delocate-fuse", wheel_path_1, wheel_path_2, "-w", str(out_dir)]
         )
         print(f"Created universal wheel {wheel_path_1} {wheel_path_2}")
 
-    for wheel_name in out_dir.iterdir():
-        wheel_name_new = wheel_name.name.replace("x86_64", "universal2").replace(
+    for wheel_path in out_dir.iterdir():
+        wheel_name_new = wheel_path.name.replace("x86_64", "universal2").replace(
             "arm64", "universal2"
         )
 
-        src_path = Path(out_dir, wheel_name)
+        src_path = Path(out_dir, wheel_path.name)
         dst_path = Path(out_dir, wheel_name_new)
 
         src_path.rename(dst_path)
