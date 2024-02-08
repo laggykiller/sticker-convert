@@ -104,8 +104,8 @@ class CompressWastickers(UploadBase):
                 self.add_metadata(Path(tempdir), pack_title, author)
                 with zipfile.ZipFile(out_f, "w", zipfile.ZIP_DEFLATED) as zipf:
                     for file in Path(tempdir).iterdir():
-                        file_path = Path(tempdir, file)
-                        zipf.write(file_path, arcname=file_path.stem)
+                        file_path = Path(tempdir, file.name)
+                        zipf.write(file_path, arcname=file_path.name)
 
             self.cb.put((out_f))
             urls.append(out_f)
