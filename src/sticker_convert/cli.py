@@ -375,10 +375,14 @@ class CLI:
     def get_opt_cred(self, args: Namespace) -> CredOption:
         creds_path = CONFIG_DIR / "creds.json"
         creds = {}
-        try:
-            creds = JsonManager.load_json(creds_path)
-        except JSONDecodeError:
-            self.cb.msg("Warning: creds.json content is corrupted")
+        if creds_path.is_file():
+            try:
+                creds = JsonManager.load_json(creds_path)
+            except JSONDecodeError:
+                self.cb.msg("Warning: creds.json content is corrupted")
+                creds = {}
+        else:
+            creds = {}
 
         if creds:
             self.cb.msg("Loaded credentials from creds.json")
