@@ -29,6 +29,7 @@
     - [MacOS complains that program from unidentified developer](#macos-complains-that-program-from-unidentified-developer)
     - [I want to upload stickers that are in stickers_output that have not been uploaded yet](#i-want-to-upload-stickers-that-are-in-stickers_output-that-have-not-been-uploaded-yet)
     - [Where are credentials stored?](#where-are-credentials-stored)
+    - [What does "power" and "steps" mean?](#what-does-power-and-steps-mean)
 - [Future plans](#future-plans)
 - [Credits](#credits)
 - [DISCLAIMER](#disclaimer)
@@ -396,6 +397,16 @@ By default, it should be in the same directory you run the program.
 However, if the directory is not writable (e.g. Installed it to `/Applications` in macOS, or `/usr/local/bin` in Linux), then `creds.json` is stored in...
 - Windows: `%APPDATA%/sticker-convert/creds.json`
 - Other: `~/.config/sticker-convert/creds.json`
+
+### What does "power" and "steps" mean?
+It's actually a bisection method to look for most optimal compression setting. The `power` provides a way to make the values 'deviate' to one side (Negative power would cause sticker-convert to try more large values; Power set to 1 would cause sticker-convert to distribute it's trial evenly between the min and max values; Power more than 1 would cause sticker-convert to try more small values)
+
+To illustrate, let's look at what `--steps 16 --fps-min 5 --fps-max 30 --fps-power 3.0` does.
+1. We would start from `8/16` (step 8 out of 16 steps), which is the mid-point.
+2. We would calculate a factor using power: `(8/16)^3.0 = 0.125`
+3. The fps setting is `round((max - min) * step / steps * factor + min)`, which is `round((16-1) * 8 / 16 * 0.125 + 5) = round(5.9375) = 6`. This means fps would be set to 6.
+4. If the file size is too small, then we would try `4/16` (step 4 out of 16 steps, which is midpoint of 0 to 8.). Else, we would try `10/16` (step 10 out of 16 steps, which is midpoint of 8 to 16).
+5. Repeat 1-3.
 
 ## Future plans
 See [docs/TODO.md](docs/TODO.md)
