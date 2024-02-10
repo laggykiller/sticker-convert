@@ -13,6 +13,7 @@ Alternatively, follow instructions below to get them manually:
 3. Launch Signal Desktop BETA VERSION
 4. On the top bar, go to `View -> Toggle Developers tools`
 5. Open console
+    - If you want to copy-paste commands, type `allow pasting` and press enter first
     - `uuid` is the output of running: `window.SignalDebug.getReduxState().items.uuid_id`
     - `password` is the output of running: `window.SignalDebug.getReduxState().items.password`
 
