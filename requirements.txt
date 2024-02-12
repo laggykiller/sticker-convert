@@ -12,6 +12,6 @@ requests~=2.31.0
 rlottie_python~=1.2.1
 selenium~=4.17.2
 signalstickers-client~=3.3.0
-tqdm~=4.66.1
+tqdm~=4.66.2
 ttkbootstrap-fork-laggykiller~=1.5.1
 webp~=0.3.0
