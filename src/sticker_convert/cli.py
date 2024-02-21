@@ -449,6 +449,7 @@ class CLI:
                     self.cb.msg(
                         f"Got uuid and password successfully: {uuid}, {password}"
                     )
+                    m.close()
                     break
 
         if args.line_get_auth:
