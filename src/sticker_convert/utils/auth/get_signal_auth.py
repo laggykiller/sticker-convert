@@ -99,6 +99,8 @@ class GetSignalAuth:
             chromedriver_which = shutil.which("chromedriver")
             if chromedriver_which:
                 chromedriver_path = Path(chromedriver_which)
+            else:
+                chromedriver_path = None
 
         if chromedriver_path:
             status, output_str = RunBin.run_cmd(
@@ -205,11 +207,6 @@ class GetSignalAuth:
         self.driver = webdriver.Chrome(options=options, service=service)
 
     def get_cred(self) -> tuple[Optional[str], Optional[str]]:
-        success = self.launch_signal_desktop()
-
-        if not success:
-            return None, None
-
         # https://stackoverflow.com/a/73456344
         uuid: Optional[str] = None
         password: Optional[str] = None
@@ -231,8 +228,8 @@ class GetSignalAuth:
         except JavascriptException:
             pass
 
-        assert isinstance(uuid, str)
-        assert isinstance(password, str)
+        assert uuid is None or isinstance(uuid, str)
+        assert password is None or isinstance(password, str)
         return uuid, password
 
     def close(self):

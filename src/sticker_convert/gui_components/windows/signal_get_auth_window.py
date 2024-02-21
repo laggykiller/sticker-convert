@@ -69,6 +69,7 @@ class SignalGetAuthWindow(BaseWindow):
 
     def cb_login_thread(self, *args: Any):
         m = GetSignalAuth(cb_msg=self.gui.cb_msg, cb_ask_str=self.cb_ask_str_signal)
+        m.launch_signal_desktop()
 
         uuid, password = None, None
         while Toplevel.winfo_exists(self):

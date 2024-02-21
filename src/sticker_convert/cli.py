@@ -436,6 +436,7 @@ class CLI:
 
         if args.signal_get_auth:
             m = GetSignalAuth(cb_msg=self.cb.msg, cb_ask_str=self.cb.ask_str)
+            m.launch_signal_desktop()
 
             uuid, password = None, None
             while True:
