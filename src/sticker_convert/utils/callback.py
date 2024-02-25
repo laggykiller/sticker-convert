@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from queue import Queue
 from multiprocessing import Queue, Event
 from typing import Callable, Optional, Union, Any
 

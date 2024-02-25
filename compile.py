@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 sys.path.append("./src")
-from sticker_convert.version import __version__
+from sticker_convert import __version__
 
 conan_archs = {
     "x86_64": ["amd64", "x86_64", "x64"],

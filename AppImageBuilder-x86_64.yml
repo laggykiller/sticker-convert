@@ -46,8 +46,6 @@ AppDir:
       - python3.11
       - python3.11-tk
       - python3.11-distutils
-      - binutils
-      - psmisc
     exclude: []
   
   after_bundle: |

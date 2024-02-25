@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 from functools import partial
-from threading import Thread
+from subprocess import Popen
 from typing import Any
 
-from ttkbootstrap import Button, Frame, Label, Toplevel  # type: ignore
+from ttkbootstrap import Button, Frame, Label  # type: ignore
 
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
@@ -20,75 +20,64 @@ class SignalGetAuthWindow(BaseWindow):
         self.cb_ask_str_signal = partial(self.gui.cb_ask_str, parent=self)
 
         self.frame_info = Frame(self.scrollable_frame)
-        self.frame_start_btn = Frame(self.scrollable_frame)
+        self.frame_btns = Frame(self.scrollable_frame)
 
         self.frame_info.grid(column=0, row=0, sticky="news", padx=3, pady=3)
-        self.frame_start_btn.grid(column=0, row=1, sticky="news", padx=3, pady=3)
+        self.frame_btns.grid(column=0, row=1, sticky="news", padx=3, pady=3)
 
         # Info frame
-        self.explanation1_lbl = Label(
+        self.explanation_lbl = Label(
             self.frame_info,
-            text="Please install Signal Desktop BETA VERSION",
-            justify="left",
-            anchor="w",
-        )
-        self.explanation2_lbl = Label(
-            self.frame_info,
-            text="After installation, you need to login to Signal Desktop",
-            justify="left",
-            anchor="w",
-        )
-        self.explanation3_lbl = Label(
-            self.frame_info,
-            text="uuid and password will be automatically fetched",
+            text="Please install Signal Desktop and login first.",
             justify="left",
             anchor="w",
         )
 
-        self.explanation1_lbl.grid(
+        self.explanation_lbl.grid(
             column=0, row=0, columnspan=3, sticky="w", padx=3, pady=3
-        )
-        self.explanation2_lbl.grid(
-            column=0, row=1, columnspan=3, sticky="w", padx=3, pady=3
-        )
-        self.explanation3_lbl.grid(
-            column=0, row=2, columnspan=3, sticky="w", padx=3, pady=3
         )
 
         # Start button frame
-        self.login_btn = Button(
-            self.frame_start_btn, text="Get uuid and password", command=self.cb_login
+        self.launch_btn = Button(
+            self.frame_btns, text="Launch Signal Desktop", command=self.cb_launch_signal
         )
 
+        self.login_btn = Button(
+            self.frame_btns, text="Get uuid and password", command=self.cb_login
+        )
+
+        self.launch_btn.pack()
         self.login_btn.pack()
 
         GUIUtils.finalize_window(self)
 
     def cb_login(self):
-        Thread(target=self.cb_login_thread, daemon=True).start()
+        m = GetSignalAuth()
+        uuid, password, msg = m.get_cred()
 
-    def cb_login_thread(self, *args: Any):
-        m = GetSignalAuth(cb_msg=self.gui.cb_msg, cb_ask_str=self.cb_ask_str_signal)
-        m.launch_signal_desktop()
+        if uuid and password:
+            if not self.gui.creds.get("signal"):
+                self.gui.creds["signal"] = {}
+            self.gui.creds["signal"]["uuid"] = uuid
+            self.gui.creds["signal"]["password"] = password
+            self.gui.signal_uuid_var.set(uuid)
+            self.gui.signal_password_var.set(password)
 
-        uuid, password = None, None
-        while Toplevel.winfo_exists(self):
-            uuid, password = m.get_cred()
+            self.gui.save_creds()
+            self.gui.highlight_fields()
 
-            if uuid and password:
-                if not self.gui.creds.get("signal"):
-                    self.gui.creds["signal"] = {}
-                self.gui.creds["signal"]["uuid"] = uuid
-                self.gui.creds["signal"]["password"] = password
-                self.gui.signal_uuid_var.set(uuid)
-                self.gui.signal_password_var.set(password)
-                m.close()
+        self.cb_msg_block_signal(msg)
 
-                self.cb_msg_block_signal(
-                    f"Got uuid and password successfully:\nuuid={uuid}\npassword={password}"
-                )
-                self.gui.save_creds()
-                self.gui.highlight_fields()
-                return
-
-        self.cb_msg_block_signal("Failed to get uuid and password")
+    def cb_launch_signal(self):
+        m = GetSignalAuth()
+        signal_bin_path, signal_user_data_dir = m.get_signal_desktop()
+        if signal_bin_path:
+            Popen(
+                [
+                    signal_bin_path,
+                    "--no-sandbox",
+                    f"--user-data-dir={signal_user_data_dir}",
+                ]
+            )
+        else:
+            self.cb_msg_block_signal("Error: Signal Desktop not installed.")

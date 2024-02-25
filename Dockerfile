@@ -67,13 +67,13 @@ RUN apt purge -y curl wget gpg git && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 FROM base-gui AS full
-# Install signal-desktop-beta
+# Install signal-desktop
 RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
     cat signal-desktop-keyring.gpg | tee -a /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null && \
     echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main' |\
     tee -a /etc/apt/sources.list.d/signal-xenial.list && \
     apt update -y && \
-    apt install --no-install-recommends -y signal-desktop-beta
+    apt install --no-install-recommends -y signal-desktop
 
 RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \
@@ -81,6 +81,4 @@ RUN apt purge -y curl wget gpg git && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 RUN mkdir -p '/root/.config/Signal' && \
-    mkdir -p '/root/.config/Signal Beta' && \
-    chmod 777 '/root/.config/Signal' && \
-    chmod 777 '/root/.config/Signal Beta'
+    chmod 777 '/root/.config/Signal'

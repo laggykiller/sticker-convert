@@ -4,6 +4,8 @@
 
 You can get them easily with `Generate` button (In GUI) or `--signal-get-auth` (In CLI)
 
+Since v2.7.0, you can get Signal uuid and password from non-beta version of Signal.
+
 Alternatively, follow instructions below to get them manually:
 
 ![../imgs/signal-uuid-password.png](../imgs/signal-uuid-password.png)

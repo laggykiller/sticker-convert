@@ -435,22 +435,15 @@ class CLI:
                 self.cb.msg(f"Got auth_token successfully: {auth_token}")
 
         if args.signal_get_auth:
-            m = GetSignalAuth(cb_msg=self.cb.msg, cb_ask_str=self.cb.ask_str)
-            m.launch_signal_desktop()
+            m = GetSignalAuth()
 
-            uuid, password = None, None
-            while True:
-                uuid, password = m.get_cred()
+            uuid, password, msg = m.get_cred()
 
-                if uuid and password:
-                    opt_cred.signal_uuid = uuid
-                    opt_cred.signal_password = password
+            if uuid and password:
+                opt_cred.signal_uuid = uuid
+                opt_cred.signal_password = password
 
-                    self.cb.msg(
-                        f"Got uuid and password successfully: {uuid}, {password}"
-                    )
-                    m.close()
-                    break
+            self.cb.msg(msg)
 
         if args.line_get_auth:
             m = GetLineAuth()
