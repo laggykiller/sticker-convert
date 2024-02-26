@@ -89,22 +89,24 @@ class GetSignalAuth:
         db_conn = sqlite3.connect(signal_database.as_posix())  # type: ignore
         db_cursor = db_conn.cursor()
         db_cursor.execute(f'PRAGMA key="{db_key}"')
-        db_cursor.execute("SELECT * FROM items")
-        result = db_cursor.fetchall()
-        db_conn.close()
 
         uuid_id = None
+        result = db_cursor.execute("SELECT * FROM items WHERE id='uuid_id'").fetchone()
+        if result:
+            uuid_id = json.loads(result[1])['value']
+
         password = None
-        for r in result:
-            if "uuid_id" in r:
-                uuid_id = json.loads(r[1])["value"]
-            if "password" in r:
-                password = json.loads(r[1])["value"]
-            if uuid_id and password:
-                msg = "Got uuid and password successfully:\n"
-                msg += f"{uuid_id=}\n"
-                msg += f"{password=}"
-                return uuid_id, password, msg
+        result = db_cursor.execute("SELECT * FROM items WHERE id='password'").fetchone()
+        if result:
+            password = json.loads(result[1])['value']
+
+        db_conn.close()
+        
+        if uuid_id and password:
+            msg = "Got uuid and password successfully:\n"
+            msg += f"{uuid_id=}\n"
+            msg += f"{password=}"
+            return uuid_id, password, msg
 
         msg = "Signal Desktop installed and Database found,\n"
         msg += "but uuid and password not found.\n"
