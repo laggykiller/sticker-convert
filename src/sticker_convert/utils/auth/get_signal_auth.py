@@ -86,7 +86,7 @@ class GetSignalAuth:
             msg += f"{signal_user_data_dir=}\n"
             return None, None, msg
 
-        db_conn = sqlite3.connect(signal_database.as_posix())  # type: ignore
+        db_conn = sqlite3.connect(signal_database.as_posix())
         db_cursor = db_conn.cursor()
         db_cursor.execute(f'PRAGMA key="{db_key}"')
 
