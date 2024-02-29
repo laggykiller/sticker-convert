@@ -63,7 +63,7 @@ class DownloadTelegram(DownloadBase):
                 )
             )
 
-            emoji_dict = {}
+            emoji_dict: dict[str, str] = {}
             for num, i in enumerate(sticker_set.stickers):
                 sticker = await i.get_file(
                     read_timeout=30,
