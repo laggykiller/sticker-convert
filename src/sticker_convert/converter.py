@@ -6,11 +6,13 @@ from fractions import Fraction
 from io import BytesIO
 from pathlib import Path
 from queue import Queue
-from typing import Optional, Union, Any
+from typing import Optional, Union, Any, TYPE_CHECKING
 
-from av.video.plane import VideoPlane
 import numpy as np
 from PIL import Image
+
+if TYPE_CHECKING:
+    from av.video.plane import VideoPlane
 
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import Callback, CallbackReturn
@@ -48,7 +50,7 @@ def get_step_value(
 
 
 def useful_array(
-    plane: VideoPlane, bytes_per_pixel: int = 1, dtype: str = "uint8"
+    plane: "VideoPlane", bytes_per_pixel: int = 1, dtype: str = "uint8"
 ) -> np.ndarray[Any, Any]:
     total_line_size = abs(plane.line_size)
     useful_line_size = plane.width * bytes_per_pixel
