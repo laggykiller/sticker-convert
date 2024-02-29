@@ -93,15 +93,15 @@ class GetSignalAuth:
         uuid_id = None
         result = db_cursor.execute("SELECT * FROM items WHERE id='uuid_id'").fetchone()
         if result:
-            uuid_id = json.loads(result[1])['value']
+            uuid_id = json.loads(result[1])["value"]
 
         password = None
         result = db_cursor.execute("SELECT * FROM items WHERE id='password'").fetchone()
         if result:
-            password = json.loads(result[1])['value']
+            password = json.loads(result[1])["value"]
 
         db_conn.close()
-        
+
         if uuid_id and password:
             msg = "Got uuid and password successfully:\n"
             msg += f"{uuid_id=}\n"
