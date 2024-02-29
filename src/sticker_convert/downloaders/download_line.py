@@ -317,7 +317,7 @@ class DownloadLine(DownloadBase):
                 self.cb_return.get_response()
 
         with open(line_sticker_text_path, "r", encoding="utf-8") as f:
-            self.sticker_text_dict: dict[int, Any] = json.load(f)
+            self.sticker_text_dict = json.load(f)
 
     def get_custom_sticker_text_urls(self) -> list[tuple[str, Path]]:
         custom_sticker_text_urls: list[tuple[str, Path]] = []

@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import io
+from io import BytesIO
 import mmap
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, BinaryIO
 
 from PIL import Image, UnidentifiedImageError
 
 
 class CodecInfo:
-    def __init__(self, file: Union[Path, io.BytesIO], file_ext: Optional[str] = None):
-        if not file_ext and isinstance(file, Path):
+    def __init__(self, file: Union[Path, bytes], file_ext: Optional[str] = None):
+        self.file_ext: Optional[str]
+        if file_ext is not None and isinstance(file, Path):
             self.file_ext = CodecInfo.get_file_ext(file)
         else:
             self.file_ext = file_ext
@@ -25,8 +26,10 @@ class CodecInfo:
 
     @staticmethod
     def get_file_fps_frames_duration(
-        file: Union[Path, io.BytesIO], file_ext: Optional[str] = None
+        file: Union[Path, bytes], file_ext: Optional[str] = None
     ) -> tuple[float, int, int]:
+        fps: float
+
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
@@ -52,9 +55,7 @@ class CodecInfo:
         return fps, frames, duration
 
     @staticmethod
-    def get_file_fps(
-        file: Union[Path, io.BytesIO], file_ext: Optional[str] = None
-    ) -> float:
+    def get_file_fps(file: Union[Path, bytes], file_ext: Optional[str] = None) -> float:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
@@ -76,7 +77,7 @@ class CodecInfo:
 
     @staticmethod
     def get_file_frames(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         file_ext: Optional[str] = None,
         check_anim: bool = False,
     ) -> int:
@@ -103,7 +104,7 @@ class CodecInfo:
 
     @staticmethod
     def get_file_duration(
-        file: Union[Path, io.BytesIO], file_ext: Optional[str] = None
+        file: Union[Path, bytes], file_ext: Optional[str] = None
     ) -> int:
         # Return duration in miliseconds
         if not file_ext and isinstance(file, Path):
@@ -125,47 +126,57 @@ class CodecInfo:
         return duration
 
     @staticmethod
-    def _get_file_fps_tgs(file: Union[Path, io.BytesIO]) -> int:
+    def _get_file_fps_tgs(file: Union[Path, bytes]) -> int:
         from rlottie_python.rlottie_wrapper import LottieAnimation
 
         if isinstance(file, Path):
-            tgs = file.as_posix()
+            with LottieAnimation.from_tgs(file.as_posix()) as anim:
+                return anim.lottie_animation_get_framerate()
         else:
-            tgs = file
+            import gzip
 
-        with LottieAnimation.from_tgs(tgs) as anim:  # type: ignore
-            return anim.lottie_animation_get_framerate()  # type: ignore
+            with gzip.open(BytesIO(file)) as f:
+                data = f.read().decode(encoding="utf-8")
+            with LottieAnimation.from_data(data) as anim:
+                return anim.lottie_animation_get_framerate()
 
     @staticmethod
-    def _get_file_frames_tgs(file: Union[Path, io.BytesIO]) -> int:
+    def _get_file_frames_tgs(file: Union[Path, bytes]) -> int:
         from rlottie_python.rlottie_wrapper import LottieAnimation
 
         if isinstance(file, Path):
-            tgs = file.as_posix()
+            with LottieAnimation.from_tgs(file.as_posix()) as anim:
+                return anim.lottie_animation_get_totalframe()
         else:
-            tgs = file
+            import gzip
 
-        with LottieAnimation.from_tgs(tgs) as anim:  # type: ignore
-            return anim.lottie_animation_get_totalframe()  # type: ignore
+            with gzip.open(BytesIO(file)) as f:
+                data = f.read().decode(encoding="utf-8")
+            with LottieAnimation.from_data(data) as anim:
+                return anim.lottie_animation_get_totalframe()
 
     @staticmethod
-    def _get_file_fps_frames_tgs(file: Union[Path, io.BytesIO]) -> tuple[int, int]:
+    def _get_file_fps_frames_tgs(file: Union[Path, bytes]) -> tuple[int, int]:
         from rlottie_python.rlottie_wrapper import LottieAnimation
 
         if isinstance(file, Path):
-            tgs = file.as_posix()
+            with LottieAnimation.from_tgs(file.as_posix()) as anim:
+                fps = anim.lottie_animation_get_framerate()
+                frames = anim.lottie_animation_get_totalframe()
         else:
-            tgs = file
+            import gzip
 
-        with LottieAnimation.from_tgs(tgs) as anim:  # type: ignore
-            fps = anim.lottie_animation_get_framerate()  # type: ignore
-            frames = anim.lottie_animation_get_totalframe()  # type: ignore
+            with gzip.open(BytesIO(file)) as f:
+                data = f.read().decode(encoding="utf-8")
+            with LottieAnimation.from_data(data) as anim:
+                fps = anim.lottie_animation_get_framerate()
+                frames = anim.lottie_animation_get_totalframe()
 
-        return fps, frames  # type: ignore
+        return fps, frames
 
     @staticmethod
     def _get_file_frames_duration_pillow(
-        file: Union[Path, io.BytesIO], frames_only: bool = False
+        file: Union[Path, bytes], frames_only: bool = False
     ) -> tuple[int, int]:
         total_duration = 0
 
@@ -183,13 +194,19 @@ class CodecInfo:
 
     @staticmethod
     def _get_file_frames_duration_webp(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
     ) -> tuple[int, int]:
         total_duration = 0
         frames = 0
 
-        with open(file, "r+b") as f:  # type: ignore
-            with mmap.mmap(f.fileno(), 0) as mm:  # type: ignore
+        f: BinaryIO
+        if isinstance(file, Path):
+            f = open(file, "r+b")
+        else:
+            f = BytesIO(file)
+
+        try:
+            with mmap.mmap(f.fileno(), 0) as mm:
                 while True:
                     anmf_pos = mm.find(b"ANMF")
                     if anmf_pos == -1:
@@ -201,6 +218,8 @@ class CodecInfo:
                     )
                     total_duration += int.from_bytes(frame_duration, "little")
                     frames += 1
+        finally:
+            f.close()
 
         if frames == 0:
             return 1, 0
@@ -209,7 +228,7 @@ class CodecInfo:
 
     @staticmethod
     def _get_file_frames_duration_av(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         frames_to_iterate: Optional[int] = None,
         frames_only: bool = False,
     ) -> tuple[int, int]:
@@ -218,10 +237,11 @@ class CodecInfo:
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
 
+        file_ref: Union[str, BinaryIO]
         if isinstance(file, Path):
             file_ref = file.as_posix()
         else:
-            file_ref = file
+            file_ref = BytesIO(file)
 
         with av.open(file_ref) as container:  # type: ignore
             stream = container.streams.video[0]
@@ -254,16 +274,15 @@ class CodecInfo:
                 return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))  # type: ignore
 
     @staticmethod
-    def get_file_codec(
-        file: Union[Path, io.BytesIO], file_ext: Optional[str] = None
-    ) -> str:
+    def get_file_codec(file: Union[Path, bytes], file_ext: Optional[str] = None) -> str:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
+        file_ref: Union[str, BinaryIO]
         if isinstance(file, Path):
             file_ref = file.as_posix()
         else:
-            file_ref = file
+            file_ref = BytesIO(file)
 
         codec = None
         animated = False
@@ -301,21 +320,24 @@ class CodecInfo:
 
     @staticmethod
     def get_file_res(
-        file: Union[Path, io.BytesIO], file_ext: Optional[str] = None
+        file: Union[Path, bytes], file_ext: Optional[str] = None
     ) -> tuple[int, int]:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if isinstance(file, Path):
-            file_ref = file.as_posix()
-        else:
-            file_ref = file
-
         if file_ext == ".tgs":
             from rlottie_python.rlottie_wrapper import LottieAnimation
 
-            with LottieAnimation.from_tgs(file_ref) as anim:  # type: ignore
-                width, height = anim.lottie_animation_get_size()  # type: ignore
+            if isinstance(file, Path):
+                with LottieAnimation.from_tgs(file.as_posix()) as anim:
+                    width, height = anim.lottie_animation_get_size()
+            else:
+                import gzip
+
+                with gzip.open(BytesIO(file)) as f:
+                    data = f.read().decode(encoding="utf-8")
+                with LottieAnimation.from_data(data) as anim:
+                    width, height = anim.lottie_animation_get_size()
         elif file_ext in (".webp", ".png", ".apng"):
             with Image.open(file) as im:
                 width = im.width
@@ -323,19 +345,25 @@ class CodecInfo:
         else:
             import av
 
+            file_ref: Union[str, BinaryIO]
+            if isinstance(file, Path):
+                file_ref = file.as_posix()
+            else:
+                file_ref = BytesIO(file)
+
             with av.open(file_ref) as container:  # type: ignore
                 stream = container.streams.video[0]
                 width = stream.width
                 height = stream.height
 
-        return width, height  # type: ignore
+        return width, height
 
     @staticmethod
     def get_file_ext(file: Path) -> str:
         return Path(file).suffix.lower()
 
     @staticmethod
-    def is_anim(file: Union[Path, io.BytesIO]) -> bool:
+    def is_anim(file: Union[Path, bytes]) -> bool:
         if CodecInfo.get_file_frames(file, check_anim=True) > 1:
             return True
         else:

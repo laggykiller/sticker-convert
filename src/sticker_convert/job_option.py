@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Any, Optional, Union
 
 import json
-import math
+from math import ceil
 from dataclasses import dataclass, field
 from multiprocessing import cpu_count
 from pathlib import Path
@@ -74,7 +74,7 @@ class CompOption(BaseOption):
     cache_dir: Optional[str] = None
     default_emoji: str = "😀"
     no_compress: Optional[bool] = None
-    processes: int = math.ceil(cpu_count() / 2)
+    processes: int = ceil(cpu_count() / 2)
     animated: Optional[bool] = None
     square: Optional[bool] = None
 
@@ -111,97 +111,75 @@ class CompOption(BaseOption):
             "square": self.square,
         }
 
-    @property
-    def size_max(self) -> list[Optional[int]]:
+    def get_size_max(self) -> list[Optional[int]]:
         return [self.size_max_img, self.size_max_vid]
 
-    @size_max.setter
-    def size_max(self, value: Optional[int]):
+    def set_size_max(self, value: Optional[int]):
         self.size_max_img, self.size_max_vid = to_int(value), to_int(value)
 
-    @property
-    def format(self) -> list[list[str]]:
+    def get_format(self) -> list[list[str]]:
         return [self.format_img, self.format_vid]
 
-    @format.setter
-    def format(self, value: list[str]):
+    def set_format(self, value: list[str]):
         self.format_img, self.format_vid = value, value
 
-    @property
-    def fps(self) -> list[Optional[int]]:
+    def get_fps(self) -> list[Optional[int]]:
         return [self.fps_min, self.fps_max]
 
-    @fps.setter
-    def fps(self, value: Optional[int]):
+    def set_fps(self, value: Optional[int]):
         self.fps_min, self.fps_max = to_int(value), to_int(value)
 
-    @property
-    def res(self) -> list[list[Optional[int]]]:
-        return [self.res_w, self.res_h]
+    def get_res(self) -> list[list[Optional[int]]]:
+        return [self.get_res_w(), self.get_res_h()]
 
-    @res.setter
-    def res(self, value: Optional[int]):
+    def set_res(self, value: Optional[int]):
         self.res_w_min = to_int(value)
         self.res_w_max = to_int(value)
         self.res_h_min = to_int(value)
         self.res_h_max = to_int(value)
 
-    @property
-    def res_max(self) -> list[Optional[int]]:
+    def get_res_max(self) -> list[Optional[int]]:
         return [self.res_w_max, self.res_h_max]
 
-    @res_max.setter
-    def res_max(self, value: Optional[int]):
+    def set_res_max(self, value: Optional[int]):
         self.res_w_max = to_int(value)
         self.res_h_max = to_int(value)
 
-    @property
-    def res_min(self) -> list[Optional[int]]:
+    def get_res_min(self) -> list[Optional[int]]:
         return [self.res_w_min, self.res_h_min]
 
-    @res_min.setter
-    def res_min(self, value: Optional[int]):
+    def set_res_min(self, value: Optional[int]):
         self.res_w_min = to_int(value)
         self.res_h_min = to_int(value)
 
-    @property
-    def res_w(self) -> list[Optional[int]]:
+    def get_res_w(self) -> list[Optional[int]]:
         return [self.res_w_min, self.res_w_max]
 
-    @res_w.setter
-    def res_w(self, value: Optional[int]):
+    def set_res_w(self, value: Optional[int]):
         self.res_w_min, self.res_w_max = to_int(value), to_int(value)
 
-    @property
-    def res_h(self) -> list[Optional[int]]:
+    def get_res_h(self) -> list[Optional[int]]:
         return [self.res_h_min, self.res_h_max]
 
-    @res_h.setter
-    def res_h(self, value: Optional[int]):
+    def set_res_h(self, value: Optional[int]):
         self.res_h_min, self.res_h_max = to_int(value), to_int(value)
 
-    @property
-    def quality(self) -> list[Optional[int]]:
+    def get_quality(self) -> list[Optional[int]]:
         return [self.quality_min, self.quality_max]
 
-    @quality.setter
-    def quality(self, value: Optional[int]):
+    def set_quality(self, value: Optional[int]):
         self.quality_min, self.quality_max = to_int(value), to_int(value)
 
-    @property
-    def color(self) -> list[Optional[int]]:
+    def get_color(self) -> list[Optional[int]]:
         return [self.color_min, self.color_max]
 
-    @color.setter
-    def color(self, value: Optional[int]):
+    def set_color(self, value: Optional[int]):
         self.color_min, self.color_max = to_int(value), to_int(value)
 
-    @property
-    def duration(self) -> list[Optional[int]]:
+    def get_duration(self) -> list[Optional[int]]:
         return [self.duration_min, self.duration_max]
 
-    @duration.setter
-    def duration(self, value: Optional[int]):
+    def set_duration(self, value: Optional[int]):
         self.duration_min, self.duration_max = to_int(value), to_int(value)
 
 

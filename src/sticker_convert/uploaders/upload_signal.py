@@ -23,13 +23,13 @@ class UploadSignal(UploadBase):
         super(UploadSignal, self).__init__(*args, **kwargs)
 
         base_spec = CompOption()
-        base_spec.size_max = 300000
-        base_spec.res_max = 512
+        base_spec.set_size_max(300000)
+        base_spec.set_res_max(512)
         base_spec.duration_max = 3000
         base_spec.square = True
 
         self.png_spec = copy.deepcopy(base_spec)
-        self.png_spec.format = [".apng"]
+        self.png_spec.set_format([".apng"])
 
         self.webp_spec = copy.deepcopy(base_spec)
         self.webp_spec.format_img = [".webp"]

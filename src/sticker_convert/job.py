@@ -91,11 +91,11 @@ class Executor:
             if isinstance(i, tuple):
                 action = i[0]
                 if len(i) >= 2:
-                    args: Optional[tuple[str, ...]] = i[1] if i[1] else tuple()
+                    args: tuple[str, ...] = i[1] if i[1] else tuple()
                 else:
                     args = tuple()
                 if len(i) >= 3:
-                    kwargs: Optional[dict[str, str]] = i[2] if i[2] else dict()
+                    kwargs: dict[str, str] = i[2] if i[2] else dict()
                 else:
                     kwargs = dict()
             else:

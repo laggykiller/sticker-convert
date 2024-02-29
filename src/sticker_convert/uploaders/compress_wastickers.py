@@ -27,25 +27,25 @@ class CompressWastickers(UploadBase):
             duration_max=10000,
             square=True,
         )
-        base_spec.res = 512
-        base_spec.format = [".webp"]
+        base_spec.set_res(512)
+        base_spec.set_format([".webp"])
 
         self.spec_cover = CompOption(
             size_max_img=50000,
             size_max_vid=50000,
             animated=False,
         )
-        self.spec_cover.res = 96
-        self.spec_cover.res = 96
-        self.spec_cover.fps = 0
+        self.spec_cover.set_res(96)
+        self.spec_cover.set_res(96)
+        self.spec_cover.set_fps(0)
         self.format = [".png"]
 
         self.webp_spec = copy.deepcopy(base_spec)
-        self.webp_spec.format = [".webp"]
+        self.webp_spec.set_format([".webp"])
         self.webp_spec.animated = None if self.opt_comp.fake_vid else True
 
         self.png_spec = copy.deepcopy(base_spec)
-        self.png_spec.format = [".png"]
+        self.png_spec.set_format([".png"])
         self.png_spec.animated = False
 
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)

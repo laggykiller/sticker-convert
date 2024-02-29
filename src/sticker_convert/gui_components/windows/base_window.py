@@ -17,6 +17,7 @@ class BaseWindow(Toplevel):
 
         GUIUtils.set_icon(self)
 
+        self.mousewheel: tuple[str, ...]
         if platform.system() == "Windows":
             self.mousewheel = ("<MouseWheel>",)
             self.delta_divide = 120

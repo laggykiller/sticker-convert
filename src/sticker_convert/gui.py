@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import math
+from math import ceil
 import os
 import platform
 import signal
@@ -222,7 +222,7 @@ class GUI(Window):
     def load_jsons(self):
         self.help = JsonManager.load_json(ROOT_DIR / "resources/help.json")
         self.input_presets = JsonManager.load_json(ROOT_DIR / "resources/input.json")
-        self.compression_presets = JsonManager.load_json(
+        self.compression_presets: dict[str, dict[str, Any]] = JsonManager.load_json(
             ROOT_DIR / "resources/compression.json"
         )
         self.output_presets = JsonManager.load_json(ROOT_DIR / "resources/output.json")
@@ -266,7 +266,11 @@ class GUI(Window):
             del comp_custom["preset"]
             del comp_custom["no_compress"]
         else:
-            comp_custom = self.compression_presets.get("custom")
+            compression_presets_custom = self.compression_presets.get("custom")
+            if compression_presets_custom is None:
+                comp_custom = {}
+            else:
+                comp_custom = compression_presets_custom
 
         self.settings = {
             "input": self.get_opt_input().to_dict(),
@@ -323,11 +327,12 @@ class GUI(Window):
         self.comp_preset_var.set(
             self.settings.get("comp", {}).get("preset", default_comp_preset)
         )
-        if self.settings.get("comp_custom"):
-            self.compression_presets["custom"] = self.settings.get("comp_custom")
+        comp_custom = self.settings.get("comp_custom")
+        if comp_custom:
+            self.compression_presets["custom"] = comp_custom
         self.cache_dir_var.set(self.settings.get("comp", {}).get("cache_dir", ""))
         self.processes_var.set(
-            self.settings.get("comp", {}).get("processes", math.ceil(cpu_count() / 2))
+            self.settings.get("comp", {}).get("processes", ceil(cpu_count() / 2))
         )
         self.default_output_mode: str = self.settings.get("output", {}).get(
             "option", "signal"

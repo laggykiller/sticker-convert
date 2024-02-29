@@ -8,13 +8,13 @@ from tqdm import tqdm
 class CallbackReturn:
     def __init__(self):
         self.response_event = Event()
-        self.response_queue: Queue[Any] = Queue()
+        self.response_queue: Queue[Union[bool, str, None]] = Queue()
 
-    def set_response(self, response: Any):
+    def set_response(self, response: Union[bool, str, None]):
         self.response_queue.put(response)
         self.response_event.set()
 
-    def get_response(self):
+    def get_response(self) -> Union[bool, str, None]:
         self.response_event.wait()
 
         response = self.response_queue.get()
@@ -35,7 +35,7 @@ class Callback:
         silent: bool = False,
         no_confirm: bool = False,
     ):
-        self.progress_bar = None
+        self.progress_bar: Optional[tqdm[Any]] = None
 
         if msg:
             self.msg = msg
@@ -176,7 +176,7 @@ class Callback:
 
         # Fake implementation for Queue.put()
         if action is None:
-            return
+            return None
         elif action == "msg":
             self.msg(*args, **kwargs)
         elif action == "bar":
@@ -191,3 +191,4 @@ class Callback:
             return self.ask_str(**kwargs)
         else:
             self.msg(action)
+        return None

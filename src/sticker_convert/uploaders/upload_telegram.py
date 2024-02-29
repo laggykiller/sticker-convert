@@ -3,7 +3,7 @@ import copy
 import re
 from pathlib import Path
 from queue import Queue
-from typing import Union, Any, Optional
+from typing import Union, Any, Optional, cast
 
 import anyio
 from telegram import Bot, InputSticker, Sticker
@@ -24,21 +24,21 @@ class UploadTelegram(UploadBase):
         base_spec = CompOption(
             size_max_img=512000, size_max_vid=256000, square=True, duration_max=3000
         )
-        base_spec.res = 512
+        base_spec.set_res(512)
 
         self.png_spec = copy.deepcopy(base_spec)
-        self.png_spec.format = [".png"]
+        self.png_spec.set_format([".png"])
         self.png_spec.animated = False
 
         self.tgs_spec = copy.deepcopy(base_spec)
-        self.tgs_spec.format = [".tgs"]
+        self.tgs_spec.set_format([".tgs"])
         self.tgs_spec.fps_min = 60
         self.tgs_spec.fps_max = 60
         self.tgs_spec.size_max_img = 64000
         self.tgs_spec.size_max_vid = 64000
 
         self.webm_spec = copy.deepcopy(base_spec)
-        self.webm_spec.format = [".webm"]
+        self.webm_spec.set_format([".webm"])
         self.webm_spec.fps_max = 30
         self.webm_spec.animated = None if self.opt_comp.fake_vid else True
 
@@ -48,19 +48,19 @@ class UploadTelegram(UploadBase):
         base_cover_spec = CompOption(
             size_max_img=128000, size_max_vid=32000, square=True, duration_max=3000
         )
-        base_cover_spec.res = 100
+        base_cover_spec.set_res(100)
 
         self.png_cover_spec = copy.deepcopy(base_cover_spec)
-        self.png_cover_spec.format = [".png"]
+        self.png_cover_spec.set_format([".png"])
         self.png_cover_spec.animated = False
 
         self.tgs_cover_spec = copy.deepcopy(base_cover_spec)
-        self.tgs_cover_spec.format = [".tgs"]
+        self.tgs_cover_spec.set_format([".tgs"])
         self.tgs_cover_spec.fps_min = 60
         self.tgs_cover_spec.fps_max = 60
 
         self.webm_cover_spec = copy.deepcopy(base_cover_spec)
-        self.webm_cover_spec.format = [".webm"]
+        self.webm_cover_spec.set_format([".webm"])
         self.webm_cover_spec.fps_max = 30
         self.webm_cover_spec.animated = True
 
@@ -153,7 +153,7 @@ class UploadTelegram(UploadBase):
 
                 if self.opt_output.option == "telegram_emoji":
                     sticker_type = Sticker.CUSTOM_EMOJI
-                    spec_choice.res = 100
+                    spec_choice.set_res(100)
                 else:
                     sticker_type = Sticker.REGULAR
 
@@ -161,13 +161,14 @@ class UploadTelegram(UploadBase):
                     with open(src, "rb") as f:
                         sticker_bytes = f.read()
                 else:
-                    _, _, sticker_bytes, _ = StickerConvert.convert(
+                    _, _, convert_result, _ = StickerConvert.convert(
                         Path(src),
                         Path(f"bytes{ext}"),
                         self.opt_comp_merged,
                         self.cb,
                         self.cb_return,
                     )
+                    sticker_bytes = cast(bytes, convert_result)
 
                 sticker = InputSticker(sticker=sticker_bytes, emoji_list=emoji_list)  # type: ignore
 

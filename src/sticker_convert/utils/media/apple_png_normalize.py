@@ -27,8 +27,8 @@ class ApplePngNormalize:
         height = None
         while chunk_pos < len(old_png):
             # Reading chunk
-            chunk_length = old_png[chunk_pos : chunk_pos + 4]
-            chunk_length = struct.unpack(">L", chunk_length)[0]
+            chunk_length_bytes = old_png[chunk_pos : chunk_pos + 4]
+            chunk_length = int(struct.unpack(">L", chunk_length_bytes)[0])
             chunk_type = old_png[chunk_pos + 4 : chunk_pos + 8]
             chunk_data = old_png[chunk_pos + 8 : chunk_pos + 8 + chunk_length]
             chunk_crc = old_png[
@@ -73,19 +73,19 @@ class ApplePngNormalize:
                 # chunk_data = newdata
                 chunk_data = zlib.compress(chunk_data)
                 chunk_length = len(chunk_data)
-                chunk_crc = zlib.crc32(b"IDAT")
-                chunk_crc = zlib.crc32(chunk_data, chunk_crc)
-                chunk_crc = (chunk_crc + 0x100000000) % 0x100000000
+                chunk_crc_idat = zlib.crc32(b"IDAT")
+                chunk_crc_data = zlib.crc32(chunk_data, chunk_crc_idat)
+                chunk_crc_mod = (chunk_crc_data + 0x100000000) % 0x100000000
 
                 new_png += struct.pack(">L", chunk_length)
                 new_png += b"IDAT"
                 new_png += chunk_data
-                new_png += struct.pack(">L", chunk_crc)
+                new_png += struct.pack(">L", chunk_crc_mod)
 
-                chunk_crc = zlib.crc32(chunk_type)
+                chunk_crc_type = zlib.crc32(chunk_type)
                 new_png += struct.pack(">L", 0)
                 new_png += b"IEND"
-                new_png += struct.pack(">L", chunk_crc)
+                new_png += struct.pack(">L", chunk_crc_type)
                 break
 
             # Removing CgBI chunk

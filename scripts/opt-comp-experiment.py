@@ -8,7 +8,7 @@ worst case scenario for compression
 import copy
 import csv
 import itertools
-import math
+from math import ceil
 import os
 import sys
 from multiprocessing import Process, Queue, cpu_count
@@ -29,7 +29,7 @@ from sticker_convert.converter import StickerConvert  # noqa: E402
 from sticker_convert.job_option import CompOption  # noqa: E402
 from sticker_convert.utils.callback import Callback, CallbackReturn  # noqa: E402
 
-processes_max = math.ceil(cpu_count() / 2)
+processes_max = ceil(cpu_count() / 2)
 
 opt_comp_template = CompOption(
     size_max_img=1,
@@ -45,9 +45,9 @@ opt_comp_template = CompOption(
     steps=1,
     fake_vid=False,
 )
-opt_comp_template.quality = 50
-opt_comp_template.color = 50
-opt_comp_template.duration = 3000
+opt_comp_template.set_quality(50)
+opt_comp_template.set_color(50)
+opt_comp_template.set_duration(3000)
 
 formats = [
     ("img", ".webp"),
@@ -63,7 +63,7 @@ formats = [
 
 
 def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
-    apngasm = APNGAsm()
+    apngasm = APNGAsm()  # type: ignore
     for _ in range(int(duration / 1000 * fps)):
         im = numpy.random.rand(res, res, 4) * 255
         frame = create_frame_from_rgba(im, res, res)
@@ -106,8 +106,8 @@ def compress_worker(
                 size,
                 opt_comp.fps_max,
                 opt_comp.res_w_max,
-                opt_comp.quality,
-                opt_comp.color,
+                opt_comp.get_quality(),
+                opt_comp.get_color(),
             )
         )
 
@@ -208,16 +208,16 @@ def main():
 
             for fps, res, quality, color in combinations:
                 opt_comp = copy.deepcopy(opt_comp_template)
-                opt_comp.size_max = None
-                opt_comp.format = [fmt]
+                opt_comp.set_size_max(None)
+                opt_comp.set_format([fmt])
                 if img_or_vid == "vidlong":
-                    opt_comp.duration = 10000
+                    opt_comp.set_duration(10000)
                 else:
-                    opt_comp.duration = 3000
-                opt_comp.fps = fps
-                opt_comp.res = res
-                opt_comp.quality = quality
-                opt_comp.color = color
+                    opt_comp.set_duration(3000)
+                opt_comp.set_fps(fps)
+                opt_comp.set_res(res)
+                opt_comp.set_quality(quality)
+                opt_comp.set_color(color)
 
                 work_queue.put((random_png_path, result_path, opt_comp))
 

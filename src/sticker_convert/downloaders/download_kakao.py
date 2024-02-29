@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import io
+from io import BytesIO
 import json
 import zipfile
 from pathlib import Path
@@ -113,8 +113,8 @@ class MetadataKakao:
 class DownloadKakao(DownloadBase):
     def __init__(self, *args: Any, **kwargs: Any):
         super(DownloadKakao, self).__init__(*args, **kwargs)
-        self.pack_title = None
-        self.author = None
+        self.pack_title: Optional[str] = None
+        self.author: Optional[str] = None
 
     def download_stickers_kakao(self) -> bool:
         auth_token = None
@@ -219,7 +219,7 @@ class DownloadKakao(DownloadBase):
             self.cb.put(f"Cannot download {pack_url}")
             return False
 
-        with zipfile.ZipFile(io.BytesIO(zip_file)) as zf:
+        with zipfile.ZipFile(BytesIO(zip_file)) as zf:
             self.cb.put("Unzipping...")
             self.cb.put(
                 (

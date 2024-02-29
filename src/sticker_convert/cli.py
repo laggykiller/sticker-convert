@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import argparse
 from argparse import Namespace
-import math
+from math import ceil
 import signal
 from json.decoder import JSONDecodeError
 from multiprocessing import cpu_count
 from pathlib import Path
+from typing import Any
 
 from sticker_convert.version import __version__
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
@@ -55,30 +56,30 @@ class CLI:
         )
 
         parser_input = parser.add_argument_group("Input options")
-        for k, v in self.help["input"].items():
-            parser_input.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
+        for k, v_str in self.help["input"].items():
+            parser_input.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v_str)
         parser_input_src = parser_input.add_mutually_exclusive_group()
-        for k, v in self.input_presets.items():
+        for k, v_dict in self.input_presets.items():
             if k == "local":
                 continue
             parser_input_src.add_argument(
                 f'--download-{k.replace("_", "-")}',
                 dest=f"download_{k}",
-                help=f'{v["help"]}\n({v["example"]})',
+                help=f'{v_dict["help"]}\n({v_dict["example"]})',
             )
 
         parser_output = parser.add_argument_group("Output options")
-        for k, v in self.help["output"].items():
-            parser_output.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v)
+        for k, v_str in self.help["output"].items():
+            parser_output.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v_str)
         parser_output_dst = parser_output.add_mutually_exclusive_group()
-        for k, v in self.output_presets.items():
+        for k, v_dict in self.output_presets.items():
             if k == "local":
                 continue
             parser_output_dst.add_argument(
                 f'--export-{k.replace("_", "-")}',
                 dest=f"export_{k}",
                 action="store_true",
-                help=v["help"],
+                help=v_dict["help"],
             )
 
         parser_comp = parser.add_argument_group("Compression options")
@@ -95,7 +96,7 @@ class CLI:
             choices=self.compression_presets.keys(),
             help=self.help["comp"]["preset"],
         )
-        flags_int = (
+        flags_comp_int = (
             "steps",
             "processes",
             "fps_min",
@@ -115,23 +116,24 @@ class CLI:
             "vid_size_max",
             "img_size_max",
         )
-        flags_float = ("fps_power", "res_power", "quality_power", "color_power")
-        flags_str = (
+        flags_comp_float = ("fps_power", "res_power", "quality_power", "color_power")
+        flags_comp_str = (
             "vid_format",
             "img_format",
             "cache_dir",
             "scale_filter",
             "quantize_method",
         )
-        flags_bool = "fake_vid"
+        flags_comp_bool = ("fake_vid",)
+        keyword_args: dict[str, Any]
         for k, v in self.help["comp"].items():
-            if k in flags_int:
+            if k in flags_comp_int:
                 keyword_args = {"type": int, "default": None}
-            elif k in flags_float:
+            elif k in flags_comp_float:
                 keyword_args = {"type": float, "default": None}
-            elif k in flags_str:
+            elif k in flags_comp_str:
                 keyword_args = {"default": None}
-            elif k in flags_bool:
+            elif k in flags_comp_bool:
                 keyword_args = {"action": "store_true", "default": None}
             else:
                 continue
@@ -149,10 +151,10 @@ class CLI:
         )
 
         parser_cred = parser.add_argument_group("Credentials options")
-        flags_bool = ("signal_get_auth", "kakao_get_auth", "line_get_auth")
+        flags_cred_bool = ("signal_get_auth", "kakao_get_auth", "line_get_auth")
         for k, v in self.help["cred"].items():
             keyword_args = {}
-            if k in flags_bool:
+            if k in flags_cred_bool:
                 keyword_args = {"action": "store_true"}
             parser_cred.add_argument(
                 f'--{k.replace("_", "-")}',
@@ -204,9 +206,11 @@ class CLI:
                 break
 
         if download_option == "auto":
-            download_option = UrlDetect.detect(url)
-            self.cb.msg(f"Detected URL input source: {download_option}")
-            if not download_option:
+            detected_download_option = UrlDetect.detect(url)
+            if detected_download_option:
+                download_option = detected_download_option
+                self.cb.msg(f"Detected URL input source: {download_option}")
+            else:
                 self.cb.msg(f"Error: Unrecognied URL input source for url: {url}")
                 exit()
 
@@ -367,7 +371,7 @@ class CLI:
             if args.default_emoji is None
             else args.default_emoji,
             no_compress=args.no_compress,
-            processes=args.processes if args.processes else math.ceil(cpu_count() / 2),
+            processes=args.processes if args.processes else ceil(cpu_count() / 2),
         )
 
         return opt_comp
@@ -421,13 +425,13 @@ class CLI:
         )
 
         if args.kakao_get_auth:
-            m = GetKakaoAuth(
+            get_kakao_auth = GetKakaoAuth(
                 opt_cred=opt_cred,
                 cb_msg=self.cb.msg,
                 cb_msg_block=self.cb.msg_block,
                 cb_ask_str=self.cb.ask_str,
             )
-            auth_token = m.get_cred()
+            auth_token = get_kakao_auth.get_cred()
 
             if auth_token:
                 opt_cred.kakao_auth_token = auth_token
@@ -435,9 +439,9 @@ class CLI:
                 self.cb.msg(f"Got auth_token successfully: {auth_token}")
 
         if args.signal_get_auth:
-            m = GetSignalAuth()
+            get_signal_auth = GetSignalAuth()
 
-            uuid, password, msg = m.get_cred()
+            uuid, password, msg = get_signal_auth.get_cred()
 
             if uuid and password:
                 opt_cred.signal_uuid = uuid
@@ -446,9 +450,9 @@ class CLI:
             self.cb.msg(msg)
 
         if args.line_get_auth:
-            m = GetLineAuth()
+            get_line_auth = GetLineAuth()
 
-            line_cookies = m.get_cred()
+            line_cookies = get_line_auth.get_cred()
 
             if line_cookies:
                 opt_cred.line_cookies = line_cookies

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import io
 import os
 from pathlib import Path
 from typing import Optional, Union
@@ -10,7 +9,7 @@ from sticker_convert.utils.media.codec_info import CodecInfo
 
 class FormatVerify:
     @staticmethod
-    def check_file(file: Union[Path, io.BytesIO], spec: CompOption) -> bool:
+    def check_file(file: Union[Path, bytes], spec: CompOption) -> bool:
         if FormatVerify.check_presence(file) is False:
             return False
 
@@ -18,23 +17,27 @@ class FormatVerify:
 
         return (
             FormatVerify.check_file_res(
-                file, res=spec.res, square=spec.square, file_info=file_info
+                file, res=spec.get_res(), square=spec.square, file_info=file_info
             )
-            and FormatVerify.check_file_fps(file, fps=spec.fps, file_info=file_info)
+            and FormatVerify.check_file_fps(
+                file, fps=spec.get_fps(), file_info=file_info
+            )
             and FormatVerify.check_file_duration(
-                file, duration=spec.duration, file_info=file_info
+                file, duration=spec.get_duration(), file_info=file_info
             )
             and FormatVerify.check_file_size(
-                file, size=spec.size_max, file_info=file_info
+                file, size=spec.get_size_max(), file_info=file_info
             )
             and FormatVerify.check_animated(
                 file, animated=spec.animated, file_info=file_info
             )
-            and FormatVerify.check_format(file, fmt=spec.format, file_info=file_info)
+            and FormatVerify.check_format(
+                file, fmt=spec.get_format(), file_info=file_info
+            )
         )
 
     @staticmethod
-    def check_presence(file: Union[Path, io.BytesIO]) -> bool:
+    def check_presence(file: Union[Path, bytes]) -> bool:
         if isinstance(file, Path):
             return Path(file).is_file()
         else:
@@ -42,7 +45,7 @@ class FormatVerify:
 
     @staticmethod
     def check_file_res(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         res: list[list[Optional[int]]],
         square: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None,
@@ -68,7 +71,7 @@ class FormatVerify:
 
     @staticmethod
     def check_file_fps(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         fps: list[Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
@@ -86,7 +89,7 @@ class FormatVerify:
 
     @staticmethod
     def check_file_duration(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         duration: list[Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
@@ -106,14 +109,14 @@ class FormatVerify:
 
     @staticmethod
     def check_file_size(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         size: list[Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if isinstance(file, Path):
             file_size = os.path.getsize(file)
         else:
-            file_size = file.getbuffer().nbytes
+            file_size = len(file)
 
         if file_info:
             file_animated = file_info.is_animated
@@ -139,7 +142,7 @@ class FormatVerify:
 
     @staticmethod
     def check_animated(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         animated: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
@@ -155,7 +158,7 @@ class FormatVerify:
 
     @staticmethod
     def check_format(
-        file: Union[Path, io.BytesIO],
+        file: Union[Path, bytes],
         fmt: list[list[str]],
         file_info: Optional[CodecInfo] = None,
     ):

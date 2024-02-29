@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-import math
+from math import ceil, floor
 import os
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
 from io import BytesIO
 from pathlib import Path
 from queue import Queue
-from typing import Optional, Union, Any, TYPE_CHECKING
+from typing import cast, Optional, Union, Any, TYPE_CHECKING, Literal
 
 import numpy as np
 from PIL import Image
@@ -54,12 +54,10 @@ def useful_array(
 ) -> np.ndarray[Any, Any]:
     total_line_size = abs(plane.line_size)
     useful_line_size = plane.width * bytes_per_pixel
-    arr: np.ndarray = np.frombuffer(plane, np.uint8)  # type: ignore
+    arr: np.ndarray[Any, Any] = np.frombuffer(cast(bytes, plane), np.uint8)
     if total_line_size != useful_line_size:
-        arr: np.ndarray = arr.reshape(  # type: ignore
-            -1, total_line_size
-        )[:, 0:useful_line_size].reshape(-1)
-    return arr.view(np.dtype(dtype))  # type: ignore
+        arr = arr.reshape(-1, total_line_size)[:, 0:useful_line_size].reshape(-1)
+    return arr.view(np.dtype(dtype))
 
 
 class StickerConvert:
@@ -78,7 +76,7 @@ class StickerConvert:
 
     def __init__(
         self,
-        in_f: Union[Path, tuple[Path, BytesIO]],
+        in_f: Union[Path, tuple[Path, bytes]],
         out_f: Path,
         opt_comp: CompOption,
         cb: Union[
@@ -93,18 +91,20 @@ class StickerConvert:
         ],
         #  cb_return: CallbackReturn
     ):
-        self.in_f: Union[BytesIO, Path]
+        self.in_f: Union[bytes, Path]
         if isinstance(in_f, Path):
             self.in_f = in_f
             self.in_f_name = self.in_f.name
-            self.codec_info_orig: CodecInfo = CodecInfo(self.in_f)
+            self.in_f_path = in_f
+            self.codec_info_orig = CodecInfo(self.in_f)
         else:
             self.in_f = in_f[1]
-            self.in_f_name = Path(in_f[0]).name  # type: ignore
-            self.codec_info_orig: CodecInfo = CodecInfo(in_f[1], Path(in_f[0]).suffix)
+            self.in_f_name = Path(in_f[0]).name
+            self.in_f_path = in_f[0]
+            self.codec_info_orig = CodecInfo(in_f[1], Path(in_f[0]).suffix)
 
         valid_formats: list[str] = []
-        for i in opt_comp.format:
+        for i in opt_comp.get_format():
             valid_formats.extend(i)
 
         valid_ext = False
@@ -146,7 +146,7 @@ class StickerConvert:
 
     @staticmethod
     def convert(
-        in_f: Union[Path, tuple[Path, BytesIO]],
+        in_f: Union[Path, tuple[Path, bytes]],
         out_f: Path,
         opt_comp: CompOption,
         cb: Union[
@@ -160,13 +160,13 @@ class StickerConvert:
             Callback,
         ],
         cb_return: CallbackReturn,
-    ) -> tuple[bool, Union[None, BytesIO, Path], Union[None, bytes, Path], int]:
+    ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         sticker = StickerConvert(in_f, out_f, opt_comp, cb)
         result = sticker._convert()
         cb.put("update_bar")
         return result
 
-    def _convert(self):
+    def _convert(self) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         result = self.check_if_compatible()
         if result:
             self.compress_done(result)
@@ -178,16 +178,16 @@ class StickerConvert:
         step_lower = 0
         step_upper = self.opt_comp.steps
 
-        if self.opt_comp.size_max == [None, None]:
-            # No limit to size, create the best quality result
-            step_current = 0
-        else:
-            step_current = round((step_lower + step_upper) / 2)
-
         if self.codec_info_orig.is_animated is True:
             self.size_max = self.opt_comp.size_max_vid
         else:
             self.size_max = self.opt_comp.size_max_img
+
+        if self.size_max is None:
+            # No limit to size, create the best quality result
+            step_current = 0
+        else:
+            step_current = round((step_lower + step_upper) / 2)
 
         self.frames_import()
         while True:
@@ -231,8 +231,8 @@ class StickerConvert:
                 self.result_size = self.size
                 self.result_step = step_current
 
-            if step_upper - step_lower > 1:
-                if self.size <= self.size_max:  # type: ignore
+            if step_upper - step_lower > 1 and self.size_max:
+                if self.size <= self.size_max:
                     sign = "<"
                     step_upper = step_current
                 else:
@@ -240,28 +240,32 @@ class StickerConvert:
                     step_lower = step_current
                 step_current = int((step_lower + step_upper) / 2)
                 self.recompress(sign)
-            elif self.result or not self.size_max:
-                return self.compress_done(self.result, self.result_step)  # type: ignore
+            elif self.result:
+                return self.compress_done(self.result, self.result_step)
             else:
                 return self.compress_fail()
 
     def check_if_compatible(self) -> Optional[bytes]:
         if (
             FormatVerify.check_format(
-                self.in_f, fmt=self.opt_comp.format, file_info=self.codec_info_orig
+                self.in_f,
+                fmt=self.opt_comp.get_format(),
+                file_info=self.codec_info_orig,
             )
             and FormatVerify.check_file_res(
-                self.in_f, res=self.opt_comp.res, file_info=self.codec_info_orig
+                self.in_f, res=self.opt_comp.get_res(), file_info=self.codec_info_orig
             )
             and FormatVerify.check_file_fps(
-                self.in_f, fps=self.opt_comp.fps, file_info=self.codec_info_orig
+                self.in_f, fps=self.opt_comp.get_fps(), file_info=self.codec_info_orig
             )
             and FormatVerify.check_file_size(
-                self.in_f, size=self.opt_comp.size_max, file_info=self.codec_info_orig
+                self.in_f,
+                size=self.opt_comp.get_size_max(),
+                file_info=self.codec_info_orig,
             )
             and FormatVerify.check_file_duration(
                 self.in_f,
-                duration=self.opt_comp.duration,
+                duration=self.opt_comp.get_duration(),
                 file_info=self.codec_info_orig,
             )
         ):
@@ -272,8 +276,8 @@ class StickerConvert:
                     result = f.read()
                 self.result_size = os.path.getsize(self.in_f)
             else:
-                result = self.in_f.read()
-                self.result_size = self.in_f.getbuffer().nbytes
+                result = self.in_f
+                self.result_size = len(self.in_f)
 
             return result
         else:
@@ -334,17 +338,19 @@ class StickerConvert:
 
     def compress_fail(
         self,
-    ) -> tuple[bool, Union[BytesIO, Path], Union[None, bytes, Path], int]:
+    ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         msg = self.MSG_FAIL_COMP.format(
             self.in_f_name, self.out_f_name, self.size_max, self.size
         )
         self.cb.put(msg)
 
-        return False, self.in_f, self.out_f, self.size
+        return False, self.in_f_path, self.out_f, self.size
 
     def compress_done(
         self, data: bytes, result_step: Optional[int] = None
-    ) -> tuple[bool, Union[None, BytesIO, Path], Union[None, bytes, Path], int]:
+    ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
+        out_f: Union[None, bytes, Path]
+
         if self.out_f.stem == "none":
             out_f = None
         elif self.out_f.stem == "bytes":
@@ -360,7 +366,7 @@ class StickerConvert:
             )
             self.cb.put(msg)
 
-        return True, self.in_f, out_f, self.result_size
+        return True, self.in_f_path, out_f, self.result_size
 
     def frames_import(self):
         if isinstance(self.in_f, Path):
@@ -393,15 +399,16 @@ class StickerConvert:
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
+        file: Union[BytesIO, str]
         if isinstance(self.in_f, Path):
             file = self.in_f.as_posix()
         else:
-            file = self.in_f
+            file = BytesIO(self.in_f)
         with av.open(file) as container:  # type: ignore
-            context = container.streams.video[0].codec_context
-            if context.name == "vp8":
+            context = container.streams.video[0].codec_context  # type: ignore
+            if context.name == "vp8":  # type: ignore
                 context = CodecContext.create("libvpx", "r")  # type: ignore
-            elif context.name == "vp9":
+            elif context.name == "vp9":  # type: ignore
                 context = CodecContext.create("libvpx-vp9", "r")  # type: ignore
 
             for packet in container.demux(container.streams.video):  # type: ignore
@@ -487,24 +494,32 @@ class StickerConvert:
             suffix = Path(self.in_f_name).suffix
 
         if suffix == ".tgs":
-            anim = LottieAnimation.from_tgs(self.in_f)  # type: ignore
+            if isinstance(self.in_f, Path):
+                anim = LottieAnimation.from_tgs(self.in_f.as_posix())
+            else:
+                import gzip
+
+                with gzip.open(BytesIO(self.in_f)) as f:
+                    data = f.read().decode(encoding="utf-8")
+                anim = LottieAnimation.from_data(data)
         else:
             if isinstance(self.in_f, Path):
-                anim = LottieAnimation.from_file(self.in_f.as_posix())  # type: ignore
+                anim = LottieAnimation.from_file(self.in_f.as_posix())
             else:
-                anim = LottieAnimation.from_data(self.in_f.read().decode("utf-8"))  # type: ignore
+                anim = LottieAnimation.from_data(self.in_f.decode("utf-8"))
 
-        for i in range(anim.lottie_animation_get_totalframe()):  # type: ignore
-            frame = np.asarray(anim.render_pillow_frame(frame_num=i))  # type: ignore
-            self.frames_raw.append(frame)  # type: ignore
+        for i in range(anim.lottie_animation_get_totalframe()):
+            frame = np.asarray(anim.render_pillow_frame(frame_num=i))
+            self.frames_raw.append(frame)
 
-        anim.lottie_animation_destroy()  # type: ignore
+        anim.lottie_animation_destroy()
 
     def frames_resize(
         self, frames_in: list[np.ndarray[Any, Any]]
     ) -> list[np.ndarray[Any, Any]]:
         frames_out: list[np.ndarray[Any, Any]] = []
 
+        resample: Literal[0, 1, 2, 3]
         if self.opt_comp.scale_filter == "nearest":
             resample = Image.NEAREST
         elif self.opt_comp.scale_filter == "bilinear":
@@ -578,12 +593,12 @@ class StickerConvert:
         frames_out_min = None
         frames_out_max = None
         if self.opt_comp.duration_min:
-            frames_out_min = math.ceil(self.fps * self.opt_comp.duration_min / 1000)
+            frames_out_min = ceil(self.fps * self.opt_comp.duration_min / 1000)
         if self.opt_comp.duration_max:
-            frames_out_max = math.floor(self.fps * self.opt_comp.duration_max / 1000)
+            frames_out_max = floor(self.fps * self.opt_comp.duration_max / 1000)
 
         frame_current = 0
-        frame_current_float = 0
+        frame_current_float = 0.0
         while True:
             frame_current_float += frame_increment
             frame_current = int(Decimal(frame_current_float).quantize(0, ROUND_HALF_UP))
@@ -699,7 +714,8 @@ class StickerConvert:
             image_quant = self.quantize(image_concat)
 
         if self.apngasm is None:
-            self.apngasm = APNGAsm()
+            self.apngasm = APNGAsm()  # type: ignore
+        assert isinstance(self.apngasm, APNGAsm)
 
         delay_num = int(1000 / self.fps)
         for i in range(0, image_quant.height, self.res_h):

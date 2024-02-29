@@ -79,18 +79,18 @@ class XcodeImessage(UploadBase):
         self.iconset = XcodeImessageIconset().iconset
 
         base_spec = CompOption()
-        base_spec.size_max = 500000
-        base_spec.res = 300
-        base_spec.format = ["png", ".apng", ".gif", ".jpeg", "jpg"]
+        base_spec.set_size_max(500000)
+        base_spec.set_res(300)
+        base_spec.set_format(["png", ".apng", ".gif", ".jpeg", "jpg"])
         base_spec.square = True
 
         self.small_spec = copy.deepcopy(base_spec)
 
         self.medium_spec = copy.deepcopy(base_spec)
-        self.medium_spec.res = 408
+        self.medium_spec.set_res(408)
 
         self.large_spec = copy.deepcopy(base_spec)
-        self.large_spec.res = 618
+        self.large_spec.set_res(618)
 
     def create_imessage_xcode(self) -> list[str]:
         urls: list[str] = []
@@ -172,9 +172,9 @@ class XcodeImessage(UploadBase):
 
         for icon, res in self.iconset.items():
             spec_cover = CompOption()
-            spec_cover.res_w = res[0]
-            spec_cover.res_h = res[1]
-            spec_cover.fps = 0
+            spec_cover.set_res_w(res[0])
+            spec_cover.set_res_h(res[1])
+            spec_cover.set_fps(0)
 
             icon_path = self.opt_output.dir / icon
             if Path(icon) in [
@@ -275,7 +275,7 @@ class XcodeImessage(UploadBase):
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/0.png
                 shutil.copy(self.opt_output.dir / i.name, sticker_path / i.name)
 
-                json_content = {
+                sticker_json_content = {
                     "info": {
                         "author": "xcode",
                         "version": 1,
@@ -285,18 +285,18 @@ class XcodeImessage(UploadBase):
 
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/Contents.json
                 with open(sticker_path / "Contents.json", "w+") as f:
-                    json.dump(json_content, f, indent=2)
+                    json.dump(sticker_json_content, f, indent=2)
 
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/Contents.json
         with open(stickers_path / "Contents.json") as f:
-            json_content = json.load(f)
+            stickerpack_json_content: dict[str, list[dict[str, str]]] = json.load(f)
 
-        json_content["stickers"] = []
-        for i in stickers_lst:
-            json_content["stickers"].append({"filename": i})
+        stickerpack_json_content["stickers"] = []
+        for sticker in stickers_lst:
+            stickerpack_json_content["stickers"].append({"filename": sticker})
 
         with open(stickers_path / "Contents.json", "w+") as f:
-            json.dump(json_content, f, indent=2)
+            json.dump(stickerpack_json_content, f, indent=2)
 
         # packname StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset
         iconset_path = (
@@ -304,14 +304,14 @@ class XcodeImessage(UploadBase):
             / "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset"
         )
 
-        for i in iconset_path.iterdir():
-            if Path(i).suffix == ".png":
-                os.remove(iconset_path / i)
+        for iconfile_name in iconset_path.iterdir():
+            if Path(iconfile_name).suffix == ".png":
+                os.remove(iconset_path / iconfile_name)
 
         icons_lst: list[str] = []
-        for i in self.iconset:
-            shutil.copy(self.opt_output.dir / i, iconset_path / i)
-            icons_lst.append(i)
+        for icon in self.iconset:
+            shutil.copy(self.opt_output.dir / icon, iconset_path / icon)
+            icons_lst.append(icon)
 
         # packname/Info.plist
         plist_path = pack_path / "stickers/Info.plist"
