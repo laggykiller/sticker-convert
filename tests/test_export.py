@@ -4,6 +4,7 @@ from pathlib import Path
 from typing import Optional
 
 import pytest
+from _pytest._py.path import LocalPath
 
 from tests.common import (
     COMPRESSION_DICT,
@@ -25,7 +26,7 @@ from sticker_convert.utils.media.codec_info import CodecInfo  # noqa: E402
 TEST_UPLOAD = os.environ.get("TEST_UPLOAD")
 
 
-def _run_sticker_convert(tmp_path: Path, preset: str, export: Optional[str]):
+def _run_sticker_convert(tmp_path: LocalPath, preset: str, export: Optional[str]):
     preset_dict = COMPRESSION_DICT.get(preset)
 
     cmd: list[str] = [
@@ -60,7 +61,7 @@ def _run_sticker_convert(tmp_path: Path, preset: str, export: Optional[str]):
             fmt = preset_dict.get("format").get("vid")
 
         fname = i.stem + fmt
-        fpath = tmp_path / fname
+        fpath = Path(tmp_path) / fname
         fps, frames, duration = CodecInfo.get_file_fps_frames_duration(fpath)
 
         print(f"[TEST] Check if {fname} exists")
@@ -78,7 +79,7 @@ def _run_sticker_convert(tmp_path: Path, preset: str, export: Optional[str]):
                 assert duration <= duration_max
 
 
-def _xcode_asserts(tmp_path: Path):
+def _xcode_asserts(tmp_path: LocalPath):
     iconset = {
         "App-Store-1024x1024pt.png": (1024, 1024),
         "iPad-Settings-29pt@2x.png": (58, 58),
@@ -95,7 +96,7 @@ def _xcode_asserts(tmp_path: Path):
         "Messages-iPhone-60x45pt@3x.png": (180, 135),
     }
 
-    imessage_xcode_dir = tmp_path / "sticker-convert-test"
+    imessage_xcode_dir = Path(tmp_path) / "sticker-convert-test"
 
     assert Path(imessage_xcode_dir / "sticker-convert-test/Info.plist").is_file()
 
@@ -120,74 +121,74 @@ def _xcode_asserts(tmp_path: Path):
 
 @pytest.mark.skipif(not TEST_UPLOAD, reason="TEST_UPLOAD not set")
 @pytest.mark.skipif(not (SIGNAL_UUID and SIGNAL_PASSWORD), reason="No credentials")
-def test_upload_signal_with_upload(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "signal", "signal")  # type: ignore
+def test_upload_signal_with_upload(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "signal", "signal")
 
 
 @pytest.mark.skipif(not TEST_UPLOAD, reason="TEST_UPLOAD not set")
 @pytest.mark.skipif(not (TELEGRAM_TOKEN and TELEGRAM_USERID), reason="No credentials")
-def test_upload_telegram_with_upload(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "telegram", "telegram")  # type: ignore
+def test_upload_telegram_with_upload(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "telegram", "telegram")
 
 
 @pytest.mark.skipif(not TEST_UPLOAD, reason="TEST_UPLOAD not set")
 @pytest.mark.skipif(not (TELEGRAM_TOKEN and TELEGRAM_USERID), reason="No credentials")
-def test_upload_telegram_emoji_with_upload(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "telegram_emoji", None)  # type: ignore
+def test_upload_telegram_emoji_with_upload(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "telegram_emoji", None)
 
 
 @pytest.mark.skipif(
     TELEGRAM_TOKEN is not None and TELEGRAM_USERID is not None,
     reason="With credentials",
 )
-def test_upload_signal(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "signal", None)  # type: ignore
+def test_upload_signal(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "signal", None)
 
 
 @pytest.mark.skipif(
     TELEGRAM_TOKEN is not None and TELEGRAM_USERID is not None,
     reason="With credentials",
 )
-def test_upload_telegram(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "telegram", None)  # type: ignore
+def test_upload_telegram(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "telegram", None)
 
 
 @pytest.mark.skipif(
     TELEGRAM_TOKEN is not None and TELEGRAM_USERID is not None,
     reason="With credentials",
 )
-def test_upload_telegram_emoji(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "telegram_emoji", None)  # type: ignore
+def test_upload_telegram_emoji(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "telegram_emoji", None)
 
 
-def test_export_wastickers(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "whatsapp", "whatsapp")  # type: ignore
+def test_export_wastickers(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "whatsapp", "whatsapp")
 
-    wastickers_path = Path(tmp_path, "sticker-convert-test.wastickers")  # type: ignore
+    wastickers_path = Path(tmp_path, "sticker-convert-test.wastickers")
     assert Path(wastickers_path).is_file()
 
 
-def test_export_line(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "line", None)  # type: ignore
+def test_export_line(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "line", None)
 
 
-def test_export_kakao(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "kakao", None)  # type: ignore
+def test_export_kakao(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "kakao", None)
 
 
-def test_export_xcode_imessage_small(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "imessage_small", "imessage")  # type: ignore
+def test_export_xcode_imessage_small(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "imessage_small", "imessage")
 
-    _xcode_asserts(tmp_path)  # type: ignore
-
-
-def test_export_xcode_imessage_medium(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "imessage_medium", "imessage")  # type: ignore
-
-    _xcode_asserts(tmp_path)  # type: ignore
+    _xcode_asserts(tmp_path)
 
 
-def test_export_xcode_imessage_large(tmp_path):  # type: ignore
-    _run_sticker_convert(tmp_path, "imessage_large", "imessage")  # type: ignore
+def test_export_xcode_imessage_medium(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "imessage_medium", "imessage")
 
-    _xcode_asserts(tmp_path)  # type: ignore
+    _xcode_asserts(tmp_path)
+
+
+def test_export_xcode_imessage_large(tmp_path: LocalPath):
+    _run_sticker_convert(tmp_path, "imessage_large", "imessage")
+
+    _xcode_asserts(tmp_path)

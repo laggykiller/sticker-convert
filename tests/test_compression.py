@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 
+from _pytest._py.path import LocalPath
 
 from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SRC_DIR, run_cmd
 
@@ -14,7 +15,7 @@ SIZE_MAX_IMG = COMPRESSION_DICT.get("custom").get("size_max").get("img")
 SIZE_MAX_VID = COMPRESSION_DICT.get("custom").get("size_max").get("vid")
 
 
-def _run_sticker_convert(fmt: str, tmp_path: Path):
+def _run_sticker_convert(fmt: str, tmp_path: LocalPath):
     run_cmd(
         [
             PYTHON_EXE,
@@ -46,7 +47,7 @@ def _run_sticker_convert(fmt: str, tmp_path: Path):
             size_max = preset_dict.get("size_max").get("vid")
 
         fname = Path(i).stem + fmt
-        fpath = tmp_path / fname
+        fpath = Path(tmp_path) / fname
         fps, frames, duration = CodecInfo.get_file_fps_frames_duration(fpath)
 
         print(f"[TEST] Check if {fname} exists")
@@ -64,29 +65,29 @@ def _run_sticker_convert(fmt: str, tmp_path: Path):
                 assert duration <= duration_max
 
 
-def test_to_static_png(tmp_path):  # type: ignore
-    _run_sticker_convert(".png", tmp_path)  # type: ignore
+def test_to_static_png(tmp_path: LocalPath):
+    _run_sticker_convert(".png", tmp_path)
 
 
-def test_to_static_webp(tmp_path):  # type: ignore
-    _run_sticker_convert(".webp", tmp_path)  # type: ignore
+def test_to_static_webp(tmp_path: LocalPath):
+    _run_sticker_convert(".webp", tmp_path)
 
 
-def test_to_animated_apng(tmp_path):  # type: ignore
-    _run_sticker_convert(".apng", tmp_path)  # type: ignore
+def test_to_animated_apng(tmp_path: LocalPath):
+    _run_sticker_convert(".apng", tmp_path)
 
 
-def test_to_animated_gif(tmp_path):  # type: ignore
-    _run_sticker_convert(".gif", tmp_path)  # type: ignore
+def test_to_animated_gif(tmp_path: LocalPath):
+    _run_sticker_convert(".gif", tmp_path)
 
 
-def test_to_animated_webm(tmp_path):  # type: ignore
-    _run_sticker_convert(".webm", tmp_path)  # type: ignore
+def test_to_animated_webm(tmp_path: LocalPath):
+    _run_sticker_convert(".webm", tmp_path)
 
 
-def test_to_animated_webp(tmp_path):  # type: ignore
-    _run_sticker_convert(".webp", tmp_path)  # type: ignore
+def test_to_animated_webp(tmp_path: LocalPath):
+    _run_sticker_convert(".webp", tmp_path)
 
 
-def test_to_animated_mp4(tmp_path):  # type: ignore
-    _run_sticker_convert(".mp4", tmp_path)  # type: ignore
+def test_to_animated_mp4(tmp_path: LocalPath):
+    _run_sticker_convert(".mp4", tmp_path)
