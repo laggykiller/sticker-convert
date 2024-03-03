@@ -5,7 +5,7 @@ from io import BytesIO
 import mmap
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
-from typing import Optional, Union, BinaryIO
+from typing import Optional, Union, BinaryIO, cast
 
 from PIL import Image, UnidentifiedImageError
 
@@ -233,6 +233,7 @@ class CodecInfo:
         frames_only: bool = False,
     ) -> tuple[int, int]:
         import av
+        from av.container.input import InputContainer
 
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
@@ -244,6 +245,7 @@ class CodecInfo:
             file_ref = BytesIO(file)
 
         with av.open(file_ref) as container:  # type: ignore
+            container = cast(InputContainer, container)
             stream = container.streams.video[0]
             if container.duration:
                 duration_metadata = int(
@@ -260,18 +262,21 @@ class CodecInfo:
             for frame_count, frame in enumerate(container.decode(stream)):  # type: ignore
                 if frames_to_iterate is not None and frame_count == frames_to_iterate:
                     break
-                last_frame = frame  # type: ignore
+                last_frame = frame
 
-            time_base_ms = (  # type: ignore
-                last_frame.time_base.numerator / last_frame.time_base.denominator * 1000  # type: ignore
+            if last_frame is None:
+                return 0, 0
+
+            time_base_ms = (
+                last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
             )
             if frame_count <= 1 or duration_metadata != 0:
                 return frame_count, duration_metadata
             else:
-                duration_n_minus_one = last_frame.pts * time_base_ms  # type: ignore
-                ms_per_frame = duration_n_minus_one / (frame_count - 1)  # type: ignore
-                duration = frame_count * ms_per_frame  # type: ignore
-                return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))  # type: ignore
+                duration_n_minus_one = last_frame.pts * time_base_ms
+                ms_per_frame = duration_n_minus_one / (frame_count - 1)
+                duration = frame_count * ms_per_frame
+                return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))
 
     @staticmethod
     def get_file_codec(file: Union[Path, bytes], file_ext: Optional[str] = None) -> str:

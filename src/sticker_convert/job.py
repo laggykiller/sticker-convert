@@ -87,7 +87,7 @@ class Executor:
         ],
         cb_return: CallbackReturn,
     ):
-        for i in iter(cb_queue.get, None):  # type: ignore[misc]
+        for i in iter(cb_queue.get, None):
             if isinstance(i, tuple):
                 action = i[0]
                 if len(i) >= 2:
@@ -133,7 +133,7 @@ class Executor:
     ):
         for work_func, work_args in iter(work_queue.get, None):
             try:
-                results = work_func(*work_args, cb_queue, cb_return)  # type: ignore
+                results = work_func(*work_args, cb_queue, cb_return)
                 results_queue.put(results)
             except Exception:
                 arg_dump: list[Any] = []

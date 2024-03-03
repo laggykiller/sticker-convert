@@ -396,6 +396,8 @@ class StickerConvert:
     def _frames_import_pyav(self):
         import av
         from av.codec.context import CodecContext
+        from av.container.input import InputContainer
+        from av.video.codeccontext import VideoCodecContext
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
@@ -405,51 +407,54 @@ class StickerConvert:
         else:
             file = BytesIO(self.in_f)
         with av.open(file) as container:  # type: ignore
-            context = container.streams.video[0].codec_context  # type: ignore
-            if context.name == "vp8":  # type: ignore
+            container = cast(InputContainer, container)
+            context = container.streams.video[0].codec_context
+            if context.name == "vp8":
                 context = CodecContext.create("libvpx", "r")  # type: ignore
-            elif context.name == "vp9":  # type: ignore
+            elif context.name == "vp9":
                 context = CodecContext.create("libvpx-vp9", "r")  # type: ignore
+            context = cast(VideoCodecContext, context)
 
             for packet in container.demux(container.streams.video):  # type: ignore
-                for frame in context.decode(packet):  # type: ignore
-                    if frame.width % 2 != 0:  # type: ignore
-                        width = frame.width - 1  # type: ignore
+                for frame in context.decode(packet):
+                    if frame.width % 2 != 0:
+                        width = frame.width - 1
                     else:
-                        width = frame.width  # type: ignore
-                    if frame.height % 2 != 0:  # type: ignore
-                        height = frame.height - 1  # type: ignore
+                        width = frame.width
+                    if frame.height % 2 != 0:
+                        height = frame.height - 1
                     else:
-                        height = frame.height  # type: ignore
-                    if frame.format.name == "yuv420p":  # type: ignore
+                        height = frame.height
+                    if frame.format.name == "yuv420p":
                         rgb_array = frame.to_ndarray(format="rgb24")  # type: ignore
+                        cast(np.ndarray[Any, Any], rgb_array)
                         rgba_array = np.dstack(
                             (
                                 rgb_array,
-                                np.zeros(rgb_array.shape[:2], dtype=np.uint8) + 255,  # type: ignore
+                                np.zeros(rgb_array.shape[:2], dtype=np.uint8) + 255,
                             )  # type: ignore
                         )
                     else:
                         # yuva420p may cause crash
                         # https://github.com/laggykiller/sticker-convert/issues/114
                         frame = frame.reformat(  # type: ignore
-                            width=width,  # type: ignore
-                            height=height,  # type: ignore
+                            width=width,
+                            height=height,
                             format="yuva420p",
                             dst_colorspace=1,
-                        )  # type: ignore
+                        )
 
                         # https://stackoverflow.com/questions/72308308/converting-yuv-to-rgb-in-python-coefficients-work-with-array-dont-work-with-n
-                        y = useful_array(frame.planes[0]).reshape(height, width)  # type: ignore
-                        u = useful_array(frame.planes[1]).reshape(  # type: ignore
-                            height // 2,  # type: ignore
-                            width // 2,  # type: ignore
+                        y = useful_array(frame.planes[0]).reshape(height, width)
+                        u = useful_array(frame.planes[1]).reshape(
+                            height // 2,
+                            width // 2,
                         )
-                        v = useful_array(frame.planes[2]).reshape(  # type: ignore
-                            height // 2,  # type: ignore
-                            width // 2,  # type: ignore
+                        v = useful_array(frame.planes[2]).reshape(
+                            height // 2,
+                            width // 2,
                         )
-                        a = useful_array(frame.planes[3]).reshape(height, width)  # type: ignore
+                        a = useful_array(frame.planes[3]).reshape(height, width)
 
                         u = u.repeat(2, axis=0).repeat(2, axis=1)
                         v = v.repeat(2, axis=0).repeat(2, axis=1)
@@ -637,6 +642,7 @@ class StickerConvert:
 
     def _frames_export_pyav(self):
         import av
+        from av.container import OutputContainer
 
         options = {}
 
@@ -665,6 +671,7 @@ class StickerConvert:
         with av.open(  # type: ignore
             self.tmp_f, "w", format=self.out_f.suffix.replace(".", "")
         ) as output:
+            output = cast(OutputContainer, output)  # type: ignore
             out_stream = output.add_stream(codec, rate=self.fps, options=options)  # type: ignore
             out_stream.width = self.res_w
             out_stream.height = self.res_h
