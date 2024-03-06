@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Optional
 
 from tqdm import tqdm
 from ttkbootstrap import LabelFrame, Progressbar  # type: ignore
@@ -32,7 +32,10 @@ class ProgressFrame(LabelFrame):
         self.progress_bar.pack(expand=True, fill="x")
 
     def update_progress_bar(
-        self, set_progress_mode: str = "", steps: int = 0, update_bar: bool = False
+        self,
+        set_progress_mode: Optional[str] = None,
+        steps: int = 0,
+        update_bar: bool = False,
     ):
         if update_bar and self.progress_bar_cli:
             self.progress_bar_cli.update()

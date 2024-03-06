@@ -549,6 +549,7 @@ class GUI(Window):
         if self.job:
             self.cb_msg(msg="Cancelling job...")
             self.job.cancel()
+            self.cb_bar(set_progress_mode="clear")
 
     def set_inputs(self, state: str):
         # state: 'normal', 'disabled'
@@ -630,9 +631,22 @@ class GUI(Window):
 
         return self.response
 
-    def cb_bar(self, *args: Any, **kwargs: Any):
+    def cb_bar(
+        self,
+        set_progress_mode: Optional[str] = None,
+        steps: int = 0,
+        update_bar: bool = False,
+        *args: Any,
+        **kwargs: Any
+    ):
         with self.bar_lock:
-            self.progress_frame.update_progress_bar(*args, **kwargs)
+            self.progress_frame.update_progress_bar(
+                set_progress_mode,
+                steps,
+                update_bar,
+                *args,
+                **kwargs
+            )
 
     def highlight_fields(self) -> bool:
         if not self.init_done:

@@ -86,7 +86,7 @@ class Callback:
     def cb_bar(
         self,
         set_progress_mode: Optional[str] = None,
-        steps: Optional[int] = None,
+        steps: int = 0,
         update_bar: bool = False,
     ):
         if self.silent:
