@@ -54,6 +54,7 @@
         "signal_uuid": "Set Signal uuid. Required for uploading Signal stickers.",
         "signal_password": "Set Signal password. Required for uploading Signal stickers.",
         "signal_get_auth": "Generate Signal uuid and password.",
+        "signal_data_dir": "Optionally specify Signal data directory\nfor getting uuid and password. Useful for portable Signal.",
         "telegram_token": "Set Telegram token. Required for uploading and downloading Telegram stickers.",
         "telegram_userid": "Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.",
         "kakao_auth_token": "Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx",

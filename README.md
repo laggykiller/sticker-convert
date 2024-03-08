@@ -91,18 +91,23 @@ To run in CLI mode, pass on any arguments
 usage: sticker-convert.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR]
                           [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
-                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-whatsapp | --export-imessage] [--no-compress]
+                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-whatsapp | --export-imessage]
+                          [--no-compress]
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER] [--res-min RES_MIN]
-                          [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                          [--res-power RES_POWER] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
-                          [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                          [--img-format IMG_FORMAT] [--fake-vid] [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
-                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                          [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
-                          [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
-                          [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth] [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER]
+                          [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
+                          [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--quality-min QUALITY_MIN]
+                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
+                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--scale-filter SCALE_FILTER]
+                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--default-emoji DEFAULT_EMOJI]
+                          [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
+                          [--signal-data-dir SIGNAL_DATA_DIR] [--telegram-token TELEGRAM_TOKEN]
+                          [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
+                          [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
+                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]
+                          [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
@@ -223,6 +228,9 @@ Credentials options:
   --signal-password SIGNAL_PASSWORD
                         Set Signal password. Required for uploading Signal stickers.
   --signal-get-auth     Generate Signal uuid and password.
+  --signal-data-dir SIGNAL_DATA_DIR
+                        Optionally specify Signal data directory
+                        for getting uuid and password. Useful for portable Signal.
   --telegram-token TELEGRAM_TOKEN
                         Set Telegram token. Required for uploading and downloading Telegram stickers.
   --telegram-userid TELEGRAM_USERID

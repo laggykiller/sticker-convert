@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-from math import ceil
 import os
 import platform
 import signal
 import sys
 from functools import partial
 from json.decoder import JSONDecodeError
+from math import ceil
 from multiprocessing import Event, cpu_count
 from pathlib import Path
 from threading import Lock, Thread
@@ -13,10 +13,16 @@ from typing import Any, Callable, Optional, Union
 from urllib.parse import urlparse
 
 from PIL import ImageFont
-from ttkbootstrap import BooleanVar, DoubleVar, IntVar, StringVar, Window, Toplevel  # type: ignore
+from ttkbootstrap import (  # type: ignore
+    BooleanVar,
+    DoubleVar,
+    IntVar,
+    StringVar,
+    Toplevel,
+    Window,
+)
 from ttkbootstrap.dialogs import Messagebox, Querybox  # type: ignore
 
-from sticker_convert.version import __version__
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
 from sticker_convert.gui_components.frames.comp_frame import CompFrame
 from sticker_convert.gui_components.frames.config_frame import ConfigFrame
@@ -31,6 +37,7 @@ from sticker_convert.job_option import CompOption, CredOption, InputOption, Outp
 from sticker_convert.utils.files.json_manager import JsonManager
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.url_detect import UrlDetect
+from sticker_convert.version import __version__
 
 
 class GUI(Window):
@@ -64,7 +71,7 @@ class GUI(Window):
         self.warn_tkinter_bug()
         GUIUtils.finalize_window(self)
 
-        self.bind("<<exec_in_main>>", self.exec_in_main)
+        self.bind("<<exec_in_main>>", self.exec_in_main)  # type: ignore
 
     def __enter__(self):
         return self
@@ -147,6 +154,7 @@ class GUI(Window):
         # Credentials
         self.signal_uuid_var = StringVar(self)
         self.signal_password_var = StringVar(self)
+        self.signal_data_dir_var = StringVar(self)
         self.telegram_token_var = StringVar(self)
         self.telegram_userid_var = StringVar(self)
         self.kakao_auth_token_var = StringVar(self)
@@ -637,15 +645,11 @@ class GUI(Window):
         steps: int = 0,
         update_bar: bool = False,
         *args: Any,
-        **kwargs: Any
+        **kwargs: Any,
     ):
         with self.bar_lock:
             self.progress_frame.update_progress_bar(
-                set_progress_mode,
-                steps,
-                update_bar,
-                *args,
-                **kwargs
+                set_progress_mode, steps, update_bar, *args, **kwargs
             )
 
     def highlight_fields(self) -> bool:

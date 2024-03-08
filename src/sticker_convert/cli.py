@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 import argparse
-from argparse import Namespace
-from math import ceil
 import signal
+from argparse import Namespace
 from json.decoder import JSONDecodeError
+from math import ceil
 from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Any
 
-from sticker_convert.version import __version__
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
 from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
@@ -18,6 +17,7 @@ from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
 from sticker_convert.utils.callback import Callback
 from sticker_convert.utils.files.json_manager import JsonManager
 from sticker_convert.utils.url_detect import UrlDetect
+from sticker_convert.version import __version__
 
 
 class CLI:
@@ -441,7 +441,15 @@ class CLI:
         if args.signal_get_auth:
             get_signal_auth = GetSignalAuth()
 
-            uuid, password, msg = get_signal_auth.get_cred()
+            signal_bin_path = None
+            signal_user_data_dir = None
+            if args.signal_data_dir:
+                signal_bin_path = "(User specified)"
+                signal_user_data_dir = args.signal_data_dir
+
+            uuid, password, msg = get_signal_auth.get_cred(
+                signal_bin_path, signal_user_data_dir
+            )
 
             if uuid and password:
                 opt_cred.signal_uuid = uuid
