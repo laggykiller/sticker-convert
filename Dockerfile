@@ -54,9 +54,6 @@ COPY ./requirements.txt /app/
 RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY ./scripts/startapp.sh /startapp.sh
-COPY ./src /app/
-
-RUN chmod -R 777 /app
 
 VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 
@@ -65,6 +62,9 @@ RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+COPY ./src /app/
+RUN chmod -R 777 /app
 
 FROM base-gui AS full
 # Install signal-desktop
@@ -82,3 +82,6 @@ RUN apt purge -y curl wget gpg git && \
 
 RUN mkdir -p '/root/.config/Signal' && \
     chmod 777 '/root/.config/Signal'
+
+COPY ./src /app/
+RUN chmod -R 777 /app
