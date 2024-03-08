@@ -1,7 +1,14 @@
 #!/usr/bin/env python3
 from typing import TYPE_CHECKING, Any
 
-from ttkbootstrap import Button, Checkbutton, Entry, Label, LabelFrame, OptionMenu  # type: ignore
+from ttkbootstrap import (  # type: ignore
+    Button,
+    Checkbutton,
+    Entry,
+    Label,
+    LabelFrame,
+    OptionMenu,
+)
 
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore

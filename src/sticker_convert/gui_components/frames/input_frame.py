@@ -3,7 +3,13 @@ from pathlib import Path
 from tkinter import filedialog
 from typing import TYPE_CHECKING, Any
 
-from ttkbootstrap import Button, Entry, Label, LabelFrame, OptionMenu  # type: ignore
+from ttkbootstrap import (  # type: ignore
+    Button,
+    Entry,
+    Label,
+    LabelFrame,
+    OptionMenu,
+)
 
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore

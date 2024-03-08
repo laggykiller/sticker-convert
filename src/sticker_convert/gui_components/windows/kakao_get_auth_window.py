@@ -3,7 +3,13 @@ from functools import partial
 from threading import Thread
 from typing import Any
 
-from ttkbootstrap import Button, Entry, Frame, Label, LabelFrame  # type: ignore
+from ttkbootstrap import (  # type: ignore
+    Button,
+    Entry,
+    Frame,
+    Label,
+    LabelFrame,
+)
 
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.gui_utils import GUIUtils

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 from queue import Queue
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 from urllib.parse import urlparse
 
 import anyio

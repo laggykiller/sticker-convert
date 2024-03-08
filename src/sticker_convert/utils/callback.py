@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-from multiprocessing import Queue, Event
-from typing import Callable, Optional, Union, Any
+from multiprocessing import Event, Queue
+from typing import Any, Callable, Optional, Union
 
 from tqdm import tqdm
 

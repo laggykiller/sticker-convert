@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from queue import Queue
-from typing import Optional, Union, Any
+from typing import Any, Optional, Union
 
 import requests
 

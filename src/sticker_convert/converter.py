@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-from math import ceil, floor
 import os
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
 from io import BytesIO
+from math import ceil, floor
 from pathlib import Path
 from queue import Queue
-from typing import cast, Optional, Union, Any, TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
 
 import numpy as np
 from PIL import Image

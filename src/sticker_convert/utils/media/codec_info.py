@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-from io import BytesIO
 import mmap
 from decimal import ROUND_HALF_UP, Decimal
+from io import BytesIO
 from pathlib import Path
-from typing import Optional, Union, BinaryIO, cast
+from typing import BinaryIO, Optional, Union, cast
 
 from PIL import Image, UnidentifiedImageError
 

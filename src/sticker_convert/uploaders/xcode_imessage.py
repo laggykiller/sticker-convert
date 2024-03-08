@@ -7,7 +7,7 @@ import shutil
 import zipfile
 from pathlib import Path
 from queue import Queue
-from typing import Union, Any, Optional
+from typing import Any, Optional, Union
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.definitions import ROOT_DIR

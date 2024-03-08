@@ -11,7 +11,7 @@ from multiprocessing.managers import SyncManager
 from pathlib import Path
 from queue import Queue
 from threading import Thread
-from typing import Callable, Generator, Optional, Union, Any
+from typing import Any, Callable, Generator, Optional, Union
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert

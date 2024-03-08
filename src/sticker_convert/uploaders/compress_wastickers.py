@@ -4,7 +4,7 @@ import shutil
 import zipfile
 from pathlib import Path
 from queue import Queue
-from typing import Union, Optional, Any
+from typing import Any, Optional, Union
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption

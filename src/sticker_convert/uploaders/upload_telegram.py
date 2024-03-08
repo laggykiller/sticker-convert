@@ -3,7 +3,7 @@ import copy
 import re
 from pathlib import Path
 from queue import Queue
-from typing import Union, Any, Optional, cast
+from typing import Any, Optional, Union, cast
 
 import anyio
 from telegram import Bot, InputSticker, Sticker

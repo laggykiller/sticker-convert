@@ -2,12 +2,15 @@
 import copy
 from pathlib import Path
 from queue import Queue
-from typing import Union, Any, Optional
+from typing import Any, Optional, Union
 
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.errors import SignalException  # type: ignore
-from signalstickers_client.models import LocalStickerPack, Sticker  # type: ignore
+from signalstickers_client.models import (  # type: ignore
+    LocalStickerPack,
+    Sticker,
+)
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption

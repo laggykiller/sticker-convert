@@ -2,7 +2,7 @@
 import json
 import secrets
 import uuid
-from typing import Optional, Callable, Any
+from typing import Any, Callable, Optional
 from urllib.parse import parse_qs, urlparse
 
 import requests

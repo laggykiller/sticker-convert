@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-from typing import Any, Optional, Union
 
 import json
-from math import ceil
 from dataclasses import dataclass, field
+from math import ceil
 from multiprocessing import cpu_count
 from pathlib import Path
+from typing import Any, Optional, Union
 
 
 def to_int(i: Union[float, str, None]) -> Optional[int]:

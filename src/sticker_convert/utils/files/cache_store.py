@@ -13,9 +13,8 @@ else:
     import tempfile
 
 from contextlib import contextmanager
-from typing import ContextManager, Optional, Union
-
 from tempfile import TemporaryDirectory
+from typing import ContextManager, Optional, Union
 
 
 def debug_cache_dir(path: str) -> ContextManager[Path]:

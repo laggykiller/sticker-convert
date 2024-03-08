@@ -2,7 +2,7 @@
 import json
 import platform
 from http.cookiejar import CookieJar
-from typing import Optional, Union, Callable, Any
+from typing import Any, Callable, Optional, Union
 
 import requests
 import rookiepy

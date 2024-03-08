@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from queue import Queue
-from typing import Union, Optional
+from typing import Optional, Union
 
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.utils.callback import Callback, CallbackReturn
