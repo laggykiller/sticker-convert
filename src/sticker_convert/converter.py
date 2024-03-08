@@ -20,6 +20,8 @@ from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
+def rounding(value: float) -> Decimal:
+    return Decimal(value).quantize(0, ROUND_HALF_UP)
 
 def get_step_value(
     max: Optional[int],
@@ -238,7 +240,7 @@ class StickerConvert:
                 else:
                     sign = ">"
                     step_lower = step_current
-                step_current = int((step_lower + step_upper) / 2)
+                step_current = int(rounding((step_lower + step_upper) / 2))
                 self.recompress(sign)
             elif self.result:
                 return self.compress_done(self.result, self.result_step)
@@ -606,7 +608,7 @@ class StickerConvert:
         frame_current_float = 0.0
         while True:
             frame_current_float += frame_increment
-            frame_current = int(Decimal(frame_current_float).quantize(0, ROUND_HALF_UP))
+            frame_current = int(rounding(frame_current_float))
             if frame_current <= len(frames_in) - 1 and not (
                 frames_out_max and len(frames_out) == frames_out_max
             ):
@@ -823,7 +825,7 @@ class StickerConvert:
             return self._fix_fps_pyav(fps)
 
     def _fix_fps_duration(self, fps: float, denominator: int) -> Fraction:
-        delay = int(Decimal(denominator / fps).quantize(0, ROUND_HALF_UP))
+        delay = int(rounding(denominator / fps))
         fps_fraction = Fraction(denominator, delay)
         if self.opt_comp.fps_max and fps_fraction > self.opt_comp.fps_max:
             return Fraction(denominator, (delay + 1))
@@ -832,4 +834,4 @@ class StickerConvert:
         return fps_fraction
 
     def _fix_fps_pyav(self, fps: float) -> Fraction:
-        return Fraction(Decimal(fps).quantize(0, ROUND_HALF_UP))
+        return Fraction(rounding(fps))
