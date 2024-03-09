@@ -55,7 +55,7 @@ strict = ["*"]
 
 [tool.mypy]
 python_version = "3.9"
-exclude = ["msicreator"]
+files = ["src", "scripts", "tests", "compile.py"]
 
 [tool.isort]
 line_length = 200
