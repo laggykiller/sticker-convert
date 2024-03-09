@@ -380,7 +380,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
         self.default_emoji_lbl = Label(self.frame_advcomp, text="Default emoji")
-        self.im = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
+        self.im: Image.Image = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
         self.ph_im = ImageTk.PhotoImage(self.im)
         self.default_emoji_dsp = Label(self.frame_advcomp, image=self.ph_im)
 
