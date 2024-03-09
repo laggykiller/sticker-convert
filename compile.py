@@ -4,8 +4,8 @@ import platform
 import shutil
 import subprocess
 import sys
-from typing import Optional
 from pathlib import Path
+from typing import Optional
 
 sys.path.append("./src")
 from sticker_convert import __version__
@@ -48,6 +48,8 @@ def osx_run_in_venv(cmd: str, get_stdout: bool = False) -> Optional[str]:
         ).stdout.decode()
     else:
         subprocess.run(sh_cmd + [venv_cmd + cmd])
+
+    return None
 
 
 def search_wheel_in_dir(package: str, dir: Path) -> Path:

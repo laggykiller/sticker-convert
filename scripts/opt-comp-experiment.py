@@ -93,7 +93,7 @@ def compress_worker(
     ],
 ):
     for in_f, out_f, opt_comp in iter(work_queue.get, None):
-        success, in_f, out_f, size = StickerConvert.convert(
+        success, _, _, size = StickerConvert.convert(
             in_f=in_f,
             out_f=out_f,
             opt_comp=opt_comp,
