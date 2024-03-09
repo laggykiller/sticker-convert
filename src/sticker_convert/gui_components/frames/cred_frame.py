@@ -8,15 +8,9 @@ if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
 
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
-from sticker_convert.gui_components.windows.kakao_get_auth_window import (
-    KakaoGetAuthWindow,
-)
-from sticker_convert.gui_components.windows.line_get_auth_window import (
-    LineGetAuthWindow,
-)
-from sticker_convert.gui_components.windows.signal_get_auth_window import (
-    SignalGetAuthWindow,
-)
+from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGetAuthWindow
+from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
+from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
 
 
 class CredFrame(LabelFrame):

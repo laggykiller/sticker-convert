@@ -4,14 +4,7 @@ from pathlib import Path
 import pytest
 from _pytest._py.path import LocalPath
 
-from tests.common import (
-    KAKAO_TOKEN,
-    LINE_COOKIES,
-    PYTHON_EXE,
-    SRC_DIR,
-    TELEGRAM_TOKEN,
-    run_cmd,
-)
+from tests.common import KAKAO_TOKEN, LINE_COOKIES, PYTHON_EXE, SRC_DIR, TELEGRAM_TOKEN, run_cmd
 
 TEST_DOWNLOAD = os.environ.get("TEST_DOWNLOAD")
 

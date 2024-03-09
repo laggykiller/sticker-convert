@@ -8,14 +8,14 @@ worst case scenario for compression
 import copy
 import csv
 import itertools
-from math import ceil
 import os
 import sys
+from math import ceil
 from multiprocessing import Process, Queue, cpu_count
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
-from typing import Optional, Any
+from typing import Any, Optional
 
 import numpy
 from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba  # type: ignore
@@ -25,9 +25,9 @@ from tqdm import tqdm
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append("../src")
 
-from sticker_convert.converter import StickerConvert  # noqa: E402
-from sticker_convert.job_option import CompOption  # noqa: E402
-from sticker_convert.utils.callback import Callback, CallbackReturn  # noqa: E402
+from sticker_convert.converter import StickerConvert  # type: ignore # noqa: E402
+from sticker_convert.job_option import CompOption  # type: ignore # noqa: E402
+from sticker_convert.utils.callback import Callback, CallbackReturn  # type: ignore # noqa: E402
 
 processes_max = ceil(cpu_count() / 2)
 

@@ -108,7 +108,7 @@ class SignalGetAuthWindow(BaseWindow):
 
         if self.gui.signal_data_dir_var.get():
             signal_user_data_dir = self.gui.signal_data_dir_var.get()
-            
+
         if signal_bin_path:
             Popen(
                 [

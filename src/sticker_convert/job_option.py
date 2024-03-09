@@ -129,7 +129,11 @@ class CompOption(BaseOption):
     def set_fps(self, value: Optional[int]):
         self.fps_min, self.fps_max = to_int(value), to_int(value)
 
-    def get_res(self) -> tuple[tuple[Optional[int], Optional[int]], tuple[Optional[int], Optional[int]]]:
+    def get_res(
+        self,
+    ) -> tuple[
+        tuple[Optional[int], Optional[int]], tuple[Optional[int], Optional[int]]
+    ]:
         return (self.get_res_w(), self.get_res_h())
 
     def set_res(self, value: Optional[int]):

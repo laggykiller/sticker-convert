@@ -5,18 +5,7 @@ from functools import partial
 from typing import Any
 
 from PIL import Image, ImageDraw, ImageTk
-from ttkbootstrap import (  # type: ignore
-    Button,
-    Canvas,
-    Checkbutton,
-    Entry,
-    Frame,
-    Label,
-    LabelFrame,
-    OptionMenu,
-    Scrollbar,
-    StringVar,
-)
+from ttkbootstrap import Button, Canvas, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, Scrollbar, StringVar  # type: ignore
 
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.gui_utils import GUIUtils

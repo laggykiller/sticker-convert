@@ -20,8 +20,10 @@ from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
+
 def rounding(value: float) -> Decimal:
     return Decimal(value).quantize(0, ROUND_HALF_UP)
+
 
 def get_step_value(
     max: Optional[int],

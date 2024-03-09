@@ -46,7 +46,9 @@ class FormatVerify:
     @staticmethod
     def check_file_res(
         file: Union[Path, bytes],
-        res: tuple[tuple[Optional[int], Optional[int]], tuple[Optional[int], Optional[int]]],
+        res: tuple[
+            tuple[Optional[int], Optional[int]], tuple[Optional[int], Optional[int]]
+        ],
         square: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None,
     ) -> bool:

@@ -1,0 +1,57 @@
+name: Check, update stub and formatting
+
+on:
+  push:
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
+
+jobs:
+  check_and_fix:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+      with:
+        fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+        submodules: recursive
+    - name: Extract branch name
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.8'
+    - name: Install dependency
+      run: |
+        pip install ruff mypy isort
+    - name: Update emoji.json
+      run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json
+    - name: Ruff check
+      run: |
+        ruff check src
+        ruff check scripts
+        ruff check tests
+    - name: Install test
+      run: pip install .
+    - name: mypy
+      run: |
+        mypy src
+        mypy scripts
+        mypy tests
+    - name: ruff format
+      run: |
+        ruff format src
+        ruff format scripts
+        ruff format tests
+    - name: isort
+      run: |
+        isort src -l 200
+        isort scripts -l 200
+        isort tests -l 200
+    - name: Commit & Push changes
+      uses: actions-js/push@master
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        message: Formatting
+        branch: ${{ steps.extract_branch.outputs.branch }}

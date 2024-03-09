@@ -6,22 +6,12 @@ from typing import Optional
 import pytest
 from _pytest._py.path import LocalPath
 
-from tests.common import (
-    COMPRESSION_DICT,
-    PYTHON_EXE,
-    SAMPLE_DIR,
-    SIGNAL_PASSWORD,
-    SIGNAL_UUID,
-    SRC_DIR,
-    TELEGRAM_TOKEN,
-    TELEGRAM_USERID,
-    run_cmd,
-)
+from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SIGNAL_PASSWORD, SIGNAL_UUID, SRC_DIR, TELEGRAM_TOKEN, TELEGRAM_USERID, run_cmd
 
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append("../src")
 
-from sticker_convert.utils.media.codec_info import CodecInfo  # noqa: E402
+from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore # noqa: E402
 
 TEST_UPLOAD = os.environ.get("TEST_UPLOAD")
 

@@ -13,14 +13,7 @@ from typing import Any, Callable, Optional, Union
 from urllib.parse import urlparse
 
 from PIL import ImageFont
-from ttkbootstrap import (  # type: ignore
-    BooleanVar,
-    DoubleVar,
-    IntVar,
-    StringVar,
-    Toplevel,
-    Window,
-)
+from ttkbootstrap import BooleanVar, DoubleVar, IntVar, StringVar, Toplevel, Window  # type: ignore
 from ttkbootstrap.dialogs import Messagebox, Querybox  # type: ignore
 
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
