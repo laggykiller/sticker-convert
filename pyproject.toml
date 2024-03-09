@@ -55,7 +55,7 @@ include = ["src", "scripts", "tests", "compile.py"]
 strict = ["*"]
 
 [tool.mypy]
-python_version = "3.9"
+python_version = "3.8"
 files = ["src", "scripts", "tests", "compile.py"]
 
 [tool.isort]
