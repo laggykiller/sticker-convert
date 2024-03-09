@@ -25,8 +25,10 @@ sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
 
 # Create msi installer
 1. Install [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
-2. Install [Wix](https://wixtoolset.org/docs/intro/): `dotnet tool install --global wix`
-3. `wix extension add WixToolset.UI.wixext`
+2. Install [Wix](https://wixtoolset.org/docs/intro/):
+`dotnet tool install --global wix --version 4.0.4`
+3. Install [WixUI dialog library](https://wixtoolset.org/docs/tools/wixext/wixui/):
+`wix extension add WixToolset.UI.wixext/4.0.4`
 4. `python compile.py`
 5. `mv sticker-convert.dist sticker-convert`
 6. `python msicreator\createmsi.py msicreator.json`

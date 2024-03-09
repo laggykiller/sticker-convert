@@ -51,7 +51,7 @@ jobs:
                 Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-windows-x86_64.zip
                 
                 dotnet tool install --global wix --version 4.0.4
-                dotnet add package WixToolset.UI.wixext --version 4.0.4
+                wix extension add WixToolset.UI.wixext/4.0.4
                 python .\msicreator\createmsi.py msicreator.json
                 move *.msi sticker-convert-windows-x86_64.msi
             OUT_FILE_NAME: |
