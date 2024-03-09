@@ -433,7 +433,7 @@ class StickerConvert:
                             width=width,
                             height=height,
                             format="yuva420p",
-                            dst_colorspace=1,
+                            dst_colorspace=1,  # type: ignore
                         )
 
                         # https://stackoverflow.com/questions/72308308/converting-yuv-to-rgb-in-python-coefficients-work-with-array-dont-work-with-n
@@ -635,7 +635,7 @@ class StickerConvert:
     def _frames_export_pyav(self) -> None:
         import av  # type: ignore
         from av.container import OutputContainer  # type: ignore
-        from av.video.stream import VideoStream
+        from av.video.stream import VideoStream  # type: ignore
 
         options = {}
 

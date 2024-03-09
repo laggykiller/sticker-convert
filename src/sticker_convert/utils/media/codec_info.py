@@ -279,6 +279,8 @@ class CodecInfo:
                 ms_per_frame = duration_n_minus_one / (frame_count - 1)
                 duration = frame_count * ms_per_frame
                 return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))
+        
+        return 0, 0
 
     @staticmethod
     def get_file_codec(file: Union[Path, bytes], file_ext: Optional[str] = None) -> str:
@@ -319,11 +321,11 @@ class CodecInfo:
 
         try:
             with av.open(file_ref) as container:  # type: ignore
-                codec = container.streams.video[0].codec_context.name
+                return container.streams.video[0].codec_context.name.lower()
         except InvalidDataError:
-            return ""
+            pass
 
-        return codec.lower()
+        return ""
 
     @staticmethod
     def get_file_res(

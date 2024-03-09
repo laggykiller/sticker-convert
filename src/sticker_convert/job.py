@@ -11,7 +11,7 @@ from multiprocessing.managers import SyncManager
 from pathlib import Path
 from queue import Queue
 from threading import Thread
-from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
@@ -206,7 +206,8 @@ class Executor:
         self.cb_thread_instance.join()
 
     def get_result(self) -> Generator[Any, None, None]:
-        for result in iter(self.results_queue.get, None):
+        gen: Iterator[Any] = iter(self.results_queue.get, None)
+        for result in gen:
             yield result
 
     def cb(
