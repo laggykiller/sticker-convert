@@ -33,7 +33,9 @@ jobs:
         ruff check scripts
         ruff check tests
     - name: Install test
-      run: pip install .
+      run: |
+        pip install .
+        pip install -r requirements-type.txt
     - name: mypy
       run: |
         mypy src
