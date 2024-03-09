@@ -51,14 +51,15 @@ dependencies = {file = ["requirements.txt"]}
 
 [tool.pyright]
 include = ["src", "scripts", "tests", "compile.py"]
-strict = ["src", "scripts", "tests", "compile.py"]
+strict = ["*"]
 
 [tool.mypy]
 python_version = "3.9"
-files = ["src", "scripts", "tests", "compile.py"]
+exclude = ["msicreator"]
 
 [tool.isort]
 line_length = 200
+extend_skip = ["msicreator"]
 
 [tool.ruff]
 exclude = ["msicreator"]

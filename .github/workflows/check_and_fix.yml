@@ -38,7 +38,7 @@ jobs:
     - name: ruff format
       run: ruff format
     - name: isort
-      run: isort src scripts tests compile.py
+      run: isort .
     - name: Commit & Push changes
       uses: actions-js/push@master
       with:
