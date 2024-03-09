@@ -171,7 +171,7 @@ class StickerConvert:
     def _convert(self) -> tuple[bool, Path, Union[None, bytes, Path], int]:
         result = self.check_if_compatible()
         if result:
-            self.compress_done(result)
+            return self.compress_done(result)
 
         self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
 
