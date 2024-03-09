@@ -1,4 +1,4 @@
-name: Check, update stub and formatting
+name: Check and formatting
 
 on:
   push:
