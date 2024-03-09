@@ -3,13 +3,13 @@ import copy
 import re
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union, cast
+from typing import Any, Dict, List, Union, cast
 
 import anyio
 from telegram import Bot, InputSticker, Sticker
 from telegram.error import TelegramError
 
-from sticker_convert.converter import StickerConvert
+from sticker_convert.converter import StickerConvert, CbQueueItemType
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import Callback, CallbackReturn
@@ -69,7 +69,7 @@ class UploadTelegram(UploadBase):
         self.opt_comp_cover_merged.merge(self.base_spec)
 
     async def upload_pack(
-        self, pack_title: str, stickers: list[Path], emoji_dict: dict[str, str]
+        self, pack_title: str, stickers: List[Path], emoji_dict: Dict[str, str]
     ) -> str:
         assert self.opt_cred.telegram_token
         bot = Bot(self.opt_cred.telegram_token.strip())
@@ -228,8 +228,8 @@ class UploadTelegram(UploadBase):
             result = f"https://t.me/addstickers/{pack_short_name}"
         return result
 
-    def upload_stickers_telegram(self) -> list[str]:
-        urls: list[str] = []
+    def upload_stickers_telegram(self) -> List[str]:
+        urls: List[str] = []
 
         if not (self.opt_cred.telegram_token and self.opt_cred.telegram_userid):
             self.cb.put("Token and userid required for uploading to telegram")
@@ -282,18 +282,9 @@ class UploadTelegram(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
-    ) -> list[str]:
+    ) -> List[str]:
         exporter = UploadTelegram(
             opt_output,
             opt_comp,

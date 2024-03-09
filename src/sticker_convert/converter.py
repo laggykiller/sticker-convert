@@ -6,7 +6,7 @@ from io import BytesIO
 from math import ceil, floor
 from pathlib import Path
 from queue import Queue
-from typing import TYPE_CHECKING, Any, Literal, Optional, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import numpy as np
 from PIL import Image
@@ -20,6 +20,12 @@ from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
+
+CbQueueItemType = Union[
+                        Tuple[str, Optional[Tuple[str]], Optional[Dict[str, str]]],
+                        str,
+                        None,
+                    ]
 
 def rounding(value: float) -> Decimal:
     return Decimal(value).quantize(0, ROUND_HALF_UP)
@@ -55,10 +61,10 @@ def get_step_value(
 
 def useful_array(
     plane: "VideoPlane", bytes_per_pixel: int = 1, dtype: str = "uint8"
-) -> np.ndarray[Any, Any]:
+) -> "np.ndarray[Any, Any]":
     total_line_size = abs(plane.line_size)
     useful_line_size = plane.width * bytes_per_pixel
-    arr: np.ndarray[Any, Any] = np.frombuffer(cast(bytes, plane), np.uint8)
+    arr: "np.ndarray[Any, Any]" = np.frombuffer(cast(bytes, plane), np.uint8)
     if total_line_size != useful_line_size:
         arr = arr.reshape(-1, total_line_size)[:, 0:useful_line_size].reshape(-1)
     return arr.view(np.dtype(dtype))
@@ -80,19 +86,10 @@ class StickerConvert:
 
     def __init__(
         self,
-        in_f: Union[Path, tuple[Path, bytes]],
+        in_f: Union[Path, Tuple[Path, bytes]],
         out_f: Path,
         opt_comp: CompOption,
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         #  cb_return: CallbackReturn
     ):
         self.in_f: Union[bytes, Path]
@@ -107,7 +104,7 @@ class StickerConvert:
             self.in_f_path = in_f[0]
             self.codec_info_orig = CodecInfo(in_f[1], Path(in_f[0]).suffix)
 
-        valid_formats: list[str] = []
+        valid_formats: List[str] = []
         for i in opt_comp.get_format():
             valid_formats.extend(i)
 
@@ -127,8 +124,8 @@ class StickerConvert:
         self.out_f_name: str = self.out_f.name
 
         self.cb = cb
-        self.frames_raw: list[np.ndarray[Any, Any]] = []
-        self.frames_processed: list[np.ndarray[Any, Any]] = []
+        self.frames_raw: "List[np.ndarray[Any, Any]]" = []
+        self.frames_processed: "List[np.ndarray[Any, Any]]" = []
         self.opt_comp: CompOption = opt_comp
         if not self.opt_comp.steps:
             self.opt_comp.steps = 1
@@ -150,27 +147,18 @@ class StickerConvert:
 
     @staticmethod
     def convert(
-        in_f: Union[Path, tuple[Path, bytes]],
+        in_f: Union[Path, Tuple[Path, bytes]],
         out_f: Path,
         opt_comp: CompOption,
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
-    ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
+    ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
         sticker = StickerConvert(in_f, out_f, opt_comp, cb)
         result = sticker._convert()
         cb.put("update_bar")
         return result
 
-    def _convert(self) -> tuple[bool, Path, Union[None, bytes, Path], int]:
+    def _convert(self) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
         result = self.check_if_compatible()
         if result:
             return self.compress_done(result)
@@ -287,8 +275,8 @@ class StickerConvert:
         else:
             return None
 
-    def generate_steps_list(self) -> list[tuple[Optional[int], ...]]:
-        steps_list: list[tuple[Optional[int], ...]] = []
+    def generate_steps_list(self) -> List[Tuple[Optional[int], ...]]:
+        steps_list: List[Tuple[Optional[int], ...]] = []
         for step in range(self.opt_comp.steps, -1, -1):
             steps_list.append(
                 (
@@ -342,7 +330,7 @@ class StickerConvert:
 
     def compress_fail(
         self,
-    ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
+    ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
         msg = self.MSG_FAIL_COMP.format(
             self.in_f_name, self.out_f_name, self.size_max, self.size
         )
@@ -352,7 +340,7 @@ class StickerConvert:
 
     def compress_done(
         self, data: bytes, result_step: Optional[int] = None
-    ) -> tuple[bool, Path, Union[None, bytes, Path], int]:
+    ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
         out_f: Union[None, bytes, Path]
 
         if self.out_f.stem == "none":
@@ -431,7 +419,7 @@ class StickerConvert:
                         height = frame.height
                     if frame.format.name == "yuv420p":
                         rgb_array = frame.to_ndarray(format="rgb24")  # type: ignore
-                        cast(np.ndarray[Any, Any], rgb_array)
+                        cast("np.ndarray[Any, Any]", rgb_array)
                         rgba_array = np.dstack(
                             (
                                 rgb_array,
@@ -472,11 +460,11 @@ class StickerConvert:
 
                         yuv_array = yuv_array.astype(np.float32)
                         yuv_array[:, :, 0] = (
-                            yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype)
+                            yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype)  # type: ignore
                             - 16
                         )
                         yuv_array[:, :, 1:] = (
-                            yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype)
+                            yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype)  # type: ignore
                             - 128
                         )
 
@@ -524,9 +512,9 @@ class StickerConvert:
         anim.lottie_animation_destroy()
 
     def frames_resize(
-        self, frames_in: list[np.ndarray[Any, Any]]
-    ) -> list[np.ndarray[Any, Any]]:
-        frames_out: list[np.ndarray[Any, Any]] = []
+        self, frames_in: "List[np.ndarray[Any, Any]]"
+    ) -> "List[np.ndarray[Any, Any]]":
+        frames_out: "List[np.ndarray[Any, Any]]" = []
 
         resample: Literal[0, 1, 2, 3]
         if self.opt_comp.scale_filter == "nearest":
@@ -544,22 +532,20 @@ class StickerConvert:
             with Image.fromarray(frame, "RGBA") as im:  # type: ignore
                 width, height = im.size
 
-                if self.res_w is None:
-                    self.res_w = width
-                if self.res_h is None:
-                    self.res_h = height
+            if self.res_w is None:
+                self.res_w = width
+            if self.res_h is None:
+                self.res_h = height
 
-                if width > height:
-                    width_new = self.res_w
-                    height_new = height * self.res_w // width
-                else:
-                    height_new = self.res_h
-                    width_new = width * self.res_h // height
+            if width > height:
+                width_new = self.res_w
+                height_new = height * self.res_w // width
+            else:
+                height_new = self.res_h
+                width_new = width * self.res_h // height
 
-                with (
-                    im.resize((width_new, height_new), resample=resample) as im_resized,
-                    Image.new("RGBA", (self.res_w, self.res_h), (0, 0, 0, 0)) as im_new,
-                ):
+            with im.resize((width_new, height_new), resample=resample) as im_resized:
+                with Image.new("RGBA", (self.res_w, self.res_h), (0, 0, 0, 0)) as im_new:
                     im_new.paste(
                         im_resized,
                         ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2),
@@ -569,8 +555,8 @@ class StickerConvert:
         return frames_out
 
     def frames_drop(
-        self, frames_in: list[np.ndarray[Any, Any]]
-    ) -> list[np.ndarray[Any, Any]]:
+        self, frames_in: "List[np.ndarray[Any, Any]]"
+    ) -> "List[np.ndarray[Any, Any]]":
         if (
             not self.codec_info_orig.is_animated
             or not self.fps
@@ -578,7 +564,7 @@ class StickerConvert:
         ):
             return [frames_in[0]]
 
-        frames_out: list[np.ndarray[Any, Any]] = []
+        frames_out: "List[np.ndarray[Any, Any]]" = []
 
         # fps_ratio: 1 frame in new anim equal to how many frame in old anim
         # speed_ratio: How much to speed up / slow down

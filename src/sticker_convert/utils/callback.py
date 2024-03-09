@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from multiprocessing import Event, Queue
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from tqdm import tqdm
 
@@ -155,18 +155,18 @@ class Callback:
     def put(
         self,
         i: Union[
-            tuple[Optional[str], Optional[tuple[Any, ...]], Optional[dict[str, Any]]],
+            Tuple[Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, Any]]],
             str,
         ],
     ) -> Union[str, bool, None]:
         if isinstance(i, tuple):
             action = i[0]
             if len(i) >= 2:
-                args: tuple[str, ...] = i[1] if i[1] else tuple()
+                args: Tuple[str, ...] = i[1] if i[1] else tuple()
             else:
                 args = tuple()
             if len(i) >= 3:
-                kwargs: dict[str, Any] = i[2] if i[2] else dict()
+                kwargs: Dict[str, Any] = i[2] if i[2] else dict()
             else:
                 kwargs = dict()
         else:

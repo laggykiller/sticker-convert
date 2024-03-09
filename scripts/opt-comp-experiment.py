@@ -15,7 +15,7 @@ from multiprocessing import Process, Queue, cpu_count
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from threading import Thread
-from typing import Any, Optional
+from typing import Any, List, Optional, Tuple
 
 import numpy
 from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba  # type: ignore
@@ -80,15 +80,15 @@ def generate_random_png(res: int, out_f: Path) -> None:
 
 
 def compress_worker(
-    work_queue: Queue[Optional[tuple[Path, Path, CompOption]]],
+    work_queue: Queue[Optional[Tuple[Path, Path, CompOption]]],
     results_queue: Queue[
-        tuple[
+        Tuple[
             bool,
             int,
             Optional[int],
             Optional[int],
-            tuple[Optional[int], Optional[int]],
-            tuple[Optional[int], Optional[int]],
+            Tuple[Optional[int], Optional[int]],
+            Tuple[Optional[int], Optional[int]],
         ]
     ],
 ):
@@ -190,14 +190,14 @@ def main() -> None:
                 for i in itertools.product(fps_list, res_list, quality_list, color_list)
             ]
 
-            work_queue: Queue[Optional[tuple[Path, Path, CompOption]]] = Queue()
+            work_queue: Queue[Optional[Tuple[Path, Path, CompOption]]] = Queue()
             results_queue: Queue[Any] = Queue()
 
             Thread(
                 target=write_result, args=(csv_path, results_queue, len(combinations))
             ).start()
 
-            processes: list[Process] = []
+            processes: List[Process] = []
             for _ in range(processes_max):
                 process = Process(
                     target=compress_worker, args=(work_queue, results_queue)

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import requests
 
@@ -20,7 +20,7 @@ class DownloadBase:
         cb: Union[
             Queue[
                 Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, Any]]],
+                    Tuple[str, Optional[Tuple[str]], Optional[Dict[str, Any]]],
                     str,
                     None,
                 ]
@@ -35,7 +35,7 @@ class DownloadBase:
         self.cb: Union[
             Queue[
                 Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, Any]]],
+                    Tuple[str, Optional[Tuple[str]], Optional[Dict[str, Any]]],
                     str,
                     None,
                 ]
@@ -45,7 +45,7 @@ class DownloadBase:
         self.cb_return: CallbackReturn = cb_return
 
     def download_multiple_files(
-        self, targets: list[tuple[str, Path]], retries: int = 3, **kwargs: Any
+        self, targets: List[Tuple[str, Path]], retries: int = 3, **kwargs: Any
     ):
         # targets format: [(url1, dest2), (url2, dest2), ...]
         self.cb.put(

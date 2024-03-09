@@ -5,7 +5,7 @@ import mmap
 from decimal import ROUND_HALF_UP, Decimal
 from io import BytesIO
 from pathlib import Path
-from typing import BinaryIO, Optional, Union, cast
+from typing import BinaryIO, Optional, Tuple, Union, cast
 
 from PIL import Image, UnidentifiedImageError
 
@@ -29,7 +29,7 @@ class CodecInfo:
     @staticmethod
     def get_file_fps_frames_duration(
         file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> tuple[float, int, int]:
+    ) -> Tuple[float, int, int]:
         fps: float
 
         if not file_ext and isinstance(file, Path):
@@ -158,7 +158,7 @@ class CodecInfo:
                 return anim.lottie_animation_get_totalframe()
 
     @staticmethod
-    def _get_file_fps_frames_tgs(file: Union[Path, bytes]) -> tuple[int, int]:
+    def _get_file_fps_frames_tgs(file: Union[Path, bytes]) -> Tuple[int, int]:
         from rlottie_python.rlottie_wrapper import LottieAnimation
 
         if isinstance(file, Path):
@@ -179,7 +179,7 @@ class CodecInfo:
     @staticmethod
     def _get_file_frames_duration_pillow(
         file: Union[Path, bytes], frames_only: bool = False
-    ) -> tuple[int, int]:
+    ) -> Tuple[int, int]:
         total_duration = 0
 
         with Image.open(file) as im:
@@ -197,7 +197,7 @@ class CodecInfo:
     @staticmethod
     def _get_file_frames_duration_webp(
         file: Union[Path, bytes],
-    ) -> tuple[int, int]:
+    ) -> Tuple[int, int]:
         total_duration = 0
         frames = 0
 
@@ -233,7 +233,7 @@ class CodecInfo:
         file: Union[Path, bytes],
         frames_to_iterate: Optional[int] = None,
         frames_only: bool = False,
-    ) -> tuple[int, int]:
+    ) -> Tuple[int, int]:
         import av  # type: ignore
         from av.container.input import InputContainer  # type: ignore
 
@@ -328,7 +328,7 @@ class CodecInfo:
     @staticmethod
     def get_file_res(
         file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> tuple[int, int]:
+    ) -> Tuple[int, int]:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 

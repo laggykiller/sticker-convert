@@ -7,9 +7,9 @@ import shutil
 import zipfile
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, Dict, List, Tuple, Union
 
-from sticker_convert.converter import StickerConvert
+from sticker_convert.converter import StickerConvert, CbQueueItemType
 from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
@@ -21,7 +21,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 
 
 class XcodeImessageIconset:
-    iconset: dict[str, tuple[int, int]] = {}
+    iconset: Dict[str, Tuple[int, int]] = {}
 
     def __init__(self) -> None:
         if self.iconset != {}:
@@ -91,8 +91,8 @@ class XcodeImessage(UploadBase):
         self.large_spec = copy.deepcopy(self.base_spec)
         self.large_spec.set_res(618)
 
-    def create_imessage_xcode(self) -> list[str]:
-        urls: list[str] = []
+    def create_imessage_xcode(self) -> List[str]:
+        urls: List[str] = []
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
             title=self.opt_output.title,
@@ -259,7 +259,7 @@ class XcodeImessage(UploadBase):
             if i.suffix == ".sticker":
                 shutil.rmtree(stickers_path / i)
 
-        stickers_lst: list[str] = []
+        stickers_lst: List[str] = []
         for i in sorted(self.opt_output.dir.iterdir()):
             if (
                 CodecInfo.get_file_ext(i) == ".png"
@@ -288,7 +288,7 @@ class XcodeImessage(UploadBase):
 
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/Contents.json
         with open(stickers_path / "Contents.json") as f:
-            stickerpack_json_content: dict[str, list[dict[str, str]]] = json.load(f)
+            stickerpack_json_content: Dict[str, List[Dict[str, str]]] = json.load(f)
 
         stickerpack_json_content["stickers"] = []
         for sticker in stickers_lst:
@@ -307,7 +307,7 @@ class XcodeImessage(UploadBase):
             if Path(iconfile_name).suffix == ".png":
                 os.remove(iconset_path / iconfile_name)
 
-        icons_lst: list[str] = []
+        icons_lst: List[str] = []
         for icon in self.iconset:
             shutil.copy(self.opt_output.dir / icon, iconset_path / icon)
             icons_lst.append(icon)
@@ -334,17 +334,8 @@ class XcodeImessage(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
-    ) -> list[str]:
+    ) -> List[str]:
         exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.create_imessage_xcode()

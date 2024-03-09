@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import List
 
 import pytest
 from _pytest._py.path import LocalPath
@@ -14,7 +15,7 @@ def _run_sticker_convert(
     source: str,
     url: str,
     expected_file_count: int,
-    expected_file_formats: list[str],
+    expected_file_formats: List[str],
     with_title: bool,
     with_author: bool,
     with_emoji: bool,

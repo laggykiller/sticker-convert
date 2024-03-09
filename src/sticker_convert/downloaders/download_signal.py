@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.errors import SignalException  # type: ignore
 from signalstickers_client.models import StickerPack  # type: ignore
 
+from sticker_convert.converter import CbQueueItemType
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
 from sticker_convert.utils.callback import Callback, CallbackReturn
@@ -38,7 +39,7 @@ class DownloadSignal(DownloadBase):
             )
         )
 
-        emoji_dict: dict[str, str] = {}
+        emoji_dict: Dict[str, str] = {}
         for sticker in pack.stickers:  # type: ignore
             f_id = str(sticker.id).zfill(3)  # type: ignore
             f_path = Path(self.out_dir, f_id)
@@ -86,16 +87,7 @@ class DownloadSignal(DownloadBase):
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
     ) -> bool:
         downloader = DownloadSignal(url, out_dir, opt_cred, cb, cb_return)

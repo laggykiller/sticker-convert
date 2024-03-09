@@ -6,7 +6,7 @@ from json.decoder import JSONDecodeError
 from math import ceil
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict
 
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
 from sticker_convert.job import Job
@@ -26,7 +26,7 @@ class CLI:
 
     def cli(self) -> None:
         try:
-            self.help: dict[str, dict[str, str]] = JsonManager.load_json(
+            self.help: Dict[str, Dict[str, str]] = JsonManager.load_json(
                 ROOT_DIR / "resources/help.json"
             )
             self.input_presets = JsonManager.load_json(
@@ -125,7 +125,7 @@ class CLI:
             "quantize_method",
         )
         flags_comp_bool = ("fake_vid",)
-        keyword_args: dict[str, Any]
+        keyword_args: Dict[str, Any]
         for k, v in self.help["comp"].items():
             if k in flags_comp_int:
                 keyword_args = {"type": int, "default": None}

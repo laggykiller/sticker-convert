@@ -9,7 +9,7 @@ from math import ceil
 from multiprocessing import Event, cpu_count
 from pathlib import Path
 from threading import Lock, Thread
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union
 from urllib.parse import urlparse
 
 from PIL import ImageFont
@@ -223,7 +223,7 @@ class GUI(Window):
     def load_jsons(self) -> None:
         self.help = JsonManager.load_json(ROOT_DIR / "resources/help.json")
         self.input_presets = JsonManager.load_json(ROOT_DIR / "resources/input.json")
-        self.compression_presets: dict[str, dict[str, Any]] = JsonManager.load_json(
+        self.compression_presets: Dict[str, Dict[str, Any]] = JsonManager.load_json(
             ROOT_DIR / "resources/compression.json"
         )
         self.output_presets = JsonManager.load_json(ROOT_DIR / "resources/output.json")
@@ -241,7 +241,7 @@ class GUI(Window):
         self.settings_path = CONFIG_DIR / "config.json"
         if self.settings_path.is_file():
             try:
-                self.settings: dict[Any, Any] = JsonManager.load_json(
+                self.settings: Dict[Any, Any] = JsonManager.load_json(
                     self.settings_path
                 )
             except JSONDecodeError:

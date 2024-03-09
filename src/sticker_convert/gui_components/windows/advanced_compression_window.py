@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from functools import partial
-from typing import Any
+from typing import Any, List, Tuple
 
 from PIL import Image, ImageDraw, ImageTk
 from ttkbootstrap import Button, Canvas, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, Scrollbar, StringVar  # type: ignore
@@ -15,7 +15,7 @@ from sticker_convert.gui_components.windows.base_window import BaseWindow
 class AdvancedCompressionWindow(BaseWindow):
     emoji_column_per_row = 10
     emoji_visible_rows = 5
-    emoji_btns: list[tuple[Button, ImageTk.PhotoImage]] = []
+    emoji_btns: List[Tuple[Button, ImageTk.PhotoImage]] = []
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(AdvancedCompressionWindow, self).__init__(*args, **kwargs)

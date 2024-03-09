@@ -2,14 +2,14 @@
 import copy
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, Dict, List, Union
 
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.errors import SignalException  # type: ignore
 from signalstickers_client.models import LocalStickerPack, Sticker  # type: ignore
 
-from sticker_convert.converter import StickerConvert
+from sticker_convert.converter import StickerConvert, CbQueueItemType
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import Callback, CallbackReturn
@@ -48,7 +48,7 @@ class UploadSignal(UploadBase):
         return result
 
     def add_stickers_to_pack(
-        self, pack: LocalStickerPack, stickers: list[Path], emoji_dict: dict[str, str]
+        self, pack: LocalStickerPack, stickers: List[Path], emoji_dict: Dict[str, str]
     ):
         for src in stickers:
             self.cb.put(f"Verifying {src} for uploading to signal")
@@ -92,8 +92,8 @@ class UploadSignal(UploadBase):
 
             pack._addsticker(sticker)  # type: ignore
 
-    def upload_stickers_signal(self) -> list[str]:
-        urls: list[str] = []
+    def upload_stickers_signal(self) -> List[str]:
+        urls: List[str] = []
 
         if not self.opt_cred.signal_uuid:
             self.cb.put("uuid required for uploading to Signal")
@@ -167,17 +167,8 @@ class UploadSignal(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
-    ) -> list[str]:
+    ) -> List[str]:
         exporter = UploadSignal(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.upload_stickers_signal()

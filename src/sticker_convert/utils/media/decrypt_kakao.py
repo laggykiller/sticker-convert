@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from typing import List
+
 """
 References:
 https://github.com/blluv/KakaoTalkEmoticonDownloader
@@ -10,7 +12,7 @@ https://github.com/star-39/moe-sticker-bot
 
 class DecryptKakao:
     @staticmethod
-    def generate_lfsr(key: str) -> list[int]:
+    def generate_lfsr(key: str) -> List[int]:
         d = list(key * 2)
         seq = [0, 0, 0]
 
@@ -32,7 +34,7 @@ class DecryptKakao:
         return seq
 
     @staticmethod
-    def xor_byte(b: int, seq: list[int]) -> int:
+    def xor_byte(b: int, seq: List[int]) -> int:
         flag1 = 1
         flag2 = 0
         result = 0

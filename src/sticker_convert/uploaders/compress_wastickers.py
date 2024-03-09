@@ -4,9 +4,9 @@ import shutil
 import zipfile
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, List, Union
 
-from sticker_convert.converter import StickerConvert
+from sticker_convert.converter import StickerConvert, CbQueueItemType
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import Callback, CallbackReturn
@@ -49,8 +49,8 @@ class CompressWastickers(UploadBase):
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
         self.opt_comp_merged.merge(self.base_spec)
 
-    def compress_wastickers(self) -> list[str]:
-        urls: list[str] = []
+    def compress_wastickers(self) -> List[str]:
+        urls: List[str] = []
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
             title=self.opt_output.title,
@@ -150,17 +150,8 @@ class CompressWastickers(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
-    ) -> list[str]:
+    ) -> List[str]:
         exporter = CompressWastickers(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.compress_wastickers()

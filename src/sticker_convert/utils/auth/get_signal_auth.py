@@ -4,13 +4,13 @@ import os
 import platform
 import shutil
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Tuple
 
 from sqlcipher3 import dbapi2 as sqlite3
 
 
 class GetSignalAuth:
-    def get_signal_desktop(self) -> tuple[Optional[str], Optional[str]]:
+    def get_signal_desktop(self) -> Tuple[Optional[str], Optional[str]]:
         if platform.system() == "Windows":
             signal_bin_path_prod = os.path.expandvars(
                 "%localappdata%/Programs/signal-desktop/Signal.exe"
@@ -54,7 +54,7 @@ class GetSignalAuth:
         self,
         signal_bin_path: Optional[str] = None,
         signal_user_data_dir: Optional[str] = None,
-    ) -> tuple[Optional[str], Optional[str], str]:
+    ) -> Tuple[Optional[str], Optional[str], str]:
         if not (signal_bin_path and signal_user_data_dir):
             signal_bin_path, signal_user_data_dir = self.get_signal_desktop()
 

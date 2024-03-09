@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Dict, List, Optional, Tuple
 
 from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.utils.files.json_manager import JsonManager
@@ -23,7 +23,7 @@ class MetadataHandler:
     @staticmethod
     def get_files_related_to_sticker_convert(
         dir: Path, include_archive: bool = True
-    ) -> list[Path]:
+    ) -> List[Path]:
         from sticker_convert.uploaders.xcode_imessage import XcodeImessageIconset
 
         xcode_iconset = XcodeImessageIconset().iconset
@@ -67,7 +67,7 @@ class MetadataHandler:
         return files
 
     @staticmethod
-    def get_stickers_present(dir: Path) -> list[Path]:
+    def get_stickers_present(dir: Path) -> List[Path]:
         from sticker_convert.uploaders.xcode_imessage import XcodeImessageIconset
 
         blacklist_prefix = ("cover",)
@@ -99,8 +99,8 @@ class MetadataHandler:
         dir: Path,
         title: Optional[str] = None,
         author: Optional[str] = None,
-        emoji_dict: Optional[dict[str, str]] = None,
-    ) -> tuple[Optional[str], Optional[str], Optional[dict[str, str]]]:
+        emoji_dict: Optional[Dict[str, str]] = None,
+    ) -> Tuple[Optional[str], Optional[str], Optional[Dict[str, str]]]:
         title_path = Path(dir, "title.txt")
         if not title and title_path.is_file():
             with open(title_path, encoding="utf-8") as f:
@@ -123,7 +123,7 @@ class MetadataHandler:
         dir: Path,
         title: Optional[str] = None,
         author: Optional[str] = None,
-        emoji_dict: Optional[dict[str, str]] = None,
+        emoji_dict: Optional[Dict[str, str]] = None,
     ):
         title_path = Path(dir, "title.txt")
         if title is not None:
@@ -205,9 +205,9 @@ class MetadataHandler:
         file_per_anim_pack: Optional[int] = None,
         file_per_image_pack: Optional[int] = None,
         separate_image_anim: bool = True,
-    ) -> dict[str, list[Path]]:
+    ) -> Dict[str, List[Path]]:
         # {pack_1: [sticker1_path, sticker2_path]}
-        packs: dict[str, list[Path]] = {}
+        packs: Dict[str, List[Path]] = {}
 
         if file_per_pack is None:
             file_per_pack = (
@@ -224,8 +224,8 @@ class MetadataHandler:
         processed = 0
 
         if separate_image_anim is True:
-            image_stickers: list[Path] = []
-            anim_stickers: list[Path] = []
+            image_stickers: List[Path] = []
+            anim_stickers: List[Path] = []
 
             image_pack_count = 0
             anim_pack_count = 0
@@ -264,7 +264,7 @@ class MetadataHandler:
                     image_pack_count += 1
 
         else:
-            stickers: list[Path] = []
+            stickers: List[Path] = []
             pack_count = 0
 
             for processed, file in enumerate(stickers_present):

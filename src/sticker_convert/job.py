@@ -11,7 +11,7 @@ from multiprocessing.managers import SyncManager
 from pathlib import Path
 from queue import Queue
 from threading import Thread
-from typing import Any, Callable, Generator, Optional, Union
+from typing import Any, Callable, Dict, Generator, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
@@ -48,21 +48,21 @@ class Executor:
 
         self.manager = SyncManager()
         self.manager.start()
-        self.work_queue: Queue[Optional[tuple[Callable[..., Any], tuple[Any, ...]]]] = (
+        self.work_queue: Queue[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]] = (
             self.manager.Queue()
         )
         self.results_queue: Queue[Any] = self.manager.Queue()
         self.cb_queue: Queue[
             Union[
-                tuple[
-                    Optional[str], Optional[tuple[Any, ...]], Optional[dict[str, str]]
+                Tuple[
+                    Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, str]]
                 ],
                 str,
                 None,
             ]
         ] = self.manager.Queue()
         self.cb_return = CallbackReturn()
-        self.processes: list[Process] = []
+        self.processes: List[Process] = []
 
         self.is_cancel_job = Value("i", 0)
 
@@ -79,8 +79,8 @@ class Executor:
         self,
         cb_queue: Queue[
             Union[
-                tuple[
-                    Optional[str], Optional[tuple[Any, ...]], Optional[dict[str, str]]
+                Tuple[
+                    Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, str]]
                 ],
                 str,
             ]
@@ -91,11 +91,11 @@ class Executor:
             if isinstance(i, tuple):
                 action = i[0]
                 if len(i) >= 2:
-                    args: tuple[str, ...] = i[1] if i[1] else tuple()
+                    args: Tuple[str, ...] = i[1] if i[1] else tuple()
                 else:
                     args = tuple()
                 if len(i) >= 3:
-                    kwargs: dict[str, str] = i[2] if i[2] else dict()
+                    kwargs: Dict[str, str] = i[2] if i[2] else dict()
                 else:
                     kwargs = dict()
             else:
@@ -119,12 +119,12 @@ class Executor:
 
     @staticmethod
     def worker(
-        work_queue: Queue[Optional[tuple[Callable[..., Any], tuple[Any, ...]]]],
+        work_queue: Queue[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]],
         results_queue: Queue[Any],
         cb_queue: Queue[
             Union[
-                tuple[
-                    Optional[str], Optional[tuple[Any, ...]], Optional[dict[str, str]]
+                Tuple[
+                    Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, str]]
                 ],
                 str,
             ]
@@ -136,7 +136,7 @@ class Executor:
                 results = work_func(*work_args, cb_queue, cb_return)
                 results_queue.put(results)
             except Exception:
-                arg_dump: list[Any] = []
+                arg_dump: List[Any] = []
                 for i in work_args:
                     if isinstance(i, CredOption):
                         arg_dump.append("CredOption(REDACTED)")
@@ -171,7 +171,7 @@ class Executor:
             self.processes.append(process)
 
     def add_work(
-        self, work_func: Callable[..., Any], work_args: tuple[Any, ...]
+        self, work_func: Callable[..., Any], work_args: Tuple[Any, ...]
     ) -> None:
         self.work_queue.put((work_func, work_args))
 
@@ -212,8 +212,8 @@ class Executor:
     def cb(
         self,
         action: Optional[str],
-        args: Optional[tuple[str, ...]] = None,
-        kwargs: Optional[dict[str, Any]] = None,
+        args: Optional[Tuple[str, ...]] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
     ):
         self.cb_queue.put((action, args, kwargs))
 
@@ -241,8 +241,8 @@ class Job:
         self.cb_ask_bool = cb_ask_bool
         self.cb_ask_str = cb_ask_str
 
-        self.compress_fails: list[str] = []
-        self.out_urls: list[str] = []
+        self.compress_fails: List[str] = []
+        self.out_urls: List[str] = []
 
         self.executor = Executor(
             self.cb_msg,
@@ -530,7 +530,7 @@ class Job:
         return True
 
     def download(self) -> bool:
-        downloaders: list[Callable[..., bool]] = []
+        downloaders: List[Callable[..., bool]] = []
 
         if self.opt_input.option == "signal":
             downloaders.append(DownloadSignal.start)
@@ -602,7 +602,7 @@ class Job:
         input_dir = Path(self.opt_input.dir)
         output_dir = Path(self.opt_output.dir)
 
-        in_fs: list[Path] = []
+        in_fs: List[Path] = []
 
         # .txt: emoji.txt, title.txt
         # .m4a: line sticker sound effects
@@ -651,7 +651,7 @@ class Job:
 
         self.executor.cb("Exporting...")
 
-        exporters: list[Callable[..., list[str]]] = []
+        exporters: List[Callable[..., List[str]]] = []
 
         if self.opt_output.option == "whatsapp":
             exporters.append(CompressWastickers.start)

@@ -2,15 +2,15 @@
 import json
 import platform
 from http.cookiejar import CookieJar
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import requests
-import rookiepy
+import rookiepy  # type: ignore
 
 
 class GetLineAuth:
     def get_cred(self) -> Optional[str]:
-        browsers: list[Callable[..., Any]] = [
+        browsers: List[Callable[..., Any]] = [
             rookiepy.load,  # type: ignore # Supposed to load from any browser, but may fail
             rookiepy.firefox,  # type: ignore
             rookiepy.libre_wolf,  # type: ignore
@@ -59,7 +59,7 @@ class GetLineAuth:
         return cookies
 
     @staticmethod
-    def validate_cookies(cookies: Union[CookieJar, dict[str, str]]) -> bool:
+    def validate_cookies(cookies: Union[CookieJar, Dict[str, str]]) -> bool:
         headers = {
             "x-requested-with": "XMLHttpRequest",
         }

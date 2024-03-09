@@ -4,7 +4,7 @@ import shutil
 import subprocess
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import Any
+from typing import Any, List
 
 
 def get_python_path() -> str:
@@ -44,7 +44,7 @@ else:
     LINE_COOKIES = os.environ.get("LINE_COOKIES")  # type: ignore
 
 
-def run_cmd(cmd: list[str], **kwargs: Any) -> None:
+def run_cmd(cmd: List[str], **kwargs: Any) -> None:
     result: CompletedProcess[Any] = subprocess.run(cmd, **kwargs)  # type: ignore
 
     assert result.returncode == 0  # type: ignore

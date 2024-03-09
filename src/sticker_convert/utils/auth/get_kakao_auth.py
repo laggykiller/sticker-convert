@@ -2,7 +2,7 @@
 import json
 import secrets
 import uuid
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Dict, Optional
 from urllib.parse import parse_qs, urlparse
 
 import requests
@@ -92,7 +92,7 @@ class GetKakaoAuth:
     def enter_phone(self) -> bool:
         self.cb_msg("Submitting phone number")
 
-        json_data: dict[str, Any] = {
+        json_data: Dict[str, Any] = {
             "countryCode": self.country_code,
             "countryIso": self.country_iso,
             "phoneNumber": self.phone_number,
@@ -210,7 +210,7 @@ class GetKakaoAuth:
             "Connection": "close",
         }
 
-        json_data: dict[str, str] = {
+        json_data: Dict[str, str] = {
             "decision": "continue",
             "lang": self.app_language,
             "sessionToken": session_token,

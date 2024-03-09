@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from queue import Queue
-from typing import Optional, Union
+from typing import Union
 
+from sticker_convert.converter import CbQueueItemType
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.utils.callback import Callback, CallbackReturn
 
@@ -12,16 +13,7 @@ class UploadBase:
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
     ):
         if not cb:

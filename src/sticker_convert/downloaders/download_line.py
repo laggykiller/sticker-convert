@@ -8,13 +8,14 @@ import zipfile
 from io import BytesIO
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 from urllib import parse
 
 import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 
+from sticker_convert.converter import CbQueueItemType
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth
@@ -27,7 +28,7 @@ from sticker_convert.utils.media.apple_png_normalize import ApplePngNormalize
 
 class MetadataLine:
     @staticmethod
-    def analyze_url(url: str) -> Optional[tuple[str, str, bool]]:
+    def analyze_url(url: str) -> Optional[Tuple[str, str, bool]]:
         region = ""
         is_emoji = False
         if url.startswith("line://shop/detail/"):
@@ -78,7 +79,7 @@ class MetadataLine:
     @staticmethod
     def get_metadata_sticon(
         pack_id: str, region: str
-    ) -> Optional[tuple[str, str, list[dict[str, Any]], str, bool]]:
+    ) -> Optional[Tuple[str, str, List[Dict[str, Any]], str, bool]]:
         pack_meta_r = requests.get(
             f"https://stickershop.line-scdn.net/sticonshop/v1/{pack_id}/sticon/iphone/meta.json"
         )
@@ -122,7 +123,7 @@ class MetadataLine:
     @staticmethod
     def get_metadata_stickers(
         pack_id: str, region: str
-    ) -> Optional[tuple[str, str, list[dict[str, Any]], str, bool]]:
+    ) -> Optional[Tuple[str, str, List[Dict[str, Any]], str, bool]]:
         pack_meta_r = requests.get(
             f"https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/android/productInfo.meta"
         )
@@ -168,10 +169,10 @@ class DownloadLine(DownloadBase):
             "x-requested-with": "XMLHttpRequest",
         }
         self.cookies = self.load_cookies()
-        self.sticker_text_dict: dict[int, Any] = {}
+        self.sticker_text_dict: Dict[int, Any] = {}
 
-    def load_cookies(self) -> dict[str, str]:
-        cookies: dict[str, str] = {}
+    def load_cookies(self) -> Dict[str, str]:
+        cookies: Dict[str, str] = {}
         if self.opt_cred and self.opt_cred.line_cookies:
             line_cookies = self.opt_cred.line_cookies
 
@@ -319,9 +320,9 @@ class DownloadLine(DownloadBase):
         with open(line_sticker_text_path, "r", encoding="utf-8") as f:
             self.sticker_text_dict = json.load(f)
 
-    def get_custom_sticker_text_urls(self) -> list[tuple[str, Path]]:
-        custom_sticker_text_urls: list[tuple[str, Path]] = []
-        name_text_key_cache: dict[str, str] = {}
+    def get_custom_sticker_text_urls(self) -> List[Tuple[str, Path]]:
+        custom_sticker_text_urls: List[Tuple[str, Path]] = []
+        name_text_key_cache: Dict[str, str] = {}
 
         for num, data in self.sticker_text_dict.items():
             out_path = Path(self.out_dir, str(num).zfill(3))
@@ -442,7 +443,7 @@ class DownloadLine(DownloadBase):
         else:
             self.decompress_stickers(zip_file)
 
-        custom_sticker_text_urls: list[tuple[str, Path]] = []
+        custom_sticker_text_urls: List[Tuple[str, Path]] = []
         if self.sticker_text_dict != {} and (
             self.resource_type == "PER_STICKER_TEXT"
             or (self.resource_type == "NAME_TEXT" and self.cookies != {})
@@ -466,16 +467,7 @@ class DownloadLine(DownloadBase):
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
     ) -> bool:
         downloader = DownloadLine(url, out_dir, opt_cred, cb, cb_return)

@@ -6,13 +6,14 @@ import zipfile
 from io import BytesIO
 from pathlib import Path
 from queue import Queue
-from typing import Any, Optional, Union
+from typing import Any, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
+from sticker_convert.converter import CbQueueItemType
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
 from sticker_convert.utils.callback import Callback, CallbackReturn
@@ -22,7 +23,7 @@ from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
 
 class MetadataKakao:
     @staticmethod
-    def get_info_from_share_link(url: str) -> tuple[Optional[str], Optional[str]]:
+    def get_info_from_share_link(url: str) -> Tuple[Optional[str], Optional[str]]:
         headers = {"User-Agent": "Android"}
 
         response = requests.get(url, headers=headers)
@@ -52,7 +53,7 @@ class MetadataKakao:
     @staticmethod
     def get_info_from_pack_title(
         pack_title: str,
-    ) -> tuple[Optional[str], Optional[str], Optional[str]]:
+    ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
         pack_meta_r = requests.get(f"https://e.kakao.com/api/v1/items/t/{pack_title}")
 
         if pack_meta_r.status_code == 200:
@@ -195,7 +196,7 @@ class DownloadKakao(DownloadBase):
             self.out_dir, title=self.pack_title, author=self.author
         )
 
-        targets: list[tuple[str, Path]] = []
+        targets: List[Tuple[str, Path]] = []
 
         for num, url in enumerate(thumbnail_urls):
             dest = Path(self.out_dir, str(num).zfill(3) + ".png")
@@ -254,16 +255,7 @@ class DownloadKakao(DownloadBase):
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: Union[
-            Queue[
-                Union[
-                    tuple[str, Optional[tuple[str]], Optional[dict[str, str]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ],
+        cb: "Union[Queue[CbQueueItemType], Callback]",
         cb_return: CallbackReturn,
     ) -> bool:
         downloader = DownloadKakao(url, out_dir, opt_cred, cb, cb_return)

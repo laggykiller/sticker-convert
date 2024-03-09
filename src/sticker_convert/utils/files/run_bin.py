@@ -3,7 +3,7 @@ import platform
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any, Callable, Union
+from typing import Any, Callable, List, Tuple, Union
 
 
 class RunBin:
@@ -27,8 +27,8 @@ class RunBin:
 
     @staticmethod
     def run_cmd(
-        cmd_list: list[str], silence: bool = False, cb_msg: Callable[..., Any] = print
-    ) -> tuple[bool, str]:
+        cmd_list: List[str], silence: bool = False, cb_msg: Callable[..., Any] = print
+    ) -> Tuple[bool, str]:
         bin_path = RunBin.get_bin(cmd_list[0])
 
         if bin_path:

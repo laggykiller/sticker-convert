@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Tuple, Union
 
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.media.codec_info import CodecInfo
@@ -46,8 +46,8 @@ class FormatVerify:
     @staticmethod
     def check_file_res(
         file: Union[Path, bytes],
-        res: tuple[
-            tuple[Optional[int], Optional[int]], tuple[Optional[int], Optional[int]]
+        res: Tuple[
+            Tuple[Optional[int], Optional[int]], Tuple[Optional[int], Optional[int]]
         ],
         square: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None,
@@ -74,7 +74,7 @@ class FormatVerify:
     @staticmethod
     def check_file_fps(
         file: Union[Path, bytes],
-        fps: tuple[Optional[int], Optional[int]],
+        fps: Tuple[Optional[int], Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if file_info:
@@ -92,7 +92,7 @@ class FormatVerify:
     @staticmethod
     def check_file_duration(
         file: Union[Path, bytes],
-        duration: tuple[Optional[int], Optional[int]],
+        duration: Tuple[Optional[int], Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if file_info:
@@ -112,7 +112,7 @@ class FormatVerify:
     @staticmethod
     def check_file_size(
         file: Union[Path, bytes],
-        size: tuple[Optional[int], Optional[int]],
+        size: Tuple[Optional[int], Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if isinstance(file, Path):
@@ -161,7 +161,7 @@ class FormatVerify:
     @staticmethod
     def check_format(
         file: Union[Path, bytes],
-        fmt: tuple[tuple[str, ...], tuple[str, ...]],
+        fmt: Tuple[Tuple[str, ...], Tuple[str, ...]],
         file_info: Optional[CodecInfo] = None,
     ):
         if file_info:

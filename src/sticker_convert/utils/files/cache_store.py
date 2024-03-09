@@ -34,7 +34,7 @@ class CacheStore:
     @staticmethod
     def get_cache_store(
         path: Optional[str] = None,
-    ) -> Union[ContextManager[Path], TemporaryDirectory[str]]:
+    ) -> "Union[ContextManager[Path], TemporaryDirectory[str]]":
         if path:
             return debug_cache_dir(path)
         else:

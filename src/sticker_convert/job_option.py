@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from math import ceil
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Tuple, Union
 
 
 def to_int(i: Union[float, str, None]) -> Optional[int]:
@@ -23,7 +23,7 @@ class BaseOption:
     def __repr__(self) -> str:
         return json.dumps(self.to_dict(), indent=2)
 
-    def to_dict(self) -> dict[str, str]:
+    def to_dict(self) -> Dict[str, str]:
         return dict()
 
 
@@ -33,7 +33,7 @@ class InputOption(BaseOption):
     url: str = ""
     dir: Path = Path()
 
-    def to_dict(self) -> dict[Any, Any]:
+    def to_dict(self) -> Dict[Any, Any]:
         return {"option": self.option, "url": self.url, "dir": self.dir.as_posix()}
 
 
@@ -43,8 +43,8 @@ class CompOption(BaseOption):
     size_max_img: Optional[int] = None
     size_max_vid: Optional[int] = None
 
-    format_img: tuple[str, ...] = tuple()
-    format_vid: tuple[str, ...] = tuple()
+    format_img: Tuple[str, ...] = tuple()
+    format_vid: Tuple[str, ...] = tuple()
 
     fps_min: Optional[int] = None
     fps_max: Optional[int] = None
@@ -78,7 +78,7 @@ class CompOption(BaseOption):
     animated: Optional[bool] = None
     square: Optional[bool] = None
 
-    def to_dict(self) -> dict[Any, Any]:
+    def to_dict(self) -> Dict[Any, Any]:
         return {
             "preset": self.preset,
             "size_max": {"img": self.size_max_img, "vid": self.size_max_vid},
@@ -111,19 +111,19 @@ class CompOption(BaseOption):
             "square": self.square,
         }
 
-    def get_size_max(self) -> tuple[Optional[int], Optional[int]]:
+    def get_size_max(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.size_max_img, self.size_max_vid)
 
     def set_size_max(self, value: Optional[int]) -> None:
         self.size_max_img, self.size_max_vid = to_int(value), to_int(value)
 
-    def get_format(self) -> tuple[tuple[str, ...], tuple[str, ...]]:
+    def get_format(self) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
         return (self.format_img, self.format_vid)
 
-    def set_format(self, value: tuple[str, ...]) -> None:
+    def set_format(self, value: Tuple[str, ...]) -> None:
         self.format_img, self.format_vid = value, value
 
-    def get_fps(self) -> tuple[Optional[int], Optional[int]]:
+    def get_fps(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.fps_min, self.fps_max)
 
     def set_fps(self, value: Optional[int]) -> None:
@@ -131,8 +131,8 @@ class CompOption(BaseOption):
 
     def get_res(
         self,
-    ) -> tuple[
-        tuple[Optional[int], Optional[int]], tuple[Optional[int], Optional[int]]
+    ) -> Tuple[
+        Tuple[Optional[int], Optional[int]], Tuple[Optional[int], Optional[int]]
     ]:
         return (self.get_res_w(), self.get_res_h())
 
@@ -142,45 +142,45 @@ class CompOption(BaseOption):
         self.res_h_min = to_int(value)
         self.res_h_max = to_int(value)
 
-    def get_res_max(self) -> tuple[Optional[int], Optional[int]]:
+    def get_res_max(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.res_w_max, self.res_h_max)
 
     def set_res_max(self, value: Optional[int]) -> None:
         self.res_w_max = to_int(value)
         self.res_h_max = to_int(value)
 
-    def get_res_min(self) -> tuple[Optional[int], Optional[int]]:
+    def get_res_min(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.res_w_min, self.res_h_min)
 
     def set_res_min(self, value: Optional[int]) -> None:
         self.res_w_min = to_int(value)
         self.res_h_min = to_int(value)
 
-    def get_res_w(self) -> tuple[Optional[int], Optional[int]]:
+    def get_res_w(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.res_w_min, self.res_w_max)
 
     def set_res_w(self, value: Optional[int]) -> None:
         self.res_w_min, self.res_w_max = to_int(value), to_int(value)
 
-    def get_res_h(self) -> tuple[Optional[int], Optional[int]]:
+    def get_res_h(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.res_h_min, self.res_h_max)
 
     def set_res_h(self, value: Optional[int]) -> None:
         self.res_h_min, self.res_h_max = to_int(value), to_int(value)
 
-    def get_quality(self) -> tuple[Optional[int], Optional[int]]:
+    def get_quality(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.quality_min, self.quality_max)
 
     def set_quality(self, value: Optional[int]) -> None:
         self.quality_min, self.quality_max = to_int(value), to_int(value)
 
-    def get_color(self) -> tuple[Optional[int], Optional[int]]:
+    def get_color(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.color_min, self.color_max)
 
     def set_color(self, value: Optional[int]) -> None:
         self.color_min, self.color_max = to_int(value), to_int(value)
 
-    def get_duration(self) -> tuple[Optional[int], Optional[int]]:
+    def get_duration(self) -> Tuple[Optional[int], Optional[int]]:
         return (self.duration_min, self.duration_max)
 
     def set_duration(self, value: Optional[int]) -> None:
@@ -194,7 +194,7 @@ class OutputOption(BaseOption):
     title: str = ""
     author: str = ""
 
-    def to_dict(self) -> dict[Any, Any]:
+    def to_dict(self) -> Dict[Any, Any]:
         return {
             "option": self.option,
             "dir": self.dir.as_posix(),
@@ -216,7 +216,7 @@ class CredOption(BaseOption):
     kakao_phone_number: str = ""
     line_cookies: str = ""
 
-    def to_dict(self) -> dict[Any, Any]:
+    def to_dict(self) -> Dict[Any, Any]:
         return {
             "signal": {"uuid": self.signal_uuid, "password": self.signal_password},
             "telegram": {"token": self.telegram_token, "userid": self.telegram_userid},

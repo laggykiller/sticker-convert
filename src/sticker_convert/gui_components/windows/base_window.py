@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import platform
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Tuple
 
 from ttkbootstrap import Toplevel  # type: ignore
 
@@ -17,7 +17,7 @@ class BaseWindow(Toplevel):
 
         GUIUtils.set_icon(self)
 
-        self.mousewheel: tuple[str, ...]
+        self.mousewheel: Tuple[str, ...]
         if platform.system() == "Windows":
             self.mousewheel = ("<MouseWheel>",)
             self.delta_divide = 120

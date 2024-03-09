@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import platform
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Tuple, Union
 
 from ttkbootstrap import Canvas, Frame, PhotoImage, Scrollbar  # type: ignore
 
@@ -27,7 +27,7 @@ class GUIUtils:
     @staticmethod
     def create_scrollable_frame(
         window: Union["BaseWindow", "GUI"],
-    ) -> tuple[Frame, Frame, Canvas, Scrollbar, Scrollbar, Frame]:
+    ) -> Tuple[Frame, Frame, Canvas, Scrollbar, Scrollbar, Frame]:
         main_frame = Frame(window)
         main_frame.pack(fill="both", expand=1)
 

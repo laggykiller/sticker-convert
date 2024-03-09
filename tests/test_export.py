@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from typing import Optional
+from typing import List, Optional
 
 import pytest
 from _pytest._py.path import LocalPath
@@ -21,7 +21,7 @@ def _run_sticker_convert(
 ) -> None:
     preset_dict = COMPRESSION_DICT.get(preset)
 
-    cmd: list[str] = [
+    cmd: List[str] = [
         PYTHON_EXE,
         "sticker-convert.py",
         "--input-dir",
