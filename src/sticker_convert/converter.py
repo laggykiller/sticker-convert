@@ -635,6 +635,7 @@ class StickerConvert:
     def _frames_export_pyav(self) -> None:
         import av  # type: ignore
         from av.container import OutputContainer  # type: ignore
+        from av.video.stream import VideoStream
 
         options = {}
 
@@ -665,6 +666,8 @@ class StickerConvert:
         ) as output:
             output = cast(OutputContainer, output)  # type: ignore
             out_stream = output.add_stream(codec, rate=self.fps, options=options)  # type: ignore
+            out_stream = cast(VideoStream, out_stream)
+            assert isinstance(self.res_w, int) and isinstance(self.res_h, int)
             out_stream.width = self.res_w
             out_stream.height = self.res_h
             out_stream.pix_fmt = pixel_format
