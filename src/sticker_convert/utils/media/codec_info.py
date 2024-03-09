@@ -279,7 +279,7 @@ class CodecInfo:
                 ms_per_frame = duration_n_minus_one / (frame_count - 1)
                 duration = frame_count * ms_per_frame
                 return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))
-        
+
         return 0, 0
 
     @staticmethod
