@@ -28,29 +28,17 @@ jobs:
     - name: Update emoji.json
       run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json
     - name: Ruff check
-      run: |
-        ruff check src
-        ruff check scripts
-        ruff check tests
+      run: ruff check
     - name: Install test
       run: |
         pip install .
         pip install -r requirements-type.txt
     - name: mypy
-      run: |
-        mypy src
-        mypy scripts
-        mypy tests
+      run: mypy
     - name: ruff format
-      run: |
-        ruff format src
-        ruff format scripts
-        ruff format tests
+      run: ruff format
     - name: isort
-      run: |
-        isort src -l 200
-        isort scripts -l 200
-        isort tests -l 200
+      run: isort src scripts tests
     - name: Commit & Push changes
       uses: actions-js/push@master
       with:
