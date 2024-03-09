@@ -13,7 +13,7 @@ from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
 
 
 class SignalGetAuthWindow(BaseWindow):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(SignalGetAuthWindow, self).__init__(*args, **kwargs)
 
         self.title("Get Signal uuid and password")
@@ -78,7 +78,7 @@ class SignalGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_login(self):
+    def cb_login(self) -> None:
         m = GetSignalAuth()
 
         signal_bin_path = None
@@ -102,7 +102,7 @@ class SignalGetAuthWindow(BaseWindow):
 
         self.cb_msg_block_signal(msg)
 
-    def cb_launch_signal(self):
+    def cb_launch_signal(self) -> None:
         m = GetSignalAuth()
         signal_bin_path, signal_user_data_dir = m.get_signal_desktop()
 
@@ -120,7 +120,7 @@ class SignalGetAuthWindow(BaseWindow):
         else:
             self.cb_msg_block_signal("Error: Signal Desktop not installed.")
 
-    def cb_setdir(self):
+    def cb_setdir(self) -> None:
         orig_input_dir = self.gui.signal_data_dir_var.get()
         if not Path(orig_input_dir).is_dir():
             orig_input_dir = ""

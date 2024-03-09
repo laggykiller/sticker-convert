@@ -111,7 +111,7 @@ class MetadataKakao:
 
 
 class DownloadKakao(DownloadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(DownloadKakao, self).__init__(*args, **kwargs)
         self.pack_title: Optional[str] = None
         self.author: Optional[str] = None

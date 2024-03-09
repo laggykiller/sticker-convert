@@ -16,7 +16,7 @@ from sticker_convert.utils.media.codec_info import CodecInfo
 
 
 class DownloadSignal(DownloadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(DownloadSignal, self).__init__(*args, **kwargs)
 
     @staticmethod
@@ -26,7 +26,7 @@ class DownloadSignal(DownloadBase):
 
         return pack
 
-    def save_stickers(self, pack: StickerPack):
+    def save_stickers(self, pack: StickerPack) -> None:
         self.cb.put(
             (
                 "bar",

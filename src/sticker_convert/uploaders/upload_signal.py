@@ -19,7 +19,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 
 
 class UploadSignal(UploadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(UploadSignal, self).__init__(*args, **kwargs)
 
         base_spec = CompOption()
@@ -39,7 +39,7 @@ class UploadSignal(UploadBase):
         self.opt_comp_merged.merge(base_spec)
 
     @staticmethod
-    async def upload_pack(pack: LocalStickerPack, uuid: str, password: str):
+    async def upload_pack(pack: LocalStickerPack, uuid: str, password: str) -> str:
         async with StickersClient(uuid, password) as client:
             pack_id, pack_key = await client.upload_pack(pack)  # type: ignore
 

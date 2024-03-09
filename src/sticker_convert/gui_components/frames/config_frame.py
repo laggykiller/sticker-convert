@@ -13,7 +13,7 @@ from sticker_convert.utils.files.run_bin import RunBin
 
 
 class ConfigFrame(LabelFrame):
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any):
+    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super(ConfigFrame, self).__init__(*args, **kwargs)
 
@@ -77,7 +77,7 @@ class ConfigFrame(LabelFrame):
             column=3, row=1, sticky="w", padx=3, pady=3
         )
 
-    def cb_clear_cred(self, *args: Any, **kwargs: Any):
+    def cb_clear_cred(self, *args: Any, **kwargs: Any) -> None:
         response = self.gui.cb_ask_bool("Are you sure you want to clear credentials?")
         if response is True:
             self.gui.delete_creds()
@@ -86,7 +86,7 @@ class ConfigFrame(LabelFrame):
             self.gui.highlight_fields()
             self.gui.cb_msg_block("Credentials cleared.")
 
-    def cb_restore_default(self, *args: Any, **kwargs: Any):
+    def cb_restore_default(self, *args: Any, **kwargs: Any) -> None:
         response = self.gui.cb_ask_bool(
             "Are you sure you want to restore default config? (This will not clear credentials.)"
         )
@@ -97,7 +97,7 @@ class ConfigFrame(LabelFrame):
             self.gui.highlight_fields()
             self.gui.cb_msg_block("Restored to default config.")
 
-    def cb_open_config_directory(self, *args: Any, **kwargs: Any):
+    def cb_open_config_directory(self, *args: Any, **kwargs: Any) -> None:
         self.gui.cb_msg(msg=f"Config is located at {CONFIG_DIR}")
         if platform.system() == "Windows":
             os.startfile(CONFIG_DIR)  # type: ignore
@@ -106,7 +106,7 @@ class ConfigFrame(LabelFrame):
         else:
             RunBin.run_cmd(["xdg-open", str(CONFIG_DIR)], silence=True)
 
-    def set_states(self, state: str):
+    def set_states(self, state: str) -> None:
         self.settings_save_cred_cbox.config(state=state)
         self.settings_clear_cred_btn.config(state=state)
         self.settings_restore_default_btn.config(state=state)

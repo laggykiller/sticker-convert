@@ -18,7 +18,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 
 
 class CompressWastickers(UploadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(CompressWastickers, self).__init__(*args, **kwargs)
         base_spec = CompOption(
             size_max_img=100000,
@@ -112,7 +112,7 @@ class CompressWastickers(UploadBase):
 
         return urls
 
-    def add_metadata(self, pack_dir: Path, title: str, author: str):
+    def add_metadata(self, pack_dir: Path, title: str, author: str) -> None:
         opt_comp_merged = copy.deepcopy(self.opt_comp)
         opt_comp_merged.merge(self.spec_cover)
 

@@ -4,6 +4,7 @@ import platform
 import shutil
 import subprocess
 import sys
+from typing import Optional
 from pathlib import Path
 
 sys.path.append("./src")
@@ -34,7 +35,7 @@ def get_arch() -> str:
     return arch
 
 
-def osx_run_in_venv(cmd: str, get_stdout: bool = False):
+def osx_run_in_venv(cmd: str, get_stdout: bool = False) -> Optional[str]:
     if Path("/bin/zsh").is_file():
         sh_cmd = ["/bin/zsh", "-c"]
     else:
@@ -46,7 +47,7 @@ def osx_run_in_venv(cmd: str, get_stdout: bool = False):
             sh_cmd + [venv_cmd + cmd], stdout=subprocess.PIPE
         ).stdout.decode()
     else:
-        return subprocess.run(sh_cmd + [venv_cmd + cmd])
+        subprocess.run(sh_cmd + [venv_cmd + cmd])
 
 
 def search_wheel_in_dir(package: str, dir: Path) -> Path:
@@ -75,7 +76,7 @@ def copy_if_universal(wheel_name: Path, in_dir: Path, out_dir: Path) -> bool:
         return False
 
 
-def create_universal_wheels(in_dir1: Path, in_dir2: Path, out_dir: Path):
+def create_universal_wheels(in_dir1: Path, in_dir2: Path, out_dir: Path) -> None:
     for wheel_name_1 in in_dir1.iterdir():
         package = wheel_name_1.name.split("-")[0]
         wheel_name_2 = search_wheel_in_dir(package, in_dir2)
@@ -103,7 +104,7 @@ def create_universal_wheels(in_dir1: Path, in_dir2: Path, out_dir: Path):
         print(f"Renamed universal wheel {dst_path}")
 
 
-def osx_install_universal2_dep():
+def osx_install_universal2_dep() -> None:
     shutil.rmtree("wheel_arm", ignore_errors=True)
     shutil.rmtree("wheel_x64", ignore_errors=True)
     shutil.rmtree("wheel_universal2", ignore_errors=True)
@@ -125,7 +126,7 @@ def osx_install_universal2_dep():
     osx_run_in_venv("python -m pip install --require-virtualenv ./wheel_universal2/*")
 
 
-def nuitka(python_bin: str, arch: str):
+def nuitka(python_bin: str, arch: str) -> None:
     cmd_list = [
         python_bin,
         "-m",
@@ -162,14 +163,14 @@ def nuitka(python_bin: str, arch: str):
         subprocess.run(cmd_list, shell=True)
 
 
-def win_patch():
+def win_patch() -> None:
     for i in Path("sticker-convert.dist/av.libs").iterdir():
         file_path = Path("sticker-convert.dist", i.name)
         if file_path.is_file():
             os.remove(file_path)
 
 
-def osx_patch():
+def osx_patch() -> None:
     # https://github.com/pyinstaller/pyinstaller/issues/5154#issuecomment-1567603461
     sticker_bin = Path("sticker-convert.app/Contents/MacOS/sticker-convert")
     sticker_bin_cli = Path("sticker-convert.app/Contents/MacOS/sticker-convert-cli")
@@ -183,7 +184,7 @@ def osx_patch():
     osx_run_in_venv("codesign --force --deep -s - sticker-convert.app")
 
 
-def compile():
+def compile() -> None:
     arch = get_arch()
     python_bin = str(Path(sys.executable).resolve())
 

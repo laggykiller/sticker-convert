@@ -174,7 +174,7 @@ class MetadataHandler:
         return output_presets[output_option]["metadata_requirements"][metadata]
 
     @staticmethod
-    def generate_emoji_file(dir: Path, default_emoji: str = ""):
+    def generate_emoji_file(dir: Path, default_emoji: str = "") -> None:
         emoji_path = Path(dir, "emoji.txt")
         emoji_dict = None
         if emoji_path.is_file():

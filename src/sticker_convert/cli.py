@@ -21,10 +21,10 @@ from sticker_convert.version import __version__
 
 
 class CLI:
-    def __init__(self):
+    def __init__(self) -> None:
         self.cb = Callback()
 
-    def cli(self):
+    def cli(self) -> None:
         try:
             self.help: dict[str, dict[str, str]] = JsonManager.load_json(
                 ROOT_DIR / "resources/help.json"

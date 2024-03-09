@@ -12,7 +12,7 @@ from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 
 
 class LineGetAuthWindow(BaseWindow):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(LineGetAuthWindow, self).__init__(*args, **kwargs)
 
         self.title("Get Line cookie")
@@ -68,7 +68,7 @@ class LineGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_open_browser(self):
+    def cb_open_browser(self) -> None:
         line_login_site = "https://store.line.me/login"
         success = webbrowser.open(line_login_site)
         if not success:
@@ -77,10 +77,10 @@ class LineGetAuthWindow(BaseWindow):
                 initialvalue=line_login_site,
             )
 
-    def cb_get_cookies(self):
+    def cb_get_cookies(self) -> None:
         Thread(target=self.cb_get_cookies_thread, daemon=True).start()
 
-    def cb_get_cookies_thread(self, *args: Any):
+    def cb_get_cookies_thread(self, *args: Any) -> None:
         m = GetLineAuth()
 
         line_cookies = None

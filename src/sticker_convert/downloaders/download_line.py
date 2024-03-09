@@ -160,7 +160,7 @@ class MetadataLine:
 
 
 class DownloadLine(DownloadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(DownloadLine, self).__init__(*args, **kwargs)
         self.headers = {
             "referer": "https://store.line.me",
@@ -237,7 +237,7 @@ class DownloadLine(DownloadBase):
         with open(out_path, "wb") as f:
             f.write(data)
 
-    def decompress_emoticon(self, zip_file: bytes):
+    def decompress_emoticon(self, zip_file: bytes) -> None:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
             self.cb.put("Unzipping...")
 
@@ -258,7 +258,7 @@ class DownloadLine(DownloadBase):
 
                 self.cb.put("update_bar")
 
-    def decompress_stickers(self, zip_file: bytes):
+    def decompress_stickers(self, zip_file: bytes) -> None:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
             self.cb.put("Unzipping...")
 
@@ -300,7 +300,7 @@ class DownloadLine(DownloadBase):
 
                 self.cb.put("update_bar")
 
-    def edit_custom_sticker_text(self):
+    def edit_custom_sticker_text(self) -> None:
         line_sticker_text_path = Path(self.out_dir, "line-sticker-text.txt")
 
         if not line_sticker_text_path.is_file():
@@ -382,7 +382,7 @@ class DownloadLine(DownloadBase):
 
         return name_text_key
 
-    def combine_custom_text(self):
+    def combine_custom_text(self) -> None:
         for i in sorted(self.out_dir.iterdir()):
             if i.name.endswith("-text.png"):
                 base_path = Path(self.out_dir, i.name.replace("-text.png", ".png"))

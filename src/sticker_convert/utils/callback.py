@@ -6,11 +6,11 @@ from tqdm import tqdm
 
 
 class CallbackReturn:
-    def __init__(self):
+    def __init__(self) -> None:
         self.response_event = Event()
         self.response_queue: Queue[Union[bool, str, None]] = Queue()
 
-    def set_response(self, response: Union[bool, str, None]):
+    def set_response(self, response: Union[bool, str, None]) -> None:
         self.response_queue.put(response)
         self.response_event.set()
 
@@ -65,7 +65,7 @@ class Callback:
         self.silent = silent
         self.no_confirm = no_confirm
 
-    def cb_msg(self, *args: Any, **kwargs: Any):
+    def cb_msg(self, *args: Any, **kwargs: Any) -> None:
         if self.silent:
             return
 
@@ -103,7 +103,7 @@ class Callback:
         elif set_progress_mode == "determinate":
             self.progress_bar = tqdm(total=steps)
 
-    def cb_msg_block(self, *args: Any):
+    def cb_msg_block(self, *args: Any) -> None:
         if self.silent:
             return
         if len(args) > 0:

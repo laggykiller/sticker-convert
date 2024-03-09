@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 
 
 class ControlFrame(Frame):
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any):
+    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super(ControlFrame, self).__init__(*args, **kwargs)
 
@@ -21,7 +21,7 @@ class ControlFrame(Frame):
 
         self.start_btn.pack(expand=True, fill="x")
 
-    def cb_start_btn(self, *args: Any, **kwargs: Any):
+    def cb_start_btn(self, *args: Any, **kwargs: Any) -> None:
         if self.gui.job:
             response = self.gui.cb_ask_bool("Cancel job?")
             if response is True:

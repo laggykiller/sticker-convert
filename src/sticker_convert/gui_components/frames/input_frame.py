@@ -14,7 +14,7 @@ from sticker_convert.utils.url_detect import UrlDetect
 
 
 class InputFrame(LabelFrame):
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any):
+    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super(InputFrame, self).__init__(*args, **kwargs)
 
@@ -100,7 +100,7 @@ class InputFrame(LabelFrame):
         else:
             self.address_entry.config(state="normal")
 
-    def cb_set_indir(self, *args: Any):
+    def cb_set_indir(self, *args: Any) -> None:
         orig_input_dir = self.gui.input_setdir_var.get()
         if not Path(orig_input_dir).is_dir():
             orig_input_dir = DEFAULT_DIR
@@ -108,7 +108,7 @@ class InputFrame(LabelFrame):
         if input_dir:
             self.gui.input_setdir_var.set(input_dir)
 
-    def cb_input_option(self, *args: Any):
+    def cb_input_option(self, *args: Any) -> bool:
         input_option_display = self.gui.get_input_display_name()
 
         if input_option_display == "auto":
@@ -130,7 +130,7 @@ class InputFrame(LabelFrame):
 
         return True
 
-    def set_states(self, state: str):
+    def set_states(self, state: str) -> None:
         self.input_option_opt.config(state=state)
         self.address_entry.config(state=state)
         self.input_setdir_entry.config(state=state)

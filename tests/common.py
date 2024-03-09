@@ -44,7 +44,7 @@ else:
     LINE_COOKIES = os.environ.get("LINE_COOKIES")  # type: ignore
 
 
-def run_cmd(cmd: list[str], **kwargs: Any):
+def run_cmd(cmd: list[str], **kwargs: Any) -> None:
     result: CompletedProcess[Any] = subprocess.run(cmd, **kwargs)  # type: ignore
 
     assert result.returncode == 0  # type: ignore

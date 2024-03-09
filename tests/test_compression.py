@@ -15,7 +15,7 @@ SIZE_MAX_IMG = COMPRESSION_DICT.get("custom").get("size_max").get("img")
 SIZE_MAX_VID = COMPRESSION_DICT.get("custom").get("size_max").get("vid")
 
 
-def _run_sticker_convert(fmt: str, tmp_path: LocalPath):
+def _run_sticker_convert(fmt: str, tmp_path: LocalPath) -> None:
     run_cmd(
         [
             PYTHON_EXE,
@@ -65,29 +65,29 @@ def _run_sticker_convert(fmt: str, tmp_path: LocalPath):
                 assert duration <= duration_max
 
 
-def test_to_static_png(tmp_path: LocalPath):
+def test_to_static_png(tmp_path: LocalPath) -> None:
     _run_sticker_convert(".png", tmp_path)
 
 
-def test_to_static_webp(tmp_path: LocalPath):
+def test_to_static_webp(tmp_path: LocalPath) -> None:
     _run_sticker_convert(".webp", tmp_path)
 
 
-def test_to_animated_apng(tmp_path: LocalPath):
+def test_to_animated_apng(tmp_path: LocalPath) -> None:
     _run_sticker_convert(".apng", tmp_path)
 
 
-def test_to_animated_gif(tmp_path: LocalPath):
+def test_to_animated_gif(tmp_path: LocalPath) -> None:
     _run_sticker_convert(".gif", tmp_path)
 
 
-def test_to_animated_webm(tmp_path: LocalPath):
+def test_to_animated_webm(tmp_path: LocalPath) -> None:
     _run_sticker_convert(".webm", tmp_path)
 
 
-def test_to_animated_webp(tmp_path: LocalPath):
+def test_to_animated_webp(tmp_path: LocalPath) -> None:
     _run_sticker_convert(".webp", tmp_path)
 
 
-def test_to_animated_mp4(tmp_path: LocalPath):
+def test_to_animated_mp4(tmp_path: LocalPath) -> None:
     _run_sticker_convert(".mp4", tmp_path)

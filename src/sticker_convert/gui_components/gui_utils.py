@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 class GUIUtils:
     @staticmethod
-    def set_icon(window: Union["BaseWindow", "GUI"]):
+    def set_icon(window: Union["BaseWindow", "GUI"]) -> None:
         window.icon = PhotoImage(file=ROOT_DIR / "resources/appicon.png")  # type: ignore
         window.iconphoto(1, window.icon)  # type: ignore
         if platform.system() == "Darwin":
@@ -66,7 +66,7 @@ class GUIUtils:
         )
 
     @staticmethod
-    def finalize_window(window: Union["GUI", "BaseWindow"]):
+    def finalize_window(window: Union["GUI", "BaseWindow"]) -> None:
         window.attributes("-alpha", 0)  # type: ignore
 
         screen_width = window.winfo_screenwidth()

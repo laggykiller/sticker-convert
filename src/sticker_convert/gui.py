@@ -34,7 +34,7 @@ from sticker_convert.version import __version__
 
 
 class GUI(Window):
-    def __init__(self):
+    def __init__(self) -> None:
         super(GUI, self).__init__(themename="darkly", alpha=0)  # type: ignore
         self.init_done = False
         self.load_jsons()
@@ -66,15 +66,15 @@ class GUI(Window):
 
         self.bind("<<exec_in_main>>", self.exec_in_main)  # type: ignore
 
-    def __enter__(self):
+    def __enter__(self) -> "GUI":
         return self
 
-    def gui(self):
+    def gui(self) -> None:
         self.init_done = True
         self.highlight_fields()
         self.mainloop()
 
-    def quit(self):
+    def quit(self) -> None:
         if self.job:
             response = self.cb_ask_bool("Job is running, really quit?")
             if response is False:
@@ -92,7 +92,7 @@ class GUI(Window):
             self.cancel_job()
         self.destroy()
 
-    def declare_variables(self):
+    def declare_variables(self) -> None:
         # Input
         self.input_option_display_var = StringVar(self)
         self.input_option_true_var = StringVar(self)
@@ -166,9 +166,9 @@ class GUI(Window):
         self.response_event = Event()
         self.response = None
         self.action: Optional[Callable[..., Any]] = None
-        self.job = None
+        self.job: Optional[Job] = None
 
-    def init_frames(self):
+    def init_frames(self) -> None:
         self.input_frame = InputFrame(
             self, self.scrollable_frame, borderwidth=1, text="Input"
         )
@@ -189,7 +189,7 @@ class GUI(Window):
         )
         self.control_frame = ControlFrame(self, self.scrollable_frame, borderwidth=1)
 
-    def pack_frames(self):
+    def pack_frames(self) -> None:
         self.input_frame.grid(column=0, row=0, sticky="w", padx=5, pady=5)
         self.comp_frame.grid(column=1, row=0, sticky="news", padx=5, pady=5)
         self.output_frame.grid(column=0, row=1, sticky="w", padx=5, pady=5)
@@ -202,7 +202,7 @@ class GUI(Window):
             column=0, row=4, columnspan=2, sticky="news", padx=5, pady=5
         )
 
-    def warn_tkinter_bug(self):
+    def warn_tkinter_bug(self) -> None:
         if (
             platform.system() == "Darwin"
             and platform.mac_ver()[0].split(".")[0] == "14"
@@ -220,7 +220,7 @@ class GUI(Window):
             msg = "(https://github.com/python/cpython/issues/110218)"
             self.cb_msg(msg)
 
-    def load_jsons(self):
+    def load_jsons(self) -> None:
         self.help = JsonManager.load_json(ROOT_DIR / "resources/help.json")
         self.input_presets = JsonManager.load_json(ROOT_DIR / "resources/input.json")
         self.compression_presets: dict[str, dict[str, Any]] = JsonManager.load_json(
@@ -260,7 +260,7 @@ class GUI(Window):
         else:
             self.creds = {}
 
-    def save_config(self):
+    def save_config(self) -> None:
         # Only update comp_custom if custom preset is selected
         if self.comp_preset_var.get() == "custom":
             comp_custom = self.get_opt_comp().to_dict()
@@ -288,20 +288,20 @@ class GUI(Window):
 
         JsonManager.save_json(self.settings_path, self.settings)
 
-    def save_creds(self):
+    def save_creds(self) -> None:
         self.creds = self.get_opt_cred().to_dict()
 
         JsonManager.save_json(self.creds_path, self.creds)
 
-    def delete_creds(self):
+    def delete_creds(self) -> None:
         if self.creds_path.is_file():
             os.remove(self.creds_path)
 
-    def delete_config(self):
+    def delete_config(self) -> None:
         if self.settings_path.is_file():
             os.remove(self.settings_path)
 
-    def apply_config(self):
+    def apply_config(self) -> None:
         # Input
         self.default_input_mode: str = self.settings.get("input", {}).get(
             "option", "auto"
@@ -358,7 +358,7 @@ class GUI(Window):
             self.output_presets[self.default_output_mode]["full_name"]
         )
 
-    def apply_creds(self):
+    def apply_creds(self) -> None:
         self.signal_uuid_var.set(self.creds.get("signal", {}).get("uuid", ""))
         self.signal_password_var.set(self.creds.get("signal", {}).get("password", ""))
         self.telegram_token_var.set(self.creds.get("telegram", {}).get("token", ""))
@@ -416,7 +416,7 @@ class GUI(Window):
         else:
             return selection
 
-    def start_job(self):
+    def start_job(self) -> None:
         self.save_config()
         if self.settings_save_cred_var.get() is True:
             self.save_creds()
@@ -535,24 +535,24 @@ class GUI(Window):
             line_cookies=self.line_cookies_var.get(),
         )
 
-    def start_process(self):
+    def start_process(self) -> None:
         if self.job:
             self.job.start()
         self.job = None
 
         self.stop_job()
 
-    def stop_job(self):
+    def stop_job(self) -> None:
         self.set_inputs("normal")
         self.control_frame.start_btn.config(text="Start", bootstyle="default")  # type: ignore
 
-    def cancel_job(self):
+    def cancel_job(self) -> None:
         if self.job:
             self.cb_msg(msg="Cancelling job...")
             self.job.cancel()
             self.cb_bar(set_progress_mode="clear")
 
-    def set_inputs(self, state: str):
+    def set_inputs(self, state: str) -> None:
         # state: 'normal', 'disabled'
 
         self.input_frame.set_states(state=state)
@@ -607,7 +607,7 @@ class GUI(Window):
             return True
         return False
 
-    def cb_msg(self, *args: Any, **kwargs: Any):
+    def cb_msg(self, *args: Any, **kwargs: Any) -> None:
         with self.msg_lock:
             self.progress_frame.update_message_box(*args, **kwargs)
 

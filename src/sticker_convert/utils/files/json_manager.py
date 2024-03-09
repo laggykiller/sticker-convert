@@ -15,6 +15,6 @@ class JsonManager:
             return data
 
     @staticmethod
-    def save_json(path: Path, data: dict[Any, Any]):
+    def save_json(path: Path, data: dict[Any, Any]) -> None:
         with open(path, "w+", encoding="utf-8") as f:
             json.dump(data, f, indent=4)

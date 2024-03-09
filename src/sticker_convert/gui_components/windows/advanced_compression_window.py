@@ -17,7 +17,7 @@ class AdvancedCompressionWindow(BaseWindow):
     emoji_visible_rows = 5
     emoji_btns: list[tuple[Button, ImageTk.PhotoImage]] = []
 
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(AdvancedCompressionWindow, self).__init__(*args, **kwargs)
         self.categories = list({entry["category"] for entry in self.gui.emoji_list})
 
@@ -559,7 +559,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_disable_fps(self, *args: Any):
+    def cb_disable_fps(self, *args: Any) -> None:
         if self.gui.fps_disable_var.get() is True:
             state = "disabled"
         else:
@@ -568,7 +568,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fps_min_entry.config(state=state)
         self.fps_max_entry.config(state=state)
 
-    def cb_disable_res_w(self, *args: Any):
+    def cb_disable_res_w(self, *args: Any) -> None:
         if self.gui.res_w_disable_var.get() is True:
             state = "disabled"
         else:
@@ -577,7 +577,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.res_w_min_entry.config(state=state)
         self.res_w_max_entry.config(state=state)
 
-    def cb_disable_res_h(self, *args: Any):
+    def cb_disable_res_h(self, *args: Any) -> None:
         if self.gui.res_h_disable_var.get() is True:
             state = "disabled"
         else:
@@ -586,7 +586,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.res_h_min_entry.config(state=state)
         self.res_h_max_entry.config(state=state)
 
-    def cb_disable_quality(self, *args: Any):
+    def cb_disable_quality(self, *args: Any) -> None:
         if self.gui.quality_disable_var.get() is True:
             state = "disabled"
         else:
@@ -595,7 +595,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.quality_min_entry.config(state=state)
         self.quality_max_entry.config(state=state)
 
-    def cb_disable_color(self, *args: Any):
+    def cb_disable_color(self, *args: Any) -> None:
         if self.gui.color_disable_var.get() is True:
             state = "disabled"
         else:
@@ -604,7 +604,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.color_min_entry.config(state=state)
         self.color_max_entry.config(state=state)
 
-    def cb_disable_duration(self, *args: Any):
+    def cb_disable_duration(self, *args: Any) -> None:
         if (
             self.gui.duration_disable_var.get() is True
             or self.gui.comp_preset_var.get() == "auto"
@@ -616,7 +616,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.duration_min_entry.config(state=state)
         self.duration_max_entry.config(state=state)
 
-    def cb_disable_size(self, *args: Any):
+    def cb_disable_size(self, *args: Any) -> None:
         if (
             self.gui.size_disable_var.get() is True
             or self.gui.comp_preset_var.get() == "auto"
@@ -628,7 +628,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.img_size_max_entry.config(state=state)
         self.vid_size_max_entry.config(state=state)
 
-    def cb_disable_format(self, *args: Any):
+    def cb_disable_format(self, *args: Any) -> None:
         if self.gui.comp_preset_var.get() == "auto":
             state = "disabled"
         else:
@@ -637,7 +637,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.img_format_entry.config(state=state)
         self.vid_format_entry.config(state=state)
 
-    def cb_disable_fake_vid(self, *args: Any):
+    def cb_disable_fake_vid(self, *args: Any) -> None:
         if self.gui.comp_preset_var.get() == "auto":
             state = "disabled"
         else:
@@ -645,7 +645,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         self.fake_vid_cbox.config(state=state)
 
-    def set_emoji_btn(self):
+    def set_emoji_btn(self) -> None:
         self.im = Image.new("RGBA", (128, 128), (255, 255, 255, 0))
         ImageDraw.Draw(self.im).text(  # type: ignore
             (0, 0),
@@ -657,7 +657,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.ph_im = ImageTk.PhotoImage(self.im)
         self.default_emoji_dsp.config(image=self.ph_im)
 
-    def render_emoji_list(self, *args: Any):
+    def render_emoji_list(self, *args: Any) -> None:
         category = self.categories_var.get()
 
         for emoji_btn, ph_im in self.emoji_btns:
@@ -735,19 +735,19 @@ class AdvancedCompressionWindow(BaseWindow):
         self.emoji_canvas.bind("<Enter>", self.cb_bound_to_mousewheel)
         self.emoji_canvas.bind("<Leave>", self.cb_unbound_to_mousewheel)
 
-    def cb_bound_to_mousewheel(self, event: Any):
+    def cb_bound_to_mousewheel(self, event: Any) -> None:
         for i in self.mousewheel:
             self.emoji_canvas.bind_all(i, self.cb_on_mousewheel)
 
-    def cb_unbound_to_mousewheel(self, event: Any):
+    def cb_unbound_to_mousewheel(self, event: Any) -> None:
         for i in self.mousewheel:
             self.emoji_canvas.unbind_all(i)
 
-    def cb_on_mousewheel(self, event: Any):
+    def cb_on_mousewheel(self, event: Any) -> None:
         self.emoji_canvas.yview_scroll(
             int(-1 * (event.delta / self.delta_divide)), "units"
         )  # type: ignore
 
-    def cb_set_emoji(self, emoji: str):
+    def cb_set_emoji(self, emoji: str) -> None:
         self.gui.default_emoji_var.set(emoji)
         self.set_emoji_btn()

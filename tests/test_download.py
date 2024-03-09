@@ -55,7 +55,7 @@ def _run_sticker_convert(
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_signal_static_png(tmp_path: LocalPath):
+def test_download_signal_static_png(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="signal",
@@ -69,7 +69,7 @@ def test_download_signal_static_png(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_signal_static_webp(tmp_path: LocalPath):
+def test_download_signal_static_webp(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="signal",
@@ -83,7 +83,7 @@ def test_download_signal_static_webp(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_signal_animated_apng(tmp_path: LocalPath):
+def test_download_signal_animated_apng(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="signal",
@@ -97,7 +97,7 @@ def test_download_signal_animated_apng(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_telegram_static_webp(tmp_path: LocalPath):
+def test_download_telegram_static_webp(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="telegram",
@@ -112,7 +112,7 @@ def test_download_telegram_static_webp(tmp_path: LocalPath):
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 @pytest.mark.skipif(not TELEGRAM_TOKEN, reason="No credentials")
-def test_download_telegram_animated_webm(tmp_path: LocalPath):
+def test_download_telegram_animated_webm(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="telegram",
@@ -127,7 +127,7 @@ def test_download_telegram_animated_webm(tmp_path: LocalPath):
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 @pytest.mark.skipif(not TELEGRAM_TOKEN, reason="No credentials")
-def test_download_telegram_animated_tgs(tmp_path: LocalPath):
+def test_download_telegram_animated_tgs(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="telegram",
@@ -142,7 +142,7 @@ def test_download_telegram_animated_tgs(tmp_path: LocalPath):
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 @pytest.mark.skipif(not TELEGRAM_TOKEN, reason="No credentials")
-def test_download_telegram_emoji(tmp_path: LocalPath):
+def test_download_telegram_emoji(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="telegram",
@@ -156,7 +156,7 @@ def test_download_telegram_emoji(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_static_png_below_775(tmp_path: LocalPath):
+def test_download_line_static_png_below_775(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -170,7 +170,7 @@ def test_download_line_static_png_below_775(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_static_png_no_region_lock(tmp_path: LocalPath):
+def test_download_line_static_png_no_region_lock(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -184,7 +184,7 @@ def test_download_line_static_png_no_region_lock(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_static_png_with_region_lock(tmp_path: LocalPath):
+def test_download_line_static_png_with_region_lock(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -198,7 +198,7 @@ def test_download_line_static_png_with_region_lock(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_static_png_officialaccount(tmp_path: LocalPath):
+def test_download_line_static_png_officialaccount(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -212,7 +212,7 @@ def test_download_line_static_png_officialaccount(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_static_png_officialaccount_special(tmp_path: LocalPath):
+def test_download_line_static_png_officialaccount_special(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -226,7 +226,7 @@ def test_download_line_static_png_officialaccount_special(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng(tmp_path: LocalPath):
+def test_download_line_animated_apng(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -240,7 +240,7 @@ def test_download_line_animated_apng(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng_sound(tmp_path: LocalPath):
+def test_download_line_animated_apng_sound(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -254,7 +254,7 @@ def test_download_line_animated_apng_sound(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng_popup(tmp_path: LocalPath):
+def test_download_line_animated_apng_popup(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -268,7 +268,7 @@ def test_download_line_animated_apng_popup(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng_popup_foreground(tmp_path: LocalPath):
+def test_download_line_animated_apng_popup_foreground(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -282,7 +282,7 @@ def test_download_line_animated_apng_popup_foreground(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng_name_text(tmp_path: LocalPath):
+def test_download_line_animated_apng_name_text(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -296,7 +296,7 @@ def test_download_line_animated_apng_name_text(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng_per_sticker_text_no_cookies(tmp_path: LocalPath):
+def test_download_line_animated_apng_per_sticker_text_no_cookies(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -311,7 +311,7 @@ def test_download_line_animated_apng_per_sticker_text_no_cookies(tmp_path: Local
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 @pytest.mark.skipif(not LINE_COOKIES, reason="No credentials")
-def test_download_line_animated_apng_per_sticker_text_with_cookies(tmp_path: LocalPath):
+def test_download_line_animated_apng_per_sticker_text_with_cookies(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -325,7 +325,7 @@ def test_download_line_animated_apng_per_sticker_text_with_cookies(tmp_path: Loc
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_static_png_emoji(tmp_path: LocalPath):
+def test_download_line_static_png_emoji(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -339,7 +339,7 @@ def test_download_line_static_png_emoji(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng_emoji(tmp_path: LocalPath):
+def test_download_line_animated_apng_emoji(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -353,7 +353,7 @@ def test_download_line_animated_apng_emoji(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_kakao_static_png(tmp_path: LocalPath):
+def test_download_kakao_static_png(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="kakao",
@@ -367,7 +367,7 @@ def test_download_kakao_static_png(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_kakao_animated_gif_store_link_no_token(tmp_path: LocalPath):
+def test_download_kakao_animated_gif_store_link_no_token(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="kakao",
@@ -382,7 +382,7 @@ def test_download_kakao_animated_gif_store_link_no_token(tmp_path: LocalPath):
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 @pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
-def test_download_kakao_animated_gif_store_link_with_token(tmp_path: LocalPath):
+def test_download_kakao_animated_gif_store_link_with_token(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="kakao",
@@ -396,7 +396,7 @@ def test_download_kakao_animated_gif_store_link_with_token(tmp_path: LocalPath):
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath):
+def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="kakao",

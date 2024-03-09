@@ -16,7 +16,7 @@ class ProgressFrame(LabelFrame):
     progress_bar_steps = 0
     auto_scroll = True
 
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any):
+    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super(ProgressFrame, self).__init__(*args, **kwargs)  # type: ignore
 
@@ -60,7 +60,7 @@ class ProgressFrame(LabelFrame):
             self.progress_bar.stop()
             self.progress_bar["value"] = 0
 
-    def update_message_box(self, *args: Any, **kwargs: Any):
+    def update_message_box(self, *args: Any, **kwargs: Any) -> None:
         msg = kwargs.get("msg")
         cls = kwargs.get("cls")
         file = kwargs.get("file")
@@ -90,8 +90,8 @@ class ProgressFrame(LabelFrame):
 
         self.message_box._text.config(state="disabled")  # type: ignore
 
-    def cb_disable_autoscroll(self, *args: Any):
+    def cb_disable_autoscroll(self, *args: Any) -> None:
         self.auto_scroll = False
 
-    def cb_enable_autoscroll(self, *args: Any):
+    def cb_enable_autoscroll(self, *args: Any) -> None:
         self.auto_scroll = True

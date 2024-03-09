@@ -23,7 +23,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 class XcodeImessageIconset:
     iconset: dict[str, tuple[int, int]] = {}
 
-    def __init__(self):
+    def __init__(self) -> None:
         if self.iconset != {}:
             return
 
@@ -74,7 +74,7 @@ class XcodeImessageIconset:
 
 
 class XcodeImessage(UploadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(XcodeImessage, self).__init__(*args, **kwargs)
         self.iconset = XcodeImessageIconset().iconset
 
@@ -155,7 +155,7 @@ class XcodeImessage(UploadBase):
 
         return urls
 
-    def add_metadata(self, author: str, title: str):
+    def add_metadata(self, author: str, title: str) -> None:
         first_image_path = Path(
             self.opt_output.dir,
             [
@@ -190,7 +190,7 @@ class XcodeImessage(UploadBase):
 
         MetadataHandler.set_metadata(self.opt_output.dir, author=author, title=title)
 
-    def create_xcode_proj(self, author: str, title: str):
+    def create_xcode_proj(self, author: str, title: str) -> None:
         pack_path = self.opt_output.dir / title
         if (ROOT_DIR / "ios-message-stickers-template.zip").is_file():
             with zipfile.ZipFile(

@@ -15,7 +15,7 @@ from sticker_convert.utils.files.metadata_handler import MetadataHandler
 
 
 class DownloadTelegram(DownloadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(DownloadTelegram, self).__init__(*args, **kwargs)
 
     def download_stickers_telegram(self) -> bool:

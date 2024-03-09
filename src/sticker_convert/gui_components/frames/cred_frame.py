@@ -14,7 +14,7 @@ from sticker_convert.gui_components.windows.signal_get_auth_window import Signal
 
 
 class CredFrame(LabelFrame):
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any):
+    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super(CredFrame, self).__init__(*args, **kwargs)
 
@@ -135,22 +135,22 @@ class CredFrame(LabelFrame):
         self.line_get_auth_btn.grid(column=2, row=6, sticky="e", padx=3, pady=3)
         self.help_btn.grid(column=2, row=8, sticky="e", padx=3, pady=3)
 
-    def cb_cred_help(self, *args: Any):
+    def cb_cred_help(self, *args: Any) -> None:
         faq_site = "https://github.com/laggykiller/sticker-convert#faq"
         success = webbrowser.open(faq_site)
         if not success:
             self.gui.cb_ask_str("You can get help from:", initialvalue=faq_site)
 
-    def cb_kakao_get_auth(self, *args: Any):
+    def cb_kakao_get_auth(self, *args: Any) -> None:
         KakaoGetAuthWindow(self.gui)
 
-    def cb_signal_get_auth(self, *args: Any):
+    def cb_signal_get_auth(self, *args: Any) -> None:
         SignalGetAuthWindow(self.gui)
 
-    def cb_line_get_auth(self, *args: Any):
+    def cb_line_get_auth(self, *args: Any) -> None:
         LineGetAuthWindow(self.gui)
 
-    def set_states(self, state: str):
+    def set_states(self, state: str) -> None:
         self.signal_uuid_entry.config(state=state)
         self.signal_password_entry.config(state=state)
         self.signal_get_auth_btn.config(state=state)

@@ -12,7 +12,7 @@ from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth
 
 
 class KakaoGetAuthWindow(BaseWindow):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(KakaoGetAuthWindow, self).__init__(*args, **kwargs)
 
         self.title("Get Kakao auth_token")
@@ -159,10 +159,10 @@ class KakaoGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_login(self):
+    def cb_login(self) -> None:
         Thread(target=self.cb_login_thread, daemon=True).start()
 
-    def cb_login_thread(self, *args: Any):
+    def cb_login_thread(self, *args: Any) -> None:
         self.gui.save_creds()
         m = GetKakaoAuth(
             opt_cred=self.gui.get_opt_cred(),

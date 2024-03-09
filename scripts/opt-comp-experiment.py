@@ -62,7 +62,7 @@ formats = [
 ]
 
 
-def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
+def generate_random_apng(res: int, fps: float, duration: float, out_f: str) -> None:
     apngasm = APNGAsm()  # type: ignore
     for _ in range(int(duration / 1000 * fps)):
         im = numpy.random.rand(res, res, 4) * 255
@@ -73,7 +73,7 @@ def generate_random_apng(res: int, fps: float, duration: float, out_f: str):
     apngasm.assemble(out_f)
 
 
-def generate_random_png(res: int, out_f: Path):
+def generate_random_png(res: int, out_f: Path) -> None:
     im_numpy = numpy.random.rand(res, res, 4) * 255
     with Image.fromarray(im_numpy, "RGBA") as im:  # type: ignore
         im.save(out_f)
@@ -114,7 +114,7 @@ def compress_worker(
     work_queue.put(None)
 
 
-def write_result(csv_path: str, results_queue: Queue[Any], items: int):
+def write_result(csv_path: str, results_queue: Queue[Any], items: int) -> None:
     with open(csv_path, "w+", newline="") as f, tqdm(total=items) as progress:
         fieldnames = ["size", "fps", "res", "quality", "color"]
         writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -132,7 +132,7 @@ def write_result(csv_path: str, results_queue: Queue[Any], items: int):
             progress.update()
 
 
-def main():
+def main() -> None:
     os.makedirs("opt-comp-result", exist_ok=True)
 
     for img_or_vid, fmt in formats:

@@ -150,7 +150,7 @@ class Executor:
                 cb_queue.put(e)
         work_queue.put(None)
 
-    def start_workers(self, processes: int = 1):
+    def start_workers(self, processes: int = 1) -> None:
         # Would contain None from previous run
         while not self.work_queue.empty():
             self.work_queue.get()
@@ -170,10 +170,10 @@ class Executor:
             process.start()
             self.processes.append(process)
 
-    def add_work(self, work_func: Callable[..., Any], work_args: tuple[Any, ...]):
+    def add_work(self, work_func: Callable[..., Any], work_args: tuple[Any, ...]) -> None:
         self.work_queue.put((work_func, work_args))
 
-    def join_workers(self):
+    def join_workers(self) -> None:
         self.work_queue.put(None)
         try:
             for process in self.processes:
@@ -183,9 +183,9 @@ class Executor:
 
         self.results_queue.put(None)
 
-        self.process = []
+        self.processes.clear()
 
-    def kill_workers(self, *args: Any, **kwargs: Any):
+    def kill_workers(self, *args: Any, **kwargs: Any) -> None:
         self.is_cancel_job.value = 1  # type: ignore
         while not self.work_queue.empty():
             self.work_queue.get()
@@ -199,7 +199,7 @@ class Executor:
 
         self.cleanup()
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         self.cb_queue.put(None)
         self.cb_thread_instance.join()
 
@@ -287,7 +287,7 @@ class Job:
 
         return code
 
-    def cancel(self, *args: Any, **kwargs: Any):
+    def cancel(self, *args: Any, **kwargs: Any) -> None:
         self.executor.kill_workers()
 
     def verify_input(self) -> bool:

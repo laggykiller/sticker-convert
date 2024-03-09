@@ -14,12 +14,12 @@ else:
 
 from contextlib import contextmanager
 from tempfile import TemporaryDirectory
-from typing import ContextManager, Optional, Union
+from typing import Any, ContextManager, Generator, Optional, Union
 
 
 def debug_cache_dir(path: str) -> ContextManager[Path]:
     @contextmanager
-    def generator():
+    def generator() -> Generator[Any, Any, Any]:
         path_random = Path(path, str(uuid4()))
         os.mkdir(path_random)
         try:

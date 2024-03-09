@@ -11,7 +11,7 @@ from PIL import Image, UnidentifiedImageError
 
 
 class CodecInfo:
-    def __init__(self, file: Union[Path, bytes], file_ext: Optional[str] = None):
+    def __init__(self, file: Union[Path, bytes], file_ext: Optional[str] = None) -> None:
         self.file_ext: Optional[str]
         if file_ext is None and isinstance(file, Path):
             self.file_ext = CodecInfo.get_file_ext(file)
@@ -232,8 +232,8 @@ class CodecInfo:
         frames_to_iterate: Optional[int] = None,
         frames_only: bool = False,
     ) -> tuple[int, int]:
-        import av
-        from av.container.input import InputContainer
+        import av  # type: ignore
+        from av.container.input import InputContainer  # type: ignore
 
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
@@ -312,8 +312,8 @@ class CodecInfo:
         elif codec is not None:
             return codec.lower()
 
-        import av
-        from av.error import InvalidDataError
+        import av  # type: ignore
+        from av.error import InvalidDataError  # type: ignore
 
         try:
             with av.open(file_ref) as container:  # type: ignore

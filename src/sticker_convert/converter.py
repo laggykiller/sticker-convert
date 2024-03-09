@@ -12,7 +12,7 @@ import numpy as np
 from PIL import Image
 
 if TYPE_CHECKING:
-    from av.video.plane import VideoPlane
+    from av.video.plane import VideoPlane  # type: ignore
 
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import Callback, CallbackReturn
@@ -334,7 +334,7 @@ class StickerConvert:
 
         return steps_list
 
-    def recompress(self, sign: str):
+    def recompress(self, sign: str) -> None:
         msg = self.MSG_REDO_COMP.format(
             sign, self.in_f_name, self.out_f_name, self.size, sign, self.size_max
         )
@@ -372,7 +372,7 @@ class StickerConvert:
 
         return True, self.in_f_path, out_f, self.result_size
 
-    def frames_import(self):
+    def frames_import(self) -> None:
         if isinstance(self.in_f, Path):
             suffix = self.in_f.suffix
         else:
@@ -387,7 +387,7 @@ class StickerConvert:
         else:
             self._frames_import_pyav()
 
-    def _frames_import_pillow(self):
+    def _frames_import_pillow(self) -> None:
         with Image.open(self.in_f) as im:
             # Note: im.convert("RGBA") would return rgba image of current frame only
             if "n_frames" in im.__dir__():
@@ -397,11 +397,11 @@ class StickerConvert:
             else:
                 self.frames_raw.append(np.asarray(im.convert("RGBA")))
 
-    def _frames_import_pyav(self):
-        import av
-        from av.codec.context import CodecContext
-        from av.container.input import InputContainer
-        from av.video.codeccontext import VideoCodecContext
+    def _frames_import_pyav(self) -> None:
+        import av  # type: ignore
+        from av.codec.context import CodecContext  # type: ignore
+        from av.container.input import InputContainer  # type: ignore
+        from av.video.codeccontext import VideoCodecContext  # type: ignore
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
@@ -494,7 +494,7 @@ class StickerConvert:
 
                     self.frames_raw.append(rgba_array)
 
-    def _frames_import_lottie(self):
+    def _frames_import_lottie(self) -> None:
         from rlottie_python.rlottie_wrapper import LottieAnimation
 
         if isinstance(self.in_f, Path):
@@ -622,7 +622,7 @@ class StickerConvert:
                     frames_out.append(frames_in[-1])
                 return frames_out
 
-    def frames_export(self):
+    def frames_export(self) -> None:
         is_animated = len(self.frames_processed) > 1 and self.fps
         if self.out_f.suffix in (".apng", ".png"):
             if is_animated:
@@ -636,7 +636,7 @@ class StickerConvert:
         else:
             self._frames_export_pil()
 
-    def _frames_export_pil(self):
+    def _frames_export_pil(self) -> None:
         with Image.fromarray(self.frames_processed[0]) as im:  # type: ignore
             im.save(
                 self.tmp_f,
@@ -644,9 +644,9 @@ class StickerConvert:
                 quality=self.quality,
             )
 
-    def _frames_export_pyav(self):
-        import av
-        from av.container import OutputContainer
+    def _frames_export_pyav(self) -> None:
+        import av  # type: ignore
+        from av.container import OutputContainer  # type: ignore
 
         options = {}
 
@@ -689,7 +689,7 @@ class StickerConvert:
             for packet in out_stream.encode():  # type: ignore
                 output.mux(packet)  # type: ignore
 
-    def _frames_export_webp(self):
+    def _frames_export_webp(self) -> None:
         import webp  # type: ignore
 
         assert self.fps
@@ -704,7 +704,7 @@ class StickerConvert:
         anim_data = enc.assemble(timestamp_ms)  # type: ignore
         self.tmp_f.write(anim_data.buffer())  # type: ignore
 
-    def _frames_export_png(self):
+    def _frames_export_png(self) -> None:
         with Image.fromarray(self.frames_processed[0], "RGBA") as image:  # type: ignore
             image_quant = self.quantize(image)
 
@@ -714,7 +714,7 @@ class StickerConvert:
             frame_optimized = self.optimize_png(f.read())
             self.tmp_f.write(frame_optimized)
 
-    def _frames_export_apng(self):
+    def _frames_export_apng(self) -> None:
         from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba  # type: ignore
 
         assert self.fps

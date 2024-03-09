@@ -13,7 +13,7 @@ from sticker_convert.gui_components.frames.right_clicker import RightClicker
 
 
 class OutputFrame(LabelFrame):
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any):
+    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super(OutputFrame, self).__init__(*args, **kwargs)
 
@@ -89,7 +89,7 @@ class OutputFrame(LabelFrame):
             column=1, columnspan=2, row=3, sticky="w", padx=3, pady=3
         )
 
-    def cb_set_outdir(self, *args: Any):
+    def cb_set_outdir(self, *args: Any) -> None:
         orig_output_dir = self.gui.output_setdir_var.get()
         if not Path(orig_output_dir).is_dir():
             orig_output_dir = DEFAULT_DIR
@@ -97,12 +97,12 @@ class OutputFrame(LabelFrame):
         if output_dir:
             self.gui.output_setdir_var.set(output_dir)
 
-    def cb_output_option(self, *args: Any):
+    def cb_output_option(self, *args: Any) -> None:
         self.gui.output_option_true_var.set(self.gui.output_option_display_var.get())
         self.gui.comp_frame.cb_comp_apply_preset()
         self.gui.highlight_fields()
 
-    def set_states(self, state: str):
+    def set_states(self, state: str) -> None:
         self.title_entry.config(state=state)
         self.author_entry.config(state=state)
         self.output_option_opt.config(state=state)

@@ -11,7 +11,7 @@ from sticker_convert.gui_components.windows.advanced_compression_window import A
 
 
 class CompFrame(LabelFrame):
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any):
+    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super(CompFrame, self).__init__(*args, **kwargs)
 
@@ -102,7 +102,7 @@ class CompFrame(LabelFrame):
         self.cb_comp_apply_preset()
         self.cb_no_compress()
 
-    def cb_comp_apply_preset(self, *args: Any):
+    def cb_comp_apply_preset(self, *args: Any) -> None:
         selection = self.gui.get_preset()
         if selection == "auto":
             if self.gui.get_input_name() == "local":
@@ -181,10 +181,10 @@ class CompFrame(LabelFrame):
         self.cb_no_compress()
         self.gui.highlight_fields()
 
-    def cb_compress_advanced(self, *args: Any):
+    def cb_compress_advanced(self, *args: Any) -> None:
         AdvancedCompressionWindow(self.gui)
 
-    def cb_no_compress(self, *args: Any):
+    def cb_no_compress(self, *args: Any) -> None:
         if self.gui.no_compress_var.get() is True:
             state = "disabled"
         else:
@@ -194,12 +194,12 @@ class CompFrame(LabelFrame):
         self.steps_entry.config(state=state)
         self.processes_entry.config(state=state)
 
-    def set_inputs_comp(self, state: str):
+    def set_inputs_comp(self, state: str) -> None:
         self.comp_preset_opt.config(state=state)
         self.comp_advanced_btn.config(state=state)
         self.steps_entry.config(state=state)
         self.processes_entry.config(state=state)
 
-    def set_states(self, state: str):
+    def set_states(self, state: str) -> None:
         self.no_compress_cbox.config(state=state)
         self.set_inputs_comp(state=state)

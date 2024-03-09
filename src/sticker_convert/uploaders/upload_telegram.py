@@ -18,7 +18,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 
 
 class UploadTelegram(UploadBase):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(UploadTelegram, self).__init__(*args, **kwargs)
 
         base_spec = CompOption(

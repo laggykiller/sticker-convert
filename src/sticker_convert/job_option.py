@@ -15,7 +15,7 @@ def to_int(i: Union[float, str, None]) -> Optional[int]:
 
 @dataclass
 class BaseOption:
-    def merge(self, config: "BaseOption"):
+    def merge(self, config: "BaseOption") -> None:
         for k, v in vars(config).items():
             if v is not None:
                 setattr(self, k, v)
@@ -114,19 +114,19 @@ class CompOption(BaseOption):
     def get_size_max(self) -> tuple[Optional[int], Optional[int]]:
         return (self.size_max_img, self.size_max_vid)
 
-    def set_size_max(self, value: Optional[int]):
+    def set_size_max(self, value: Optional[int]) -> None:
         self.size_max_img, self.size_max_vid = to_int(value), to_int(value)
 
     def get_format(self) -> tuple[tuple[str, ...], tuple[str, ...]]:
         return (self.format_img, self.format_vid)
 
-    def set_format(self, value: tuple[str, ...]):
+    def set_format(self, value: tuple[str, ...]) -> None:
         self.format_img, self.format_vid = value, value
 
     def get_fps(self) -> tuple[Optional[int], Optional[int]]:
         return (self.fps_min, self.fps_max)
 
-    def set_fps(self, value: Optional[int]):
+    def set_fps(self, value: Optional[int]) -> None:
         self.fps_min, self.fps_max = to_int(value), to_int(value)
 
     def get_res(
@@ -136,7 +136,7 @@ class CompOption(BaseOption):
     ]:
         return (self.get_res_w(), self.get_res_h())
 
-    def set_res(self, value: Optional[int]):
+    def set_res(self, value: Optional[int]) -> None:
         self.res_w_min = to_int(value)
         self.res_w_max = to_int(value)
         self.res_h_min = to_int(value)
@@ -145,45 +145,45 @@ class CompOption(BaseOption):
     def get_res_max(self) -> tuple[Optional[int], Optional[int]]:
         return (self.res_w_max, self.res_h_max)
 
-    def set_res_max(self, value: Optional[int]):
+    def set_res_max(self, value: Optional[int]) -> None:
         self.res_w_max = to_int(value)
         self.res_h_max = to_int(value)
 
     def get_res_min(self) -> tuple[Optional[int], Optional[int]]:
         return (self.res_w_min, self.res_h_min)
 
-    def set_res_min(self, value: Optional[int]):
+    def set_res_min(self, value: Optional[int]) -> None:
         self.res_w_min = to_int(value)
         self.res_h_min = to_int(value)
 
     def get_res_w(self) -> tuple[Optional[int], Optional[int]]:
         return (self.res_w_min, self.res_w_max)
 
-    def set_res_w(self, value: Optional[int]):
+    def set_res_w(self, value: Optional[int]) -> None:
         self.res_w_min, self.res_w_max = to_int(value), to_int(value)
 
     def get_res_h(self) -> tuple[Optional[int], Optional[int]]:
         return (self.res_h_min, self.res_h_max)
 
-    def set_res_h(self, value: Optional[int]):
+    def set_res_h(self, value: Optional[int]) -> None:
         self.res_h_min, self.res_h_max = to_int(value), to_int(value)
 
     def get_quality(self) -> tuple[Optional[int], Optional[int]]:
         return (self.quality_min, self.quality_max)
 
-    def set_quality(self, value: Optional[int]):
+    def set_quality(self, value: Optional[int]) -> None:
         self.quality_min, self.quality_max = to_int(value), to_int(value)
 
     def get_color(self) -> tuple[Optional[int], Optional[int]]:
         return (self.color_min, self.color_max)
 
-    def set_color(self, value: Optional[int]):
+    def set_color(self, value: Optional[int]) -> None:
         self.color_min, self.color_max = to_int(value), to_int(value)
 
     def get_duration(self) -> tuple[Optional[int], Optional[int]]:
         return (self.duration_min, self.duration_max)
 
-    def set_duration(self, value: Optional[int]):
+    def set_duration(self, value: Optional[int]) -> None:
         self.duration_min, self.duration_max = to_int(value), to_int(value)
 
 
