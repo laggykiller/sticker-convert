@@ -27,18 +27,18 @@ class UploadTelegram(UploadBase):
         base_spec.set_res(512)
 
         self.png_spec = copy.deepcopy(base_spec)
-        self.png_spec.set_format([".png"])
+        self.png_spec.set_format((".png",))
         self.png_spec.animated = False
 
         self.tgs_spec = copy.deepcopy(base_spec)
-        self.tgs_spec.set_format([".tgs"])
+        self.tgs_spec.set_format((".tgs",))
         self.tgs_spec.fps_min = 60
         self.tgs_spec.fps_max = 60
         self.tgs_spec.size_max_img = 64000
         self.tgs_spec.size_max_vid = 64000
 
         self.webm_spec = copy.deepcopy(base_spec)
-        self.webm_spec.set_format([".webm"])
+        self.webm_spec.set_format((".webm",))
         self.webm_spec.fps_max = 30
         self.webm_spec.animated = None if self.opt_comp.fake_vid else True
 
@@ -51,16 +51,16 @@ class UploadTelegram(UploadBase):
         base_cover_spec.set_res(100)
 
         self.png_cover_spec = copy.deepcopy(base_cover_spec)
-        self.png_cover_spec.set_format([".png"])
+        self.png_cover_spec.set_format((".png",))
         self.png_cover_spec.animated = False
 
         self.tgs_cover_spec = copy.deepcopy(base_cover_spec)
-        self.tgs_cover_spec.set_format([".tgs"])
+        self.tgs_cover_spec.set_format((".tgs",))
         self.tgs_cover_spec.fps_min = 60
         self.tgs_cover_spec.fps_max = 60
 
         self.webm_cover_spec = copy.deepcopy(base_cover_spec)
-        self.webm_cover_spec.set_format([".webm"])
+        self.webm_cover_spec.set_format((".webm",))
         self.webm_cover_spec.fps_max = 30
         self.webm_cover_spec.animated = True
 

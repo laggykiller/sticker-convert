@@ -478,8 +478,8 @@ class GUI(Window):
             size_max_vid=self.vid_size_max_var.get()
             if not self.size_disable_var.get()
             else None,
-            format_img=[self.img_format_var.get()],
-            format_vid=[self.vid_format_var.get()],
+            format_img=(self.img_format_var.get(),),
+            format_vid=(self.vid_format_var.get(),),
             fps_min=self.fps_min_var.get() if not self.fps_disable_var.get() else None,
             fps_max=self.fps_max_var.get() if not self.fps_disable_var.get() else None,
             fps_power=self.fps_power_var.get(),

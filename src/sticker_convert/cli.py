@@ -296,16 +296,16 @@ class CLI:
             size_max_vid=self.compression_presets[preset]["size_max"]["vid"]
             if args.vid_size_max is None
             else args.vid_size_max,
-            format_img=[
+            format_img=tuple(
                 self.compression_presets[preset]["format"]["img"]
                 if args.img_format is None
                 else args.img_format
-            ],
-            format_vid=[
+            ),
+            format_vid=tuple(
                 self.compression_presets[preset]["format"]["vid"]
                 if args.vid_format is None
                 else args.vid_format
-            ],
+            ),
             fps_min=self.compression_presets[preset]["fps"]["min"]
             if args.fps_min is None
             else args.fps_min,

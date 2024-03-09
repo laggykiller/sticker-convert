@@ -46,7 +46,7 @@ class FormatVerify:
     @staticmethod
     def check_file_res(
         file: Union[Path, bytes],
-        res: list[list[Optional[int]]],
+        res: tuple[tuple[Optional[int], Optional[int]], tuple[Optional[int], Optional[int]]],
         square: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
@@ -72,7 +72,7 @@ class FormatVerify:
     @staticmethod
     def check_file_fps(
         file: Union[Path, bytes],
-        fps: list[Optional[int]],
+        fps: tuple[Optional[int], Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if file_info:
@@ -90,7 +90,7 @@ class FormatVerify:
     @staticmethod
     def check_file_duration(
         file: Union[Path, bytes],
-        duration: list[Optional[int]],
+        duration: tuple[Optional[int], Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if file_info:
@@ -110,7 +110,7 @@ class FormatVerify:
     @staticmethod
     def check_file_size(
         file: Union[Path, bytes],
-        size: list[Optional[int]],
+        size: tuple[Optional[int], Optional[int]],
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if isinstance(file, Path):
@@ -159,7 +159,7 @@ class FormatVerify:
     @staticmethod
     def check_format(
         file: Union[Path, bytes],
-        fmt: list[list[str]],
+        fmt: tuple[tuple[str, ...], tuple[str, ...]],
         file_info: Optional[CodecInfo] = None,
     ):
         if file_info:

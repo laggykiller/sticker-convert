@@ -34,8 +34,8 @@ processes_max = ceil(cpu_count() / 2)
 opt_comp_template = CompOption(
     size_max_img=1,
     size_max_vid=1,
-    format_img=[".webp"],
-    format_vid=[".apng"],
+    format_img=(".webp",),
+    format_vid=(".apng",),
     fps_min=1,
     fps_max=1,
     res_w_min=256,
@@ -87,8 +87,8 @@ def compress_worker(
             int,
             Optional[int],
             Optional[int],
-            list[Optional[int]],
-            list[Optional[int]],
+            tuple[Optional[int], Optional[int]],
+            tuple[Optional[int], Optional[int]],
         ]
     ],
 ):
@@ -209,7 +209,7 @@ def main():
             for fps, res, quality, color in combinations:
                 opt_comp = copy.deepcopy(opt_comp_template)
                 opt_comp.set_size_max(None)
-                opt_comp.set_format([fmt])
+                opt_comp.set_format((fmt,))
                 if img_or_vid == "vidlong":
                     opt_comp.set_duration(10000)
                 else:

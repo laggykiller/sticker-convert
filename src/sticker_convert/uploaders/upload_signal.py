@@ -32,10 +32,10 @@ class UploadSignal(UploadBase):
         base_spec.square = True
 
         self.png_spec = copy.deepcopy(base_spec)
-        self.png_spec.set_format([".apng"])
+        self.png_spec.set_format((".apng",))
 
         self.webp_spec = copy.deepcopy(base_spec)
-        self.webp_spec.format_img = [".webp"]
+        self.webp_spec.format_img = (".webp",)
         self.webp_spec.animated = False
 
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
@@ -78,10 +78,16 @@ class UploadSignal(UploadBase):
                     dst = "bytes.apng"
                 else:
                     dst = "bytes.png"
-                _, _, image_data, _ = StickerConvert.convert(
+                success, _, image_data, _ = StickerConvert.convert(
                     Path(src), Path(dst), self.opt_comp_merged, self.cb, self.cb_return
                 )
-                assert image_data
+                if not success:
+                    self.cb.put(
+                        f"Warning: Cannot compress file {Path(src).name}, skip uploading this file..."
+                    )
+                    continue
+
+                assert isinstance(image_data, bytes)
 
                 sticker.image_data = image_data  # type: ignore
             else:
