@@ -22,21 +22,20 @@ class UploadSignal(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(UploadSignal, self).__init__(*args, **kwargs)
 
-        base_spec = CompOption()
-        base_spec.set_size_max(300000)
-        base_spec.set_res_max(512)
-        base_spec.duration_max = 3000
-        base_spec.square = True
+        self.base_spec.set_size_max(300000)
+        self.base_spec.set_res_max(512)
+        self.base_spec.duration_max = 3000
+        self.base_spec.square = True
 
-        self.png_spec = copy.deepcopy(base_spec)
+        self.png_spec = copy.deepcopy(self.base_spec)
         self.png_spec.set_format((".apng",))
 
-        self.webp_spec = copy.deepcopy(base_spec)
+        self.webp_spec = copy.deepcopy(self.base_spec)
         self.webp_spec.format_img = (".webp",)
         self.webp_spec.animated = False
 
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
-        self.opt_comp_merged.merge(base_spec)
+        self.opt_comp_merged.merge(self.base_spec)
 
     @staticmethod
     async def upload_pack(pack: LocalStickerPack, uuid: str, password: str) -> str:

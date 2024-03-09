@@ -21,29 +21,30 @@ class UploadTelegram(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(UploadTelegram, self).__init__(*args, **kwargs)
 
-        base_spec = CompOption(
-            size_max_img=512000, size_max_vid=256000, square=True, duration_max=3000
-        )
-        base_spec.set_res(512)
+        self.base_spec.size_max_img = 512000
+        self.base_spec.size_max_vid = 256000
+        self.base_spec.square = True
+        self.base_spec.duration_max = 3000
+        self.base_spec.set_res(512)
 
-        self.png_spec = copy.deepcopy(base_spec)
+        self.png_spec = copy.deepcopy(self.base_spec)
         self.png_spec.set_format((".png",))
         self.png_spec.animated = False
 
-        self.tgs_spec = copy.deepcopy(base_spec)
+        self.tgs_spec = copy.deepcopy(self.base_spec)
         self.tgs_spec.set_format((".tgs",))
         self.tgs_spec.fps_min = 60
         self.tgs_spec.fps_max = 60
         self.tgs_spec.size_max_img = 64000
         self.tgs_spec.size_max_vid = 64000
 
-        self.webm_spec = copy.deepcopy(base_spec)
+        self.webm_spec = copy.deepcopy(self.base_spec)
         self.webm_spec.set_format((".webm",))
         self.webm_spec.fps_max = 30
         self.webm_spec.animated = None if self.opt_comp.fake_vid else True
 
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
-        self.opt_comp_merged.merge(base_spec)
+        self.opt_comp_merged.merge(self.base_spec)
 
         base_cover_spec = CompOption(
             size_max_img=128000, size_max_vid=32000, square=True, duration_max=3000
@@ -65,7 +66,7 @@ class UploadTelegram(UploadBase):
         self.webm_cover_spec.animated = True
 
         self.opt_comp_cover_merged = copy.deepcopy(self.opt_comp)
-        self.opt_comp_cover_merged.merge(base_spec)
+        self.opt_comp_cover_merged.merge(self.base_spec)
 
     async def upload_pack(
         self, pack_title: str, stickers: list[Path], emoji_dict: dict[str, str]

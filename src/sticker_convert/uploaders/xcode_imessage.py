@@ -78,18 +78,17 @@ class XcodeImessage(UploadBase):
         super(XcodeImessage, self).__init__(*args, **kwargs)
         self.iconset = XcodeImessageIconset().iconset
 
-        base_spec = CompOption()
-        base_spec.set_size_max(500000)
-        base_spec.set_res(300)
-        base_spec.set_format(("png", ".apng", ".gif", ".jpeg", "jpg"))
-        base_spec.square = True
+        self.base_spec.set_size_max(500000)
+        self.base_spec.set_res(300)
+        self.base_spec.set_format(("png", ".apng", ".gif", ".jpeg", "jpg"))
+        self.base_spec.square = True
 
-        self.small_spec = copy.deepcopy(base_spec)
+        self.small_spec = copy.deepcopy(self.base_spec)
 
-        self.medium_spec = copy.deepcopy(base_spec)
+        self.medium_spec = copy.deepcopy(self.base_spec)
         self.medium_spec.set_res(408)
 
-        self.large_spec = copy.deepcopy(base_spec)
+        self.large_spec = copy.deepcopy(self.base_spec)
         self.large_spec.set_res(618)
 
     def create_imessage_xcode(self) -> list[str]:

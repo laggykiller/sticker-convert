@@ -20,15 +20,13 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 class CompressWastickers(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(CompressWastickers, self).__init__(*args, **kwargs)
-        base_spec = CompOption(
-            size_max_img=100000,
-            size_max_vid=500000,
-            duration_min=8,
-            duration_max=10000,
-            square=True,
-        )
-        base_spec.set_res(512)
-        base_spec.set_format((".webp",))
+        self.base_spec.size_max_img = 100000
+        self.base_spec.size_max_vid = 500000
+        self.base_spec.duration_min = 8
+        self.base_spec.duration_max = 10000
+        self.base_spec.square = True
+        self.base_spec.set_res(512)
+        self.base_spec.set_format((".webp",))
 
         self.spec_cover = CompOption(
             size_max_img=50000,
@@ -40,16 +38,16 @@ class CompressWastickers(UploadBase):
         self.spec_cover.set_fps(0)
         self.spec_cover.set_format((".png",))
 
-        self.webp_spec = copy.deepcopy(base_spec)
+        self.webp_spec = copy.deepcopy(self.base_spec)
         self.webp_spec.set_format((".webp",))
         self.webp_spec.animated = None if self.opt_comp.fake_vid else True
 
-        self.png_spec = copy.deepcopy(base_spec)
+        self.png_spec = copy.deepcopy(self.base_spec)
         self.png_spec.set_format((".png",))
         self.png_spec.animated = False
 
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
-        self.opt_comp_merged.merge(base_spec)
+        self.opt_comp_merged.merge(self.base_spec)
 
     def compress_wastickers(self) -> list[str]:
         urls: list[str] = []
