@@ -189,7 +189,7 @@ class StickerConvert:
             # No limit to size, create the best quality result
             step_current = 0
         else:
-            step_current = round((step_lower + step_upper) / 2)
+            step_current = int(rounding((step_lower + step_upper) / 2))
 
         self.frames_import()
         while True:
