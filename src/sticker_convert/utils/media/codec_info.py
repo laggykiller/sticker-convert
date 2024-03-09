@@ -11,7 +11,9 @@ from PIL import Image, UnidentifiedImageError
 
 
 class CodecInfo:
-    def __init__(self, file: Union[Path, bytes], file_ext: Optional[str] = None) -> None:
+    def __init__(
+        self, file: Union[Path, bytes], file_ext: Optional[str] = None
+    ) -> None:
         self.file_ext: Optional[str]
         if file_ext is None and isinstance(file, Path):
             self.file_ext = CodecInfo.get_file_ext(file)

@@ -296,7 +296,9 @@ def test_download_line_animated_apng_name_text(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_line_animated_apng_per_sticker_text_no_cookies(tmp_path: LocalPath) -> None:
+def test_download_line_animated_apng_per_sticker_text_no_cookies(
+    tmp_path: LocalPath,
+) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",
@@ -311,7 +313,9 @@ def test_download_line_animated_apng_per_sticker_text_no_cookies(tmp_path: Local
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 @pytest.mark.skipif(not LINE_COOKIES, reason="No credentials")
-def test_download_line_animated_apng_per_sticker_text_with_cookies(tmp_path: LocalPath) -> None:
+def test_download_line_animated_apng_per_sticker_text_with_cookies(
+    tmp_path: LocalPath,
+) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="line",

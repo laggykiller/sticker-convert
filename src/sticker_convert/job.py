@@ -48,9 +48,9 @@ class Executor:
 
         self.manager = SyncManager()
         self.manager.start()
-        self.work_queue: Queue[
-            Optional[tuple[Callable[..., Any], tuple[Any, ...]]]
-        ] = self.manager.Queue()
+        self.work_queue: Queue[Optional[tuple[Callable[..., Any], tuple[Any, ...]]]] = (
+            self.manager.Queue()
+        )
         self.results_queue: Queue[Any] = self.manager.Queue()
         self.cb_queue: Queue[
             Union[
@@ -170,7 +170,9 @@ class Executor:
             process.start()
             self.processes.append(process)
 
-    def add_work(self, work_func: Callable[..., Any], work_args: tuple[Any, ...]) -> None:
+    def add_work(
+        self, work_func: Callable[..., Any], work_args: tuple[Any, ...]
+    ) -> None:
         self.work_queue.put((work_func, work_args))
 
     def join_workers(self) -> None:

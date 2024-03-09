@@ -16,7 +16,9 @@ from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore # n
 TEST_UPLOAD = os.environ.get("TEST_UPLOAD")
 
 
-def _run_sticker_convert(tmp_path: LocalPath, preset: str, export: Optional[str]) -> None:
+def _run_sticker_convert(
+    tmp_path: LocalPath, preset: str, export: Optional[str]
+) -> None:
     preset_dict = COMPRESSION_DICT.get(preset)
 
     cmd: list[str] = [

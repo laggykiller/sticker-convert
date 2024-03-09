@@ -3,6 +3,7 @@
 Required for pack_id < 775 (https://github.com/star-39/moe-sticker-bot/blob/ef2f06f3eb7a833e011e0a5201e007fc130978e7/pkg/msbimport/import_line.go#L68)
 Reference: https://stackoverflow.com/a/53622211
 """
+
 import struct
 import zlib
 
