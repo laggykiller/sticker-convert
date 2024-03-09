@@ -9,7 +9,7 @@ from pathlib import Path
 from queue import Queue
 from typing import Any, Dict, List, Tuple, Union
 
-from sticker_convert.converter import StickerConvert, CbQueueItemType
+from sticker_convert.converter import CbQueueItemType, StickerConvert
 from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase

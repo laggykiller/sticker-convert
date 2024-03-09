@@ -20,12 +20,12 @@ from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
-
 CbQueueItemType = Union[
-                        Tuple[str, Optional[Tuple[str]], Optional[Dict[str, str]]],
-                        str,
-                        None,
-                    ]
+    Tuple[str, Optional[Tuple[str]], Optional[Dict[str, str]]],
+    str,
+    None,
+]
+
 
 def rounding(value: float) -> Decimal:
     return Decimal(value).quantize(0, ROUND_HALF_UP)
@@ -545,7 +545,9 @@ class StickerConvert:
                 width_new = width * self.res_h // height
 
             with im.resize((width_new, height_new), resample=resample) as im_resized:
-                with Image.new("RGBA", (self.res_w, self.res_h), (0, 0, 0, 0)) as im_new:
+                with Image.new(
+                    "RGBA", (self.res_w, self.res_h), (0, 0, 0, 0)
+                ) as im_new:
                     im_new.paste(
                         im_resized,
                         ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2),

@@ -6,7 +6,7 @@ from pathlib import Path
 from queue import Queue
 from typing import Any, List, Union
 
-from sticker_convert.converter import StickerConvert, CbQueueItemType
+from sticker_convert.converter import CbQueueItemType, StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import Callback, CallbackReturn
