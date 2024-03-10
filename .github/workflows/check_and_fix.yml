@@ -34,7 +34,7 @@ jobs:
         pip install -r requirements-type.txt
     - name: mypy
       run: mypy
-    - name: ruff format
+    - name: Ruff format
       run: ruff format
     - name: isort
       run: isort .
