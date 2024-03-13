@@ -10,30 +10,6 @@ from typing import Optional
 sys.path.append("./src")
 from sticker_convert import __version__
 
-conan_archs = {
-    "x86_64": ["amd64", "x86_64", "x64"],
-    "x86": ["i386", "i686", "x86"],
-    "armv8": ["arm64", "aarch64", "aarch64_be", "armv8b", "armv8l"],
-    "ppc64le": ["ppc64le", "powerpc"],
-    "s390x": ["s390", "s390x"],
-}
-
-
-def get_arch() -> str:
-    arch = None
-    if os.getenv("SC_COMPILE_ARCH"):
-        arch = os.getenv("SC_COMPILE_ARCH")
-    else:
-        for k, v in conan_archs.items():
-            if platform.machine().lower() in v:
-                arch = k
-                break
-
-    if arch is None:
-        arch = platform.machine().lower()
-
-    return arch
-
 
 def osx_run_in_venv(cmd: str, get_stdout: bool = False) -> Optional[str]:
     if Path("/bin/zsh").is_file():
@@ -128,7 +104,7 @@ def osx_install_universal2_dep() -> None:
     osx_run_in_venv("python -m pip install --require-virtualenv ./wheel_universal2/*")
 
 
-def nuitka(python_bin: str, arch: str) -> None:
+def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
     cmd_list = [
         python_bin,
         "-m",
@@ -149,11 +125,12 @@ def nuitka(python_bin: str, arch: str) -> None:
         cmd_list.append(
             "--windows-icon-from-ico=src/sticker_convert/resources/appicon.ico"
         )
-    elif platform.system() == "Darwin" and arch:
+    elif platform.system() == "Darwin":
         cmd_list.append("--disable-console")
         cmd_list.append("--macos-create-app-bundle")
         cmd_list.append("--macos-app-icon=src/sticker_convert/resources/appicon.icns")
-        cmd_list.append(f"--macos-target-arch={arch}")
+        if arch is not None:
+            cmd_list.append(f"--macos-target-arch={arch}")
         cmd_list.append(f"--macos-app-version={__version__}")
     else:
         cmd_list.append("--linux-icon=src/sticker_convert/resources/appicon.png")
@@ -187,7 +164,7 @@ def osx_patch() -> None:
 
 
 def compile() -> None:
-    arch = get_arch()
+    arch = os.getenv("SC_COMPILE_ARCH")
     python_bin = str(Path(sys.executable).resolve())
 
     ios_stickers_path = "src/sticker_convert/ios-message-stickers-template"
@@ -213,7 +190,7 @@ def compile() -> None:
         subprocess.run(f"{python_bin} -m venv venv".split(" "))
         python_bin = "python"
         osx_run_in_venv("python -m pip install -r requirements-build.txt")
-        if not arch:
+        if arch is None:
             osx_run_in_venv(
                 "python -m pip install --require-virtualenv -r requirements.txt"
             )
