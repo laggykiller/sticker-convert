@@ -5,10 +5,10 @@ from tqdm import tqdm
 from ttkbootstrap import LabelFrame, Progressbar  # type: ignore
 from ttkbootstrap.scrolled import ScrolledText  # type: ignore
 
+from sticker_convert.gui_components.frames.right_clicker import RightClicker
+
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
-
-from sticker_convert.gui_components.frames.right_clicker import RightClicker
 
 
 class ProgressFrame(LabelFrame):
@@ -18,7 +18,7 @@ class ProgressFrame(LabelFrame):
 
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
-        super(ProgressFrame, self).__init__(*args, **kwargs)  # type: ignore
+        super().__init__(*args, **kwargs)  # type: ignore
 
         self.message_box = ScrolledText(self, height=15, wrap="word")
         self.message_box._text.bind("<Button-3><ButtonRelease-3>", RightClicker)  # type: ignore
@@ -90,8 +90,8 @@ class ProgressFrame(LabelFrame):
 
         self.message_box._text.config(state="disabled")  # type: ignore
 
-    def cb_disable_autoscroll(self, *args: Any) -> None:
+    def cb_disable_autoscroll(self, *_: Any) -> None:
         self.auto_scroll = False
 
-    def cb_enable_autoscroll(self, *args: Any) -> None:
+    def cb_enable_autoscroll(self, *_: Any) -> None:
         self.auto_scroll = True

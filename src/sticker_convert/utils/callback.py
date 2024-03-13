@@ -122,16 +122,15 @@ class Callback:
                 '"--no-confirm" flag is set. Continue with this run without asking questions'
             )
             return True
-        else:
-            self.msg(
-                '[If you do not want to get asked by this question, add "--no-confirm" flag]'
-            )
-            self.msg()
-            result = input("Continue? [y/N] > ")
-            if result.lower() != "y":
-                return False
-            else:
-                return True
+
+        self.msg(
+            '[If you do not want to get asked by this question, add "--no-confirm" flag]'
+        )
+        self.msg()
+        result = input("Continue? [y/N] > ")
+        if result.lower() != "y":
+            return False
+        return True
 
     def cb_ask_str(
         self,
@@ -166,18 +165,18 @@ class Callback:
             else:
                 args = tuple()
             if len(i) >= 3:
-                kwargs: Dict[str, Any] = i[2] if i[2] else dict()
+                kwargs: Dict[str, Any] = i[2] if i[2] else {}
             else:
-                kwargs = dict()
+                kwargs = {}
         else:
             action = i
             args = tuple()
-            kwargs = dict()
+            kwargs = {}
 
         # Fake implementation for Queue.put()
         if action is None:
             return None
-        elif action == "msg":
+        if action == "msg":
             self.msg(*args, **kwargs)
         elif action == "bar":
             self.bar(**kwargs)

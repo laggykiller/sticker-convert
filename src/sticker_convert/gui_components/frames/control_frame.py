@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 class ControlFrame(Frame):
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
-        super(ControlFrame, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.start_btn = Button(
             self,

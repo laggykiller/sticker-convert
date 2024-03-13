@@ -5,17 +5,17 @@ from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Checkbutton, Label, LabelFrame  # type: ignore
 
-if TYPE_CHECKING:
-    from sticker_convert.gui import GUI  # type: ignore
-
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.files.run_bin import RunBin
+
+if TYPE_CHECKING:
+    from sticker_convert.gui import GUI  # type: ignore
 
 
 class ConfigFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
-        super(ConfigFrame, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.grid_columnconfigure(1, weight=1)
         self.grid_columnconfigure(3, weight=1)
@@ -77,7 +77,7 @@ class ConfigFrame(LabelFrame):
             column=3, row=1, sticky="w", padx=3, pady=3
         )
 
-    def cb_clear_cred(self, *args: Any, **kwargs: Any) -> None:
+    def cb_clear_cred(self, *_: Any, **kwargs: Any) -> None:
         response = self.gui.cb_ask_bool("Are you sure you want to clear credentials?")
         if response is True:
             self.gui.delete_creds()
@@ -86,7 +86,7 @@ class ConfigFrame(LabelFrame):
             self.gui.highlight_fields()
             self.gui.cb_msg_block("Credentials cleared.")
 
-    def cb_restore_default(self, *args: Any, **kwargs: Any) -> None:
+    def cb_restore_default(self, *_: Any, **kwargs: Any) -> None:
         response = self.gui.cb_ask_bool(
             "Are you sure you want to restore default config? (This will not clear credentials.)"
         )
@@ -97,7 +97,7 @@ class ConfigFrame(LabelFrame):
             self.gui.highlight_fields()
             self.gui.cb_msg_block("Restored to default config.")
 
-    def cb_open_config_directory(self, *args: Any, **kwargs: Any) -> None:
+    def cb_open_config_directory(self, *_: Any, **kwargs: Any) -> None:
         self.gui.cb_msg(msg=f"Config is located at {CONFIG_DIR}")
         if platform.system() == "Windows":
             os.startfile(CONFIG_DIR)  # type: ignore

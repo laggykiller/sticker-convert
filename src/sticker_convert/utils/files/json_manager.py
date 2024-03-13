@@ -9,10 +9,9 @@ class JsonManager:
     def load_json(path: Path) -> Dict[Any, Any]:
         if not path.is_file():
             raise RuntimeError(f"{path} cannot be found")
-        else:
-            with open(path, encoding="utf-8") as f:
-                data = json.load(f)
-            return data
+        with open(path, encoding="utf-8") as f:
+            data = json.load(f)
+        return data
 
     @staticmethod
     def save_json(path: Path, data: Dict[Any, Any]) -> None:

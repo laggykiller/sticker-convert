@@ -5,18 +5,18 @@ from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Entry, Label, LabelFrame, OptionMenu  # type: ignore
 
-if TYPE_CHECKING:
-    from sticker_convert.gui import GUI  # type: ignore
-
 from sticker_convert.definitions import DEFAULT_DIR
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.utils.url_detect import UrlDetect
+
+if TYPE_CHECKING:
+    from sticker_convert.gui import GUI  # type: ignore
 
 
 class InputFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
-        super(InputFrame, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.input_option_lbl = Label(
             self, text="Input source", width=15, justify="left", anchor="w"
@@ -100,7 +100,7 @@ class InputFrame(LabelFrame):
         else:
             self.address_entry.config(state="normal")
 
-    def cb_set_indir(self, *args: Any) -> None:
+    def cb_set_indir(self, *_args: Any) -> None:
         orig_input_dir = self.gui.input_setdir_var.get()
         if not Path(orig_input_dir).is_dir():
             orig_input_dir = DEFAULT_DIR
@@ -108,7 +108,7 @@ class InputFrame(LabelFrame):
         if input_dir:
             self.gui.input_setdir_var.set(input_dir)
 
-    def cb_input_option(self, *args: Any) -> bool:
+    def cb_input_option(self, *_: Any) -> bool:
         input_option_display = self.gui.get_input_display_name()
 
         if input_option_display == "auto":

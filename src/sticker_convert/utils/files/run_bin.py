@@ -9,19 +9,19 @@ from typing import Any, Callable, List, Tuple, Union
 class RunBin:
     @staticmethod
     def get_bin(
-        bin: str, silent: bool = False, cb_msg: Callable[..., Any] = print
+        executable: str, silent: bool = False, cb_msg: Callable[..., Any] = print
     ) -> Union[str, None]:
-        if Path(bin).is_file():
-            return bin
+        if Path(executable).is_file():
+            return executable
 
         if platform.system() == "Windows":
-            bin = bin + ".exe"
+            executable = executable + ".exe"
 
-        which_result = shutil.which(bin)
+        which_result = shutil.which(executable)
         if which_result is not None:
             return str(Path(which_result).resolve())
-        elif silent is False:
-            cb_msg(f"Warning: Cannot find binary file {bin}")
+        if silent is False:
+            cb_msg(f"Warning: Cannot find binary file {executable}")
 
         return None
 
@@ -46,6 +46,7 @@ class RunBin:
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
+            check=False,
         )
 
         output_str = sp.stdout.decode()

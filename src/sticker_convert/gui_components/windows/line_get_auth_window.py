@@ -13,7 +13,7 @@ from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 
 class LineGetAuthWindow(BaseWindow):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(LineGetAuthWindow, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.title("Get Line cookie")
 
@@ -80,7 +80,7 @@ class LineGetAuthWindow(BaseWindow):
     def cb_get_cookies(self) -> None:
         Thread(target=self.cb_get_cookies_thread, daemon=True).start()
 
-    def cb_get_cookies_thread(self, *args: Any) -> None:
+    def cb_get_cookies_thread(self, *_: Any) -> None:
         m = GetLineAuth()
 
         line_cookies = None

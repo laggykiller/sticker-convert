@@ -24,7 +24,7 @@ class CodecInfo:
         )
         self.codec = CodecInfo.get_file_codec(file)
         self.res = CodecInfo.get_file_res(file)
-        self.is_animated = True if self.fps > 1 else False
+        self.is_animated = self.fps > 1
 
     @staticmethod
     def get_file_fps_frames_duration(
@@ -63,7 +63,7 @@ class CodecInfo:
 
         if file_ext == ".tgs":
             return CodecInfo._get_file_fps_tgs(file)
-        elif file_ext == ".webp":
+        if file_ext == ".webp":
             frames, duration = CodecInfo._get_file_frames_duration_webp(file)
         elif file_ext in (".gif", ".apng", ".png"):
             frames, duration = CodecInfo._get_file_frames_duration_pillow(file)
@@ -74,8 +74,7 @@ class CodecInfo:
 
         if duration > 0:
             return frames / duration * 1000
-        else:
-            return 0
+        return 0
 
     @staticmethod
     def get_file_frames(
@@ -89,7 +88,7 @@ class CodecInfo:
 
         if file_ext == ".tgs":
             return CodecInfo._get_file_frames_tgs(file)
-        elif file_ext in (".gif", ".webp", ".png", ".apng"):
+        if file_ext in (".gif", ".webp", ".png", ".apng"):
             frames, _ = CodecInfo._get_file_frames_duration_pillow(
                 file, frames_only=True
             )
@@ -183,7 +182,7 @@ class CodecInfo:
         total_duration = 0
 
         with Image.open(file) as im:
-            if "n_frames" in im.__dir__():
+            if "n_frames" in dir(im):
                 frames = im.n_frames
                 if frames_only is True:
                     return frames, 1
@@ -191,8 +190,8 @@ class CodecInfo:
                     im.seek(i)
                     total_duration += im.info.get("duration", 1000)
                 return frames, total_duration
-            else:
-                return 1, 0
+
+        return 1, 0
 
     @staticmethod
     def _get_file_frames_duration_webp(
@@ -201,13 +200,12 @@ class CodecInfo:
         total_duration = 0
         frames = 0
 
-        f: BinaryIO
-        if isinstance(file, Path):
-            f = open(file, "r+b")
-        else:
-            f = BytesIO(file)
+        def _open_f(file: Union[Path, bytes]) -> BinaryIO:
+            if isinstance(file, Path):
+                return open(file, "r+b")
+            return BytesIO(file)
 
-        try:
+        with _open_f(file) as f:
             with mmap.mmap(f.fileno(), 0) as mm:
                 while True:
                     anmf_pos = mm.find(b"ANMF")
@@ -220,13 +218,11 @@ class CodecInfo:
                     )
                     total_duration += int.from_bytes(frame_duration, "little")
                     frames += 1
-        finally:
-            f.close()
 
         if frames == 0:
             return 1, 0
-        else:
-            return frames, total_duration
+
+        return frames, total_duration
 
     @staticmethod
     def _get_file_frames_duration_av(
@@ -274,11 +270,10 @@ class CodecInfo:
             )
             if frame_count <= 1 or duration_metadata != 0:
                 return frame_count, duration_metadata
-            else:
-                duration_n_minus_one = last_frame.pts * time_base_ms
-                ms_per_frame = duration_n_minus_one / (frame_count - 1)
-                duration = frame_count * ms_per_frame
-                return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))
+            duration_n_minus_one = last_frame.pts * time_base_ms
+            ms_per_frame = duration_n_minus_one / (frame_count - 1)
+            duration = frame_count * ms_per_frame
+            return frame_count, int(Decimal(duration).quantize(0, ROUND_HALF_UP))
 
         return 0, 0
 
@@ -300,7 +295,7 @@ class CodecInfo:
         try:
             with Image.open(file) as im:
                 codec = im.format
-                if "is_animated" in im.__dir__():
+                if "is_animated" in dir(im):
                     animated = im.is_animated
                 else:
                     animated = False
@@ -311,9 +306,8 @@ class CodecInfo:
             # Unable to distinguish apng and png
             if animated:
                 return "apng"
-            else:
-                return "png"
-        elif codec is not None:
+            return "png"
+        if codec is not None:
             return codec.lower()
 
         import av  # type: ignore
@@ -375,5 +369,4 @@ class CodecInfo:
     def is_anim(file: Union[Path, bytes]) -> bool:
         if CodecInfo.get_file_frames(file, check_anim=True) > 1:
             return True
-        else:
-            return False
+        return False

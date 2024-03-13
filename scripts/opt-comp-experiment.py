@@ -98,7 +98,7 @@ def compress_worker(
             out_f=out_f,
             opt_comp=opt_comp,
             cb=Callback(),
-            cb_return=CallbackReturn(),
+            _cb_return=CallbackReturn(),
         )
         results_queue.put(
             (

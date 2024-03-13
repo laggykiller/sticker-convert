@@ -24,7 +24,7 @@ class BaseOption:
         return json.dumps(self.to_dict(), indent=2)
 
     def to_dict(self) -> Dict[str, str]:
-        return dict()
+        return {}
 
 
 @dataclass

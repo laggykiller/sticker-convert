@@ -11,14 +11,14 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Uni
 import numpy as np
 from PIL import Image
 
-if TYPE_CHECKING:
-    from av.video.plane import VideoPlane  # type: ignore
-
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import Callback, CallbackReturn
 from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
+
+if TYPE_CHECKING:
+    from av.video.plane import VideoPlane  # type: ignore
 
 CbQueueItemType = Union[
     Tuple[str, Optional[Tuple[str]], Optional[Dict[str, str]]],
@@ -45,8 +45,8 @@ def rounding(value: float) -> Decimal:
 
 
 def get_step_value(
-    max: Optional[int],
-    min: Optional[int],
+    max_step: Optional[int],
+    min_step: Optional[int],
     step: int,
     steps: int,
     power: float = 1.0,
@@ -62,14 +62,12 @@ def get_step_value(
     else:
         factor = 0
 
-    if max is not None and min is not None:
-        v = round((max - min) * step / steps * factor + min)
+    if max_step is not None and min_step is not None:
+        v = round((max_step - min_step) * step / steps * factor + min_step)
         if even is True and v % 2 == 1:
             return v + 1
-        else:
-            return v
-    else:
-        return None
+        return v
+    return None
 
 
 def useful_array(
@@ -151,7 +149,7 @@ class StickerConvert:
         out_f: Path,
         opt_comp: CompOption,
         cb: "Union[Queue[CbQueueItemType], Callback]",
-        cb_return: CallbackReturn,
+        _cb_return: CallbackReturn,
     ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
         sticker = StickerConvert(in_f, out_f, opt_comp, cb)
         result = sticker._convert()
@@ -272,8 +270,8 @@ class StickerConvert:
                 self.result_size = len(self.in_f)
 
             return result
-        else:
-            return None
+
+        return None
 
     def generate_steps_list(self) -> List[Tuple[Optional[int], ...]]:
         steps_list: List[Tuple[Optional[int], ...]] = []
@@ -378,7 +376,7 @@ class StickerConvert:
     def _frames_import_pillow(self) -> None:
         with Image.open(self.in_f) as im:
             # Note: im.convert("RGBA") would return rgba image of current frame only
-            if "n_frames" in im.__dir__():
+            if "n_frames" in dir(im):
                 for i in range(im.n_frames):
                     im.seek(i)
                     self.frames_raw.append(np.asarray(im.convert("RGBA")))
@@ -764,10 +762,10 @@ class StickerConvert:
             return image.copy()
         if self.opt_comp.quantize_method == "imagequant":
             return self._quantize_by_imagequant(image)
-        elif self.opt_comp.quantize_method == "fastoctree":
+        if self.opt_comp.quantize_method == "fastoctree":
             return self._quantize_by_fastoctree(image)
-        else:
-            return image
+
+        return image
 
     def _quantize_by_imagequant(self, image: Image.Image) -> Image.Image:
         import imagequant  # type: ignore
@@ -812,17 +810,17 @@ class StickerConvert:
             #
             # For GIF, we need to adjust fps such that delay is matching to hundreths of second
             return self._fix_fps_duration(fps, 100)
-        elif self.out_f.suffix in (".webp", ".apng", ".png"):
+        if self.out_f.suffix in (".webp", ".apng", ".png"):
             return self._fix_fps_duration(fps, 1000)
-        else:
-            return self._fix_fps_pyav(fps)
+
+        return self._fix_fps_pyav(fps)
 
     def _fix_fps_duration(self, fps: float, denominator: int) -> Fraction:
         delay = int(rounding(denominator / fps))
         fps_fraction = Fraction(denominator, delay)
         if self.opt_comp.fps_max and fps_fraction > self.opt_comp.fps_max:
             return Fraction(denominator, (delay + 1))
-        elif self.opt_comp.fps_min and fps_fraction < self.opt_comp.fps_min:
+        if self.opt_comp.fps_min and fps_fraction < self.opt_comp.fps_min:
             return Fraction(denominator, (delay - 1))
         return fps_fraction
 

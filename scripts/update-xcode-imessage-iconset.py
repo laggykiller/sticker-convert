@@ -5,16 +5,16 @@ from typing import Dict, Tuple
 ROOT_DIR = Path(__file__).parents[1]
 
 
-def main():
+def main() -> None:
     xcode_imessage_iconset: Dict[str, Tuple[int, int]] = {}
 
     with open(
         ROOT_DIR
         / "src/sticker_convert/ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
     ) as f:
-        dict = json.load(f)
+        contents_json = json.load(f)
 
-    for i in dict["images"]:
+    for i in contents_json["images"]:
         filename = i["filename"]
         size = i["size"]
         size_w = int(size.split("x")[0])

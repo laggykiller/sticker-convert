@@ -117,13 +117,12 @@ class GetKakaoAuth:
 
         if self.verify_method == "passcode":
             return self.verify_receive_sms()
-        elif self.verify_method == "mo-send":
+        if self.verify_method == "mo-send":
             dest_number = response_json["viewData"]["moNumber"]
             msg = response_json["viewData"]["moMessage"]
             return self.verify_send_sms(dest_number, msg)
-        else:
-            self.cb_msg_block(f"Unknown verification method: {response.text}")
-            return False
+        self.cb_msg_block(f"Unknown verification method: {response.text}")
+        return False
 
     def verify_send_sms(self, dest_number: str, msg: str) -> bool:
         self.cb_msg("Verification by sending SMS")

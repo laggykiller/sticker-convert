@@ -3,11 +3,9 @@ from __future__ import annotations
 
 from typing import List
 
-"""
-References:
-https://github.com/blluv/KakaoTalkEmoticonDownloader
-https://github.com/star-39/moe-sticker-bot
-"""
+# References:
+# https://github.com/blluv/KakaoTalkEmoticonDownloader
+# https://github.com/star-39/moe-sticker-bot
 
 
 class DecryptKakao:

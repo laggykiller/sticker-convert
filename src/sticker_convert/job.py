@@ -94,13 +94,13 @@ class Executor:
                 else:
                     args = tuple()
                 if len(i) >= 3:
-                    kwargs: Dict[str, str] = i[2] if i[2] else dict()
+                    kwargs: Dict[str, str] = i[2] if i[2] else {}
                 else:
-                    kwargs = dict()
+                    kwargs = {}
             else:
                 action = i
                 args = tuple()
-                kwargs = dict()
+                kwargs = {}
             if action == "msg":
                 self.cb_msg(*args, **kwargs)
             elif action == "bar":
@@ -186,7 +186,7 @@ class Executor:
 
         self.processes.clear()
 
-    def kill_workers(self, *args: Any, **kwargs: Any) -> None:
+    def kill_workers(self, *_: Any, **__: Any) -> None:
         self.is_cancel_job.value = 1  # type: ignore
         while not self.work_queue.empty():
             self.work_queue.get()
@@ -206,8 +206,7 @@ class Executor:
 
     def get_result(self) -> Generator[Any, None, None]:
         gen: Iterator[Any] = iter(self.results_queue.get, None)
-        for result in gen:
-            yield result
+        yield from gen
 
     def cb(
         self,
@@ -279,7 +278,7 @@ class Job:
                 code = 2
                 self.executor.cb("Job cancelled.")
                 break
-            elif not success:
+            if not success:
                 code = 1
                 self.executor.cb("An error occured during this run.")
                 break
@@ -289,7 +288,7 @@ class Job:
 
         return code
 
-    def cancel(self, *args: Any, **kwargs: Any) -> None:
+    def cancel(self, *_: Any, **_kwargs: Any) -> None:
         self.executor.kill_workers()
 
     def verify_input(self) -> bool:
@@ -450,7 +449,7 @@ class Job:
                 or not any(path.iterdir())
             ):
                 continue
-            elif path_type == "Output" and (
+            if path_type == "Output" and (
                 path.name == "stickers_output"
                 or self.opt_comp.no_compress
                 or not any(path.iterdir())
@@ -458,7 +457,7 @@ class Job:
                 continue
 
             related_files = MetadataHandler.get_files_related_to_sticker_convert(path)
-            if any([i for i in path.iterdir() if i not in related_files]):
+            if any(i for i in path.iterdir() if i not in related_files):
                 msg = "WARNING: {} directory is set to {}.\n"
                 msg += 'It does not have default name of "{}",\n'
                 msg += "and It seems like it contains PERSONAL DATA.\n"
@@ -611,9 +610,7 @@ class Job:
 
             if not in_f.is_file():
                 continue
-            elif (
-                CodecInfo.get_file_ext(i) in (".txt", ".m4a") or Path(i).stem == "cover"
-            ):
+            if CodecInfo.get_file_ext(i) in (".txt", ".m4a") or Path(i).stem == "cover":
                 shutil.copy(in_f, output_dir / i.name)
             else:
                 in_fs.append(i)
@@ -682,7 +679,9 @@ class Job:
             self.out_urls.extend(result)
 
         if self.out_urls:
-            with open(Path(self.opt_output.dir, "export-result.txt"), "w+") as f:
+            with open(
+                Path(self.opt_output.dir, "export-result.txt"), "w+", encoding="utf-8"
+            ) as f:
                 f.write("\n".join(self.out_urls))
         else:
             self.executor.cb("An error occured while exporting stickers")
@@ -696,14 +695,14 @@ class Job:
         msg += "##########\n"
         msg += "\n"
 
-        if self.compress_fails != []:
+        if self.compress_fails:
             msg += f'Warning: Could not compress the following {len(self.compress_fails)} file{"s" if len(self.compress_fails) > 1 else ""}:\n'
             msg += "\n".join(self.compress_fails)
             msg += "\n"
             msg += "\nConsider adjusting compression parameters"
             msg += "\n"
 
-        if self.out_urls != []:
+        if self.out_urls:
             msg += "Export results:\n"
             msg += "\n".join(self.out_urls)
         else:

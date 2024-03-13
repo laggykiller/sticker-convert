@@ -3,17 +3,17 @@ from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Checkbutton, Entry, Label, LabelFrame, OptionMenu  # type: ignore
 
-if TYPE_CHECKING:
-    from sticker_convert.gui import GUI  # type: ignore
-
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.windows.advanced_compression_window import AdvancedCompressionWindow
+
+if TYPE_CHECKING:
+    from sticker_convert.gui import GUI  # type: ignore
 
 
 class CompFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
-        super(CompFrame, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.grid_columnconfigure(2, weight=1)
 
@@ -102,7 +102,7 @@ class CompFrame(LabelFrame):
         self.cb_comp_apply_preset()
         self.cb_no_compress()
 
-    def cb_comp_apply_preset(self, *args: Any) -> None:
+    def cb_comp_apply_preset(self, *_: Any) -> None:
         selection = self.gui.get_preset()
         if selection == "auto":
             if self.gui.get_input_name() == "local":
@@ -181,10 +181,10 @@ class CompFrame(LabelFrame):
         self.cb_no_compress()
         self.gui.highlight_fields()
 
-    def cb_compress_advanced(self, *args: Any) -> None:
+    def cb_compress_advanced(self, *_: Any) -> None:
         AdvancedCompressionWindow(self.gui)
 
-    def cb_no_compress(self, *args: Any) -> None:
+    def cb_no_compress(self, *_: Any) -> None:
         if self.gui.no_compress_var.get() is True:
             state = "disabled"
         else:

@@ -12,20 +12,19 @@ class UrlDetect:
         if domain == "signal.art":
             return "signal"
 
-        elif domain in ("telegram.me", "t.me"):
+        if domain in ("telegram.me", "t.me"):
             return "telegram"
 
-        elif (
+        if (
             domain in ("store.line.me", "line.me")
             or url.startswith("line://shop/detail/")
             or (len(url) == 24 and all(c in string.hexdigits for c in url))
         ):
             return "line"
 
-        elif domain in ("e.kakao.com", "emoticon.kakao.com") or url.startswith(
+        if domain in ("e.kakao.com", "emoticon.kakao.com") or url.startswith(
             "kakaotalk://store/emoticon/"
         ):
             return "kakao"
 
-        else:
-            return None
+        return None

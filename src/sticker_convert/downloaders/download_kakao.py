@@ -41,7 +41,7 @@ class MetadataKakao:
         data_urls = app_scheme_link_tag.get("data-url")
         if not data_urls:
             return None, None
-        elif isinstance(data_urls, list):
+        if isinstance(data_urls, list):
             data_url = data_urls[0]
         else:
             data_url = data_urls
@@ -113,7 +113,7 @@ class MetadataKakao:
 
 class DownloadKakao(DownloadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(DownloadKakao, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.pack_title: Optional[str] = None
         self.author: Optional[str] = None
 
@@ -129,13 +129,10 @@ class DownloadKakao(DownloadBase):
 
             if item_code:
                 return self.download_animated(item_code)
-            else:
-                self.cb.put(
-                    "Download failed: Cannot download metadata for sticker pack"
-                )
-                return False
+            self.cb.put("Download failed: Cannot download metadata for sticker pack")
+            return False
 
-        elif self.url.isnumeric() or self.url.startswith("kakaotalk://store/emoticon/"):
+        if self.url.isnumeric() or self.url.startswith("kakaotalk://store/emoticon/"):
             item_code = self.url.replace("kakaotalk://store/emoticon/", "")
 
             self.pack_title = None
@@ -150,7 +147,7 @@ class DownloadKakao(DownloadBase):
 
             return self.download_animated(item_code)
 
-        elif urlparse(self.url).netloc == "e.kakao.com":
+        if urlparse(self.url).netloc == "e.kakao.com":
             self.pack_title = self.url.replace("https://e.kakao.com/t/", "")
             (
                 self.author,
@@ -172,24 +169,22 @@ class DownloadKakao(DownloadBase):
                 item_code = MetadataKakao.get_item_code(title_ko, auth_token)
                 if item_code:
                     return self.download_animated(item_code)
+                msg = "Warning: Cannot get item code.\n"
+                msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
+                msg += "Continue to download static stickers instead?"
+                self.cb.put(("ask_bool", (msg,), None))
+                if self.cb_return:
+                    response = self.cb_return.get_response()
                 else:
-                    msg = "Warning: Cannot get item code.\n"
-                    msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
-                    msg += "Continue to download static stickers instead?"
-                    self.cb.put(("ask_bool", (msg,), None))
-                    if self.cb_return:
-                        response = self.cb_return.get_response()
-                    else:
-                        response = False
+                    response = False
 
-                    if response is False:
-                        return False
+                if response is False:
+                    return False
 
             return self.download_static(thumbnail_urls)
 
-        else:
-            self.cb.put("Download failed: Unrecognized URL")
-            return False
+        self.cb.put("Download failed: Unrecognized URL")
+        return False
 
     def download_static(self, thumbnail_urls: str) -> bool:
         MetadataHandler.set_metadata(

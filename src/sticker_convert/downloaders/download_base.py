@@ -75,8 +75,7 @@ class DownloadBase:
 
                 if response.status_code != 200:
                     return b""
-                else:
-                    self.cb.put(f"Downloading {url}")
+                self.cb.put(f"Downloading {url}")
 
                 if show_progress:
                     steps = (total_length / chunk_size) + 1
@@ -101,11 +100,10 @@ class DownloadBase:
 
         if not result:
             return b""
-        elif dest:
+        if dest:
             with open(dest, "wb+") as f:
                 f.write(result)
             msg = f"Downloaded {url}"
             self.cb.put(msg)
             return b""
-        else:
-            return result
+        return result

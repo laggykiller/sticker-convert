@@ -23,7 +23,7 @@ from sticker_convert.utils.callback import Callback, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.apple_png_normalize import ApplePngNormalize
 
-"""Reference: https://github.com/doubleplusc/Line-sticker-downloader/blob/master/sticker_dl.py"""
+# Reference: https://github.com/doubleplusc/Line-sticker-downloader/blob/master/sticker_dl.py
 
 
 class MetadataLine:
@@ -162,7 +162,7 @@ class MetadataLine:
 
 class DownloadLine(DownloadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(DownloadLine, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.headers = {
             "referer": "https://store.line.me",
             "user-agent": "Android",
@@ -444,13 +444,13 @@ class DownloadLine(DownloadBase):
             self.decompress_stickers(zip_file)
 
         custom_sticker_text_urls: List[Tuple[str, Path]] = []
-        if self.sticker_text_dict != {} and (
+        if self.sticker_text_dict and (
             self.resource_type == "PER_STICKER_TEXT"
-            or (self.resource_type == "NAME_TEXT" and self.cookies != {})
+            or (self.resource_type == "NAME_TEXT" and self.cookies)
         ):
             self.edit_custom_sticker_text()
             custom_sticker_text_urls = self.get_custom_sticker_text_urls()
-        elif self.resource_type == "NAME_TEXT" and self.cookies == {}:
+        elif self.resource_type == "NAME_TEXT" and not self.cookies:
             self.cb.put('Warning: Line "Custom stickers" is supplied as input')
             self.cb.put(
                 "However, adding custom message requires Line cookies, and it is not supplied"

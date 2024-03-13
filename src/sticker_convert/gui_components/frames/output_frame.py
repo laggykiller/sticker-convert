@@ -5,17 +5,17 @@ from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Entry, Label, LabelFrame, OptionMenu  # type: ignore
 
-if TYPE_CHECKING:
-    from sticker_convert.gui import GUI  # type: ignore
-
 from sticker_convert.definitions import DEFAULT_DIR
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
+
+if TYPE_CHECKING:
+    from sticker_convert.gui import GUI  # type: ignore
 
 
 class OutputFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
-        super(OutputFrame, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.output_option_lbl = Label(
             self, text="Output options", width=18, justify="left", anchor="w"
@@ -89,7 +89,7 @@ class OutputFrame(LabelFrame):
             column=1, columnspan=2, row=3, sticky="w", padx=3, pady=3
         )
 
-    def cb_set_outdir(self, *args: Any) -> None:
+    def cb_set_outdir(self, *_args: Any) -> None:
         orig_output_dir = self.gui.output_setdir_var.get()
         if not Path(orig_output_dir).is_dir():
             orig_output_dir = DEFAULT_DIR
@@ -97,7 +97,7 @@ class OutputFrame(LabelFrame):
         if output_dir:
             self.gui.output_setdir_var.set(output_dir)
 
-    def cb_output_option(self, *args: Any) -> None:
+    def cb_output_option(self, *_: Any) -> None:
         self.gui.output_option_true_var.set(self.gui.output_option_display_var.get())
         self.gui.comp_frame.cb_comp_apply_preset()
         self.gui.highlight_fields()

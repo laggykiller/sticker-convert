@@ -18,7 +18,7 @@ class AdvancedCompressionWindow(BaseWindow):
     emoji_btns: List[Tuple[Button, ImageTk.PhotoImage]] = []
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(AdvancedCompressionWindow, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.categories = list({entry["category"] for entry in self.gui.emoji_list})
 
         self.title("Advanced compression options")
@@ -559,7 +559,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_disable_fps(self, *args: Any) -> None:
+    def cb_disable_fps(self, *_: Any) -> None:
         if self.gui.fps_disable_var.get() is True:
             state = "disabled"
         else:
@@ -568,7 +568,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fps_min_entry.config(state=state)
         self.fps_max_entry.config(state=state)
 
-    def cb_disable_res_w(self, *args: Any) -> None:
+    def cb_disable_res_w(self, *_: Any) -> None:
         if self.gui.res_w_disable_var.get() is True:
             state = "disabled"
         else:
@@ -577,7 +577,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.res_w_min_entry.config(state=state)
         self.res_w_max_entry.config(state=state)
 
-    def cb_disable_res_h(self, *args: Any) -> None:
+    def cb_disable_res_h(self, *_: Any) -> None:
         if self.gui.res_h_disable_var.get() is True:
             state = "disabled"
         else:
@@ -586,7 +586,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.res_h_min_entry.config(state=state)
         self.res_h_max_entry.config(state=state)
 
-    def cb_disable_quality(self, *args: Any) -> None:
+    def cb_disable_quality(self, *_: Any) -> None:
         if self.gui.quality_disable_var.get() is True:
             state = "disabled"
         else:
@@ -595,7 +595,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.quality_min_entry.config(state=state)
         self.quality_max_entry.config(state=state)
 
-    def cb_disable_color(self, *args: Any) -> None:
+    def cb_disable_color(self, *_: Any) -> None:
         if self.gui.color_disable_var.get() is True:
             state = "disabled"
         else:
@@ -604,7 +604,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.color_min_entry.config(state=state)
         self.color_max_entry.config(state=state)
 
-    def cb_disable_duration(self, *args: Any) -> None:
+    def cb_disable_duration(self, *_: Any) -> None:
         if (
             self.gui.duration_disable_var.get() is True
             or self.gui.comp_preset_var.get() == "auto"
@@ -616,7 +616,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.duration_min_entry.config(state=state)
         self.duration_max_entry.config(state=state)
 
-    def cb_disable_size(self, *args: Any) -> None:
+    def cb_disable_size(self, *_: Any) -> None:
         if (
             self.gui.size_disable_var.get() is True
             or self.gui.comp_preset_var.get() == "auto"
@@ -628,7 +628,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.img_size_max_entry.config(state=state)
         self.vid_size_max_entry.config(state=state)
 
-    def cb_disable_format(self, *args: Any) -> None:
+    def cb_disable_format(self, *_: Any) -> None:
         if self.gui.comp_preset_var.get() == "auto":
             state = "disabled"
         else:
@@ -637,7 +637,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.img_format_entry.config(state=state)
         self.vid_format_entry.config(state=state)
 
-    def cb_disable_fake_vid(self, *args: Any) -> None:
+    def cb_disable_fake_vid(self, *_: Any) -> None:
         if self.gui.comp_preset_var.get() == "auto":
             state = "disabled"
         else:
@@ -657,7 +657,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.ph_im = ImageTk.PhotoImage(self.im)
         self.default_emoji_dsp.config(image=self.ph_im)
 
-    def render_emoji_list(self, *args: Any) -> None:
+    def render_emoji_list(self, *_: Any) -> None:
         category = self.categories_var.get()
 
         for emoji_btn, ph_im in self.emoji_btns:

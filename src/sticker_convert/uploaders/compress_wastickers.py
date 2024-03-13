@@ -19,7 +19,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 
 class CompressWastickers(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(CompressWastickers, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.base_spec.size_max_img = 100000
         self.base_spec.size_max_vid = 500000
         self.base_spec.duration_min = 8

@@ -40,8 +40,7 @@ class FormatVerify:
     def check_presence(file: Union[Path, bytes]) -> bool:
         if isinstance(file, Path):
             return Path(file).is_file()
-        else:
-            return True
+        return True
 
     @staticmethod
     def check_file_res(
@@ -184,11 +183,10 @@ class FormatVerify:
 
         if len(valid_fmt) == 0:
             return True
-        elif file_ext in valid_fmt:
+        if file_ext in valid_fmt:
             return True
-        elif file_ext in jpg_exts and (".jpg" in valid_fmt or ".jpeg" in valid_fmt):
+        if file_ext in jpg_exts and (".jpg" in valid_fmt or ".jpeg" in valid_fmt):
             return True
-        elif file_ext in png_exts and (".png" in valid_fmt or ".apng" in valid_fmt):
+        if file_ext in png_exts and (".png" in valid_fmt or ".apng" in valid_fmt):
             return True
-        else:
-            return False
+        return False

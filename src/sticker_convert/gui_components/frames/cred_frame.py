@@ -4,19 +4,19 @@ from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Entry, Label, LabelFrame  # type: ignore
 
-if TYPE_CHECKING:
-    from sticker_convert.gui import GUI  # type: ignore
-
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGetAuthWindow
 from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
 from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
 
+if TYPE_CHECKING:
+    from sticker_convert.gui import GUI  # type: ignore
+
 
 class CredFrame(LabelFrame):
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
-        super(CredFrame, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.grid_columnconfigure(1, weight=1)
 
@@ -135,19 +135,19 @@ class CredFrame(LabelFrame):
         self.line_get_auth_btn.grid(column=2, row=6, sticky="e", padx=3, pady=3)
         self.help_btn.grid(column=2, row=8, sticky="e", padx=3, pady=3)
 
-    def cb_cred_help(self, *args: Any) -> None:
+    def cb_cred_help(self, *_: Any) -> None:
         faq_site = "https://github.com/laggykiller/sticker-convert#faq"
         success = webbrowser.open(faq_site)
         if not success:
             self.gui.cb_ask_str("You can get help from:", initialvalue=faq_site)
 
-    def cb_kakao_get_auth(self, *args: Any) -> None:
+    def cb_kakao_get_auth(self, *_: Any) -> None:
         KakaoGetAuthWindow(self.gui)
 
-    def cb_signal_get_auth(self, *args: Any) -> None:
+    def cb_signal_get_auth(self, *_: Any) -> None:
         SignalGetAuthWindow(self.gui)
 
-    def cb_line_get_auth(self, *args: Any) -> None:
+    def cb_line_get_auth(self, *_: Any) -> None:
         LineGetAuthWindow(self.gui)
 
     def set_states(self, state: str) -> None:

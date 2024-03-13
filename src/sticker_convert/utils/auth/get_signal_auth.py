@@ -45,10 +45,10 @@ class GetSignalAuth:
 
         if Path(signal_bin_path_prod).is_file():
             return signal_bin_path_prod, signal_user_data_dir_prod
-        elif Path(signal_bin_path_beta).is_file():
+        if Path(signal_bin_path_beta).is_file():
             return signal_bin_path_beta, signal_user_data_dir_beta
-        else:
-            return None, None
+
+        return None, None
 
     def get_cred(
         self,
@@ -76,7 +76,7 @@ class GetSignalAuth:
             msg += f"{signal_user_data_dir=}\n"
             return None, None, msg
 
-        with open(signal_config) as f:
+        with open(signal_config, encoding="utf-8") as f:
             config = json.load(f)
         key = config.get("key")
         db_key = f"x'{key}'"

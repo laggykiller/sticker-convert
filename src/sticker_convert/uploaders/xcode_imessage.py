@@ -14,31 +14,15 @@ from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import Callback, CallbackReturn
-from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.files.metadata_handler import XCODE_IMESSAGE_ICONSET, MetadataHandler
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
-XCODE_IMESSAGE_ICONSET = {
-    "App-Store-1024x1024pt.png": (1024, 1024),
-    "iPad-Settings-29pt@2x.png": (58, 58),
-    "iPhone-settings-29pt@2x.png": (58, 58),
-    "iPhone-settings-29pt@3x.png": (87, 87),
-    "Messages27x20pt@2x.png": (54, 40),
-    "Messages27x20pt@3x.png": (81, 60),
-    "Messages32x24pt@2x.png": (64, 48),
-    "Messages32x24pt@3x.png": (96, 72),
-    "Messages-App-Store-1024x768pt.png": (1024, 768),
-    "Messages-iPad-67x50pt@2x.png": (134, 100),
-    "Messages-iPad-Pro-74x55pt@2x.png": (148, 110),
-    "Messages-iPhone-60x45pt@2x.png": (120, 90),
-    "Messages-iPhone-60x45pt@3x.png": (180, 135),
-}
-
 
 class XcodeImessage(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(XcodeImessage, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.base_spec.set_size_max(500000)
         self.base_spec.set_res(300)
         self.base_spec.set_format(("png", ".apng", ".gif", ".jpeg", "jpg"))
@@ -137,9 +121,9 @@ class XcodeImessage(UploadBase):
             spec_cover.set_fps(0)
 
             icon_path = self.opt_output.dir / icon
-            if Path(icon) in [
-                i for i in self.opt_output.dir.iterdir()
-            ] and not FormatVerify.check_file(icon_path, spec=spec_cover):
+            if Path(icon) in list(
+                self.opt_output.dir.iterdir()
+            ) and not FormatVerify.check_file(icon_path, spec=spec_cover):
                 StickerConvert.convert(
                     icon_path, icon_path, spec_cover, self.cb, self.cb_return
                 )
@@ -244,18 +228,18 @@ class XcodeImessage(UploadBase):
                 }
 
                 # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/0.sticker/Contents.json
-                with open(sticker_path / "Contents.json", "w+") as f:
+                with open(sticker_path / "Contents.json", "w+", encoding="utf-8") as f:
                     json.dump(sticker_json_content, f, indent=2)
 
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/Contents.json
-        with open(stickers_path / "Contents.json") as f:
+        with open(stickers_path / "Contents.json", encoding="utf-8") as f:
             stickerpack_json_content: Dict[str, List[Dict[str, str]]] = json.load(f)
 
         stickerpack_json_content["stickers"] = []
         for sticker in stickers_lst:
             stickerpack_json_content["stickers"].append({"filename": sticker})
 
-        with open(stickers_path / "Contents.json", "w+") as f:
+        with open(stickers_path / "Contents.json", "w+", encoding="utf-8") as f:
             json.dump(stickerpack_json_content, f, indent=2)
 
         # packname StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset

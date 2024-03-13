@@ -20,7 +20,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 
 class UploadSignal(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(UploadSignal, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.base_spec.set_size_max(300000)
         self.base_spec.set_res_max(512)
@@ -117,7 +117,7 @@ class UploadSignal(UploadBase):
             msg_block += f"Default emoji is set to {self.opt_comp.default_emoji}.\n"
             msg_block += "Please edit emoji.txt now, then continue"
             MetadataHandler.generate_emoji_file(
-                dir=self.opt_output.dir, default_emoji=self.opt_comp.default_emoji
+                directory=self.opt_output.dir, default_emoji=self.opt_comp.default_emoji
             )
 
             self.cb.put(("msg_block", (msg_block,), None))

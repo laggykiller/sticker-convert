@@ -46,7 +46,7 @@ def sanitize_filename(filename: str) -> str:
     filename = unicodedata.normalize("NFKD", filename)
     filename = filename.rstrip(". ")  # Windows does not allow these at end
     filename = filename.strip()
-    if all([x == "." for x in filename]):
+    if all(x == "." for x in filename):
         filename = "__" + filename
     if filename in RESERVED_FILENAME:
         filename = "__" + filename

@@ -56,8 +56,8 @@ class ApplePngNormalize:
 
                 assert width
                 assert height
-                bufSize = width * height * 4 + height
-                chunk_data = zlib.decompress(chunk_d, -8, bufSize)
+                buf_size = width * height * 4 + height
+                chunk_data = zlib.decompress(chunk_d, -8, buf_size)
 
                 # Swapping red & blue bytes for each pixel
                 chunk_data = bytearray(chunk_data)

@@ -80,10 +80,8 @@ class GUIUtils:
         window_width = frame_width + window.y_scrollbar.winfo_width()
         window_height = frame_height + window.x_scrollbar.winfo_height()
 
-        if window_width > screen_width:
-            window_width = screen_width
-        if window_height > screen_height:
-            window_height = screen_height
+        window_width = min(window_width, screen_width)
+        window_height = min(window_height, screen_height)
 
         frame_width = window_width - window.y_scrollbar.winfo_width()
         frame_height = window_height - window.x_scrollbar.winfo_height()

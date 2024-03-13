@@ -48,8 +48,7 @@ def check_root_dir_exe_writable() -> bool:
         or "site-packages" in ROOT_DIR_EXE.as_posix()
     ):
         return False
-    else:
-        return True
+    return True
 
 
 ROOT_DIR_EXE_WRITABLE = check_root_dir_exe_writable()
@@ -58,13 +57,11 @@ ROOT_DIR_EXE_WRITABLE = check_root_dir_exe_writable()
 def get_default_dir() -> Path:
     if ROOT_DIR_EXE_WRITABLE:
         return ROOT_DIR_EXE
-    else:
-        home_dir = Path.home()
-        desktop_dir = home_dir / "Desktop"
-        if desktop_dir.is_dir():
-            return desktop_dir
-        else:
-            return home_dir
+    home_dir = Path.home()
+    desktop_dir = home_dir / "Desktop"
+    if desktop_dir.is_dir():
+        return desktop_dir
+    return home_dir
 
 
 # Default directory for stickers_input and stickers_output
@@ -79,9 +76,8 @@ def get_config_dir() -> Path:
 
     if ROOT_DIR_EXE_WRITABLE:
         return ROOT_DIR_EXE
-    else:
-        os.makedirs(fallback_dir, exist_ok=True)
-        return fallback_dir
+    os.makedirs(fallback_dir, exist_ok=True)
+    return fallback_dir
 
 
 # Directory for saving configs

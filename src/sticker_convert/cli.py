@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import signal
+import sys
 from argparse import Namespace
 from json.decoder import JSONDecodeError
 from math import ceil
@@ -28,7 +29,7 @@ class CLI:
         try:
             from sticker_convert.utils.files.json_resources_loader import COMPRESSION_JSON, EMOJI_JSON, HELP_JSON, INPUT_JSON, OUTPUT_JSON
         except RuntimeError as e:
-            self.cb.msg(e.__str__())
+            self.cb.msg(str(e))
             return
 
         self.help = HELP_JSON
@@ -181,7 +182,7 @@ class CLI:
 
         signal.signal(signal.SIGINT, job.cancel)
         status = job.start()
-        exit(status)
+        sys.exit(status)
 
     def get_opt_input(self, args: Namespace) -> InputOption:
         download_options = {
@@ -207,7 +208,7 @@ class CLI:
                 self.cb.msg(f"Detected URL input source: {download_option}")
             else:
                 self.cb.msg(f"Error: Unrecognied URL input source for url: {url}")
-                exit()
+                sys.exit()
 
         opt_input = InputOption(
             option=download_option,

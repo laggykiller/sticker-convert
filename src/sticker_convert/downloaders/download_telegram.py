@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from pathlib import Path
 from queue import Queue
-from typing import Any, Dict, Optional, Union
+from typing import Dict, Optional, Union
 from urllib.parse import urlparse
 
 import anyio
@@ -16,8 +16,8 @@ from sticker_convert.utils.files.metadata_handler import MetadataHandler
 
 
 class DownloadTelegram(DownloadBase):
-    def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(DownloadTelegram, self).__init__(*args, **kwargs)
+    # def __init__(self, *args: Any, **kwargs: Any) -> None:
+    #     super().__init__(*args, **kwargs)
 
     def download_stickers_telegram(self) -> bool:
         self.token = ""

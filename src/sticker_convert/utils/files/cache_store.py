@@ -2,7 +2,10 @@
 import os
 import platform
 import shutil
+from contextlib import contextmanager
 from pathlib import Path
+from tempfile import TemporaryDirectory
+from typing import Any, ContextManager, Generator, Optional, Union
 from uuid import uuid4
 
 if platform.system() == "Linux":
@@ -11,10 +14,6 @@ if platform.system() == "Linux":
     tempfile = memory_tempfile.MemoryTempfile(fallback=True)  # type: ignore
 else:
     import tempfile
-
-from contextlib import contextmanager
-from tempfile import TemporaryDirectory
-from typing import Any, ContextManager, Generator, Optional, Union
 
 
 def debug_cache_dir(path: str) -> ContextManager[Path]:
@@ -37,5 +36,4 @@ class CacheStore:
     ) -> "Union[ContextManager[Path], TemporaryDirectory[str]]":
         if path:
             return debug_cache_dir(path)
-        else:
-            return tempfile.TemporaryDirectory()  # type: ignore
+        return tempfile.TemporaryDirectory()  # type: ignore

@@ -35,7 +35,7 @@ from sticker_convert.version import __version__
 
 class GUI(Window):
     def __init__(self) -> None:
-        super(GUI, self).__init__(themename="darkly", alpha=0)  # type: ignore
+        super().__init__(themename="darkly", alpha=0)  # type: ignore
         self.init_done = False
         self.load_jsons()
 
@@ -224,7 +224,7 @@ class GUI(Window):
         try:
             from sticker_convert.utils.files.json_resources_loader import COMPRESSION_JSON, EMOJI_JSON, HELP_JSON, INPUT_JSON, OUTPUT_JSON
         except RuntimeError as e:
-            self.cb_msg(e.__str__())
+            self.cb_msg(str(e))
             return
 
         self.help = HELP_JSON
@@ -399,12 +399,12 @@ class GUI(Window):
             if v["full_name"] == self.output_option_true_var.get()
         ][0]
 
-    def get_output_display_name(self) -> str:
-        return [
-            k
-            for k, v in self.output_presets.items()
-            if v["full_name"] == self.output_option_display_var.get()
-        ][0]
+    # def get_output_display_name(self) -> str:
+    #     return [
+    #         k
+    #         for k, v in self.output_presets.items()
+    #         if v["full_name"] == self.output_option_display_var.get()
+    #     ][0]
 
     def get_preset(self) -> str:
         selection = self.comp_preset_var.get()
@@ -412,13 +412,11 @@ class GUI(Window):
             output_option = self.get_output_name()
             if output_option == "imessage":
                 return "imessage_small"
-            elif output_option == "local":
+            if output_option == "local":
                 return selection
-            else:
-                return output_option
+            return output_option
 
-        else:
-            return selection
+        return selection
 
     def start_job(self) -> None:
         self.save_config()
@@ -569,7 +567,7 @@ class GUI(Window):
             self.input_frame.cb_input_option()
             self.comp_frame.cb_no_compress()
 
-    def exec_in_main(self, evt: Any) -> Any:
+    def exec_in_main(self, _evt: Any) -> Any:
         if self.action:
             self.response = self.action()
         self.response_event.set()
@@ -617,10 +615,10 @@ class GUI(Window):
 
     def cb_msg_block(
         self,
+        *args: Any,
         message: Optional[str] = None,
         parent: Optional[object] = None,
-        *args: Any,
-        **kwargs: Any,
+        **_kwargs: Any,
     ) -> Any:
         if message is None and len(args) > 0:
             message = " ".join(str(i) for i in args)
@@ -638,10 +636,10 @@ class GUI(Window):
 
     def cb_bar(
         self,
+        *args: Any,
         set_progress_mode: Optional[str] = None,
         steps: int = 0,
         update_bar: bool = False,
-        *args: Any,
         **kwargs: Any,
     ):
         with self.bar_lock:
@@ -659,13 +657,10 @@ class GUI(Window):
         # output_option_display = self.get_output_display_name()
         url = self.input_address_var.get()
 
-        if (
+        in_out_dir_same = (
             Path(self.input_setdir_var.get()).absolute()
             == Path(self.output_setdir_var.get()).absolute()
-        ):
-            in_out_dir_same = True
-        else:
-            in_out_dir_same = False
+        )
 
         # Input
         if in_out_dir_same is True:

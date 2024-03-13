@@ -77,5 +77,4 @@ class GetLineAuth:
 
         if response_dict["errorMessage"]:
             return False
-        else:
-            return True
+        return True

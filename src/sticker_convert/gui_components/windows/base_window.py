@@ -4,15 +4,15 @@ from typing import TYPE_CHECKING, Tuple
 
 from ttkbootstrap import Toplevel  # type: ignore
 
+from sticker_convert.gui_components.gui_utils import GUIUtils
+
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
-
-from sticker_convert.gui_components.gui_utils import GUIUtils
 
 
 class BaseWindow(Toplevel):
     def __init__(self, gui: "GUI") -> None:
-        super(BaseWindow, self).__init__(alpha=0)  # type: ignore
+        super().__init__(alpha=0)  # type: ignore
         self.gui = gui
 
         GUIUtils.set_icon(self)
