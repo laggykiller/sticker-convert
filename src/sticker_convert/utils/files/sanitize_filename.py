@@ -26,7 +26,8 @@ RESERVED_FILENAME = (
     "LPT7",
     "LPT8",
     "LPT9",
-  )  # Reserved words on Windows
+)  # Reserved words on Windows
+
 
 def sanitize_filename(filename: str) -> str:
     # Based on https://gitlab.com/jplusplus/sanitize-filename/-/blob/master/sanitize_filename/sanitize_filename.py

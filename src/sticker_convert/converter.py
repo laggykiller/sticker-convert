@@ -39,6 +39,7 @@ MSG_FAIL_COMP = (
     "cannot get below limit {} with lowest quality under current settings (Best size: {})"
 )
 
+
 def rounding(value: float) -> Decimal:
     return Decimal(value).quantize(0, ROUND_HALF_UP)
 

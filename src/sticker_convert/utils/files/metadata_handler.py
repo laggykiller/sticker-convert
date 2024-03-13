@@ -8,7 +8,6 @@ from typing import Dict, List, Optional, Tuple
 from sticker_convert.utils.files.json_resources_loader import INPUT_JSON, OUTPUT_JSON
 from sticker_convert.utils.media.codec_info import CodecInfo
 
-
 RELATED_EXTENSIONS = (
     ".png",
     ".apng",
@@ -38,6 +37,7 @@ RELATED_NAME = (
 
 BLACKLIST_PREFIX = ("cover",)
 BLACKLIST_SUFFIX = (".txt", ".m4a", ".wastickers", ".DS_Store", "._.DS_Store")
+
 
 def check_if_xcodeproj(path: Path) -> bool:
     if not path.is_dir():

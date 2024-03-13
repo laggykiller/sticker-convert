@@ -20,20 +20,21 @@ from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
 XCODE_IMESSAGE_ICONSET = {
-    'App-Store-1024x1024pt.png': (1024, 1024),
-    'iPad-Settings-29pt@2x.png': (58, 58),
-    'iPhone-settings-29pt@2x.png': (58, 58),
-    'iPhone-settings-29pt@3x.png': (87, 87),
-    'Messages27x20pt@2x.png': (54, 40),
-    'Messages27x20pt@3x.png': (81, 60),
-    'Messages32x24pt@2x.png': (64, 48),
-    'Messages32x24pt@3x.png': (96, 72),
-    'Messages-App-Store-1024x768pt.png': (1024, 768),
-    'Messages-iPad-67x50pt@2x.png': (134, 100),
-    'Messages-iPad-Pro-74x55pt@2x.png': (148, 110),
-    'Messages-iPhone-60x45pt@2x.png': (120, 90),
-    'Messages-iPhone-60x45pt@3x.png': (180, 135)
+    "App-Store-1024x1024pt.png": (1024, 1024),
+    "iPad-Settings-29pt@2x.png": (58, 58),
+    "iPhone-settings-29pt@2x.png": (58, 58),
+    "iPhone-settings-29pt@3x.png": (87, 87),
+    "Messages27x20pt@2x.png": (54, 40),
+    "Messages27x20pt@3x.png": (81, 60),
+    "Messages32x24pt@2x.png": (64, 48),
+    "Messages32x24pt@3x.png": (96, 72),
+    "Messages-App-Store-1024x768pt.png": (1024, 768),
+    "Messages-iPad-67x50pt@2x.png": (134, 100),
+    "Messages-iPad-Pro-74x55pt@2x.png": (148, 110),
+    "Messages-iPhone-60x45pt@2x.png": (120, 90),
+    "Messages-iPhone-60x45pt@3x.png": (180, 135),
 }
+
 
 class XcodeImessage(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:

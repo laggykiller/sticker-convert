@@ -26,11 +26,11 @@ class CLI:
 
     def cli(self) -> None:
         try:
-            from sticker_convert.utils.files.json_resources_loader import HELP_JSON, INPUT_JSON, COMPRESSION_JSON, OUTPUT_JSON, EMOJI_JSON
+            from sticker_convert.utils.files.json_resources_loader import COMPRESSION_JSON, EMOJI_JSON, HELP_JSON, INPUT_JSON, OUTPUT_JSON
         except RuntimeError as e:
             self.cb.msg(e.__str__())
             return
-        
+
         self.help = HELP_JSON
         self.input_presets = INPUT_JSON
         self.compression_presets = COMPRESSION_JSON
