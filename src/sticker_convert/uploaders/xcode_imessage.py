@@ -7,7 +7,7 @@ import shutil
 import zipfile
 from pathlib import Path
 from queue import Queue
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Union
 
 from sticker_convert.converter import CbQueueItemType, StickerConvert
 from sticker_convert.definitions import ROOT_DIR
@@ -19,65 +19,25 @@ from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
-
-class XcodeImessageIconset:
-    iconset: Dict[str, Tuple[int, int]] = {}
-
-    def __init__(self) -> None:
-        if self.iconset != {}:
-            return
-
-        if (ROOT_DIR / "ios-message-stickers-template").is_dir():
-            with open(
-                ROOT_DIR
-                / "ios-message-stickers-template/stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
-            ) as f:
-                dict = json.load(f)
-        elif (ROOT_DIR / "ios-message-stickers-template.zip").is_file():
-            with zipfile.ZipFile(
-                (ROOT_DIR / "ios-message-stickers-template.zip"), "r"
-            ) as f:
-                dict = json.loads(
-                    f.read(
-                        "stickers StickerPackExtension/Stickers.xcstickers/iMessage App Icon.stickersiconset/Contents.json"
-                    ).decode()
-                )
-        else:
-            raise FileNotFoundError("ios-message-stickers-template not found")
-
-        for i in dict["images"]:
-            filename = i["filename"]
-            size = i["size"]
-            size_w = int(size.split("x")[0])
-            size_h = int(size.split("x")[1])
-            scale = int(i["scale"].replace("x", ""))
-            size_w_scaled = size_w * scale
-            size_h_scaled = size_h * scale
-
-            self.iconset[filename] = (size_w_scaled, size_h_scaled)
-
-        # self.iconset = {
-        #     'App-Store-1024x1024pt.png': (1024, 1024),
-        #     'iPad-Settings-29pt@2x.png': (58, 58),
-        #     'iPhone-settings-29pt@2x.png': (58, 58),
-        #     'iPhone-settings-29pt@3x.png': (87, 87),
-        #     'Messages27x20pt@2x.png': (54, 40),
-        #     'Messages27x20pt@3x.png': (81, 60),
-        #     'Messages32x24pt@2x.png': (64, 48),
-        #     'Messages32x24pt@3x.png': (96, 72),
-        #     'Messages-App-Store-1024x768pt.png': (1024, 768),
-        #     'Messages-iPad-67x50pt@2x.png': (134, 100),
-        #     'Messages-iPad-Pro-74x55pt@2x.png': (148, 110),
-        #     'Messages-iPhone-60x45pt@2x.png': (120, 90),
-        #     'Messages-iPhone-60x45pt@3x.png': (180, 135)
-        # }
-
+XCODE_IMESSAGE_ICONSET = {
+    'App-Store-1024x1024pt.png': (1024, 1024),
+    'iPad-Settings-29pt@2x.png': (58, 58),
+    'iPhone-settings-29pt@2x.png': (58, 58),
+    'iPhone-settings-29pt@3x.png': (87, 87),
+    'Messages27x20pt@2x.png': (54, 40),
+    'Messages27x20pt@3x.png': (81, 60),
+    'Messages32x24pt@2x.png': (64, 48),
+    'Messages32x24pt@3x.png': (96, 72),
+    'Messages-App-Store-1024x768pt.png': (1024, 768),
+    'Messages-iPad-67x50pt@2x.png': (134, 100),
+    'Messages-iPad-Pro-74x55pt@2x.png': (148, 110),
+    'Messages-iPhone-60x45pt@2x.png': (120, 90),
+    'Messages-iPhone-60x45pt@3x.png': (180, 135)
+}
 
 class XcodeImessage(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(XcodeImessage, self).__init__(*args, **kwargs)
-        self.iconset = XcodeImessageIconset().iconset
-
         self.base_spec.set_size_max(500000)
         self.base_spec.set_res(300)
         self.base_spec.set_format(("png", ".apng", ".gif", ".jpeg", "jpg"))
@@ -169,7 +129,7 @@ class XcodeImessage(UploadBase):
         else:
             icon_source = first_image_path
 
-        for icon, res in self.iconset.items():
+        for icon, res in XCODE_IMESSAGE_ICONSET.items():
             spec_cover = CompOption()
             spec_cover.set_res_w(res[0])
             spec_cover.set_res_h(res[1])
@@ -264,7 +224,7 @@ class XcodeImessage(UploadBase):
             if (
                 CodecInfo.get_file_ext(i) == ".png"
                 and i.stem != "cover"
-                and i.name not in self.iconset
+                and i.name not in XCODE_IMESSAGE_ICONSET
             ):
                 sticker_dir = f"{i.stem}.sticker"  # 0.sticker
                 stickers_lst.append(sticker_dir)
@@ -308,7 +268,7 @@ class XcodeImessage(UploadBase):
                 os.remove(iconset_path / iconfile_name)
 
         icons_lst: List[str] = []
-        for icon in self.iconset:
+        for icon in XCODE_IMESSAGE_ICONSET:
             shutil.copy(self.opt_output.dir / icon, iconset_path / icon)
             icons_lst.append(icon)
 

@@ -5,10 +5,39 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from sticker_convert.definitions import ROOT_DIR
-from sticker_convert.utils.files.json_manager import JsonManager
+from sticker_convert.utils.files.json_resources_loader import INPUT_JSON, OUTPUT_JSON
 from sticker_convert.utils.media.codec_info import CodecInfo
 
+
+RELATED_EXTENSIONS = (
+    ".png",
+    ".apng",
+    ".jpg",
+    ".jpeg",
+    ".gif",
+    ".tgs",
+    ".lottie",
+    ".json",
+    ".mp4",
+    ".mkv",
+    ".mov",
+    ".webm",
+    ".webp",
+    ".avi",
+    ".m4a",
+    ".wastickers",
+)
+RELATED_NAME = (
+    "title.txt",
+    "author.txt",
+    "emoji.txt",
+    "export-result.txt",
+    ".DS_Store",
+    "._.DS_Store",
+)
+
+BLACKLIST_PREFIX = ("cover",)
+BLACKLIST_SUFFIX = (".txt", ".m4a", ".wastickers", ".DS_Store", "._.DS_Store")
 
 def check_if_xcodeproj(path: Path) -> bool:
     if not path.is_dir():
@@ -24,42 +53,14 @@ class MetadataHandler:
     def get_files_related_to_sticker_convert(
         dir: Path, include_archive: bool = True
     ) -> List[Path]:
-        from sticker_convert.uploaders.xcode_imessage import XcodeImessageIconset
-
-        xcode_iconset = XcodeImessageIconset().iconset
-        related_extensions = (
-            ".png",
-            ".apng",
-            ".jpg",
-            ".jpeg",
-            ".gif",
-            ".tgs",
-            ".lottie",
-            ".json",
-            ".mp4",
-            ".mkv",
-            ".mov",
-            ".webm",
-            ".webp",
-            ".avi",
-            ".m4a",
-            ".wastickers",
-        )
-        related_name = (
-            "title.txt",
-            "author.txt",
-            "emoji.txt",
-            "export-result.txt",
-            ".DS_Store",
-            "._.DS_Store",
-        )
+        from sticker_convert.uploaders.xcode_imessage import XCODE_IMESSAGE_ICONSET
 
         files = [
             i
             for i in sorted(dir.iterdir())
-            if i.stem in related_name
-            or i.name in xcode_iconset
-            or i.suffix in related_extensions
+            if i.stem in RELATED_NAME
+            or i.name in XCODE_IMESSAGE_ICONSET
+            or i.suffix in RELATED_EXTENSIONS
             or (include_archive and i.name.startswith("archive_"))
             or check_if_xcodeproj(i)
         ]
@@ -68,19 +69,15 @@ class MetadataHandler:
 
     @staticmethod
     def get_stickers_present(dir: Path) -> List[Path]:
-        from sticker_convert.uploaders.xcode_imessage import XcodeImessageIconset
-
-        blacklist_prefix = ("cover",)
-        blacklist_suffix = (".txt", ".m4a", ".wastickers", ".DS_Store", "._.DS_Store")
-        xcode_iconset = XcodeImessageIconset().iconset
+        from sticker_convert.uploaders.xcode_imessage import XCODE_IMESSAGE_ICONSET
 
         stickers_present = [
             i
             for i in sorted(dir.iterdir())
             if Path(dir, i.name).is_file()
-            and not i.name.startswith(blacklist_prefix)
-            and i.suffix not in blacklist_suffix
-            and i.name not in xcode_iconset
+            and not i.name.startswith(BLACKLIST_PREFIX)
+            and i.suffix not in BLACKLIST_SUFFIX
+            and i.name not in XCODE_IMESSAGE_ICONSET
         ]
 
         return stickers_present
@@ -150,7 +147,7 @@ class MetadataHandler:
         Does not check if metadata provided via user input in GUI or flag options
         metadata = 'title' or 'author'
         """
-        input_presets = JsonManager.load_json(ROOT_DIR / "resources/input.json")
+        input_presets = INPUT_JSON
         assert input_presets
 
         if input_option == "local":
@@ -169,7 +166,7 @@ class MetadataHandler:
     @staticmethod
     def check_metadata_required(output_option: str, metadata: str) -> bool:
         # metadata = 'title' or 'author'
-        output_presets = JsonManager.load_json(ROOT_DIR / "resources/output.json")
+        output_presets = OUTPUT_JSON
         assert output_presets
         return output_presets[output_option]["metadata_requirements"][metadata]
 

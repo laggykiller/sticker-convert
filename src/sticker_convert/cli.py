@@ -8,7 +8,7 @@ from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Any, Dict
 
-from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
+from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR
 from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
 from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth
@@ -26,21 +26,16 @@ class CLI:
 
     def cli(self) -> None:
         try:
-            self.help: Dict[str, Dict[str, str]] = JsonManager.load_json(
-                ROOT_DIR / "resources/help.json"
-            )
-            self.input_presets = JsonManager.load_json(
-                ROOT_DIR / "resources/input.json"
-            )
-            self.compression_presets = JsonManager.load_json(
-                ROOT_DIR / "resources/compression.json"
-            )
-            self.output_presets = JsonManager.load_json(
-                ROOT_DIR / "resources/output.json"
-            )
+            from sticker_convert.utils.files.json_resources_loader import HELP_JSON, INPUT_JSON, COMPRESSION_JSON, OUTPUT_JSON, EMOJI_JSON
         except RuntimeError as e:
-            self.cb.msg(e.__str__)
+            self.cb.msg(e.__str__())
             return
+        
+        self.help = HELP_JSON
+        self.input_presets = INPUT_JSON
+        self.compression_presets = COMPRESSION_JSON
+        self.output_presets = OUTPUT_JSON
+        self.emoji_list = EMOJI_JSON
 
         parser = argparse.ArgumentParser(
             description="CLI for stickers-convert",

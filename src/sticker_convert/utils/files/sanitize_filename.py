@@ -2,6 +2,31 @@
 import re
 import unicodedata
 
+BLACKLIST_CHAR = ("\\", "/", ":", "*", "?", '"', "<", ">", "|", "\0")
+RESERVED_FILENAME = (
+    "CON",
+    "PRN",
+    "AUX",
+    "NUL",
+    "COM1",
+    "COM2",
+    "COM3",
+    "COM4",
+    "COM5",
+    "COM6",
+    "COM7",
+    "COM8",
+    "COM9",
+    "LPT1",
+    "LPT2",
+    "LPT3",
+    "LPT4",
+    "LPT5",
+    "LPT6",
+    "LPT7",
+    "LPT8",
+    "LPT9",
+  )  # Reserved words on Windows
 
 def sanitize_filename(filename: str) -> str:
     # Based on https://gitlab.com/jplusplus/sanitize-filename/-/blob/master/sanitize_filename/sanitize_filename.py
@@ -13,32 +38,8 @@ def sanitize_filename(filename: str) -> str:
     and make sure we do not exceed Windows filename length limits.
     Hence a less safe blacklist, rather than a whitelist.
     """
-    blacklist = ["\\", "/", ":", "*", "?", '"', "<", ">", "|", "\0"]
-    reserved = [
-        "CON",
-        "PRN",
-        "AUX",
-        "NUL",
-        "COM1",
-        "COM2",
-        "COM3",
-        "COM4",
-        "COM5",
-        "COM6",
-        "COM7",
-        "COM8",
-        "COM9",
-        "LPT1",
-        "LPT2",
-        "LPT3",
-        "LPT4",
-        "LPT5",
-        "LPT6",
-        "LPT7",
-        "LPT8",
-        "LPT9",
-    ]  # Reserved words on Windows
-    filename = "".join(c if c not in blacklist else "_" for c in filename)
+
+    filename = "".join(c if c not in BLACKLIST_CHAR else "_" for c in filename)
     # Remove all charcters below code point 32
     filename = "".join(c if 31 < ord(c) else "_" for c in filename)
     filename = unicodedata.normalize("NFKD", filename)
@@ -46,7 +47,7 @@ def sanitize_filename(filename: str) -> str:
     filename = filename.strip()
     if all([x == "." for x in filename]):
         filename = "__" + filename
-    if filename in reserved:
+    if filename in RESERVED_FILENAME:
         filename = "__" + filename
     if len(filename) == 0:
         filename = "__"

@@ -15,7 +15,6 @@ from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Tup
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
-from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.downloaders.download_kakao import DownloadKakao
 from sticker_convert.downloaders.download_line import DownloadLine
 from sticker_convert.downloaders.download_signal import DownloadSignal
@@ -26,7 +25,7 @@ from sticker_convert.uploaders.upload_signal import UploadSignal
 from sticker_convert.uploaders.upload_telegram import UploadTelegram
 from sticker_convert.uploaders.xcode_imessage import XcodeImessage
 from sticker_convert.utils.callback import CallbackReturn
-from sticker_convert.utils.files.json_manager import JsonManager
+from sticker_convert.utils.files.json_resources_loader import OUTPUT_JSON
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 
@@ -335,7 +334,7 @@ class Job:
             error_msg += "[X] Uploading to signal requires uuid and password.\n"
             error_msg += save_to_local_tip
 
-        output_presets = JsonManager.load_json(ROOT_DIR / "resources/output.json")
+        output_presets = OUTPUT_JSON
 
         input_option = self.opt_input.option
         output_option = self.opt_output.option

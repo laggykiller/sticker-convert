@@ -49,7 +49,7 @@ opt_comp_template.set_quality(50)
 opt_comp_template.set_color(50)
 opt_comp_template.set_duration(3000)
 
-formats = [
+formats = (
     ("img", ".webp"),
     ("vid", ".webp"),
     ("vidlong", ".webp"),
@@ -59,7 +59,7 @@ formats = [
     ("vid618", ".apng"),
     ("vid", ".webm"),
     ("vid", ".gif"),
-]
+)
 
 
 def generate_random_apng(res: int, fps: float, duration: float, out_f: str) -> None:

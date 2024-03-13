@@ -26,6 +26,18 @@ CbQueueItemType = Union[
     None,
 ]
 
+MSG_START_COMP = "[I] Start compressing {} -> {}"
+MSG_SKIP_COMP = "[S] Compatible file found, skip compress and just copy {} -> {}"
+MSG_COMP = (
+    "[C] Compressing {} -> {} res={}x{}, "
+    "quality={}, fps={}, color={} (step {}-{}-{})"
+)
+MSG_REDO_COMP = "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
+MSG_DONE_COMP = "[S] Successful compression {} -> {} size {} (step {})"
+MSG_FAIL_COMP = (
+    "[F] Failed Compression {} -> {}, "
+    "cannot get below limit {} with lowest quality under current settings (Best size: {})"
+)
 
 def rounding(value: float) -> Decimal:
     return Decimal(value).quantize(0, ROUND_HALF_UP)
@@ -71,19 +83,6 @@ def useful_array(
 
 
 class StickerConvert:
-    MSG_START_COMP = "[I] Start compressing {} -> {}"
-    MSG_SKIP_COMP = "[S] Compatible file found, skip compress and just copy {} -> {}"
-    MSG_COMP = (
-        "[C] Compressing {} -> {} res={}x{}, "
-        "quality={}, fps={}, color={} (step {}-{}-{})"
-    )
-    MSG_REDO_COMP = "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
-    MSG_DONE_COMP = "[S] Successful compression {} -> {} size {} (step {})"
-    MSG_FAIL_COMP = (
-        "[F] Failed Compression {} -> {}, "
-        "cannot get below limit {} with lowest quality under current settings (Best size: {})"
-    )
-
     def __init__(
         self,
         in_f: Union[Path, Tuple[Path, bytes]],
@@ -163,7 +162,7 @@ class StickerConvert:
         if result:
             return self.compress_done(result)
 
-        self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
+        self.cb.put((MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
 
         steps_list = self.generate_steps_list()
 
@@ -195,7 +194,7 @@ class StickerConvert:
             self.color = param[4]
 
             self.tmp_f = BytesIO()
-            msg = self.MSG_COMP.format(
+            msg = MSG_COMP.format(
                 self.in_f_name,
                 self.out_f_name,
                 self.res_w,
@@ -261,7 +260,7 @@ class StickerConvert:
                 file_info=self.codec_info_orig,
             )
         ):
-            self.cb.put((self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name)))
+            self.cb.put((MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name)))
 
             if isinstance(self.in_f, Path):
                 with open(self.in_f, "rb") as f:
@@ -323,7 +322,7 @@ class StickerConvert:
         return steps_list
 
     def recompress(self, sign: str) -> None:
-        msg = self.MSG_REDO_COMP.format(
+        msg = MSG_REDO_COMP.format(
             sign, self.in_f_name, self.out_f_name, self.size, sign, self.size_max
         )
         self.cb.put(msg)
@@ -331,7 +330,7 @@ class StickerConvert:
     def compress_fail(
         self,
     ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
-        msg = self.MSG_FAIL_COMP.format(
+        msg = MSG_FAIL_COMP.format(
             self.in_f_name, self.out_f_name, self.size_max, self.size
         )
         self.cb.put(msg)
@@ -353,7 +352,7 @@ class StickerConvert:
                 f.write(data)
 
         if result_step:
-            msg = self.MSG_DONE_COMP.format(
+            msg = MSG_DONE_COMP.format(
                 self.in_f_name, self.out_f_name, self.result_size, result_step
             )
             self.cb.put(msg)

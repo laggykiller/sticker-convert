@@ -221,13 +221,17 @@ class GUI(Window):
             self.cb_msg(msg)
 
     def load_jsons(self) -> None:
-        self.help = JsonManager.load_json(ROOT_DIR / "resources/help.json")
-        self.input_presets = JsonManager.load_json(ROOT_DIR / "resources/input.json")
-        self.compression_presets: Dict[str, Dict[str, Any]] = JsonManager.load_json(
-            ROOT_DIR / "resources/compression.json"
-        )
-        self.output_presets = JsonManager.load_json(ROOT_DIR / "resources/output.json")
-        self.emoji_list = JsonManager.load_json(ROOT_DIR / "resources/emoji.json")
+        try:
+            from sticker_convert.utils.files.json_resources_loader import HELP_JSON, INPUT_JSON, COMPRESSION_JSON, OUTPUT_JSON, EMOJI_JSON
+        except RuntimeError as e:
+            self.cb_msg(e.__str__())
+            return
+        
+        self.help = HELP_JSON
+        self.input_presets = INPUT_JSON
+        self.compression_presets = COMPRESSION_JSON
+        self.output_presets = OUTPUT_JSON
+        self.emoji_list = EMOJI_JSON
 
         if not (
             self.compression_presets and self.input_presets and self.output_presets
