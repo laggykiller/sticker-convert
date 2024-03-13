@@ -12,12 +12,13 @@ RUN cat requirements.txt | grep -v 'ttkbootstrap' > requirements-cli.txt &&\
 
 COPY ./src /app/
 
-RUN chmod -R 777 /app
-
 RUN apt purge -y python3-pip && \
     apt clean autoclean && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
+
+RUN useradd --create-home app
+USER app
 
 VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 
@@ -55,6 +56,8 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY ./scripts/startapp.sh /startapp.sh
 
+ENV HOME=/home/app
+
 VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 
 FROM base-gui AS min-gui
@@ -64,7 +67,6 @@ RUN apt purge -y curl wget gpg git && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 COPY ./src /app/
-RUN chmod -R 777 /app
 
 FROM base-gui AS full
 # Install signal-desktop
@@ -80,8 +82,7 @@ RUN apt purge -y curl wget gpg git && \
     apt autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
-RUN mkdir -p '/root/.config/Signal' && \
-    chmod 777 '/root/.config/Signal'
-
 COPY ./src /app/
-RUN chmod -R 777 /app
+
+RUN mkdir -p '/home/app' && \
+    chmod -R 777 '/home/app'

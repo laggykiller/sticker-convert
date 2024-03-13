@@ -14,16 +14,13 @@ services:
     # image: laggykiller/sticker-convert:latest-min-gui
 
     volumes:
-      - ./stickers_input:/app/stickers_input
-      - ./stickers_output:/app/stickers_output
-      # - ./creds.json:/app/creds.json
+      - ./stickers_input:/home/app/stickers_input
+      - ./stickers_output:/home/app/stickers_output
+      # - ./creds.json:/home/app/.config/sticker-convert/creds.json
 
     ports:
       - 5800:5800 # Port for Web UI
       # - 5900:5900 # Optional for VNC
-
-    tmpfs:
-      - /tmp
 
     dns:
       - 1.1.1.1 # Or else download/upload to telegram fails in Docker
