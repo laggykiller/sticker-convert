@@ -3,11 +3,12 @@ import copy
 import re
 from pathlib import Path
 from queue import Queue
-from typing import Any, Dict, List, Union, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 import anyio
-from telegram import Bot, InputSticker, Sticker
+from telegram import InputFile, InputSticker, Sticker
 from telegram.error import TelegramError
+from telegram.ext import AIORateLimiter, ApplicationBuilder
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
@@ -70,11 +71,25 @@ class UploadTelegram(UploadBase):
 
     async def upload_pack(
         self, pack_title: str, stickers: List[Path], emoji_dict: Dict[str, str]
-    ) -> str:
-        assert self.opt_cred.telegram_token
-        bot = Bot(self.opt_cred.telegram_token.strip())
+    ) -> Optional[str]:
+        token = self.opt_cred.telegram_token.strip()
+        assert token
+        timeout = 10 * len(stickers)
 
-        async with bot:
+        application = (  # type: ignore
+            ApplicationBuilder()
+            .token(self.opt_cred.telegram_token.strip())
+            .rate_limiter(AIORateLimiter())
+            .connect_timeout(timeout)
+            .pool_timeout(timeout)
+            .read_timeout(timeout)
+            .write_timeout(timeout)
+            .connection_pool_size(len(stickers))
+            .build()
+        )
+
+        async with application:
+            bot = application.bot
             pack_short_name = (
                 pack_title.replace(" ", "_") + "_by_" + bot.name.replace("@", "")
             )
@@ -82,26 +97,27 @@ class UploadTelegram(UploadBase):
                 "[^0-9a-zA-Z]+", "_", pack_short_name
             )  # name used in url, only alphanum and underscore only
 
+            sticker_set = None
             try:
                 sticker_set = await bot.get_sticker_set(
-                    pack_short_name,  # type: ignore
+                    pack_short_name,
                     read_timeout=30,
                     write_timeout=30,
                     connect_timeout=30,
                     pool_timeout=30,
                 )
-                await bot.get_sticker_set(pack_short_name)  # type: ignore
-                pack_exists = True
             except TelegramError:
-                pack_exists = False
+                pass
 
-            if pack_exists is True:
+            if sticker_set is not None:
+                question = f"Warning: Pack {pack_short_name} already exists.\n"
+                question += "Delete all stickers in pack?\n"
+                question += "Note: After recreating set, please wait for about 3 minutes for the set to reappear."
+
                 self.cb.put(
                     (
                         "ask_bool",
-                        (
-                            f"Warning: Pack {pack_short_name} already exists.\nDelete all stickers in pack?",
-                        ),
+                        (question,),
                         None,
                     )
                 )
@@ -109,18 +125,23 @@ class UploadTelegram(UploadBase):
                     response = self.cb_return.get_response()
                 else:
                     response = False
+
                 if response is True:
                     self.cb.put(f"Deleting all stickers from pack {pack_short_name}")
-                    try:
-                        for i in sticker_set.stickers:  # type: ignore
-                            await bot.delete_sticker_from_set(i.file_id)
-                    except TelegramError as e:
-                        self.cb.put(
-                            f"Cannot delete sticker {i.file_id} from {pack_short_name} due to {e}"  # type: ignore
-                        )
+                    await bot.delete_sticker_set(pack_short_name)
+                    sticker_set = None
                 else:
                     self.cb.put(f"Not deleting existing pack {pack_short_name}")
 
+            if self.opt_output.option == "telegram_emoji":
+                sticker_type = Sticker.CUSTOM_EMOJI
+            else:
+                sticker_type = Sticker.REGULAR
+
+            input_stickers: List[InputSticker] = []
+            sticker_format = None
+            cover_spec_choice = None
+            ext = None
             for src in stickers:
                 self.cb.put(f"Verifying {src} for uploading to telegram")
 
@@ -153,10 +174,7 @@ class UploadTelegram(UploadBase):
                     sticker_format = "static"
 
                 if self.opt_output.option == "telegram_emoji":
-                    sticker_type = Sticker.CUSTOM_EMOJI
                     spec_choice.set_res(100)
-                else:
-                    sticker_type = Sticker.REGULAR
 
                 if FormatVerify.check_file(src, spec=spec_choice):
                     with open(src, "rb") as f:
@@ -171,57 +189,88 @@ class UploadTelegram(UploadBase):
                     )
                     sticker_bytes = cast(bytes, convert_result)
 
-                sticker = InputSticker(sticker=sticker_bytes, emoji_list=emoji_list)  # type: ignore
-
-                try:
-                    if pack_exists is False:
-                        await bot.create_new_sticker_set(
-                            user_id=self.opt_cred.telegram_userid,
-                            name=pack_short_name,
-                            title=pack_title,
-                            stickers=[sticker],
-                            sticker_format=sticker_format,
-                            sticker_type=sticker_type,
-                        )  # type: ignore
-                        pack_exists = True
-                    else:
-                        await bot.add_sticker_to_set(
-                            user_id=self.opt_cred.telegram_userid,
-                            name=pack_short_name,
-                            sticker=sticker,
-                        )  # type: ignore
-                except TelegramError as e:
-                    self.cb.put(
-                        f"Cannot upload sticker {src} in {pack_short_name} due to {e}"
-                    )
-                    continue
-
-                self.cb.put(f"Uploaded {src}")
+                input_stickers.append(
+                    InputSticker(sticker=sticker_bytes, emoji_list=emoji_list)
+                )
 
             cover_path = MetadataHandler.get_cover(self.opt_output.dir)
-            if cover_path:
-                if FormatVerify.check_file(cover_path, spec=cover_spec_choice):  # type: ignore
+            thumbnail_bytes: Union[None, bytes, Path] = None
+            if cover_path and cover_spec_choice and ext:
+                if FormatVerify.check_file(cover_path, spec=cover_spec_choice):
                     with open(cover_path, "rb") as f:
                         thumbnail_bytes = f.read()
                 else:
-                    _, _, thumbnail_bytes, _ = StickerConvert.convert(  # type: ignore
+                    _, _, thumbnail_bytes, _ = StickerConvert.convert(
                         cover_path,
-                        Path(f"bytes{ext}"),  # type: ignore
+                        Path(f"bytes{ext}"),
                         self.opt_comp_cover_merged,
                         self.cb,
                         self.cb_return,
                     )
 
+            base_num = 1
+            if sticker_set is None and sticker_format is not None:
+                init_stickers = input_stickers[:50]
+                if len(input_stickers) > 50:
+                    amount_str = "first 50"
+                else:
+                    amount_str = "all"
+                start_msg = f"Creating pack and bulk uploading {amount_str} stickers of {pack_short_name}"
+                finish_msg = f"Created pack and bulk uploaded {amount_str} stickers of {pack_short_name}"
+                error_msg = f"Cannot create pack and bulk upload {amount_str} stickers of {pack_short_name} due to"
+                self.cb.put(start_msg)
                 try:
+                    await bot.create_new_sticker_set(
+                        user_id=self.opt_cred.telegram_userid,
+                        name=pack_short_name,
+                        title=pack_title,
+                        stickers=init_stickers,
+                        sticker_format=sticker_format,
+                        sticker_type=sticker_type,
+                    )
+                    self.cb.put(finish_msg)
+                    input_stickers = input_stickers[50:]
+                    base_num = 51
+                except TelegramError as e:
+                    self.cb.put(f"{error_msg} {e}")
+                    return None
+
+            if len(input_stickers) > 0:
+                self.cb.put(f"Uploading stickers of {pack_short_name} one-by-one")
+                for i, sticker in enumerate(input_stickers):
+                    assert isinstance(sticker.sticker, InputFile)
+                    num = base_num + i
+                    try:
+                        # We could use tg.start_soon() here
+                        # But this would disrupt the order of stickers
+                        await bot.add_sticker_to_set(
+                            user_id=self.opt_cred.telegram_userid,
+                            name=pack_short_name,
+                            sticker=sticker,
+                        )
+                        self.cb.put(f"Uploaded sticker #{num} of {pack_short_name}")
+                    except TelegramError as e:
+                        self.cb.put(
+                            f"Cannot upload sticker #{num} of {pack_short_name} due to {e}"
+                        )
+
+            if thumbnail_bytes is not None:
+                try:
+                    self.cb.put(
+                        f"Uploading cover (thumbnail) of pack {pack_short_name}"
+                    )
                     await bot.set_sticker_set_thumbnail(
                         name=pack_short_name,
                         user_id=self.opt_cred.telegram_userid,
                         thumbnail=thumbnail_bytes,
-                    )  # type: ignore
+                    )
+                    self.cb.put(f"Uploaded cover (thumbnail) of pack {pack_short_name}")
                 except TelegramError as e:
                     self.cb.put(
-                        f"Cannot upload cover (thumbnail) for {pack_short_name} due to {e}"
+                        f"Cannot upload cover (thumbnail) of pack {pack_short_name} due to {e}"
                     )
+
+            self.cb.put(f"Finish uploading {pack_short_name}")
 
         if self.opt_output.option == "telegram_emoji":
             result = f"https://t.me/addemoji/{pack_short_name}"
@@ -262,9 +311,10 @@ class UploadTelegram(UploadBase):
                 author=self.opt_output.author,
             )
 
+        assert title is not None
         packs = MetadataHandler.split_sticker_packs(
             self.opt_output.dir,
-            title=title,  # type: ignore
+            title=title,
             file_per_anim_pack=50,
             file_per_image_pack=120,
             separate_image_anim=not self.opt_comp.fake_vid,
@@ -273,8 +323,9 @@ class UploadTelegram(UploadBase):
         for pack_title, stickers in packs.items():
             self.cb.put(f"Uploading pack {pack_title}")
             result = anyio.run(self.upload_pack, pack_title, stickers, emoji_dict)
-            self.cb.put((result))
-            urls.append(result)
+            if result:
+                self.cb.put((result))
+                urls.append(result)
 
         return urls
 

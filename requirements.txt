@@ -1,3 +1,5 @@
+aiolimiter~=1.1.0
+anyio~=3.7.1
 apngasm_python~=1.2.3
 av~=11.0.0
 beautifulsoup4~=4.12.3

@@ -5,8 +5,9 @@ from typing import Dict, Optional, Union
 from urllib.parse import urlparse
 
 import anyio
-from telegram import Bot
+from telegram import PhotoSize, Sticker, StickerSet
 from telegram.error import TelegramError
+from telegram.ext import AIORateLimiter, ApplicationBuilder
 
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
@@ -33,18 +34,33 @@ class DownloadTelegram(DownloadBase):
 
         self.title = Path(urlparse(self.url).path).name
 
+        self.emoji_dict: Dict[str, str] = {}
+
         return anyio.run(self.save_stickers)
 
     async def save_stickers(self) -> bool:
-        bot = Bot(self.token)
-        async with bot:
+        timeout = 30
+        application = (  # type: ignore
+            ApplicationBuilder()
+            .token(self.token)
+            .rate_limiter(AIORateLimiter())
+            .connect_timeout(timeout)
+            .pool_timeout(timeout)
+            .read_timeout(timeout)
+            .write_timeout(timeout)
+            .connection_pool_size(20)
+            .build()
+        )
+
+        async with application:
+            bot = application.bot
             try:
-                sticker_set = await bot.get_sticker_set(
-                    self.title,  # type: ignore
-                    read_timeout=30,
-                    write_timeout=30,
-                    connect_timeout=30,
-                    pool_timeout=30,
+                sticker_set: StickerSet = await bot.get_sticker_set(
+                    self.title,
+                    read_timeout=timeout,
+                    write_timeout=timeout,
+                    connect_timeout=timeout,
+                    pool_timeout=timeout,
                 )
             except TelegramError as e:
                 self.cb.put(
@@ -63,50 +79,43 @@ class DownloadTelegram(DownloadBase):
                 )
             )
 
-            emoji_dict: Dict[str, str] = {}
-            for num, i in enumerate(sticker_set.stickers):
-                sticker = await i.get_file(
-                    read_timeout=30,
-                    write_timeout=30,
-                    connect_timeout=30,
-                    pool_timeout=30,
+            async def download_sticker(
+                sticker: Union[PhotoSize, Sticker], f_id: str
+            ) -> None:
+                sticker_file = await sticker.get_file(
+                    read_timeout=timeout,
+                    write_timeout=timeout,
+                    connect_timeout=timeout,
+                    pool_timeout=timeout,
                 )
-                ext = Path(sticker.file_path).suffix
-                f_id = str(num).zfill(3)
+                fpath = sticker_file.file_path
+                assert fpath is not None
+                ext = Path(fpath).suffix
                 f_name = f_id + ext
                 f_path = Path(self.out_dir, f_name)
-                await sticker.download_to_drive(
+                await sticker_file.download_to_drive(
                     custom_path=f_path,
-                    read_timeout=30,
-                    write_timeout=30,
-                    connect_timeout=30,
-                    pool_timeout=30,
+                    read_timeout=timeout,
+                    write_timeout=timeout,
+                    connect_timeout=timeout,
+                    pool_timeout=timeout,
                 )
-                emoji_dict[f_id] = i.emoji
+                if isinstance(sticker, Sticker) and sticker.emoji is not None:
+                    self.emoji_dict[f_id] = sticker.emoji
                 self.cb.put(f"Downloaded {f_name}")
-                self.cb.put("update_bar")
+                if f_id != "cover":
+                    self.cb.put("update_bar")
 
-            if sticker_set.thumbnail:
-                cover = await sticker_set.thumbnail.get_file(
-                    read_timeout=30,
-                    write_timeout=30,
-                    connect_timeout=30,
-                    pool_timeout=30,
-                )
-                cover_ext = Path(cover.file_path).suffix
-                cover_name = "cover" + cover_ext
-                cover_path = Path(self.out_dir, cover_name)
-                await cover.download_to_drive(
-                    custom_path=cover_path,
-                    read_timeout=30,
-                    write_timeout=30,
-                    connect_timeout=30,
-                    pool_timeout=30,
-                )
-                self.cb.put(f"Downloaded {cover_name}")
+            async with anyio.create_task_group() as tg:
+                for num, sticker in enumerate(sticker_set.stickers):
+                    f_id = str(num).zfill(3)
+                    tg.start_soon(download_sticker, sticker, f_id)
+
+                if sticker_set.thumbnail is not None:
+                    tg.start_soon(download_sticker, sticker_set.thumbnail, "cover")
 
         MetadataHandler.set_metadata(
-            self.out_dir, title=self.title, emoji_dict=emoji_dict
+            self.out_dir, title=self.title, emoji_dict=self.emoji_dict
         )
         return True
 
