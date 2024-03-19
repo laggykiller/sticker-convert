@@ -143,7 +143,11 @@ class Executor:
                 e += traceback.format_exc()
                 e += "#####################"
                 cb_queue.put(e)
-        work_list.append(None)
+        
+        try:
+            work_list.append(None)
+        except RemoteError:
+            pass
 
     def start_workers(self, processes: int = 1) -> None:
         for _ in range(processes):
@@ -180,7 +184,6 @@ class Executor:
 
     def kill_workers(self, *_: Any, **__: Any) -> None:
         self.is_cancel_job.value = 1  # type: ignore
-        self.work_list = self.manager.list()
 
         for process in self.processes:
             if platform.system() == "Windows":
