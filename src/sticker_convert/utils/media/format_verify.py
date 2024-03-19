@@ -162,7 +162,7 @@ class FormatVerify:
         file: Union[Path, bytes],
         fmt: Tuple[Tuple[str, ...], Tuple[str, ...]],
         file_info: Optional[CodecInfo] = None,
-    ):
+    ) -> bool:
         if file_info:
             file_animated = file_info.is_animated
             file_ext = file_info.file_ext

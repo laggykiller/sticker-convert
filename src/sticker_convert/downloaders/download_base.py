@@ -3,12 +3,12 @@ from __future__ import annotations
 
 from pathlib import Path
 from queue import Queue
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 import requests
 
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 
 
 class DownloadBase:
@@ -18,35 +18,20 @@ class DownloadBase:
         out_dir: Path,
         opt_cred: Optional[CredOption],
         cb: Union[
-            Queue[
-                Union[
-                    Tuple[str, Optional[Tuple[str]], Optional[Dict[str, Any]]],
-                    str,
-                    None,
-                ]
-            ],
+            Queue[CbQueueItemType],
             Callback,
         ],
         cb_return: CallbackReturn,
-    ):
-        self.url: str = url
-        self.out_dir: Path = out_dir
-        self.opt_cred: Optional[CredOption] = opt_cred
-        self.cb: Union[
-            Queue[
-                Union[
-                    Tuple[str, Optional[Tuple[str]], Optional[Dict[str, Any]]],
-                    str,
-                    None,
-                ]
-            ],
-            Callback,
-        ] = cb
-        self.cb_return: CallbackReturn = cb_return
+    ) -> None:
+        self.url = url
+        self.out_dir = out_dir
+        self.opt_cred = opt_cred
+        self.cb = cb
+        self.cb_return = cb_return
 
     def download_multiple_files(
         self, targets: List[Tuple[str, Path]], retries: int = 3, **kwargs: Any
-    ):
+    ) -> None:
         # targets format: [(url1, dest2), (url2, dest2), ...]
         self.cb.put(
             ("bar", None, {"set_progress_mode": "determinate", "steps": len(targets)})

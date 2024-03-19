@@ -9,11 +9,11 @@ from pathlib import Path
 from queue import Queue
 from typing import Any, Dict, List, Union
 
-from sticker_convert.converter import CbQueueItemType, StickerConvert
+from sticker_convert.converter import StickerConvert
 from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.metadata_handler import XCODE_IMESSAGE_ICONSET, MetadataHandler
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.codec_info import CodecInfo

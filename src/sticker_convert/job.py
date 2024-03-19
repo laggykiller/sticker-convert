@@ -7,11 +7,11 @@ import shutil
 import traceback
 from datetime import datetime
 from multiprocessing import Process, Value
-from multiprocessing.managers import SyncManager
+from multiprocessing.managers import SyncManager, ListProxy
 from pathlib import Path
 from queue import Queue
 from threading import Thread
-from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
@@ -24,11 +24,13 @@ from sticker_convert.uploaders.compress_wastickers import CompressWastickers
 from sticker_convert.uploaders.upload_signal import UploadSignal
 from sticker_convert.uploaders.upload_telegram import UploadTelegram
 from sticker_convert.uploaders.xcode_imessage import XcodeImessage
-from sticker_convert.utils.callback import CallbackReturn
+from sticker_convert.utils.callback import CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.json_resources_loader import OUTPUT_JSON
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 
+CbQueueType = Queue[CbQueueItemType]
+WorkListType = ListProxy[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]]
 
 class Executor:
     def __init__(
@@ -38,7 +40,7 @@ class Executor:
         cb_bar: Callable[..., None],
         cb_ask_bool: Callable[..., bool],
         cb_ask_str: Callable[..., str],
-    ):
+    ) -> None:
         self.cb_msg = cb_msg
         self.cb_msg_block = cb_msg_block
         self.cb_bar = cb_bar
@@ -47,19 +49,11 @@ class Executor:
 
         self.manager = SyncManager()
         self.manager.start()
-        self.work_queue: Queue[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]] = (
-            self.manager.Queue()
-        )
+        # Using list instead of queue for work_list as it can cause random deadlocks
+        # Especially when using scale_filter=nearest
+        self.work_list: WorkListType = self.manager.list()
         self.results_queue: Queue[Any] = self.manager.Queue()
-        self.cb_queue: Queue[
-            Union[
-                Tuple[
-                    Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, str]]
-                ],
-                str,
-                None,
-            ]
-        ] = self.manager.Queue()
+        self.cb_queue: CbQueueType = self.manager.Queue()
         self.cb_return = CallbackReturn()
         self.processes: List[Process] = []
 
@@ -76,16 +70,9 @@ class Executor:
 
     def cb_thread(
         self,
-        cb_queue: Queue[
-            Union[
-                Tuple[
-                    Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, str]]
-                ],
-                str,
-            ]
-        ],
+        cb_queue: CbQueueType,
         cb_return: CallbackReturn,
-    ):
+    ) -> None:
         for i in iter(cb_queue.get, None):
             if isinstance(i, tuple):
                 action = i[0]
@@ -118,19 +105,17 @@ class Executor:
 
     @staticmethod
     def worker(
-        work_queue: Queue[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]],
+        work_list: WorkListType,
         results_queue: Queue[Any],
-        cb_queue: Queue[
-            Union[
-                Tuple[
-                    Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, str]]
-                ],
-                str,
-            ]
-        ],
+        cb_queue: CbQueueType,
         cb_return: CallbackReturn,
-    ):
-        for work_func, work_args in iter(work_queue.get, None):
+    ) -> None:
+        while True:
+            work = work_list.pop(0)
+            if work is None:
+                break
+            else:
+                work_func, work_args = work
             try:
                 results = work_func(*work_args, cb_queue, cb_return)
                 results_queue.put(results)
@@ -147,18 +132,17 @@ class Executor:
                 e += traceback.format_exc()
                 e += "#####################"
                 cb_queue.put(e)
-        work_queue.put(None)
+        work_list.append(None)
 
     def start_workers(self, processes: int = 1) -> None:
         # Would contain None from previous run
-        while not self.work_queue.empty():
-            self.work_queue.get()
+        self.work_list = self.manager.list()
 
         for _ in range(processes):
             process = Process(
                 target=Executor.worker,
                 args=(
-                    self.work_queue,
+                    self.work_list,
                     self.results_queue,
                     self.cb_queue,
                     self.cb_return,
@@ -172,10 +156,10 @@ class Executor:
     def add_work(
         self, work_func: Callable[..., Any], work_args: Tuple[Any, ...]
     ) -> None:
-        self.work_queue.put((work_func, work_args))
+        self.work_list.append((work_func, work_args))
 
     def join_workers(self) -> None:
-        self.work_queue.put(None)
+        self.work_list.append(None)
         try:
             for process in self.processes:
                 process.join()
@@ -188,8 +172,7 @@ class Executor:
 
     def kill_workers(self, *_: Any, **__: Any) -> None:
         self.is_cancel_job.value = 1  # type: ignore
-        while not self.work_queue.empty():
-            self.work_queue.get()
+        self.work_list = self.manager.list()
 
         for process in self.processes:
             if platform.system() == "Windows":
@@ -213,7 +196,7 @@ class Executor:
         action: Optional[str],
         args: Optional[Tuple[str, ...]] = None,
         kwargs: Optional[Dict[str, Any]] = None,
-    ):
+    ) -> None:
         self.cb_queue.put((action, args, kwargs))
 
 
@@ -229,7 +212,7 @@ class Job:
         cb_bar: Callable[..., None],
         cb_ask_bool: Callable[..., bool],
         cb_ask_str: Callable[..., str],
-    ):
+    ) -> None:
         self.opt_input = opt_input
         self.opt_comp = opt_comp
         self.opt_output = opt_output
@@ -402,7 +385,9 @@ class Job:
 
         if self.opt_comp.scale_filter not in (
             "nearest",
+            "box",
             "bilinear",
+            "hamming",
             "bicubic",
             "lanczos",
         ):
@@ -410,7 +395,7 @@ class Job:
             error_msg += (
                 f"[X] scale_filter {self.opt_comp.scale_filter} is not valid option"
             )
-            error_msg += "    Valid options: nearest, bilinear, bicubic, lanczos"
+            error_msg += "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
 
         if self.opt_comp.quantize_method not in ("imagequant", "fastoctree", "none"):
             error_msg += "\n"

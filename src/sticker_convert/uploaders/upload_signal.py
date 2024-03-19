@@ -9,10 +9,10 @@ from signalstickers_client import StickersClient  # type: ignore
 from signalstickers_client.errors import SignalException  # type: ignore
 from signalstickers_client.models import LocalStickerPack, Sticker  # type: ignore
 
-from sticker_convert.converter import CbQueueItemType, StickerConvert
+from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
@@ -49,7 +49,7 @@ class UploadSignal(UploadBase):
 
     def add_stickers_to_pack(
         self, pack: LocalStickerPack, stickers: List[Path], emoji_dict: Dict[str, str]
-    ):
+    ) -> None:
         for src in stickers:
             self.cb.put(f"Verifying {src} for uploading to signal")
 

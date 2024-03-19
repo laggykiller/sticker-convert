@@ -133,7 +133,7 @@ class MetadataHandler:
         title: Optional[str] = None,
         author: Optional[str] = None,
         emoji_dict: Optional[Dict[str, str]] = None,
-    ):
+    ) -> None:
         title_path = Path(directory, "title.txt")
         if title is not None:
             with open(title_path, "w+", encoding="utf-8") as f:

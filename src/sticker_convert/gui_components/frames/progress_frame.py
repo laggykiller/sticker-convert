@@ -36,7 +36,7 @@ class ProgressFrame(LabelFrame):
         set_progress_mode: Optional[str] = None,
         steps: int = 0,
         update_bar: bool = False,
-    ):
+    ) -> None:
         if update_bar and self.progress_bar_cli:
             self.progress_bar_cli.update()
             self.progress_bar["value"] += 100 / self.progress_bar_steps

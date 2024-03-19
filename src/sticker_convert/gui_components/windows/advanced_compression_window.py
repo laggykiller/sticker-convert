@@ -329,7 +329,9 @@ class AdvancedCompressionWindow(BaseWindow):
             self.gui.scale_filter_var,
             self.gui.scale_filter_var.get(),
             "nearest",
+            "box",
             "bilinear",
+            "hamming",
             "bicubic",
             "lanczos",
             bootstyle="secondary",  # type: ignore

@@ -8,10 +8,9 @@ import anyio
 from telegram import Bot
 from telegram.error import TelegramError
 
-from sticker_convert.converter import CbQueueItemType
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 
 

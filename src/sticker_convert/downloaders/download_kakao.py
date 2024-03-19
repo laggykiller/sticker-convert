@@ -13,10 +13,9 @@ import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
 
-from sticker_convert.converter import CbQueueItemType
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
 

@@ -17,7 +17,7 @@ class GetKakaoAuth:
         cb_msg: Callable[..., None] = print,
         cb_msg_block: Callable[..., Any] = input,
         cb_ask_str: Callable[..., str] = input,
-    ):
+    ) -> None:
         self.username = opt_cred.kakao_username
         self.password = opt_cred.kakao_password
         self.country_code = opt_cred.kakao_country_code

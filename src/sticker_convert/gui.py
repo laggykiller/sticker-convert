@@ -641,7 +641,7 @@ class GUI(Window):
         steps: int = 0,
         update_bar: bool = False,
         **kwargs: Any,
-    ):
+    ) -> None:
         with self.bar_lock:
             self.progress_frame.update_progress_bar(
                 set_progress_mode, steps, update_bar, *args, **kwargs

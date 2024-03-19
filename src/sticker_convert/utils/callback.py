@@ -4,6 +4,12 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from tqdm import tqdm
 
+CbQueueTupleType = Tuple[Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, Any]]]
+CbQueueItemType = Union[
+    CbQueueTupleType,
+    str,
+    None,
+]
 
 class CallbackReturn:
     def __init__(self) -> None:
@@ -34,7 +40,7 @@ class Callback:
         ask_str: Optional[Callable[..., str]] = None,
         silent: bool = False,
         no_confirm: bool = False,
-    ):
+    ) -> None:
         self.progress_bar: Optional[tqdm[Any]] = None
 
         if msg:
@@ -88,7 +94,7 @@ class Callback:
         set_progress_mode: Optional[str] = None,
         steps: int = 0,
         update_bar: bool = False,
-    ):
+    ) -> None:
         if self.silent:
             return
 
@@ -154,7 +160,7 @@ class Callback:
     def put(
         self,
         i: Union[
-            Tuple[Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, Any]]],
+            CbQueueItemType,
             str,
         ],
     ) -> Union[str, bool, None]:

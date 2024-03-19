@@ -15,11 +15,10 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 
-from sticker_convert.converter import CbQueueItemType
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.apple_png_normalize import ApplePngNormalize
 
@@ -227,7 +226,7 @@ class DownloadLine(DownloadBase):
         num: int,
         prefix: str = "",
         suffix: str = "",
-    ):
+    ) -> None:
         data = zf.read(f_path)
         ext = Path(f_path).suffix
         if ext == ".png" and not self.is_emoji and int() < 775:

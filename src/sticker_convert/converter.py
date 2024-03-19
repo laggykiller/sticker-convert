@@ -6,25 +6,19 @@ from io import BytesIO
 from math import ceil, floor
 from pathlib import Path
 from queue import Queue
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, List, Literal, Optional, Tuple, Union, cast
 
 import numpy as np
 from PIL import Image
 
 from sticker_convert.job_option import CompOption
-from sticker_convert.utils.callback import Callback, CallbackReturn
+from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
 if TYPE_CHECKING:
     from av.video.plane import VideoPlane  # type: ignore
-
-CbQueueItemType = Union[
-    Tuple[str, Optional[Tuple[str]], Optional[Dict[str, str]]],
-    str,
-    None,
-]
 
 MSG_START_COMP = "[I] Start compressing {} -> {}"
 MSG_SKIP_COMP = "[S] Compatible file found, skip compress and just copy {} -> {}"
@@ -89,7 +83,7 @@ class StickerConvert:
         opt_comp: CompOption,
         cb: "Union[Queue[CbQueueItemType], Callback]",
         #  cb_return: CallbackReturn
-    ):
+    ) -> None:
         self.in_f: Union[bytes, Path]
         if isinstance(in_f, Path):
             self.in_f = in_f
@@ -514,11 +508,15 @@ class StickerConvert:
     ) -> "List[np.ndarray[Any, Any]]":
         frames_out: "List[np.ndarray[Any, Any]]" = []
 
-        resample: Literal[0, 1, 2, 3]
+        resample: Literal[0, 1, 2, 3, 4, 5]
         if self.opt_comp.scale_filter == "nearest":
             resample = Image.NEAREST
+        elif self.opt_comp.scale_filter == "box":
+            resample = Image.BOX
         elif self.opt_comp.scale_filter == "bilinear":
             resample = Image.BILINEAR
+        elif self.opt_comp.scale_filter == "hamming":
+            resample = Image.HAMMING
         elif self.opt_comp.scale_filter == "bicubic":
             resample = Image.BICUBIC
         elif self.opt_comp.scale_filter == "lanczos":
