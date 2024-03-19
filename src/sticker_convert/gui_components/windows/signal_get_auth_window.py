@@ -41,15 +41,21 @@ class SignalGetAuthWindow(BaseWindow):
 
         # Start button frame
         self.launch_btn = Button(
-            self.frame_btns, text="Launch Signal Desktop", command=self.cb_launch_signal
+            self.frame_btns,
+            text="Launch Signal Desktop",
+            command=self.cb_launch_signal,
+            bootstyle="secondary",  # type: ignore
         )
 
-        self.login_btn = Button(
-            self.frame_btns, text="Get uuid and password", command=self.cb_login
+        self.get_cred_btn = Button(
+            self.frame_btns,
+            text="Get uuid and password",
+            command=self.cb_get_cred,
+            bootstyle="default",  # type: ignore
         )
 
         self.launch_btn.pack()
-        self.login_btn.pack()
+        self.get_cred_btn.pack()
 
         # Config frame
         self.setdir_lbl = Label(
@@ -78,7 +84,7 @@ class SignalGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_login(self) -> None:
+    def cb_get_cred(self) -> None:
         m = GetSignalAuth()
 
         signal_bin_path = None
