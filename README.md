@@ -94,20 +94,20 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-whatsapp | --export-imessage]
                           [--no-compress]
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER]
-                          [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
-                          [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--quality-min QUALITY_MIN]
-                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
-                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--scale-filter SCALE_FILTER]
-                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--default-emoji DEFAULT_EMOJI]
-                          [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                          [--signal-data-dir SIGNAL_DATA_DIR] [--telegram-token TELEGRAM_TOKEN]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
+                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
+                          [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
+                          [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER]
+                          [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX]
+                          [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
+                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
+                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                          [--signal-get-auth] [--signal-data-dir SIGNAL_DATA_DIR] [--telegram-token TELEGRAM_TOKEN]
                           [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
                           [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]
-                          [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
+                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
+                          [--line-get-auth] [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
@@ -208,7 +208,9 @@ Compression options:
   --scale-filter SCALE_FILTER
                         Set scale filter. Default as lanczos. Valid options are:
                         - nearest = Use nearest neighbour (Suitable for pixel art)
-                        - bilinear = linear interpolation
+                        -box = Similar to nearest, but better downscaling
+                        - bilinear = Linear interpolation
+                        - hamming = Similar to bilinear, but better downscaling
                         - bicubic = Cubic spline interpolation
                         - lanczos = A high-quality downsampling filter
   --quantize-method QUANTIZE_METHOD

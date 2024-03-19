@@ -11,7 +11,7 @@ from multiprocessing.managers import ListProxy, SyncManager
 from pathlib import Path
 from queue import Queue
 from threading import Thread
-from typing import Any, Callable, Dict, Generator, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Iterator, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
@@ -30,8 +30,12 @@ from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 
 CbQueueType = Queue[CbQueueItemType]
-# mypy complains about this
-WorkListType = ListProxy[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]]  # type: ignore
+WorkListItemType = Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]
+if TYPE_CHECKING:
+    # mypy complains about this
+    WorkListType = ListProxy[WorkListItemType]  # type: ignore
+else:
+    WorkListType = List[WorkListItemType]
 
 
 class Executor:
