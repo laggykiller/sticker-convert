@@ -117,11 +117,16 @@ class Executor:
         cb_return: CallbackReturn,
     ) -> None:
         while True:
-            work = work_list.pop(0)
+            try:
+                work = work_list.pop(0)
+            except IndexError:
+                break
+
             if work is None:
                 break
             else:
                 work_func, work_args = work
+
             try:
                 results = work_func(*work_args, cb_queue, cb_return)
                 results_queue.put(results)
@@ -141,9 +146,6 @@ class Executor:
         work_list.append(None)
 
     def start_workers(self, processes: int = 1) -> None:
-        # Would contain None from previous run
-        self.work_list = self.manager.list()
-
         for _ in range(processes):
             process = Process(
                 target=Executor.worker,
@@ -173,7 +175,7 @@ class Executor:
             pass
 
         self.results_queue.put(None)
-
+        self.work_list = self.manager.list()
         self.processes.clear()
 
     def kill_workers(self, *_: Any, **__: Any) -> None:
@@ -192,6 +194,7 @@ class Executor:
     def cleanup(self) -> None:
         self.cb_queue.put(None)
         self.cb_thread_instance.join()
+        self.work_list = self.manager.list()
 
     def get_result(self) -> Generator[Any, None, None]:
         gen: Iterator[Any] = iter(self.results_queue.get, None)
@@ -542,14 +545,13 @@ class Job:
             self.executor.cb("Nothing to download")
             return True
 
-        self.executor.start_workers(processes=1)
-
         for downloader in downloaders:
             self.executor.add_work(
                 work_func=downloader,
                 work_args=(self.opt_input.url, self.opt_input.dir, self.opt_cred),
             )
 
+        self.executor.start_workers(processes=1)
         self.executor.join_workers()
 
         # Return False if any of the job returns failure
@@ -615,8 +617,6 @@ class Job:
             "bar", kwargs={"set_progress_mode": "determinate", "steps": in_fs_count}
         )
 
-        self.executor.start_workers(processes=min(self.opt_comp.processes, in_fs_count))
-
         for i in in_fs:
             in_f = input_dir / i.name
             out_f = output_dir / Path(i).stem
@@ -625,6 +625,7 @@ class Job:
                 work_func=StickerConvert.convert, work_args=(in_f, out_f, self.opt_comp)
             )
 
+        self.executor.start_workers(processes=min(self.opt_comp.processes, in_fs_count))
         self.executor.join_workers()
 
         # Return False if any of the job returns failure
@@ -658,14 +659,13 @@ class Job:
         if self.opt_output.option == "imessage":
             exporters.append(XcodeImessage.start)
 
-        self.executor.start_workers(processes=1)
-
         for exporter in exporters:
             self.executor.add_work(
                 work_func=exporter,
                 work_args=(self.opt_output, self.opt_comp, self.opt_cred),
             )
-
+        
+        self.executor.start_workers(processes=1)
         self.executor.join_workers()
 
         for result in self.executor.get_result():
