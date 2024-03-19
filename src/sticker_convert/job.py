@@ -7,7 +7,7 @@ import shutil
 import traceback
 from datetime import datetime
 from multiprocessing import Process, Value
-from multiprocessing.managers import SyncManager, ListProxy
+from multiprocessing.managers import ListProxy, SyncManager
 from pathlib import Path
 from queue import Queue
 from threading import Thread
@@ -30,7 +30,9 @@ from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 
 CbQueueType = Queue[CbQueueItemType]
-WorkListType = ListProxy[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]]
+# mypy complains about this
+WorkListType = ListProxy[Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]]  # type: ignore
+
 
 class Executor:
     def __init__(
@@ -395,7 +397,9 @@ class Job:
             error_msg += (
                 f"[X] scale_filter {self.opt_comp.scale_filter} is not valid option"
             )
-            error_msg += "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
+            error_msg += (
+                "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
+            )
 
         if self.opt_comp.quantize_method not in ("imagequant", "fastoctree", "none"):
             error_msg += "\n"

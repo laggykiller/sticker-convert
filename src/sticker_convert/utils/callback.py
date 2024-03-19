@@ -4,12 +4,15 @@ from typing import Any, Callable, Dict, Optional, Tuple, Union
 
 from tqdm import tqdm
 
-CbQueueTupleType = Tuple[Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, Any]]]
+CbQueueTupleType = Tuple[
+    Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, Any]]
+]
 CbQueueItemType = Union[
     CbQueueTupleType,
     str,
     None,
 ]
+
 
 class CallbackReturn:
     def __init__(self) -> None:
