@@ -7,7 +7,7 @@ import shutil
 import traceback
 from datetime import datetime
 from multiprocessing import Process, Value
-from multiprocessing.managers import ListProxy, SyncManager
+from multiprocessing.managers import ListProxy, RemoteError, SyncManager
 from pathlib import Path
 from queue import Queue
 from threading import Thread
@@ -119,7 +119,7 @@ class Executor:
         while True:
             try:
                 work = work_list.pop(0)
-            except IndexError:
+            except (IndexError, RemoteError):
                 break
 
             if work is None:

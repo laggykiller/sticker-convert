@@ -36,10 +36,16 @@ class GetSignalAuth:
                 "~/Library/Application Support/Signal Beta"
             )
         else:
-            if not (signal_bin_path_prod := shutil.which("signal-desktop")):  # type: ignore
+            prod_which = shutil.which("signal-desktop")
+            if prod_which is None:
                 signal_bin_path_prod = "signal-desktop"
-            if not (signal_bin_path_beta := shutil.which("signal-desktop-beta")):  # type: ignore
+            else:
+                signal_bin_path_prod = prod_which
+            beta_which = shutil.which("signal-desktop-beta")
+            if beta_which is None:
                 signal_bin_path_beta = "signal-desktop-beta"
+            else:
+                signal_bin_path_beta = beta_which
             signal_user_data_dir_prod = os.path.expanduser("~/.config/Signal")
             signal_user_data_dir_beta = os.path.expanduser("~/.config/Signal Beta")
 

@@ -135,7 +135,7 @@ class CLI:
                 continue
             parser_comp.add_argument(
                 f'--{k.replace("_", "-")}',
-                **keyword_args,  # type: ignore
+                **keyword_args,
                 dest=k,
                 help=v,
             )
@@ -154,7 +154,7 @@ class CLI:
                 keyword_args = {"action": "store_true"}
             parser_cred.add_argument(
                 f'--{k.replace("_", "-")}',
-                **keyword_args,  # type: ignore
+                **keyword_args,
                 dest=k,
                 help=v,
             )
