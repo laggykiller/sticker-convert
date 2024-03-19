@@ -143,7 +143,7 @@ class Executor:
                 e += traceback.format_exc()
                 e += "#####################"
                 cb_queue.put(e)
-        
+
         try:
             work_list.append(None)
         except RemoteError:
