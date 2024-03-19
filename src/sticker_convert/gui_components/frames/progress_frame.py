@@ -15,6 +15,12 @@ class ProgressFrame(LabelFrame):
     progress_bar_cli = None
     progress_bar_steps = 0
     auto_scroll = True
+    msg_cls = False
+    msg_buffer = ""
+    bar_mode_changed = False
+    bar_mode = 0
+    bar_updates = 0
+    bar_steps = 0
 
     def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
         self.gui = gui
@@ -31,64 +37,105 @@ class ProgressFrame(LabelFrame):
         self.message_box.pack(expand=True, fill="x")
         self.progress_bar.pack(expand=True, fill="x")
 
+        self.after(40, self.update_ui)
+
     def update_progress_bar(
         self,
         set_progress_mode: Optional[str] = None,
         steps: int = 0,
-        update_bar: bool = False,
+        update_bar: int = 0,
     ) -> None:
-        if update_bar and self.progress_bar_cli:
-            self.progress_bar_cli.update()
-            self.progress_bar["value"] += 100 / self.progress_bar_steps
+        if update_bar:
+            self.bar_updates += update_bar
         elif set_progress_mode == "determinate":
-            self.progress_bar_cli = tqdm(total=steps)
-            self.progress_bar.config(mode="determinate")
-            self.progress_bar_steps = steps
-            self.progress_bar.stop()
-            self.progress_bar["value"] = 0
+            self.bar_mode = 2
+            self.bar_steps = steps
+            self.bar_updates = 0
+            self.bar_mode_changed = True
         elif set_progress_mode == "indeterminate":
-            if self.progress_bar_cli:
-                self.progress_bar_cli.close()
-                self.progress_bar_cli = None
-            self.progress_bar["value"] = 0
-            self.progress_bar.config(mode="indeterminate")
-            self.progress_bar.start(50)
+            self.bar_mode = 1
+            self.bar_steps = 0
+            self.bar_updates = 0
+            self.bar_mode_changed = True
         elif set_progress_mode == "clear":
-            if self.progress_bar_cli:
-                self.progress_bar_cli.reset()
-            self.progress_bar.config(mode="determinate")
-            self.progress_bar.stop()
-            self.progress_bar["value"] = 0
+            self.bar_mode = 0
+            self.bar_steps = 0
+            self.bar_updates = 0
+            self.bar_mode_changed = True
 
     def update_message_box(self, *args: Any, **kwargs: Any) -> None:
         msg = kwargs.get("msg")
         cls = kwargs.get("cls")
-        file = kwargs.get("file")
 
         if not msg and len(args) == 1:
             msg = str(args[0])
 
-        if msg:
-            if self.progress_bar_cli:
-                self.progress_bar_cli.write(msg)
-            elif file:
-                print(msg, file=file)
-            else:
-                print(msg)
-            msg += "\n"
-
-        self.message_box._text.config(state="normal")  # type: ignore
-
         if cls:
-            self.message_box.delete(1.0, "end")  # type: ignore
+            self.msg_cls = True
+            self.msg_buffer = ""
 
         if msg:
-            self.message_box.insert("end", msg)  # type: ignore
+            self.msg_buffer += msg + "\n"
 
-            if self.auto_scroll:
-                self.message_box._text.yview_moveto(1.0)  # type: ignore
+    def update_ui(self) -> None:
+        if self.msg_cls or self.msg_buffer:
+            self.message_box._text.config(state="normal")  # type: ignore
 
-        self.message_box._text.config(state="disabled")  # type: ignore
+            if self.msg_cls:
+                self.message_box.delete(1.0, "end")  # type: ignore
+
+            if self.msg_buffer:
+                msg = self.msg_buffer.strip()
+                if self.progress_bar_cli:
+                    self.progress_bar_cli.write(msg)
+                else:
+                    print(msg)
+
+                self.message_box.insert("end", msg + "\n")  # type: ignore
+
+                if self.auto_scroll:
+                    self.message_box._text.yview_moveto(1.0)  # type: ignore
+
+            self.msg_cls = False
+            self.msg_buffer = ""
+
+            self.message_box._text.config(state="disabled")  # type: ignore
+
+        if self.bar_mode_changed:
+            if self.bar_mode == 2:
+                self.progress_bar_cli = tqdm(total=self.progress_bar_steps)
+                self.progress_bar.config(mode="determinate")
+                self.progress_bar_steps = self.progress_bar_steps
+                self.progress_bar.stop()
+                self.progress_bar["value"] = 0
+
+            elif self.bar_mode == 1:
+                if self.progress_bar_cli:
+                    self.progress_bar_cli.close()
+                    self.progress_bar_cli = None
+                self.progress_bar["value"] = 0
+                self.progress_bar.config(mode="indeterminate")
+                self.progress_bar.start(50)
+
+            elif self.bar_mode == 0:
+                if self.progress_bar_cli:
+                    self.progress_bar_cli.close()
+                    self.progress_bar_cli = None
+                self.progress_bar.config(mode="determinate")
+                self.progress_bar.stop()
+                self.progress_bar["value"] = 0
+
+        if self.bar_updates and self.bar_mode == 2 and self.progress_bar_cli:
+            self.progress_bar_cli.update(self.bar_updates)
+            self.progress_bar["value"] += (
+                100 / self.progress_bar_steps * self.bar_updates
+            )
+            self.update_progress_bar(update_bar=self.bar_updates)
+
+        self.bar_mode_changed = False
+        self.bar_updates = 0
+
+        self.after(40, self.update_ui)
 
     def cb_disable_autoscroll(self, *_: Any) -> None:
         self.auto_scroll = False

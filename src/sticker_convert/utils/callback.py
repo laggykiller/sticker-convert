@@ -79,7 +79,6 @@ class Callback:
             return
 
         msg = kwargs.get("msg")
-        file = kwargs.get("file")
 
         if not msg and len(args) == 1:
             msg = str(args[0])
@@ -87,8 +86,6 @@ class Callback:
         if msg:
             if self.progress_bar:
                 self.progress_bar.write(msg)
-            elif file:
-                print(msg, file=file)
             else:
                 print(msg)
 
@@ -96,19 +93,17 @@ class Callback:
         self,
         set_progress_mode: Optional[str] = None,
         steps: int = 0,
-        update_bar: bool = False,
+        update_bar: int = 0,
     ) -> None:
         if self.silent:
             return
 
         if self.progress_bar:
             if update_bar:
-                self.progress_bar.update()
-            elif set_progress_mode == "indeterminate":
+                self.progress_bar.update(update_bar)
+            elif set_progress_mode in ("indeterminate", "clear"):
                 self.progress_bar.close()
                 self.progress_bar = None
-            elif set_progress_mode == "clear":
-                self.progress_bar.reset()
         elif set_progress_mode == "determinate":
             self.progress_bar = tqdm(total=steps)
 
@@ -190,7 +185,7 @@ class Callback:
         elif action == "bar":
             self.bar(**kwargs)
         elif action == "update_bar":
-            self.bar(update_bar=True)
+            self.bar(update_bar=1)
         elif action == "msg_block":
             return self.msg_block(*args, **kwargs)
         elif action == "ask_bool":

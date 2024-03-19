@@ -550,9 +550,8 @@ class GUI(Window):
 
     def cancel_job(self) -> None:
         if self.job:
-            self.cb_msg(msg="Cancelling job...")
-            self.job.cancel()
-            self.cb_bar(set_progress_mode="clear")
+            # Need to start new thread or else GUI may freeze
+            Thread(target=self.job.cancel, daemon=True).start()
 
     def set_inputs(self, state: str) -> None:
         # state: 'normal', 'disabled'
@@ -639,7 +638,7 @@ class GUI(Window):
         *args: Any,
         set_progress_mode: Optional[str] = None,
         steps: int = 0,
-        update_bar: bool = False,
+        update_bar: int = 0,
         **kwargs: Any,
     ) -> None:
         with self.bar_lock:

@@ -7,11 +7,11 @@ import shutil
 import traceback
 from datetime import datetime
 from multiprocessing import Process, Value
-from multiprocessing.managers import ListProxy, RemoteError, SyncManager
+from multiprocessing.managers import ListProxy, SyncManager
 from pathlib import Path
 from queue import Queue
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, Iterator, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
@@ -99,7 +99,7 @@ class Executor:
             elif action == "bar":
                 self.cb_bar(*args, **kwargs)
             elif action == "update_bar":
-                self.cb_bar(update_bar=True)
+                self.cb_bar(update_bar=1)
             elif action == "msg_block":
                 cb_return.set_response(self.cb_msg_block(*args, **kwargs))
             elif action == "ask_bool":
@@ -119,7 +119,7 @@ class Executor:
         while True:
             try:
                 work = work_list.pop(0)
-            except (IndexError, RemoteError):
+            except IndexError:
                 break
 
             if work is None:
@@ -144,10 +144,7 @@ class Executor:
                 e += "#####################"
                 cb_queue.put(e)
 
-        try:
-            work_list.append(None)
-        except RemoteError:
-            pass
+        work_list.append(None)
 
     def start_workers(self, processes: int = 1) -> None:
         for _ in range(processes):
@@ -179,7 +176,7 @@ class Executor:
             pass
 
         self.results_queue.put(None)
-        self.work_list = self.manager.list()
+        self.work_list[:] = []
         self.processes.clear()
 
     def kill_workers(self, *_: Any, **__: Any) -> None:
@@ -192,16 +189,17 @@ class Executor:
                 process.close()
             process.join()
 
-        self.cleanup()
+        self.cleanup(killed=True)
 
-    def cleanup(self) -> None:
+    def cleanup(self, killed: bool = False) -> None:
+        if killed:
+            self.cb_queue.put("Job cancelled.")
+        self.cb_queue.put(("bar", None, {"set_progress_mode": "clear"}))
         self.cb_queue.put(None)
         self.cb_thread_instance.join()
-        self.work_list = self.manager.list()
 
     def get_result(self) -> Generator[Any, None, None]:
-        gen: Iterator[Any] = iter(self.results_queue.get, None)
-        yield from gen
+        yield from iter(self.results_queue.get, None)
 
     def cb(
         self,
@@ -271,14 +269,12 @@ class Job:
 
             if self.executor.is_cancel_job.value == 1:  # type: ignore
                 code = 2
-                self.executor.cb("Job cancelled.")
                 break
             if not success:
                 code = 1
                 self.executor.cb("An error occured during this run.")
                 break
 
-        self.executor.cb("bar", kwargs={"set_progress_mode": "clear"})
         self.executor.cleanup()
 
         return code

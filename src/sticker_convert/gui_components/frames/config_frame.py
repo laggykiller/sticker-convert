@@ -42,7 +42,7 @@ class ConfigFrame(LabelFrame):
         )
 
         self.settings_restore_default_lbl = Label(
-            self, text="Restore default config", width=18, justify="left", anchor="w"
+            self, text="Default config", width=18, justify="left", anchor="w"
         )
         self.settings_restore_default_btn = Button(
             self,
