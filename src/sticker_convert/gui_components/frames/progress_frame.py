@@ -18,7 +18,7 @@ class ProgressFrame(LabelFrame):
     msg_cls = False
     msg_buffer = ""
     bar_mode_changed = False
-    bar_mode = 0
+    bar_mode = "clear"
     bar_updates = 0
     bar_steps = 0
 
@@ -47,19 +47,9 @@ class ProgressFrame(LabelFrame):
     ) -> None:
         if update_bar:
             self.bar_updates += update_bar
-        elif set_progress_mode == "determinate":
-            self.bar_mode = 2
+        elif set_progress_mode:
+            self.bar_mode = set_progress_mode
             self.bar_steps = steps
-            self.bar_updates = 0
-            self.bar_mode_changed = True
-        elif set_progress_mode == "indeterminate":
-            self.bar_mode = 1
-            self.bar_steps = 0
-            self.bar_updates = 0
-            self.bar_mode_changed = True
-        elif set_progress_mode == "clear":
-            self.bar_mode = 0
-            self.bar_steps = 0
             self.bar_updates = 0
             self.bar_mode_changed = True
 
@@ -102,30 +92,25 @@ class ProgressFrame(LabelFrame):
             self.message_box._text.config(state="disabled")  # type: ignore
 
         if self.bar_mode_changed:
-            if self.bar_mode == 2:
-                self.progress_bar_cli = tqdm(total=self.progress_bar_steps)
+            if self.bar_mode == "determinate":
+                self.progress_bar_cli = tqdm(total=self.bar_steps)
                 self.progress_bar.config(mode="determinate")
-                self.progress_bar_steps = self.progress_bar_steps
+                self.progress_bar_steps = self.bar_steps
                 self.progress_bar.stop()
-                self.progress_bar["value"] = 0
+            elif self.progress_bar_cli:
+                self.progress_bar_cli.close()
+                self.progress_bar_cli = None
 
-            elif self.bar_mode == 1:
-                if self.progress_bar_cli:
-                    self.progress_bar_cli.close()
-                    self.progress_bar_cli = None
-                self.progress_bar["value"] = 0
+            if self.bar_mode == "indeterminate":
                 self.progress_bar.config(mode="indeterminate")
                 self.progress_bar.start(50)
-
-            elif self.bar_mode == 0:
-                if self.progress_bar_cli:
-                    self.progress_bar_cli.close()
-                    self.progress_bar_cli = None
+            elif self.bar_mode == "clear":
                 self.progress_bar.config(mode="determinate")
                 self.progress_bar.stop()
-                self.progress_bar["value"] = 0
 
-        if self.bar_updates and self.bar_mode == 2 and self.progress_bar_cli:
+            self.progress_bar["value"] = 0
+
+        if self.bar_updates and self.progress_bar_cli:
             self.progress_bar_cli.update(self.bar_updates)
             self.progress_bar["value"] += (
                 100 / self.progress_bar_steps * self.bar_updates
