@@ -139,7 +139,6 @@ class ProgressFrame(LabelFrame):
                 self.progress_bar["value"] += (
                     100 / self.progress_bar_steps * bar_updates
                 )
-                self.update_progress_bar(update_bar=bar_updates)
 
         self.after(40, self.update_ui)
 
