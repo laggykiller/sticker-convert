@@ -8,7 +8,7 @@ from json.decoder import JSONDecodeError
 from math import ceil
 from multiprocessing import Event, cpu_count
 from pathlib import Path
-from threading import Lock, Thread
+from threading import Thread
 from typing import Any, Callable, Dict, Optional, Union
 from urllib.parse import urlparse
 
@@ -161,8 +161,6 @@ class GUI(Window):
         self.settings_save_cred_var = BooleanVar()
 
         # Other
-        self.msg_lock = Lock()
-        self.bar_lock = Lock()
         self.response_event = Event()
         self.response = None
         self.action: Optional[Callable[..., Any]] = None
@@ -609,8 +607,7 @@ class GUI(Window):
         return False
 
     def cb_msg(self, *args: Any, **kwargs: Any) -> None:
-        with self.msg_lock:
-            self.progress_frame.update_message_box(*args, **kwargs)
+        self.progress_frame.update_message_box(*args, **kwargs)
 
     def cb_msg_block(
         self,
@@ -641,10 +638,9 @@ class GUI(Window):
         update_bar: int = 0,
         **kwargs: Any,
     ) -> None:
-        with self.bar_lock:
-            self.progress_frame.update_progress_bar(
-                set_progress_mode, steps, update_bar, *args, **kwargs
-            )
+        self.progress_frame.update_progress_bar(
+            set_progress_mode, steps, update_bar, *args, **kwargs
+        )
 
     def highlight_fields(self) -> bool:
         if not self.init_done:
