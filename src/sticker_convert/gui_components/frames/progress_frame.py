@@ -98,7 +98,7 @@ class ProgressFrame(LabelFrame):
                 else:
                     print(msg)
 
-                self.message_box.insert("end", msg)  # type: ignore
+                self.message_box.insert("end", msg + "\n")  # type: ignore
 
                 if self.auto_scroll:
                     self.message_box._text.yview_moveto(1.0)  # type: ignore
