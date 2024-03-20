@@ -51,7 +51,6 @@ class ProgressFrame(LabelFrame):
         steps: int = 0,
         update_bar: int = 0,
     ) -> None:
-        
         if update_bar:
             with self.bar_lock:
                 self.bar_updates += update_bar
@@ -69,7 +68,7 @@ class ProgressFrame(LabelFrame):
 
         if not msg and len(args) == 1:
             msg = str(args[0])
-        
+
         if msg:
             with self.msg_lock:
                 self.msg_buffer.append(msg)
@@ -87,7 +86,7 @@ class ProgressFrame(LabelFrame):
 
                 self.msg_cls = False
                 self.msg_buffer.clear()
-            
+
             self.message_box._text.config(state="normal")  # type: ignore
 
             if msg_cls:
@@ -105,7 +104,7 @@ class ProgressFrame(LabelFrame):
                     self.message_box._text.yview_moveto(1.0)  # type: ignore
 
             self.message_box._text.config(state="disabled")  # type: ignore
-        
+
         if self.bar_mode_changed or self.bar_updates:
             with self.bar_lock:
                 bar_mode_changed = self.bar_mode_changed
@@ -115,7 +114,7 @@ class ProgressFrame(LabelFrame):
 
                 self.bar_mode_changed = False
                 self.bar_updates = 0
-            
+
             if bar_mode_changed:
                 if bar_mode == "determinate":
                     self.progress_bar_cli = tqdm(total=bar_steps)
