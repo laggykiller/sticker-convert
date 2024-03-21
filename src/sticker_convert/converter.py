@@ -453,11 +453,11 @@ class StickerConvert:
 
                         yuv_array = yuv_array.astype(np.float32)
                         yuv_array[:, :, 0] = (
-                            yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype)
+                            yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype)  # type: ignore
                             - 16
                         )
                         yuv_array[:, :, 1:] = (
-                            yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype)
+                            yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype)  # type: ignore
                             - 128
                         )
 

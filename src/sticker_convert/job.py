@@ -29,7 +29,6 @@ from sticker_convert.utils.files.json_resources_loader import OUTPUT_JSON
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 
-CbQueueType = Queue[CbQueueItemType]
 WorkListItemType = Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]
 if TYPE_CHECKING:
     # mypy complains about this
@@ -59,7 +58,7 @@ class Executor:
         # Especially when using scale_filter=nearest
         self.work_list: WorkListType = self.manager.list()
         self.results_queue: Queue[Any] = self.manager.Queue()
-        self.cb_queue: CbQueueType = self.manager.Queue()
+        self.cb_queue: Queue[CbQueueItemType] = self.manager.Queue()
         self.cb_return = CallbackReturn()
         self.processes: List[Process] = []
 
@@ -76,7 +75,7 @@ class Executor:
 
     def cb_thread(
         self,
-        cb_queue: CbQueueType,
+        cb_queue: Queue[CbQueueItemType],
         cb_return: CallbackReturn,
     ) -> None:
         for i in iter(cb_queue.get, None):
@@ -113,7 +112,7 @@ class Executor:
     def worker(
         work_list: WorkListType,
         results_queue: Queue[Any],
-        cb_queue: CbQueueType,
+        cb_queue: Queue[CbQueueItemType],
         cb_return: CallbackReturn,
     ) -> None:
         while True:
