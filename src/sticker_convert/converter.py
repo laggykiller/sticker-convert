@@ -6,7 +6,7 @@ from io import BytesIO
 from math import ceil, floor
 from pathlib import Path
 from queue import Queue
-from typing import TYPE_CHECKING, Any, List, Literal, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import numpy as np
 from PIL import Image
@@ -378,10 +378,10 @@ class StickerConvert:
                 self.frames_raw.append(np.asarray(im.convert("RGBA")))
 
     def _frames_import_pyav(self) -> None:
-        import av  # type: ignore
-        from av.codec.context import CodecContext  # type: ignore
-        from av.container.input import InputContainer  # type: ignore
-        from av.video.codeccontext import VideoCodecContext  # type: ignore
+        import av
+        from av.codec.context import CodecContext
+        from av.container.input import InputContainer
+        from av.video.codeccontext import VideoCodecContext
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
@@ -390,16 +390,15 @@ class StickerConvert:
             file = self.in_f.as_posix()
         else:
             file = BytesIO(self.in_f)
-        with av.open(file) as container:  # type: ignore
+        with av.open(file) as container:
             container = cast(InputContainer, container)
             context = container.streams.video[0].codec_context
             if context.name == "vp8":
-                context = CodecContext.create("libvpx", "r")  # type: ignore
+                context = cast(VideoCodecContext, CodecContext.create("libvpx", "r"))
             elif context.name == "vp9":
-                context = CodecContext.create("libvpx-vp9", "r")  # type: ignore
-            context = cast(VideoCodecContext, context)
+                context = cast(VideoCodecContext, CodecContext.create("libvpx-vp9", "r"))
 
-            for packet in container.demux(container.streams.video):  # type: ignore
+            for packet in container.demux(container.streams.video):
                 for frame in context.decode(packet):
                     if frame.width % 2 != 0:
                         width = frame.width - 1
@@ -410,22 +409,22 @@ class StickerConvert:
                     else:
                         height = frame.height
                     if frame.format.name == "yuv420p":
-                        rgb_array = frame.to_ndarray(format="rgb24")  # type: ignore
+                        rgb_array = frame.to_ndarray(format="rgb24")
                         cast("np.ndarray[Any, Any]", rgb_array)
                         rgba_array = np.dstack(
                             (
                                 rgb_array,
                                 np.zeros(rgb_array.shape[:2], dtype=np.uint8) + 255,
-                            )  # type: ignore
+                            )
                         )
                     else:
                         # yuva420p may cause crash
                         # https://github.com/laggykiller/sticker-convert/issues/114
-                        frame = frame.reformat(  # type: ignore
+                        frame = frame.reformat(
                             width=width,
                             height=height,
                             format="yuva420p",
-                            dst_colorspace=1,  # type: ignore
+                            dst_colorspace=1,
                         )
 
                         # https://stackoverflow.com/questions/72308308/converting-yuv-to-rgb-in-python-coefficients-work-with-array-dont-work-with-n
@@ -452,11 +451,11 @@ class StickerConvert:
 
                         yuv_array = yuv_array.astype(np.float32)
                         yuv_array[:, :, 0] = (
-                            yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype)  # type: ignore
+                            yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype)
                             - 16
                         )
                         yuv_array[:, :, 1:] = (
-                            yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype)  # type: ignore
+                            yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype)
                             - 128
                         )
 
@@ -629,11 +628,10 @@ class StickerConvert:
             )
 
     def _frames_export_pyav(self) -> None:
-        import av  # type: ignore
-        from av.container import OutputContainer  # type: ignore
-        from av.video.stream import VideoStream  # type: ignore
+        import av
+        from av.video.stream import VideoStream
 
-        options = {}
+        options: Dict[str, str] = {}
 
         if isinstance(self.quality, int):
             # Seems not actually working
@@ -657,11 +655,10 @@ class StickerConvert:
             pixel_format = "yuv420p"
             options["loop"] = "0"
 
-        with av.open(  # type: ignore
+        with av.open(
             self.tmp_f, "w", format=self.out_f.suffix.replace(".", "")
         ) as output:
-            output = cast(OutputContainer, output)  # type: ignore
-            out_stream = output.add_stream(codec, rate=self.fps, options=options)  # type: ignore
+            out_stream = output.add_stream(codec, rate=self.fps, options=options)
             out_stream = cast(VideoStream, out_stream)
             assert isinstance(self.res_w, int) and isinstance(self.res_h, int)
             out_stream.width = self.res_w
@@ -669,12 +666,9 @@ class StickerConvert:
             out_stream.pix_fmt = pixel_format
 
             for frame in self.frames_processed:
-                av_frame = av.VideoFrame.from_ndarray(frame, format="rgba")  # type: ignore
-                for packet in out_stream.encode(av_frame):  # type: ignore
-                    output.mux(packet)  # type: ignore
-
-            for packet in out_stream.encode():  # type: ignore
-                output.mux(packet)  # type: ignore
+                av_frame = av.VideoFrame.from_ndarray(frame, format="rgba")
+                output.mux(out_stream.encode(av_frame))
+            output.mux(out_stream.encode())
 
     def _frames_export_webp(self) -> None:
         import webp  # type: ignore

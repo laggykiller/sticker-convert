@@ -230,8 +230,8 @@ class CodecInfo:
         frames_to_iterate: Optional[int] = None,
         frames_only: bool = False,
     ) -> Tuple[int, int]:
-        import av  # type: ignore
-        from av.container.input import InputContainer  # type: ignore
+        import av
+        from av.container.input import InputContainer
 
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
@@ -242,7 +242,7 @@ class CodecInfo:
         else:
             file_ref = BytesIO(file)
 
-        with av.open(file_ref) as container:  # type: ignore
+        with av.open(file_ref) as container:
             container = cast(InputContainer, container)
             stream = container.streams.video[0]
             if container.duration:
@@ -257,7 +257,7 @@ class CodecInfo:
 
             frame_count = 0
             last_frame = None
-            for frame_count, frame in enumerate(container.decode(stream)):  # type: ignore
+            for frame_count, frame in enumerate(container.decode(stream)):
                 if frames_to_iterate is not None and frame_count == frames_to_iterate:
                     break
                 last_frame = frame
@@ -310,11 +310,11 @@ class CodecInfo:
         if codec is not None:
             return codec.lower()
 
-        import av  # type: ignore
-        from av.error import InvalidDataError  # type: ignore
+        import av
+        from av.error import InvalidDataError
 
         try:
-            with av.open(file_ref) as container:  # type: ignore
+            with av.open(file_ref) as container:
                 return container.streams.video[0].codec_context.name.lower()
         except InvalidDataError:
             pass
@@ -354,7 +354,7 @@ class CodecInfo:
             else:
                 file_ref = BytesIO(file)
 
-            with av.open(file_ref) as container:  # type: ignore
+            with av.open(file_ref) as container:
                 stream = container.streams.video[0]
                 width = stream.width
                 height = stream.height
