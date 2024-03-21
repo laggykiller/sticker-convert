@@ -396,7 +396,9 @@ class StickerConvert:
             if context.name == "vp8":
                 context = cast(VideoCodecContext, CodecContext.create("libvpx", "r"))
             elif context.name == "vp9":
-                context = cast(VideoCodecContext, CodecContext.create("libvpx-vp9", "r"))
+                context = cast(
+                    VideoCodecContext, CodecContext.create("libvpx-vp9", "r")
+                )
 
             for packet in container.demux(container.streams.video):
                 for frame in context.decode(packet):
