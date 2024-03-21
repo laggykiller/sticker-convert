@@ -22,18 +22,19 @@ jobs:
     - uses: actions/setup-python@v5
       with:
         python-version: '3.8'
-    - name: Install dependency
-      run: pip install ruff mypy isort pytest
-    - name: Update emoji.json
-      run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json
-    - name: Ruff check
-      run: ruff check
     - name: Install test
       run: |
-        pip install .
+        pip install -r requirements-dev.txt
         pip install -r requirements-type.txt
+        pip install .
+    - name: Update emoji.json
+      run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json
     - name: mypy
       run: mypy
+    - name: pyright
+      run: pyright
+    - name: Ruff check
+      run: ruff check
     - name: Ruff format
       run: ruff format
     - name: isort

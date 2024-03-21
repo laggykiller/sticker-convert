@@ -1,0 +1,5 @@
+pytest
+pyright
+mypy
+isort
+ruff
