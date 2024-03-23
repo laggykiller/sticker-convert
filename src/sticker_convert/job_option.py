@@ -67,6 +67,8 @@ class CompOption(BaseOption):
     duration_min: Optional[int] = None
     duration_max: Optional[int] = None
 
+    bg_color: Optional[str] = None
+
     steps: int = 1
     fake_vid: Optional[bool] = None
     quantize_method: Optional[str] = None
@@ -101,7 +103,9 @@ class CompOption(BaseOption):
             },
             "duration": {"min": self.duration_min, "max": self.duration_max},
             "steps": self.steps,
+            "bg_color": self.bg_color,
             "fake_vid": self.fake_vid,
+            "quantize_method": self.quantize_method,
             "scale_filter": self.scale_filter,
             "cache_dir": self.cache_dir,
             "default_emoji": self.default_emoji,

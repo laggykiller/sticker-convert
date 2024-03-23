@@ -38,6 +38,7 @@
             "min": 0,
             "max": 10000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -83,6 +84,7 @@
             "min": 0,
             "max": 3000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -128,6 +130,7 @@
             "min": 0,
             "max": 3000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -173,6 +176,7 @@
             "min": 0,
             "max": 3000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -218,6 +222,7 @@
             "min": 8,
             "max": 10000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": true,
         "scale_filter": "bicubic",
@@ -263,6 +268,7 @@
             "min": 83,
             "max": 4000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -308,6 +314,7 @@
             "min": 0,
             "max": 5000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -353,6 +360,7 @@
             "min": 0,
             "max": 2000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -398,6 +406,7 @@
             "min": 0,
             "max": 2000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -443,6 +452,7 @@
             "min": 0,
             "max": 2000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",
@@ -488,6 +498,7 @@
             "min": 0,
             "max": 10000
         },
+        "bg_color": "",
         "steps": 16,
         "fake_vid": false,
         "scale_filter": "bicubic",

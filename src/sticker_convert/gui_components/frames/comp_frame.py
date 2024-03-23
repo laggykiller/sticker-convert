@@ -110,73 +110,33 @@ class CompFrame(LabelFrame):
             else:
                 self.gui.no_compress_var.set(False)
 
-        self.gui.fps_min_var.set(self.gui.compression_presets[selection]["fps"]["min"])
-        self.gui.fps_max_var.set(self.gui.compression_presets[selection]["fps"]["max"])
-        self.gui.fps_power_var.set(
-            self.gui.compression_presets[selection]["fps"]["power"]
-        )
-        self.gui.res_w_min_var.set(
-            self.gui.compression_presets[selection]["res"]["w"]["min"]
-        )
-        self.gui.res_w_max_var.set(
-            self.gui.compression_presets[selection]["res"]["w"]["max"]
-        )
-        self.gui.res_h_min_var.set(
-            self.gui.compression_presets[selection]["res"]["h"]["min"]
-        )
-        self.gui.res_h_max_var.set(
-            self.gui.compression_presets[selection]["res"]["h"]["max"]
-        )
-        self.gui.res_power_var.set(
-            self.gui.compression_presets[selection]["res"]["power"]
-        )
-        self.gui.quality_min_var.set(
-            self.gui.compression_presets[selection]["quality"]["min"]
-        )
-        self.gui.quality_max_var.set(
-            self.gui.compression_presets[selection]["quality"]["max"]
-        )
-        self.gui.quality_power_var.set(
-            self.gui.compression_presets[selection]["quality"]["power"]
-        )
-        self.gui.color_min_var.set(
-            self.gui.compression_presets[selection]["color"]["min"]
-        )
-        self.gui.color_max_var.set(
-            self.gui.compression_presets[selection]["color"]["max"]
-        )
-        self.gui.color_power_var.set(
-            self.gui.compression_presets[selection]["color"]["power"]
-        )
-        self.gui.duration_min_var.set(
-            self.gui.compression_presets[selection]["duration"]["min"]
-        )
-        self.gui.duration_max_var.set(
-            self.gui.compression_presets[selection]["duration"]["max"]
-        )
-        self.gui.img_size_max_var.set(
-            self.gui.compression_presets[selection]["size_max"]["img"]
-        )
-        self.gui.vid_size_max_var.set(
-            self.gui.compression_presets[selection]["size_max"]["vid"]
-        )
-        self.gui.img_format_var.set(
-            self.gui.compression_presets[selection]["format"]["img"]
-        )
-        self.gui.vid_format_var.set(
-            self.gui.compression_presets[selection]["format"]["vid"]
-        )
-        self.gui.fake_vid_var.set(self.gui.compression_presets[selection]["fake_vid"])
-        self.gui.scale_filter_var.set(
-            self.gui.compression_presets[selection]["scale_filter"]
-        )
-        self.gui.quantize_method_var.set(
-            self.gui.compression_presets[selection]["quantize_method"]
-        )
-        self.gui.default_emoji_var.set(
-            self.gui.compression_presets[selection]["default_emoji"]
-        )
-        self.gui.steps_var.set(self.gui.compression_presets[selection]["steps"])
+        preset = self.gui.compression_presets[selection]
+        self.gui.fps_min_var.set(preset.get("fps", {}).get("min"))
+        self.gui.fps_max_var.set(preset.get("fps", {}).get("max"))
+        self.gui.fps_power_var.set(preset.get("fps", {}).get("power"))
+        self.gui.res_w_min_var.set(preset.get("res", {}).get("w", {}).get("min"))
+        self.gui.res_w_max_var.set(preset.get("res", {}).get("w", {}).get("max"))
+        self.gui.res_h_min_var.set(preset.get("res", {}).get("h", {}).get("min"))
+        self.gui.res_h_max_var.set(preset.get("res", {}).get("h", {}).get("max"))
+        self.gui.res_power_var.set(preset.get("res", {}).get("power"))
+        self.gui.quality_min_var.set(preset.get("quality", {}).get("min"))
+        self.gui.quality_max_var.set(preset.get("quality", {}).get("max"))
+        self.gui.quality_power_var.set(preset.get("quality", {}).get("power"))
+        self.gui.color_min_var.set(preset.get("color", {}).get("min"))
+        self.gui.color_max_var.set(preset.get("color", {}).get("max"))
+        self.gui.color_power_var.set(preset.get("color", {}).get("power"))
+        self.gui.duration_min_var.set(preset.get("duration", {}).get("min"))
+        self.gui.duration_max_var.set(preset.get("duration", {}).get("max"))
+        self.gui.img_size_max_var.set(preset.get("size_max", {}).get("img"))
+        self.gui.vid_size_max_var.set(preset.get("size_max", {}).get("vid"))
+        self.gui.img_format_var.set(preset.get("format", {}).get("img"))
+        self.gui.vid_format_var.set(preset.get("format", {}).get("vid"))
+        self.gui.bg_color_var.set(preset.get("bg_color"))
+        self.gui.fake_vid_var.set(preset.get("fake_vid"))
+        self.gui.scale_filter_var.set(preset.get("scale_filter"))
+        self.gui.quantize_method_var.set(preset.get("quantize_method"))
+        self.gui.default_emoji_var.set(preset.get("default_emoji"))
+        self.gui.steps_var.set(preset.get("steps"))
 
         self.cb_no_compress()
         self.gui.highlight_fields()

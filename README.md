@@ -96,18 +96,19 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
                           [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
                           [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]        
                           [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
                           [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER]
-                          [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--vid-size-max VID_SIZE_MAX]
-                          [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
-                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
-                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
-                          [--signal-get-auth] [--signal-data-dir SIGNAL_DATA_DIR] [--telegram-token TELEGRAM_TOKEN]
+                          [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--bg-color BG_COLOR]
+                          [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
+                          [--img-format IMG_FORMAT] [--fake-vid] [--scale-filter SCALE_FILTER]
+                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--default-emoji DEFAULT_EMOJI]
+                          [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
+                          [--signal-data-dir SIGNAL_DATA_DIR] [--telegram-token TELEGRAM_TOKEN]
                           [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
                           [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
-                          [--line-get-auth] [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
+                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]  
+                          [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
@@ -152,7 +153,7 @@ Output options:
 
 Compression options:
   --no-compress         Do not compress files. Useful for only downloading stickers.
-  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}        
                         Apply preset for compression.
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
@@ -193,6 +194,10 @@ Compression options:
                         Set minimum output duration in miliseconds.
   --duration-max DURATION_MAX
                         Set maximum output duration in miliseconds.
+  --bg-color BG_COLOR   Set custom background color.
+                        Example: 00ff00 for green.
+                        If this is not set, background color would be auto set to black if image is bright, or white if image is dark.
+                        Note: The color should not be visible if output format supports transparency.
   --vid-size-max VID_SIZE_MAX
                         Set maximum file size limit for animated stickers.
   --img-size-max IMG_SIZE_MAX
@@ -236,10 +241,10 @@ Credentials options:
   --telegram-token TELEGRAM_TOKEN
                         Set Telegram token. Required for uploading and downloading Telegram stickers.
   --telegram-userid TELEGRAM_USERID
-                        Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.
+                        Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.     
   --kakao-auth-token KAKAO_AUTH_TOKEN
-                        Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx
-  --kakao-get-auth      Generate Kakao auth_token. Kakao username, password, country code and phone number are also required.
+                        Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx        
+  --kakao-get-auth      Generate Kakao auth_token. Kakao username, password, country code and phone number are also required.    
   --kakao-username KAKAO_USERNAME
                         Set Kakao username, which is email or phone number used for signing up Kakao account
                         Example: +447700900142

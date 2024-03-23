@@ -411,6 +411,15 @@ class Job:
             error_msg += f"[X] quantize_method {self.opt_comp.quantize_method} is not valid option"
             error_msg += "    Valid options: imagequant, fastoctree, none"
 
+        if self.opt_comp.bg_color:
+            try:
+                _, _, _ = bytes.fromhex(self.opt_comp.bg_color)
+            except ValueError:
+                error_msg += "\n"
+                error_msg += (
+                    f"[X] bg_color {self.opt_comp.bg_color} is not valid color hex"
+                )
+
         # Warn about unable to download animated Kakao stickers with such link
         if (
             self.opt_output.option == "kakao"

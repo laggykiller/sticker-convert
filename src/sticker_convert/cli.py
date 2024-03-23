@@ -114,6 +114,7 @@ class CLI:
         )
         flags_comp_float = ("fps_power", "res_power", "quality_power", "color_power")
         flags_comp_str = (
+            "bg_color",
             "vid_format",
             "img_format",
             "cache_dir",
@@ -350,6 +351,9 @@ class CLI:
             duration_max=self.compression_presets[preset]["duration"]["max"]
             if args.duration_max is None
             else args.duration_max,
+            bg_color=self.compression_presets[preset]["bg_color"]
+            if args.bg_color is None
+            else args.bg_color,
             steps=self.compression_presets[preset]["steps"]
             if args.steps is None
             else args.steps,

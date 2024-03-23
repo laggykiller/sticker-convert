@@ -12,6 +12,7 @@ from threading import Thread
 from typing import Any, Callable, Dict, Optional, Union
 from urllib.parse import urlparse
 
+from mergedeep import merge  # type: ignore
 from PIL import ImageFont
 from ttkbootstrap import BooleanVar, DoubleVar, IntVar, StringVar, Toplevel, Window  # type: ignore
 from ttkbootstrap.dialogs import Messagebox, Querybox  # type: ignore
@@ -127,6 +128,7 @@ class GUI(Window):
         self.img_size_max_var = IntVar(self)
         self.vid_size_max_var = IntVar(self)
         self.size_disable_var = BooleanVar()
+        self.bg_color_var = StringVar()
         self.img_format_var = StringVar(self)
         self.vid_format_var = StringVar(self)
         self.fake_vid_var = BooleanVar()
@@ -265,7 +267,12 @@ class GUI(Window):
     def save_config(self) -> None:
         # Only update comp_custom if custom preset is selected
         if self.comp_preset_var.get() == "custom":
-            comp_custom = self.get_opt_comp().to_dict()
+            comp_custom: Dict[Any, Any] = merge(  # type: ignore
+                self.compression_presets.get("custom"),  # type: ignore
+                self.get_opt_comp().to_dict(),
+            )
+            comp_custom["format"]["img"] = comp_custom["format"]["img"][0]
+            comp_custom["format"]["vid"] = comp_custom["format"]["vid"][0]
             del comp_custom["preset"]
             del comp_custom["no_compress"]
         else:
@@ -332,7 +339,9 @@ class GUI(Window):
         )
         comp_custom = self.settings.get("comp_custom")
         if comp_custom:
-            self.compression_presets["custom"] = comp_custom
+            self.compression_presets["custom"] = merge(
+                self.compression_presets["custom"], comp_custom
+            )
         self.cache_dir_var.set(self.settings.get("comp", {}).get("cache_dir", ""))
         self.processes_var.set(
             self.settings.get("comp", {}).get("processes", ceil(cpu_count() / 2))
@@ -509,6 +518,7 @@ class GUI(Window):
             duration_max=self.duration_max_var.get()
             if not self.duration_disable_var.get()
             else None,
+            bg_color=self.bg_color_var.get(),
             steps=self.steps_var.get(),
             fake_vid=self.fake_vid_var.get(),
             scale_filter=self.scale_filter_var.get(),

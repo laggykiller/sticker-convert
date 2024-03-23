@@ -526,6 +526,26 @@ class StickerConvert:
         else:
             resample = Image.BICUBIC
 
+        if not self.opt_comp.bg_color:
+            # Calculate average color of all frames for selecting background color
+            frames_raw_np = np.array(self.frames_raw)
+            s = frames_raw_np.shape
+            colors = frames_raw_np.reshape((-1, s[3]))  # type: ignore
+            # Do not count in alpha=0
+            # If alpha > 0, use alpha as weight
+            colors = colors[colors[:, 3] != 0]
+            if colors.shape[0] == 0:
+                bg = (0, 0, 0, 0)
+            else:
+                colors = colors * (colors[3] / 255)
+                if np.mean(colors[:, :3]) < 128:
+                    bg = (255, 255, 255, 0)
+                else:
+                    bg = (0, 0, 0, 0)
+        else:
+            r, g, b = bytes.fromhex(self.opt_comp.bg_color)
+            bg = (r, g, b, 0)
+
         for frame in frames_in:
             with Image.fromarray(frame, "RGBA") as im:  # type: ignore
                 width, height = im.size
@@ -543,10 +563,8 @@ class StickerConvert:
                 width_new = width * self.res_h // height
 
             with im.resize((width_new, height_new), resample=resample) as im_resized:
-                with Image.new(
-                    "RGBA", (self.res_w, self.res_h), (0, 0, 0, 0)
-                ) as im_new:
-                    im_new.paste(
+                with Image.new("RGBA", (self.res_w, self.res_h), bg) as im_new:
+                    im_new.alpha_composite(
                         im_resized,
                         ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2),
                     )

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from functools import partial
+from tkinter import colorchooser
 from typing import Any, List, Tuple
 
 from PIL import Image, ImageDraw, ImageTk
@@ -13,7 +14,7 @@ from sticker_convert.gui_components.windows.base_window import BaseWindow
 
 
 class AdvancedCompressionWindow(BaseWindow):
-    emoji_column_per_row = 10
+    emoji_column_per_row = 8
     emoji_visible_rows = 5
     emoji_btns: List[Tuple[Button, ImageTk.PhotoImage]] = []
 
@@ -33,15 +34,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         self.frame_advcomp.grid_columnconfigure(6, weight=1)
 
-        cb_msg_block_adv_comp_win = partial(self.gui.cb_msg_block, parent=self)
-
-        self.fps_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(self.gui.help["comp"]["fps"]),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.fps_help_btn = self.add_help_btn(self.gui.help["comp"]["fps"])
         self.fps_lbl = Label(self.frame_advcomp, text="Output FPS")
         self.fps_min_lbl = Label(self.frame_advcomp, text="Min:")
         self.fps_min_entry = Entry(
@@ -63,13 +56,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
-        self.res_w_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(self.gui.help["comp"]["res"]),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.res_w_help_btn = self.add_help_btn(self.gui.help["comp"]["res"])
         self.res_w_lbl = Label(self.frame_advcomp, text="Output resolution (Width)")
         self.res_w_min_lbl = Label(self.frame_advcomp, text="Min:")
         self.res_w_min_entry = Entry(
@@ -91,13 +78,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
-        self.res_h_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(self.gui.help["comp"]["res"]),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.res_h_help_btn = self.add_help_btn(self.gui.help["comp"]["res"])
         self.res_h_lbl = Label(self.frame_advcomp, text="Output resolution (Height)")
         self.res_h_min_lbl = Label(self.frame_advcomp, text="Min:")
         self.res_h_min_entry = Entry(
@@ -119,13 +100,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
-        self.quality_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(self.gui.help["comp"]["quality"]),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.quality_help_btn = self.add_help_btn(self.gui.help["comp"]["quality"])
         self.quality_lbl = Label(self.frame_advcomp, text="Output quality (0-100)")
         self.quality_min_lbl = Label(self.frame_advcomp, text="Min:")
         self.quality_min_entry = Entry(
@@ -147,13 +122,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
-        self.color_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(self.gui.help["comp"]["color"]),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.color_help_btn = self.add_help_btn(self.gui.help["comp"]["color"])
         self.color_lbl = Label(self.frame_advcomp, text="Colors (0-256)")
         self.color_min_lbl = Label(self.frame_advcomp, text="Min:")
         self.color_min_entry = Entry(
@@ -175,15 +144,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
-        self.duration_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["duration"]
-            ),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.duration_help_btn = self.add_help_btn(self.gui.help["comp"]["duration"])
         self.duration_lbl = Label(self.frame_advcomp, text="Duration (Miliseconds)")
         self.duration_min_lbl = Label(self.frame_advcomp, text="Min:")
         self.duration_min_entry = Entry(
@@ -205,13 +166,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
-        self.size_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(self.gui.help["comp"]["size"]),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.size_help_btn = self.add_help_btn(self.gui.help["comp"]["size"])
         self.size_lbl = Label(self.frame_advcomp, text="Maximum file size (bytes)")
         self.img_size_max_lbl = Label(self.frame_advcomp, text="Img:")
         self.img_size_max_entry = Entry(
@@ -233,13 +188,7 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
-        self.format_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(self.gui.help["comp"]["format"]),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.format_help_btn = self.add_help_btn(self.gui.help["comp"]["format"])
         self.format_lbl = Label(self.frame_advcomp, text="File format")
         self.img_format_lbl = Label(self.frame_advcomp, text="Img:")
         self.img_format_entry = Entry(
@@ -252,15 +201,7 @@ class AdvancedCompressionWindow(BaseWindow):
         )
         self.vid_format_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
-        self.power_help_btn1 = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["fps_power"]
-            ),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.power_help_btn1 = self.add_help_btn(self.gui.help["comp"]["fps_power"])
         self.power_lbl1 = Label(self.frame_advcomp, text="Power (Importance)")
         self.fps_power_lbl = Label(self.frame_advcomp, text="FPS:")
         self.fps_power_entry = Entry(
@@ -273,15 +214,7 @@ class AdvancedCompressionWindow(BaseWindow):
         )
         self.res_power_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
-        self.power_help_btn2 = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["fps_power"]
-            ),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.power_help_btn2 = self.add_help_btn(self.gui.help["comp"]["fps_power"])
         self.power_lbl2 = Label(self.frame_advcomp, text="Power (Importance)")
         self.quality_power_lbl = Label(self.frame_advcomp, text="Quality:")
         self.quality_power_entry = Entry(
@@ -294,15 +227,7 @@ class AdvancedCompressionWindow(BaseWindow):
         )
         self.color_power_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
-        self.fake_vid_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["fake_vid"]
-            ),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.fake_vid_help_btn = self.add_help_btn(self.gui.help["comp"]["fake_vid"])
         self.fake_vid_lbl = Label(
             self.frame_advcomp, text="Convert (faking) image to video"
         )
@@ -314,14 +239,20 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="success-round-toggle",  # type: ignore
         )
 
-        self.scale_filter_help_btn = Button(
+        self.bg_color_help_btn = self.add_help_btn(self.gui.help["comp"]["bg_color"])
+        self.bg_color_lbl = Label(self.frame_advcomp, text="Background color")
+        self.bg_color_entry = Entry(
+            self.frame_advcomp, textvariable=self.gui.bg_color_var, width=8
+        )
+        self.bg_color_btn = Button(
             self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["scale_filter"]
-            ),
+            text="Set",
+            command=self.cb_bg_color,
             bootstyle="secondary",  # type: ignore
+        )
+
+        self.scale_filter_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["scale_filter"]
         )
         self.scale_filter_lbl = Label(self.frame_advcomp, text="Scale filter")
         self.scale_filter_opt = OptionMenu(
@@ -337,14 +268,8 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
 
-        self.quantize_method_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["quantize_method"]
-            ),
-            bootstyle="secondary",  # type: ignore
+        self.quantize_method_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["quantize_method"]
         )
         self.quantize_method_lbl = Label(self.frame_advcomp, text="Quantize method")
         self.quantize_method_opt = OptionMenu(
@@ -357,29 +282,15 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
 
-        self.cache_dir_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["cache_dir"]
-            ),
-            bootstyle="secondary",  # type: ignore
-        )
+        self.cache_dir_help_btn = self.add_help_btn(self.gui.help["comp"]["cache_dir"])
         self.cache_dir_lbl = Label(self.frame_advcomp, text="Custom cache directory")
         self.cache_dir_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.cache_dir_var, width=30
         )
         self.cache_dir_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
-        self.default_emoji_help_btn = Button(
-            self.frame_advcomp,
-            text="?",
-            width=1,
-            command=lambda: cb_msg_block_adv_comp_win(
-                self.gui.help["comp"]["default_emoji"]
-            ),
-            bootstyle="secondary",  # type: ignore
+        self.default_emoji_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["default_emoji"]
         )
         self.default_emoji_lbl = Label(self.frame_advcomp, text="Default emoji")
         self.im: Image.Image = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
@@ -467,27 +378,32 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fake_vid_lbl.grid(column=1, row=12, sticky="w", padx=3, pady=3)
         self.fake_vid_cbox.grid(column=6, row=12, sticky="nes", padx=3, pady=3)
 
-        self.scale_filter_help_btn.grid(column=0, row=13, sticky="w", padx=3, pady=3)
-        self.scale_filter_lbl.grid(column=1, row=13, sticky="w", padx=3, pady=3)
-        self.scale_filter_opt.grid(
-            column=2, row=13, columnspan=4, sticky="nes", padx=3, pady=3
-        )
+        self.bg_color_help_btn.grid(column=0, row=13, sticky="w", padx=3, pady=3)
+        self.bg_color_lbl.grid(column=1, row=13, sticky="w", padx=3, pady=3)
+        self.bg_color_entry.grid(column=5, row=13, sticky="w", padx=3, pady=3)
+        self.bg_color_btn.grid(column=6, row=13, sticky="nes", padx=3, pady=3)
 
-        self.quantize_method_help_btn.grid(column=0, row=14, sticky="w", padx=3, pady=3)
-        self.quantize_method_lbl.grid(column=1, row=14, sticky="w", padx=3, pady=3)
-        self.quantize_method_opt.grid(
+        self.scale_filter_help_btn.grid(column=0, row=14, sticky="w", padx=3, pady=3)
+        self.scale_filter_lbl.grid(column=1, row=14, sticky="w", padx=3, pady=3)
+        self.scale_filter_opt.grid(
             column=2, row=14, columnspan=4, sticky="nes", padx=3, pady=3
         )
 
-        self.cache_dir_help_btn.grid(column=0, row=15, sticky="w", padx=3, pady=3)
-        self.cache_dir_lbl.grid(column=1, row=15, sticky="w", padx=3, pady=3)
-        self.cache_dir_entry.grid(
+        self.quantize_method_help_btn.grid(column=0, row=15, sticky="w", padx=3, pady=3)
+        self.quantize_method_lbl.grid(column=1, row=15, sticky="w", padx=3, pady=3)
+        self.quantize_method_opt.grid(
             column=2, row=15, columnspan=4, sticky="nes", padx=3, pady=3
         )
 
-        self.default_emoji_help_btn.grid(column=0, row=16, sticky="w", padx=3, pady=3)
-        self.default_emoji_lbl.grid(column=1, row=16, sticky="w", padx=3, pady=3)
-        self.default_emoji_dsp.grid(column=6, row=16, sticky="nes", padx=3, pady=3)
+        self.cache_dir_help_btn.grid(column=0, row=16, sticky="w", padx=3, pady=3)
+        self.cache_dir_lbl.grid(column=1, row=16, sticky="w", padx=3, pady=3)
+        self.cache_dir_entry.grid(
+            column=2, row=16, columnspan=4, sticky="nes", padx=3, pady=3
+        )
+
+        self.default_emoji_help_btn.grid(column=0, row=17, sticky="w", padx=3, pady=3)
+        self.default_emoji_lbl.grid(column=1, row=17, sticky="w", padx=3, pady=3)
+        self.default_emoji_dsp.grid(column=6, row=17, sticky="nes", padx=3, pady=3)
 
         # https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
         # Create a frame for the canvas with non-zero row&column weights
@@ -647,6 +563,42 @@ class AdvancedCompressionWindow(BaseWindow):
 
         self.fake_vid_cbox.config(state=state)
 
+    def cb_bg_color(self, *_: Any) -> None:
+        color = colorchooser.askcolor(title="Choose color")[1]
+        if color:
+            self.gui.bg_color_var.set(color.replace("#", ""))
+        self.lift()
+        self.attributes("-topmost", True)  # type: ignore
+        self.attributes("-topmost", False)  # type: ignore
+
+    def cb_bound_to_mousewheel(self, event: Any) -> None:
+        for i in self.mousewheel:
+            self.emoji_canvas.bind_all(i, self.cb_on_mousewheel)
+
+    def cb_unbound_to_mousewheel(self, event: Any) -> None:
+        for i in self.mousewheel:
+            self.emoji_canvas.unbind_all(i)
+
+    def cb_on_mousewheel(self, event: Any) -> None:
+        self.emoji_canvas.yview_scroll(
+            int(-1 * (event.delta / self.delta_divide)), "units"
+        )  # type: ignore
+
+    def cb_set_emoji(self, emoji: str) -> None:
+        self.gui.default_emoji_var.set(emoji)
+        self.set_emoji_btn()
+
+    def add_help_btn(self, msg: str) -> Button:
+        cb_msg_block_adv_comp_win = partial(self.gui.cb_msg_block, parent=self)
+
+        return Button(
+            self.frame_advcomp,
+            text="?",
+            width=1,
+            command=lambda: cb_msg_block_adv_comp_win(msg),
+            bootstyle="secondary",  # type: ignore
+        )
+
     def set_emoji_btn(self) -> None:
         self.im = Image.new("RGBA", (128, 128), (255, 255, 255, 0))
         ImageDraw.Draw(self.im).text(  # type: ignore
@@ -736,20 +688,3 @@ class AdvancedCompressionWindow(BaseWindow):
         # https://stackoverflow.com/questions/17355902/tkinter-binding-mousewheel-to-scrollbar
         self.emoji_canvas.bind("<Enter>", self.cb_bound_to_mousewheel)
         self.emoji_canvas.bind("<Leave>", self.cb_unbound_to_mousewheel)
-
-    def cb_bound_to_mousewheel(self, event: Any) -> None:
-        for i in self.mousewheel:
-            self.emoji_canvas.bind_all(i, self.cb_on_mousewheel)
-
-    def cb_unbound_to_mousewheel(self, event: Any) -> None:
-        for i in self.mousewheel:
-            self.emoji_canvas.unbind_all(i)
-
-    def cb_on_mousewheel(self, event: Any) -> None:
-        self.emoji_canvas.yview_scroll(
-            int(-1 * (event.delta / self.delta_divide)), "units"
-        )  # type: ignore
-
-    def cb_set_emoji(self, emoji: str) -> None:
-        self.gui.default_emoji_var.set(emoji)
-        self.set_emoji_btn()
