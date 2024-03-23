@@ -523,7 +523,7 @@ class StickerConvert:
         elif self.opt_comp.scale_filter == "lanczos":
             resample = Image.LANCZOS
         else:
-            resample = Image.LANCZOS
+            resample = Image.BICUBIC
 
         for frame in frames_in:
             with Image.fromarray(frame, "RGBA") as im:  # type: ignore

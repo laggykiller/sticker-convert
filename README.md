@@ -206,7 +206,7 @@ Compression options:
                         (1) Size limit for video is larger than image;
                         (2) Mix image and video into same pack.
   --scale-filter SCALE_FILTER
-                        Set scale filter. Default as lanczos. Valid options are:
+                        Set scale filter. Default as bicubic. Valid options are:
                         - nearest = Use nearest neighbour (Suitable for pixel art)
                         -box = Similar to nearest, but better downscaling
                         - bilinear = Linear interpolation

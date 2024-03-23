@@ -40,7 +40,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -85,7 +85,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -130,7 +130,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -175,7 +175,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -220,7 +220,7 @@
         },
         "steps": 16,
         "fake_vid": true,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -265,7 +265,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -310,7 +310,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -355,7 +355,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -400,7 +400,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -445,7 +445,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
@@ -490,7 +490,7 @@
         },
         "steps": 16,
         "fake_vid": false,
-        "scale_filter": "lanczos",
+        "scale_filter": "bicubic",
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     }
