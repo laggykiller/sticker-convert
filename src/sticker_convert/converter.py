@@ -537,8 +537,12 @@ class StickerConvert:
             if colors.shape[0] == 0:
                 bg = (0, 0, 0, 0)
             else:
-                colors = colors * (colors[3] / 255)
-                if np.mean(colors[:, :3]) < 128:
+                alphas = colors[:, 3] / 255
+                r_mean = np.mean(colors[:, 0] * alphas)
+                g_mean = np.mean(colors[:, 1] * alphas)
+                b_mean = np.mean(colors[:, 2] * alphas)
+                mean = (r_mean + g_mean + b_mean) / 3
+                if mean < 128:
                     bg = (255, 255, 255, 0)
                 else:
                     bg = (0, 0, 0, 0)
