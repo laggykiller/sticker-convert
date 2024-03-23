@@ -19,6 +19,7 @@ from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
 if TYPE_CHECKING:
+    from av.video.frame import VideoFrame  # type: ignore
     from av.video.plane import VideoPlane  # type: ignore
 
 MSG_START_COMP = "[I] Start compressing {} -> {}"
@@ -32,6 +33,14 @@ MSG_DONE_COMP = "[S] Successful compression {} -> {} size {} (step {})"
 MSG_FAIL_COMP = (
     "[F] Failed Compression {} -> {}, "
     "cannot get below limit {} with lowest quality under current settings (Best size: {})"
+)
+
+YUV_RGB_MATRIX = np.array(
+    [
+        [1.164, 0.000, 1.793],
+        [1.164, -0.213, -0.533],
+        [1.164, 2.112, 0.000],
+    ]
 )
 
 
@@ -74,6 +83,40 @@ def useful_array(
     if total_line_size != useful_line_size:
         arr = arr.reshape(-1, total_line_size)[:, 0:useful_line_size].reshape(-1)
     return arr.view(np.dtype(dtype))
+
+
+def yuva_to_rgba(frame: "VideoFrame") -> "np.ndarray[Any, Any]":
+    # https://stackoverflow.com/questions/72308308/converting-yuv-to-rgb-in-python-coefficients-work-with-array-dont-work-with-n
+
+    width = frame.width
+    height = frame.height
+
+    y = useful_array(frame.planes[0]).reshape(height, width)
+    u = useful_array(frame.planes[1]).reshape(height // 2, width // 2)
+    v = useful_array(frame.planes[2]).reshape(height // 2, width // 2)
+    a = useful_array(frame.planes[3]).reshape(height, width)
+
+    u = u.repeat(2, axis=0).repeat(2, axis=1)
+    v = v.repeat(2, axis=0).repeat(2, axis=1)
+
+    y = y.reshape((y.shape[0], y.shape[1], 1))
+    u = u.reshape((u.shape[0], u.shape[1], 1))
+    v = v.reshape((v.shape[0], v.shape[1], 1))
+    a = a.reshape((a.shape[0], a.shape[1], 1))
+
+    yuv_array = np.concatenate((y, u, v), axis=2)
+
+    yuv_array = yuv_array.astype(np.float32)
+    yuv_array[:, :, 0] = (
+        yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype) - 16  # type: ignore
+    )
+    yuv_array[:, :, 1:] = (
+        yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype) - 128  # type: ignore
+    )
+
+    rgb_array = np.matmul(yuv_array, YUV_RGB_MATRIX.T).clip(0, 255).astype("uint8")
+
+    return np.concatenate((rgb_array, a), axis=2)
 
 
 class StickerConvert:
@@ -407,10 +450,12 @@ class StickerConvert:
                         width = frame.width - 1
                     else:
                         width = frame.width
+
                     if frame.height % 2 != 0:
                         height = frame.height - 1
                     else:
                         height = frame.height
+
                     if frame.format.name == "yuv420p":
                         rgb_array = frame.to_ndarray(format="rgb24")
                         cast("np.ndarray[Any, Any]", rgb_array)
@@ -422,6 +467,7 @@ class StickerConvert:
                         )
                     else:
                         # yuva420p may cause crash
+                        # Not safe to directly call frame.to_ndarray(format="rgba")
                         # https://github.com/laggykiller/sticker-convert/issues/114
                         frame = frame.reformat(
                             width=width,
@@ -429,50 +475,7 @@ class StickerConvert:
                             format="yuva420p",
                             dst_colorspace=1,
                         )
-
-                        # https://stackoverflow.com/questions/72308308/converting-yuv-to-rgb-in-python-coefficients-work-with-array-dont-work-with-n
-                        y = useful_array(frame.planes[0]).reshape(height, width)
-                        u = useful_array(frame.planes[1]).reshape(
-                            height // 2,
-                            width // 2,
-                        )
-                        v = useful_array(frame.planes[2]).reshape(
-                            height // 2,
-                            width // 2,
-                        )
-                        a = useful_array(frame.planes[3]).reshape(height, width)
-
-                        u = u.repeat(2, axis=0).repeat(2, axis=1)
-                        v = v.repeat(2, axis=0).repeat(2, axis=1)
-
-                        y = y.reshape((y.shape[0], y.shape[1], 1))
-                        u = u.reshape((u.shape[0], u.shape[1], 1))
-                        v = v.reshape((v.shape[0], v.shape[1], 1))
-                        a = a.reshape((a.shape[0], a.shape[1], 1))
-
-                        yuv_array = np.concatenate((y, u, v), axis=2)
-
-                        yuv_array = yuv_array.astype(np.float32)
-                        yuv_array[:, :, 0] = (
-                            yuv_array[:, :, 0].clip(16, 235).astype(yuv_array.dtype)  # type: ignore
-                            - 16
-                        )
-                        yuv_array[:, :, 1:] = (
-                            yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype)  # type: ignore
-                            - 128
-                        )
-
-                        convert = np.array(
-                            [
-                                [1.164, 0.000, 1.793],
-                                [1.164, -0.213, -0.533],
-                                [1.164, 2.112, 0.000],
-                            ]
-                        )
-                        rgb_array = (
-                            np.matmul(yuv_array, convert.T).clip(0, 255).astype("uint8")
-                        )
-                        rgba_array = np.concatenate((rgb_array, a), axis=2)
+                        rgba_array = yuva_to_rgba(frame)
 
                     self.frames_raw.append(rgba_array)
 
