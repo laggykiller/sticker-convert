@@ -537,7 +537,6 @@ class StickerConvert:
     def frames_resize(
         self, frames_in: "List[np.ndarray[Any, Any]]"
     ) -> "List[np.ndarray[Any, Any]]":
-
         frames_out: "List[np.ndarray[Any, Any]]" = []
 
         resample: Literal[0, 1, 2, 3, 4, 5]
@@ -576,7 +575,9 @@ class StickerConvert:
                 width_new = width * self.res_h // height
 
             with im.resize((width_new, height_new), resample=resample) as im_resized:
-                with Image.new("RGBA", (self.res_w, self.res_h), self.bg_color) as im_new:
+                with Image.new(
+                    "RGBA", (self.res_w, self.res_h), self.bg_color
+                ) as im_new:
                     im_new.alpha_composite(
                         im_resized,
                         ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2),
