@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import os
-import platform
 import shutil
 import traceback
 from datetime import datetime
@@ -182,11 +181,7 @@ class Executor:
         self.is_cancel_job.value = 1  # type: ignore
 
         for process in self.processes:
-            if platform.system() == "Windows":
-                process.terminate()
-            else:
-                process.close()
-            process.join()
+            process.terminate()
 
         self.cleanup(killed=True)
 
