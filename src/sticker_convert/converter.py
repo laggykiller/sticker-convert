@@ -685,14 +685,19 @@ class StickerConvert:
         # Only enable transparency if all pixels have alpha channel
         # with value of 0 or 255
         alpha_channel_values = np.unique(np.array(self.frames_raw)[:, :, :, 3])
-        illegals = np.setxor1d(alpha_channel_values, [0, 255])  # Find all values not 0 or 255
+        illegals = np.setxor1d(
+            alpha_channel_values, [0, 255]
+        )  # Find all values not 0 or 255
         if illegals.size == 0:
             extra_kwargs["transparency"] = 0
             extra_kwargs["disposal"] = 2
             im_out = [self.quantize(Image.fromarray(i)) for i in self.frames_processed]
         else:
-            im_out = [self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB") for i in self.frames_processed]
-        
+            im_out = [
+                self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB")
+                for i in self.frames_processed
+            ]
+
         if self.fps:
             extra_kwargs["save_all"] = True
             extra_kwargs["append_images"] = im_out[1:]
