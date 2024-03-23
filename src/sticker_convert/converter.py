@@ -174,6 +174,11 @@ class StickerConvert:
         self.fps: Optional[Fraction] = None
         self.color: Optional[int] = None
 
+        self.bg_color: Optional[Tuple[int, int, int, int]]
+        if self.opt_comp.bg_color:
+            r, g, b = bytes.fromhex(self.opt_comp.bg_color)
+            self.bg_color = (r, g, b, 0)
+
         self.tmp_f: BytesIO = BytesIO()
         self.result: Optional[bytes] = None
         self.result_size: int = 0
@@ -508,9 +513,31 @@ class StickerConvert:
 
         anim.lottie_animation_destroy()
 
+    def determine_bg_color(self) -> Tuple[int, int, int, int]:
+        # Calculate average color of all frames for selecting background color
+        frames_raw_np = np.array(self.frames_raw)
+        s = frames_raw_np.shape
+        colors = frames_raw_np.reshape((-1, s[3]))  # type: ignore
+        # Do not count in alpha=0
+        # If alpha > 0, use alpha as weight
+        colors = colors[colors[:, 3] != 0]
+        if colors.shape[0] == 0:
+            return (0, 0, 0, 0)
+        else:
+            alphas = colors[:, 3] / 255
+            r_mean = np.mean(colors[:, 0] * alphas)
+            g_mean = np.mean(colors[:, 1] * alphas)
+            b_mean = np.mean(colors[:, 2] * alphas)
+            mean = (r_mean + g_mean + b_mean) / 3
+            if mean < 128:
+                return (255, 255, 255, 0)
+            else:
+                return (0, 0, 0, 0)
+
     def frames_resize(
         self, frames_in: "List[np.ndarray[Any, Any]]"
     ) -> "List[np.ndarray[Any, Any]]":
+
         frames_out: "List[np.ndarray[Any, Any]]" = []
 
         resample: Literal[0, 1, 2, 3, 4, 5]
@@ -529,29 +556,8 @@ class StickerConvert:
         else:
             resample = Image.BICUBIC
 
-        if not self.opt_comp.bg_color:
-            # Calculate average color of all frames for selecting background color
-            frames_raw_np = np.array(self.frames_raw)
-            s = frames_raw_np.shape
-            colors = frames_raw_np.reshape((-1, s[3]))  # type: ignore
-            # Do not count in alpha=0
-            # If alpha > 0, use alpha as weight
-            colors = colors[colors[:, 3] != 0]
-            if colors.shape[0] == 0:
-                bg = (0, 0, 0, 0)
-            else:
-                alphas = colors[:, 3] / 255
-                r_mean = np.mean(colors[:, 0] * alphas)
-                g_mean = np.mean(colors[:, 1] * alphas)
-                b_mean = np.mean(colors[:, 2] * alphas)
-                mean = (r_mean + g_mean + b_mean) / 3
-                if mean < 128:
-                    bg = (255, 255, 255, 0)
-                else:
-                    bg = (0, 0, 0, 0)
-        else:
-            r, g, b = bytes.fromhex(self.opt_comp.bg_color)
-            bg = (r, g, b, 0)
+        if self.bg_color is None:
+            self.bg_color = self.determine_bg_color()
 
         for frame in frames_in:
             with Image.fromarray(frame, "RGBA") as im:  # type: ignore
@@ -570,7 +576,7 @@ class StickerConvert:
                 width_new = width * self.res_h // height
 
             with im.resize((width_new, height_new), resample=resample) as im_resized:
-                with Image.new("RGBA", (self.res_w, self.res_h), bg) as im_new:
+                with Image.new("RGBA", (self.res_w, self.res_h), self.bg_color) as im_new:
                     im_new.alpha_composite(
                         im_resized,
                         ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2),
