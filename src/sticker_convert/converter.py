@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Uni
 
 import numpy as np
 from PIL import Image
+from PIL import __version__ as PillowVersion
 
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
@@ -616,6 +617,8 @@ class StickerConvert:
                 self._frames_export_png()
         elif self.out_f.suffix == ".webp" and is_animated:
             self._frames_export_webp()
+        elif self.out_f.suffix == ".gif":
+            self._frames_export_gif()
         elif self.out_f.suffix in (".webm", ".mp4", ".mkv") or is_animated:
             self._frames_export_pyav()
         else:
@@ -640,11 +643,7 @@ class StickerConvert:
             options["quality"] = str(self.quality)
             options["lossless"] = "0"
 
-        if self.out_f.suffix == ".gif":
-            codec = "gif"
-            pixel_format = "rgb8"
-            options["loop"] = "0"
-        elif self.out_f.suffix in (".apng", ".png"):
+        if self.out_f.suffix in (".apng", ".png"):
             codec = "apng"
             pixel_format = "rgba"
             options["plays"] = "0"
@@ -671,6 +670,41 @@ class StickerConvert:
                 av_frame = av.VideoFrame.from_ndarray(frame, format="rgba")
                 output.mux(out_stream.encode(av_frame))
             output.mux(out_stream.encode())
+
+    def _frames_export_gif(self) -> None:
+        extra_kwargs: Dict[str, Any] = {}
+
+        # disposal=2 on gif cause flicker in image with transparency
+        # Occurs in Pillow == 10.2.0
+        # https://github.com/python-pillow/Pillow/issues/7787
+        if PillowVersion == "10.2.0":
+            extra_kwargs["optimize"] = False
+        else:
+            extra_kwargs["optimize"] = True
+
+        # Only enable transparency if all pixels have alpha channel
+        # with value of 0 or 255
+        alpha_channel_values = np.unique(np.array(self.frames_raw)[:, :, :, 3])
+        illegals = np.setxor1d(alpha_channel_values, [0, 255])  # Find all values not 0 or 255
+        if illegals.size == 0:
+            extra_kwargs["transparency"] = 0
+            extra_kwargs["disposal"] = 2
+            im_out = [self.quantize(Image.fromarray(i)) for i in self.frames_processed]
+        else:
+            im_out = [self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB") for i in self.frames_processed]
+        
+        if self.fps:
+            extra_kwargs["save_all"] = True
+            extra_kwargs["append_images"] = im_out[1:]
+            extra_kwargs["duration"] = int(1000 / self.fps)
+            extra_kwargs["loop"] = 0
+
+        im_out[0].save(
+            self.tmp_f,
+            format="GIF",
+            quality=self.quality,
+            **extra_kwargs,
+        )
 
     def _frames_export_webp(self) -> None:
         import webp  # type: ignore
