@@ -174,7 +174,7 @@ class StickerConvert:
         self.fps: Optional[Fraction] = None
         self.color: Optional[int] = None
 
-        self.bg_color: Optional[Tuple[int, int, int, int]]
+        self.bg_color: Optional[Tuple[int, int, int, int]] = None
         if self.opt_comp.bg_color:
             r, g, b = bytes.fromhex(self.opt_comp.bg_color)
             self.bg_color = (r, g, b, 0)
