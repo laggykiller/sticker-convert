@@ -714,20 +714,20 @@ class StickerConvert:
         else:
             extra_kwargs["optimize"] = True
 
-        # Only enable transparency if all pixels have alpha channel
-        # with value of 0 or 255
-        alpha_channel_values = np.unique(np.array(self.frames_raw)[:, :, :, 3])
-        illegals = np.setxor1d(
-            alpha_channel_values, [0, 255]
-        )  # Find all values not 0 or 255
-        if illegals.size == 0:
+        # GIF can only have one alpha color
+        # Only keep alpha=0 and alpha=255, nothing in between
+        frames_processed = np.array(self.frames_processed)
+        alpha = frames_processed[:, :, :, 3]
+        alpha[alpha > 0] = 255
+
+        if 0 in alpha:
             extra_kwargs["transparency"] = 0
             extra_kwargs["disposal"] = 2
-            im_out = [self.quantize(Image.fromarray(i)) for i in self.frames_processed]
+            im_out = [self.quantize(Image.fromarray(i)) for i in frames_processed]
         else:
             im_out = [
                 self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB")
-                for i in self.frames_processed
+                for i in frames_processed
             ]
 
         if self.fps:
