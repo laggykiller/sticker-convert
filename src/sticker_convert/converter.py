@@ -715,10 +715,14 @@ class StickerConvert:
             extra_kwargs["optimize"] = True
 
         # GIF can only have one alpha color
+        # Change lowest alpha to alpha=0
         # Only keep alpha=0 and alpha=255, nothing in between
         frames_processed = np.array(self.frames_processed)
         alpha = frames_processed[:, :, :, 3]
-        alpha[alpha > 0] = 255
+        alpha_min = np.min(alpha)  # type: ignore
+        if alpha_min < 255:
+            alpha[alpha > alpha_min] = 255
+            alpha[alpha == alpha_min] = 0
 
         if 0 in alpha:
             extra_kwargs["transparency"] = 0
