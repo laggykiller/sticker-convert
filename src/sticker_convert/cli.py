@@ -6,9 +6,10 @@ from argparse import Namespace
 from json.decoder import JSONDecodeError
 from math import ceil
 from multiprocessing import cpu_count
-from mergedeep import merge  # type: ignore
 from pathlib import Path
 from typing import Any, Dict
+
+from mergedeep import merge  # type: ignore
 
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR
 from sticker_convert.job import Job

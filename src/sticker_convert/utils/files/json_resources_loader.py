@@ -1,8 +1,10 @@
-from mergedeep import merge  # type: ignore
 from typing import Any, Dict
 
-from sticker_convert.definitions import ROOT_DIR, CONFIG_DIR
+from mergedeep import merge  # type: ignore
+
+from sticker_convert.definitions import CONFIG_DIR, ROOT_DIR
 from sticker_convert.utils.files.json_manager import JsonManager
+
 
 def _load_compression() -> Dict[Any, Any]:
     compression_json = JsonManager.load_json(ROOT_DIR / "resources/compression.json")
@@ -14,6 +16,7 @@ def _load_compression() -> Dict[Any, Any]:
             custom_preset_json,
         )
     return compression_json
+
 
 HELP_JSON: Dict[str, Dict[str, str]] = JsonManager.load_json(
     ROOT_DIR / "resources/help.json"
