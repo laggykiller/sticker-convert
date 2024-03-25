@@ -88,7 +88,7 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--custom-presets CUSTOM_PRESETS] [--input-dir INPUT_DIR]
                           [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-whatsapp | --export-imessage]
@@ -96,7 +96,7 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}]
                           [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
                           [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]        
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
                           [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
                           [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER]
                           [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--bg-color BG_COLOR]
@@ -107,15 +107,19 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--input-dir INPUT_DIR
                           [--signal-data-dir SIGNAL_DATA_DIR] [--telegram-token TELEGRAM_TOKEN]
                           [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
                           [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]  
+                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]
                           [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
-options:
+optional arguments:
   -h, --help            show this help message and exit
   --version             show program's version number and exit
   --no-confirm          Do not ask any questions.
+  --custom-presets CUSTOM_PRESETS
+                        Specify a json file containing custom compression presets.
+                        See compression.json for format.
+                        Note that if present, 'custom_preset.json' from config directory would be auto loaded.
 
 Input options:
   --input-dir INPUT_DIR
@@ -153,7 +157,7 @@ Output options:
 
 Compression options:
   --no-compress         Do not compress files. Useful for only downloading stickers.
-  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}        
+  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,imessage_small,imessage_medium,imessage_large,custom}
                         Apply preset for compression.
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
@@ -213,7 +217,7 @@ Compression options:
   --scale-filter SCALE_FILTER
                         Set scale filter. Default as bicubic. Valid options are:
                         - nearest = Use nearest neighbour (Suitable for pixel art)
-                        -box = Similar to nearest, but better downscaling
+                        - box = Similar to nearest, but better downscaling
                         - bilinear = Linear interpolation
                         - hamming = Similar to bilinear, but better downscaling
                         - bicubic = Cubic spline interpolation
@@ -241,10 +245,10 @@ Credentials options:
   --telegram-token TELEGRAM_TOKEN
                         Set Telegram token. Required for uploading and downloading Telegram stickers.
   --telegram-userid TELEGRAM_USERID
-                        Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.     
+                        Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.
   --kakao-auth-token KAKAO_AUTH_TOKEN
-                        Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx        
-  --kakao-get-auth      Generate Kakao auth_token. Kakao username, password, country code and phone number are also required.    
+                        Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx
+  --kakao-get-auth      Generate Kakao auth_token. Kakao username, password, country code and phone number are also required.
   --kakao-username KAKAO_USERNAME
                         Set Kakao username, which is email or phone number used for signing up Kakao account
                         Example: +447700900142

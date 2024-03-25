@@ -6,6 +6,7 @@ from argparse import Namespace
 from json.decoder import JSONDecodeError
 from math import ceil
 from multiprocessing import cpu_count
+from mergedeep import merge  # type: ignore
 from pathlib import Path
 from typing import Any, Dict
 
@@ -49,6 +50,12 @@ class CLI:
             dest="no_confirm",
             action="store_true",
             help=self.help["global"]["no_confirm"],
+        )
+        parser.add_argument(
+            "--custom-presets",
+            dest="custom_presets",
+            default=None,
+            help=self.help["global"]["custom_presets"],
         )
 
         parser_input = parser.add_argument_group("Input options")
@@ -161,6 +168,16 @@ class CLI:
             )
 
         args = parser.parse_args()
+
+        if args.custom_presets:
+            try:
+                custom_presets = JsonManager.load_json(Path(args.custom_presets))
+                self.compression_presets: Dict[Any, Any] = merge(  # type: ignore
+                    self.compression_presets,  # type: ignore
+                    custom_presets,
+                )
+            except RuntimeError:
+                print(f"Error: Cannot load custom presets from {args.custom_presets}")
 
         self.cb.no_confirm = args.no_confirm
 

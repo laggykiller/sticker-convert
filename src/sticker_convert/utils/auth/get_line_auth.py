@@ -22,6 +22,12 @@ class GetLineAuth:
             rookiepy.vivaldi,  # type: ignore
         ]
 
+        # https://github.com/thewh1teagle/rookie/pull/24
+        if "libre_wolf" in rookiepy.__all__:
+            browsers.extend(rookiepy.libre_wolf)  # type: ignore
+        else:
+            browsers.extend(rookiepy.librewolf)  # type: ignore
+
         if platform.system() == "Windows":
             browsers.extend(
                 [
