@@ -62,7 +62,7 @@ def durations_gcd(*durations: Union[int, float]) -> Union[float, Fraction]:
             ):
                 return Fraction(gcd(*(int(rounding(i * x)) for i in durations)), x)
         else:
-            return sum(durations) / len(durations)
+            return min(durations)
     else:
         return Fraction(gcd(*durations), 1)  # type: ignore
 
