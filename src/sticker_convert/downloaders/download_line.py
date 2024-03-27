@@ -7,8 +7,7 @@ import string
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from queue import Queue
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple
 from urllib import parse
 
 import requests
@@ -18,7 +17,7 @@ from PIL import Image
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.apple_png_normalize import ApplePngNormalize
 
@@ -466,7 +465,7 @@ class DownloadLine(DownloadBase):
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> bool:
         downloader = DownloadLine(url, out_dir, opt_cred, cb, cb_return)

@@ -6,14 +6,13 @@ import plistlib
 import shutil
 import zipfile
 from pathlib import Path
-from queue import Queue
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.definitions import ROOT_DIR
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import XCODE_IMESSAGE_ICONSET, MetadataHandler
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.codec_info import CodecInfo
@@ -279,7 +278,7 @@ class XcodeImessage(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> List[str]:
         exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb, cb_return)

@@ -1,39 +1,55 @@
 #!/usr/bin/env python3
-from multiprocessing import Event, Queue
-from typing import Any, Callable, Dict, Optional, Tuple, Union
+from multiprocessing import Event, Manager
+from multiprocessing.managers import ListProxy, SyncManager
+from queue import Queue
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Protocol, Tuple, Union
 
 from tqdm import tqdm
 
 CbQueueTupleType = Tuple[
     Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, Any]]
 ]
-CbQueueItemType = Union[
-    CbQueueTupleType,
-    str,
-    None,
-]
+CbQueueItemType = Union[CbQueueTupleType, str, None]
+WorkQueueItemType = Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]
+ResponseItemType = Union[bool, str, None]
+
+CbQueueType = Queue[CbQueueItemType]
+WorkQueueType = Queue[WorkQueueItemType]
+if TYPE_CHECKING:
+    # mypy complains about this
+    ResultsListType = ListProxy[Any]  # type: ignore
+    ResponseListType = ListProxy[ResponseItemType]  # type: ignore
+else:
+    ResultsListType = List[Any]
+    ResponseListType = List[ResponseItemType]
 
 
 class CallbackReturn:
-    def __init__(self) -> None:
+    def __init__(self, manager: Optional[SyncManager] = None) -> None:
         self.response_event = Event()
-        self.response_queue: Queue[Union[bool, str, None]] = Queue()
+        if manager is None:
+            manager = Manager()
+        self.response_queue: ResponseListType = manager.list()
 
-    def set_response(self, response: Union[bool, str, None]) -> None:
-        self.response_queue.put(response)
+    def set_response(self, response: ResponseItemType) -> None:
+        self.response_queue.append(response)
         self.response_event.set()
 
-    def get_response(self) -> Union[bool, str, None]:
+    def get_response(self) -> ResponseItemType:
         self.response_event.wait()
 
-        response = self.response_queue.get()
+        response = self.response_queue.pop()
 
         self.response_event.clear()
 
         return response
 
 
-class Callback:
+class CallbackProtocol(Protocol):
+    def put(self, i: Union[CbQueueItemType, str]) -> Any: ...
+
+
+class Callback(CallbackProtocol):
     def __init__(
         self,
         msg: Optional[Callable[..., None]] = None,
@@ -155,13 +171,7 @@ class Callback:
 
         return response
 
-    def put(
-        self,
-        i: Union[
-            CbQueueItemType,
-            str,
-        ],
-    ) -> Union[str, bool, None]:
+    def put(self, i: Union[CbQueueItemType, str]) -> Union[str, bool, None]:
         if isinstance(i, tuple):
             action = i[0]
             if len(i) >= 2:

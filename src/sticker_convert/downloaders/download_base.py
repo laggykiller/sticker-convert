@@ -2,13 +2,12 @@
 from __future__ import annotations
 
 from pathlib import Path
-from queue import Queue
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple
 
 import requests
 
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 
 
 class DownloadBase:
@@ -17,10 +16,7 @@ class DownloadBase:
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: Union[
-            Queue[CbQueueItemType],
-            Callback,
-        ],
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> None:
         self.url = url

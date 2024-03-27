@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
-from queue import Queue
-from typing import Union
 
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 
 
 class UploadBase:
@@ -12,13 +10,9 @@ class UploadBase:
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> None:
-        if not cb:
-            cb = Callback(silent=True)
-            cb_return = CallbackReturn()
-
         self.opt_output = opt_output
         self.opt_comp = opt_comp
         self.opt_cred = opt_cred

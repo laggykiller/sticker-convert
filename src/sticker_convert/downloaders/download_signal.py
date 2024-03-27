@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from queue import Queue
-from typing import Dict, Optional, Union
+from typing import Dict, Optional
 
 import anyio
 from signalstickers_client import StickersClient  # type: ignore
@@ -10,7 +9,7 @@ from signalstickers_client.models import StickerPack  # type: ignore
 
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 
@@ -86,7 +85,7 @@ class DownloadSignal(DownloadBase):
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> bool:
         downloader = DownloadSignal(url, out_dir, opt_cred, cb, cb_return)

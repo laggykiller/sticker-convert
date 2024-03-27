@@ -5,8 +5,7 @@ import json
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from queue import Queue
-from typing import Any, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import requests
@@ -15,7 +14,7 @@ from bs4.element import Tag
 
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
 
@@ -249,7 +248,7 @@ class DownloadKakao(DownloadBase):
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> bool:
         downloader = DownloadKakao(url, out_dir, opt_cred, cb, cb_return)

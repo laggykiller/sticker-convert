@@ -2,7 +2,6 @@
 import copy
 import re
 from pathlib import Path
-from queue import Queue
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import anyio
@@ -13,7 +12,7 @@ from telegram.ext import AIORateLimiter, ApplicationBuilder
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.format_verify import FormatVerify
 
@@ -350,7 +349,7 @@ class UploadTelegram(UploadBase):
         opt_output: OutputOption,
         opt_comp: CompOption,
         opt_cred: CredOption,
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> List[str]:
         exporter = UploadTelegram(

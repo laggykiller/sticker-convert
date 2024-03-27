@@ -4,7 +4,6 @@ from fractions import Fraction
 from io import BytesIO
 from math import ceil, floor
 from pathlib import Path
-from queue import Queue
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import numpy as np
@@ -12,7 +11,7 @@ from PIL import Image
 from PIL import __version__ as PillowVersion
 
 from sticker_convert.job_option import CompOption
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo, rounding
 from sticker_convert.utils.media.format_verify import FormatVerify
@@ -120,7 +119,7 @@ class StickerConvert:
         in_f: Union[Path, Tuple[Path, bytes]],
         out_f: Path,
         opt_comp: CompOption,
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         #  cb_return: CallbackReturn
     ) -> None:
         self.in_f: Union[bytes, Path]
@@ -186,7 +185,7 @@ class StickerConvert:
         in_f: Union[Path, Tuple[Path, bytes]],
         out_f: Path,
         opt_comp: CompOption,
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         _cb_return: CallbackReturn,
     ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
         sticker = StickerConvert(in_f, out_f, opt_comp, cb)

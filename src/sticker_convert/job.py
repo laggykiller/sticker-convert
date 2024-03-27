@@ -5,12 +5,10 @@ import os
 import shutil
 import traceback
 from datetime import datetime
-from multiprocessing import Process, Value
-from multiprocessing.managers import ListProxy, SyncManager
+from multiprocessing import Manager, Process, Value
 from pathlib import Path
-from queue import Queue
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Callable, Dict, Generator, List, Optional, Tuple
+from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
@@ -23,17 +21,10 @@ from sticker_convert.uploaders.compress_wastickers import CompressWastickers
 from sticker_convert.uploaders.upload_signal import UploadSignal
 from sticker_convert.uploaders.upload_telegram import UploadTelegram
 from sticker_convert.uploaders.xcode_imessage import XcodeImessage
-from sticker_convert.utils.callback import CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackReturn, CbQueueType, ResultsListType, WorkQueueType
 from sticker_convert.utils.files.json_resources_loader import OUTPUT_JSON
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
-
-WorkListItemType = Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]
-if TYPE_CHECKING:
-    # mypy complains about this
-    WorkListType = ListProxy[WorkListItemType]  # type: ignore
-else:
-    WorkListType = List[WorkListItemType]
 
 
 class Executor:
@@ -51,33 +42,29 @@ class Executor:
         self.cb_ask_bool = cb_ask_bool
         self.cb_ask_str = cb_ask_str
 
-        self.manager = SyncManager()
-        self.manager.start()
-        # Using list instead of queue for work_list as it can cause random deadlocks
-        # Especially when using scale_filter=nearest
-        self.work_list: WorkListType = self.manager.list()
-        self.results_queue: Queue[Any] = self.manager.Queue()
-        self.cb_queue: Queue[CbQueueItemType] = self.manager.Queue()
-        self.cb_return = CallbackReturn()
+        self.manager = Manager()
+        self.work_queue: WorkQueueType = self.manager.Queue()
+        self.cb_queue: CbQueueType = self.manager.Queue()
+        self.results_list: ResultsListType = self.manager.list()
+        self.cb_return = CallbackReturn(self.manager)
         self.processes: List[Process] = []
 
         self.is_cancel_job = Value("i", 0)
 
-        self.cb_thread_instance = Thread(
-            target=self.cb_thread,
-            args=(
-                self.cb_queue,
-                self.cb_return,
-            ),
-        )
-        self.cb_thread_instance.start()
+        self.cb_thread_instance: Optional[Thread] = None
 
     def cb_thread(
         self,
-        cb_queue: Queue[CbQueueItemType],
-        cb_return: CallbackReturn,
+        cb_queue: CbQueueType,
+        processes: int,
     ) -> None:
+        processes_done = 0
         for i in iter(cb_queue.get, None):
+            if i == "__PROCESS_DONE__":
+                processes_done += 1
+                if processes_done == processes:
+                    cb_queue.put(None)
+                continue
             if isinstance(i, tuple):
                 action = i[0]
                 if len(i) >= 2:
@@ -92,42 +79,44 @@ class Executor:
                 action = i
                 args = tuple()
                 kwargs = {}
-            if action == "msg":
-                self.cb_msg(*args, **kwargs)
-            elif action == "bar":
-                self.cb_bar(*args, **kwargs)
-            elif action == "update_bar":
-                self.cb_bar(update_bar=1)
-            elif action == "msg_block":
-                cb_return.set_response(self.cb_msg_block(*args, **kwargs))
-            elif action == "ask_bool":
-                cb_return.set_response(self.cb_ask_bool(*args, **kwargs))
-            elif action == "ask_str":
-                cb_return.set_response(self.cb_ask_str(*args, **kwargs))
-            else:
-                self.cb_msg(action)
+            self.cb(action, args, kwargs)
+
+    def cb(
+        self,
+        action: Optional[str],
+        args: Optional[Tuple[str, ...]] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
+    ) -> None:
+        if args is None:
+            args = tuple()
+        if kwargs is None:
+            kwargs = {}
+        if action == "msg":
+            self.cb_msg(*args, **kwargs)
+        elif action == "bar":
+            self.cb_bar(*args, **kwargs)
+        elif action == "update_bar":
+            self.cb_bar(update_bar=1)
+        elif action == "msg_block":
+            self.cb_return.set_response(self.cb_msg_block(*args, **kwargs))
+        elif action == "ask_bool":
+            self.cb_return.set_response(self.cb_ask_bool(*args, **kwargs))
+        elif action == "ask_str":
+            self.cb_return.set_response(self.cb_ask_str(*args, **kwargs))
+        else:
+            self.cb_msg(action)
 
     @staticmethod
     def worker(
-        work_list: WorkListType,
-        results_queue: Queue[Any],
-        cb_queue: Queue[CbQueueItemType],
+        work_queue: WorkQueueType,
+        results_list: ResultsListType,
+        cb_queue: CbQueueType,
         cb_return: CallbackReturn,
     ) -> None:
-        while True:
-            try:
-                work = work_list.pop(0)
-            except IndexError:
-                break
-
-            if work is None:
-                break
-            else:
-                work_func, work_args = work
-
+        for work_func, work_args in iter(work_queue.get, None):
             try:
                 results = work_func(*work_args, cb_queue, cb_return)
-                results_queue.put(results)
+                results_list.append(results)
             except Exception:
                 arg_dump: List[Any] = []
                 for i in work_args:
@@ -142,15 +131,25 @@ class Executor:
                 e += "#####################"
                 cb_queue.put(e)
 
-        work_list.append(None)
+        work_queue.put(None)
+        cb_queue.put("__PROCESS_DONE__")
 
     def start_workers(self, processes: int = 1) -> None:
+        self.cb_thread_instance = Thread(
+            target=self.cb_thread,
+            args=(self.cb_queue, processes),
+        )
+        self.cb_thread_instance.start()
+
+        self.results_list[:] = []
+        while not self.work_queue.empty():
+            self.work_queue.get()
         for _ in range(processes):
             process = Process(
                 target=Executor.worker,
                 args=(
-                    self.work_list,
-                    self.results_queue,
+                    self.work_queue,
+                    self.results_list,
                     self.cb_queue,
                     self.cb_return,
                 ),
@@ -163,18 +162,18 @@ class Executor:
     def add_work(
         self, work_func: Callable[..., Any], work_args: Tuple[Any, ...]
     ) -> None:
-        self.work_list.append((work_func, work_args))
+        self.work_queue.put((work_func, work_args))
 
     def join_workers(self) -> None:
-        self.work_list.append(None)
+        self.work_queue.put(None)
         try:
             for process in self.processes:
                 process.join()
         except KeyboardInterrupt:
             pass
 
-        self.results_queue.put(None)
-        self.work_list[:] = []
+        if self.cb_thread_instance:
+            self.cb_thread_instance.join()
         self.processes.clear()
 
     def kill_workers(self, *_: Any, **__: Any) -> None:
@@ -187,21 +186,10 @@ class Executor:
 
     def cleanup(self, killed: bool = False) -> None:
         if killed:
-            self.cb_queue.put("Job cancelled.")
-        self.cb_queue.put(("bar", None, {"set_progress_mode": "clear"}))
-        self.cb_queue.put(None)
-        self.cb_thread_instance.join()
-
-    def get_result(self) -> Generator[Any, None, None]:
-        yield from iter(self.results_queue.get, None)
-
-    def cb(
-        self,
-        action: Optional[str],
-        args: Optional[Tuple[str, ...]] = None,
-        kwargs: Optional[Dict[str, Any]] = None,
-    ) -> None:
-        self.cb_queue.put((action, args, kwargs))
+            self.cb_msg("Job cancelled.")
+        self.cb_bar("clear")
+        # self.cb_queue.put(None)
+        self.manager.shutdown()
 
 
 class Job:
@@ -547,17 +535,18 @@ class Job:
             self.executor.cb("Nothing to download")
             return True
 
+        self.executor.start_workers(processes=1)
+
         for downloader in downloaders:
             self.executor.add_work(
                 work_func=downloader,
                 work_args=(self.opt_input.url, self.opt_input.dir, self.opt_cred),
             )
 
-        self.executor.start_workers(processes=1)
         self.executor.join_workers()
 
         # Return False if any of the job returns failure
-        for result in self.executor.get_result():
+        for result in self.executor.results_list:
             if result is False:
                 return False
 
@@ -619,6 +608,8 @@ class Job:
             "bar", kwargs={"set_progress_mode": "determinate", "steps": in_fs_count}
         )
 
+        self.executor.start_workers(processes=min(self.opt_comp.processes, in_fs_count))
+
         for i in in_fs:
             in_f = input_dir / i.name
             out_f = output_dir / Path(i).stem
@@ -627,11 +618,10 @@ class Job:
                 work_func=StickerConvert.convert, work_args=(in_f, out_f, self.opt_comp)
             )
 
-        self.executor.start_workers(processes=min(self.opt_comp.processes, in_fs_count))
         self.executor.join_workers()
 
         # Return False if any of the job returns failure
-        for result in self.executor.get_result():
+        for result in self.executor.results_list:
             if result[0] is False:
                 return False
 
@@ -661,16 +651,17 @@ class Job:
         if self.opt_output.option == "imessage":
             exporters.append(XcodeImessage.start)
 
+        self.executor.start_workers(processes=1)
+
         for exporter in exporters:
             self.executor.add_work(
                 work_func=exporter,
                 work_args=(self.opt_output, self.opt_comp, self.opt_cred),
             )
 
-        self.executor.start_workers(processes=1)
         self.executor.join_workers()
 
-        for result in self.executor.get_result():
+        for result in self.executor.results_list:
             self.out_urls.extend(result)
 
         if self.out_urls:

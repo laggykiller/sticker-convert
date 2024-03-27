@@ -258,11 +258,7 @@ class CodecInfo:
                     fps = frames_apparent / total_duration * 1000
                 return fps, frames, total_duration
 
-        return (
-            0.0,
-            1,
-            0,
-        )
+        return 0.0, 1, 0
 
     @staticmethod
     def _get_file_fps_frames_duration_webp(
@@ -294,8 +290,8 @@ class CodecInfo:
                     total_duration += frame_duration
                     frames += 1
 
-        if frames == 0:
-            return 0.0, 0, 0
+        if frames <= 1:
+            return 0.0, 1, 0
 
         if len(durations) == 1:
             fps = frames / total_duration * 1000

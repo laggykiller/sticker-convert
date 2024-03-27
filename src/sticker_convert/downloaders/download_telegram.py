@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from queue import Queue
 from typing import Dict, Optional, Union
 from urllib.parse import urlparse
 
@@ -11,7 +10,7 @@ from telegram.ext import AIORateLimiter, ApplicationBuilder
 
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
+from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 
 
@@ -124,7 +123,7 @@ class DownloadTelegram(DownloadBase):
         url: str,
         out_dir: Path,
         opt_cred: Optional[CredOption],
-        cb: "Union[Queue[CbQueueItemType], Callback]",
+        cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> bool:
         downloader = DownloadTelegram(url, out_dir, opt_cred, cb, cb_return)
