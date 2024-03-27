@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import os
-from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
 from io import BytesIO
 from math import ceil, floor
@@ -15,7 +14,7 @@ from PIL import __version__ as PillowVersion
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import Callback, CallbackReturn, CbQueueItemType
 from sticker_convert.utils.files.cache_store import CacheStore
-from sticker_convert.utils.media.codec_info import CodecInfo
+from sticker_convert.utils.media.codec_info import CodecInfo, rounding
 from sticker_convert.utils.media.format_verify import FormatVerify
 
 if TYPE_CHECKING:
@@ -42,10 +41,6 @@ YUV_RGB_MATRIX = np.array(
         [1.164, 2.112, 0.000],
     ]
 )
-
-
-def rounding(value: float) -> Decimal:
-    return Decimal(value).quantize(0, ROUND_HALF_UP)
 
 
 def get_step_value(
@@ -114,7 +109,11 @@ def yuva_to_rgba(frame: "VideoFrame") -> "np.ndarray[Any, Any]":
         yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype) - 128  # type: ignore
     )
 
-    rgb_array = np.matmul(yuv_array, YUV_RGB_MATRIX.T).clip(0, 255).astype("uint8")
+    rgb_array = (
+        cast("np.ndarray[Any, Any]", np.matmul(yuv_array, YUV_RGB_MATRIX.T))
+        .clip(0, 255)
+        .astype("uint8")
+    )
 
     return np.concatenate((rgb_array, a), axis=2)
 

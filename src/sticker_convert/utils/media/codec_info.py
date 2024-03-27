@@ -41,25 +41,19 @@ def get_five_dec_place(value: float) -> str:
     return str(value).split(".")[1][:5].ljust(5, "0")
 
 
-def is_fraction_of_x(value: float, x: int) -> bool:
-    valid_ends = (get_five_dec_place(i / x) for i in range(1, x))
-    value_dec = get_five_dec_place(value)
-    return any(i for i in valid_ends if value_dec == i)
-
-
-def is_recurring_dec_int(value: float) -> bool:
-    # 0.99999... == 1
-    return True if get_five_dec_place(value) == "99999" else False
+def likely_int(value: float) -> bool:
+    if isinstance(value, int):
+        return True
+    return True if get_five_dec_place(value) in ("99999", "00000") else False
 
 
 def durations_gcd(*durations: Union[int, float]) -> Union[float, Fraction]:
     if any(i for i in durations if isinstance(i, float)):
-        if all(i for i in durations if isinstance(i, int) or is_recurring_dec_int(i)):
+        if all(i for i in durations if likely_int(i)):
             return Fraction(gcd(*(int(rounding(i)) for i in durations)), 1)
-        for x in (3, 6, 7, 9):
-            if all(
-                i for i in durations if isinstance(i, int) or is_fraction_of_x(i, x)
-            ):
+        # Test for denominators that can produce recurring decimal
+        for x in (3, 6, 7, 9, 11, 13):
+            if all(likely_int(i * x) for i in durations):
                 return Fraction(gcd(*(int(rounding(i * x)) for i in durations)), x)
         else:
             return min(durations)
