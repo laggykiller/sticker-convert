@@ -791,10 +791,25 @@ class StickerConvert:
         config = webp.WebPConfig.new(quality=self.quality)  # type: ignore
         enc = webp.WebPAnimEncoder.new(self.res_w, self.res_h)  # type: ignore
         timestamp_ms = 0
-        for frame in self.frames_processed:
-            pic = webp.WebPPicture.from_numpy(frame)  # type: ignore
+        timestamp_inc = int(1000 / self.fps)
+
+        pic = webp.WebPPicture.from_numpy(self.frames_processed[0])  # type: ignore
+        enc.encode_frame(pic, 0, config=config)  # type: ignore
+
+        frame_num = 1
+        frame_num_prev = 1
+        frame_total = len(self.frames_processed)
+        while frame_num < frame_total - 1:
+            while frame_num < frame_total - 1 and np.array_equal(
+                self.frames_processed[frame_num_prev],
+                self.frames_processed[frame_num],
+            ):
+                timestamp_ms += timestamp_inc
+                frame_num += 1
+            pic = webp.WebPPicture.from_numpy(self.frames_processed[frame_num])  # type: ignore
             enc.encode_frame(pic, timestamp_ms, config=config)  # type: ignore
-            timestamp_ms += int(1000 / self.fps)
+            frame_num_prev = frame_num
+
         anim_data = enc.assemble(timestamp_ms)  # type: ignore
         self.tmp_f.write(anim_data.buffer())  # type: ignore
 
