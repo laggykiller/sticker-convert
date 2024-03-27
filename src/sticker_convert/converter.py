@@ -264,14 +264,21 @@ class StickerConvert:
                 self.result_size = self.size
                 self.result_step = step_current
 
-            if step_upper - step_lower > 1 and self.size_max:
+            if (
+                step_upper - step_lower > 0
+                and step_current != step_lower
+                and self.size_max
+            ):
                 if self.size <= self.size_max:
                     sign = "<"
                     step_upper = step_current
                 else:
                     sign = ">"
                     step_lower = step_current
-                step_current = int(rounding((step_lower + step_upper) / 2))
+                if step_current == step_lower + 1:
+                    step_current = step_lower
+                else:
+                    step_current = int(rounding((step_lower + step_upper) / 2))
                 self.recompress(sign)
             elif self.result:
                 return self.compress_done(self.result, self.result_step)
