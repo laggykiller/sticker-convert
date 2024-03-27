@@ -426,10 +426,24 @@ class StickerConvert:
     def _frames_import_pillow(self) -> None:
         with Image.open(self.in_f) as im:
             # Note: im.convert("RGBA") would return rgba image of current frame only
-            if "n_frames" in dir(im):
-                for i in range(im.n_frames):
-                    im.seek(i)
+            if (
+                "n_frames" in dir(im)
+                and im.n_frames != 0
+                and self.codec_info_orig.fps != 0.0
+            ):
+                duration_ptr = 0.0
+                duration_inc = 1 / self.codec_info_orig.fps * 1000
+                next_frame_start_duration = im.info.get("duration", 1000)
+                frame = 0
+                while True:
                     self.frames_raw.append(np.asarray(im.convert("RGBA")))
+                    duration_ptr += duration_inc
+                    if duration_ptr >= next_frame_start_duration:
+                        if frame == im.n_frames:
+                            break
+                        im.seek(frame)
+                        next_frame_start_duration += im.info.get("duration", 1000)
+                        frame += 1
             else:
                 self.frames_raw.append(np.asarray(im.convert("RGBA")))
 
