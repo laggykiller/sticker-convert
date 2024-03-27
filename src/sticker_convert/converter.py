@@ -550,25 +550,25 @@ class StickerConvert:
         anim.lottie_animation_destroy()
 
     def determine_bg_color(self) -> Tuple[int, int, int, int]:
+        mean_total = 0.0
         # Calculate average color of all frames for selecting background color
-        frames_raw_np = np.array(self.frames_raw)
-        s = frames_raw_np.shape
-        colors = frames_raw_np.reshape((-1, s[3]))  # type: ignore
-        # Do not count in alpha=0
-        # If alpha > 0, use alpha as weight
-        colors = colors[colors[:, 3] != 0]
-        if colors.shape[0] == 0:
-            return (0, 0, 0, 0)
+        for frame in self.frames_raw:
+            s = frame.shape
+            colors = frame.reshape((-1, s[2]))  # type: ignore
+            # Do not count in alpha=0
+            # If alpha > 0, use alpha as weight
+            colors = colors[colors[:, 3] != 0]
+            if colors.shape[0] != 0:
+                alphas = colors[:, 3] / 255
+                r_mean = np.mean(colors[:, 0] * alphas)
+                g_mean = np.mean(colors[:, 1] * alphas)
+                b_mean = np.mean(colors[:, 2] * alphas)
+                mean_total += (r_mean + g_mean + b_mean) / 3
+
+        if mean_total / len(self.frames_raw) < 128:
+            return (255, 255, 255, 0)
         else:
-            alphas = colors[:, 3] / 255
-            r_mean = np.mean(colors[:, 0] * alphas)
-            g_mean = np.mean(colors[:, 1] * alphas)
-            b_mean = np.mean(colors[:, 2] * alphas)
-            mean = (r_mean + g_mean + b_mean) / 3
-            if mean < 128:
-                return (255, 255, 255, 0)
-            else:
-                return (0, 0, 0, 0)
+            return (0, 0, 0, 0)
 
     def frames_resize(
         self, frames_in: "List[np.ndarray[Any, Any]]"
