@@ -480,10 +480,12 @@ class StickerConvert:
                         graph.configure()
 
                         graph.push(frame)
-                        frame = cast(VideoFrame, graph.pull())
+                        frame_resized = cast(VideoFrame, graph.pull())
+                    else:
+                        frame_resized = frame
 
-                    if frame.format.name == "yuv420p":
-                        rgb_array = frame.to_ndarray(format="rgb24")
+                    if frame_resized.format.name == "yuv420p":
+                        rgb_array = frame_resized.to_ndarray(format="rgb24")
                         rgba_array = np.dstack(
                             (
                                 rgb_array,
@@ -494,11 +496,11 @@ class StickerConvert:
                         # yuva420p may cause crash
                         # Not safe to directly call frame.to_ndarray(format="rgba")
                         # https://github.com/laggykiller/sticker-convert/issues/114
-                        frame = frame.reformat(
+                        frame_resized = frame_resized.reformat(
                             format="yuva420p",
                             dst_colorspace=1,
                         )
-                        rgba_array = yuva_to_rgba(frame)
+                        rgba_array = yuva_to_rgba(frame_resized)
 
                     # Remove pixels that was added to make dimensions even
                     rgba_array = rgba_array[0:width_orig, 0:height_orig]
