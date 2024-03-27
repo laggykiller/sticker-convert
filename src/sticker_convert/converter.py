@@ -19,8 +19,8 @@ from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 
 if TYPE_CHECKING:
-    from av.video.frame import VideoFrame  # type: ignore
-    from av.video.plane import VideoPlane  # type: ignore
+    from av.video.frame import VideoFrame
+    from av.video.plane import VideoPlane
 
 MSG_START_COMP = "[I] Start compressing {} -> {}"
 MSG_SKIP_COMP = "[S] Compatible file found, skip compress and just copy {} -> {}"
@@ -438,6 +438,7 @@ class StickerConvert:
         from av.codec.context import CodecContext
         from av.container.input import InputContainer
         from av.video.codeccontext import VideoCodecContext
+        from av.video.frame import VideoFrame
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
@@ -458,19 +459,31 @@ class StickerConvert:
 
             for packet in container.demux(container.streams.video):
                 for frame in context.decode(packet):
-                    if frame.width % 2 != 0:
-                        width = frame.width - 1
-                    else:
-                        width = frame.width
+                    width_orig = frame.width
+                    height_orig = frame.height
 
-                    if frame.height % 2 != 0:
-                        height = frame.height - 1
-                    else:
-                        height = frame.height
+                    # Need to pad frame to even dimension first
+                    if width_orig % 2 == 1 or height_orig % 2 == 1:
+                        from av.filter import Graph
+
+                        width_new = width_orig + width_orig % 2
+                        height_new = height_orig + height_orig % 2
+
+                        graph = Graph()
+                        in_src = graph.add_buffer(template=container.streams.video[0])
+                        pad = graph.add(
+                            "pad", f"{width_new}:{height_new}:0:0:color=#00000000"
+                        )
+                        in_src.link_to(pad)
+                        sink = graph.add("buffersink")
+                        pad.link_to(sink)
+                        graph.configure()
+
+                        graph.push(frame)
+                        frame = cast(VideoFrame, graph.pull())
 
                     if frame.format.name == "yuv420p":
                         rgb_array = frame.to_ndarray(format="rgb24")
-                        cast("np.ndarray[Any, Any]", rgb_array)
                         rgba_array = np.dstack(
                             (
                                 rgb_array,
@@ -482,13 +495,13 @@ class StickerConvert:
                         # Not safe to directly call frame.to_ndarray(format="rgba")
                         # https://github.com/laggykiller/sticker-convert/issues/114
                         frame = frame.reformat(
-                            width=width,
-                            height=height,
                             format="yuva420p",
                             dst_colorspace=1,
                         )
                         rgba_array = yuva_to_rgba(frame)
 
+                    # Remove pixels that was added to make dimensions even
+                    rgba_array = rgba_array[0:width_orig, 0:height_orig]
                     self.frames_raw.append(rgba_array)
 
     def _frames_import_lottie(self) -> None:
@@ -734,10 +747,10 @@ class StickerConvert:
         if 0 in alpha:
             extra_kwargs["transparency"] = 0
             extra_kwargs["disposal"] = 2
-            im_out = [self.quantize(Image.fromarray(i)) for i in frames_processed]
+            im_out = [self.quantize(Image.fromarray(i)) for i in frames_processed]  # type: ignore
         else:
             im_out = [
-                self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB")
+                self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB")  # type: ignore
                 for i in frames_processed
             ]
 
