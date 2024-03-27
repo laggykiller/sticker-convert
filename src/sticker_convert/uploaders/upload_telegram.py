@@ -78,7 +78,7 @@ class UploadTelegram(UploadBase):
         application = (  # type: ignore
             ApplicationBuilder()
             .token(self.opt_cred.telegram_token.strip())
-            .rate_limiter(AIORateLimiter())
+            .rate_limiter(AIORateLimiter(max_retries=3))
             .connect_timeout(timeout)
             .pool_timeout(timeout)
             .read_timeout(timeout)

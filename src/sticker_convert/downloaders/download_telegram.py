@@ -42,7 +42,7 @@ class DownloadTelegram(DownloadBase):
         application = (  # type: ignore
             ApplicationBuilder()
             .token(self.token)
-            .rate_limiter(AIORateLimiter())
+            .rate_limiter(AIORateLimiter(max_retries=3))
             .connect_timeout(timeout)
             .pool_timeout(timeout)
             .read_timeout(timeout)
