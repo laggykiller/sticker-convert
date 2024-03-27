@@ -5,11 +5,15 @@ import mmap
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
 from io import BytesIO
-from math import gcd, lcm
+from math import gcd
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Tuple, Union, cast
 
 from PIL import Image, UnidentifiedImageError
+
+
+def lcm(a: int, b: int):
+    return abs(a * b) // gcd(a, b)
 
 
 def rounding(value: float) -> Decimal:
@@ -52,8 +56,10 @@ def durations_gcd(*durations: Union[int, float]) -> Union[float, Fraction]:
     if any(i for i in durations if isinstance(i, float)):
         if all(i for i in durations if isinstance(i, int) or is_recurring_dec_int(i)):
             return Fraction(gcd(*(int(rounding(i)) for i in durations)), 1)
-        for x in (9, 7, 6, 3):
-            if any(i for i in durations if is_fraction_of_x(i, x)):
+        for x in (3, 6, 7, 9):
+            if all(
+                i for i in durations if isinstance(i, int) or is_fraction_of_x(i, x)
+            ):
                 return Fraction(gcd(*(int(rounding(i * x)) for i in durations)), x)
         else:
             return sum(durations) / len(durations)
@@ -82,6 +88,7 @@ class CodecInfo:
         file: Union[Path, bytes], file_ext: Optional[str] = None
     ) -> Tuple[float, int, float]:
         fps: float
+        duration: float
 
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
@@ -93,9 +100,9 @@ class CodecInfo:
             else:
                 duration = 0
         elif file_ext == ".webp":
-            frames, duration, fps = CodecInfo._get_file_frames_duration_fps_webp(file)
+            fps, frames, duration = CodecInfo._get_file_fps_frames_duration_webp(file)
         elif file_ext in (".gif", ".apng", ".png"):
-            frames, duration, fps = CodecInfo._get_file_frames_duration_fps_pillow(file)
+            fps, frames, duration = CodecInfo._get_file_fps_frames_duration_pillow(file)
         else:
             frames, duration = CodecInfo._get_file_frames_duration_av(file)
 
@@ -114,10 +121,10 @@ class CodecInfo:
         if file_ext == ".tgs":
             return CodecInfo._get_file_fps_tgs(file)
         elif file_ext == ".webp":
-            _, _, fps = CodecInfo._get_file_frames_duration_fps_webp(file)
+            fps, _, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
             return fps
         elif file_ext in (".gif", ".apng", ".png"):
-            _, _, fps = CodecInfo._get_file_frames_duration_fps_pillow(file)
+            fps, _, _ = CodecInfo._get_file_fps_frames_duration_pillow(file)
             return fps
 
         frames, duration = CodecInfo._get_file_frames_duration_av(
@@ -141,7 +148,7 @@ class CodecInfo:
         if file_ext == ".tgs":
             return CodecInfo._get_file_frames_tgs(file)
         if file_ext in (".gif", ".webp", ".png", ".apng"):
-            frames, _, _ = CodecInfo._get_file_frames_duration_fps_pillow(
+            _, frames, _ = CodecInfo._get_file_fps_frames_duration_pillow(
                 file, frames_only=True
             )
         else:
@@ -159,6 +166,8 @@ class CodecInfo:
     def get_file_duration(
         file: Union[Path, bytes], file_ext: Optional[str] = None
     ) -> float:
+        duration: float
+
         # Return duration in miliseconds
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
@@ -170,9 +179,9 @@ class CodecInfo:
             else:
                 duration = 0
         elif file_ext == ".webp":
-            _, duration, _ = CodecInfo._get_file_frames_duration_fps_webp(file)
+            _, _, duration = CodecInfo._get_file_fps_frames_duration_webp(file)
         elif file_ext in (".gif", ".png", ".apng"):
-            _, duration, _ = CodecInfo._get_file_frames_duration_fps_pillow(file)
+            _, _, duration = CodecInfo._get_file_fps_frames_duration_pillow(file)
         else:
             _, duration = CodecInfo._get_file_frames_duration_av(file)
 
@@ -228,9 +237,9 @@ class CodecInfo:
         return fps, frames
 
     @staticmethod
-    def _get_file_frames_duration_fps_pillow(
+    def _get_file_fps_frames_duration_pillow(
         file: Union[Path, bytes], frames_only: bool = False
-    ) -> Tuple[int, float, float]:
+    ) -> Tuple[float, int, float]:
         total_duration = 0.0
         durations: List[float] = []
 
@@ -238,7 +247,7 @@ class CodecInfo:
             if "n_frames" in dir(im):
                 frames = im.n_frames
                 if frames_only is True:
-                    return frames, 1, 0.0
+                    return 0.0, frames, 1
                 for i in range(im.n_frames):
                     im.seek(i)
                     frame_duration = cast(float, im.info.get("duration", 1000))
@@ -253,14 +262,18 @@ class CodecInfo:
                     duration_gcd = durations_gcd(*durations)
                     frames_apparent = total_duration / duration_gcd
                     fps = frames_apparent / total_duration * 1000
-                return frames, total_duration, fps
+                return fps, frames, total_duration
 
-        return 1, 0, 0.0
+        return (
+            0.0,
+            1,
+            0,
+        )
 
     @staticmethod
-    def _get_file_frames_duration_fps_webp(
+    def _get_file_fps_frames_duration_webp(
         file: Union[Path, bytes],
-    ) -> Tuple[int, int, float]:
+    ) -> Tuple[float, int, int]:
         total_duration = 0
         frames = 0
         durations: List[int] = []
@@ -288,7 +301,7 @@ class CodecInfo:
                     frames += 1
 
         if frames == 0:
-            return 1, 0, 0.0
+            return 0.0, 0, 0
 
         if len(durations) == 1:
             fps = frames / total_duration * 1000
@@ -297,7 +310,7 @@ class CodecInfo:
             frames_apparent = total_duration / duration_gcd
             fps = float(frames_apparent / total_duration * 1000)
 
-        return frames, total_duration, fps
+        return fps, frames, total_duration
 
     @staticmethod
     def _get_file_frames_duration_av(
