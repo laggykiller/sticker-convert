@@ -416,7 +416,7 @@ class StickerConvert:
 
         if suffix in (".tgs", ".lottie", ".json"):
             self._frames_import_lottie()
-        elif suffix in (".webp", ".apng", "png"):
+        elif suffix in (".webp", ".apng", ".png", ".gif"):
             # ffmpeg do not support webp decoding (yet)
             # ffmpeg could fail to decode apng if file is buggy
             self._frames_import_pillow()
