@@ -109,11 +109,7 @@ def yuva_to_rgba(frame: "VideoFrame") -> "np.ndarray[Any, Any]":
         yuv_array[:, :, 1:].clip(16, 240).astype(yuv_array.dtype) - 128  # type: ignore
     )
 
-    rgb_array = (
-        cast("np.ndarray[Any, Any]", np.matmul(yuv_array, YUV_RGB_MATRIX.T))
-        .clip(0, 255)
-        .astype("uint8")
-    )
+    rgb_array = np.matmul(yuv_array, YUV_RGB_MATRIX.T).clip(0, 255).astype("uint8")
 
     return np.concatenate((rgb_array, a), axis=2)
 
