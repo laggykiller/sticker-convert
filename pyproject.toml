@@ -40,7 +40,7 @@ Repository = "https://github.com/laggykiller/sticker-convert"
 sticker-convert = "sticker_convert.__main__:main"
 
 [build-system]
-requires = ["setuptools>=61.0.0", "wheel"]
+requires = ["setuptools>=61.0.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
