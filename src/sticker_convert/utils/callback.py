@@ -13,15 +13,17 @@ CbQueueItemType = Union[CbQueueTupleType, str, None]
 WorkQueueItemType = Optional[Tuple[Callable[..., Any], Tuple[Any, ...]]]
 ResponseItemType = Union[bool, str, None]
 
-CbQueueType = Queue[CbQueueItemType]
-WorkQueueType = Queue[WorkQueueItemType]
 if TYPE_CHECKING:
     # mypy complains about this
     ResultsListType = ListProxy[Any]  # type: ignore
     ResponseListType = ListProxy[ResponseItemType]  # type: ignore
+    CbQueueType = Queue[CbQueueItemType]  # type: ignore
+    WorkQueueType = Queue[WorkQueueItemType]  # type: ignore
 else:
     ResultsListType = List[Any]
     ResponseListType = List[ResponseItemType]
+    CbQueueType = Queue
+    WorkQueueType = Queue
 
 
 class CallbackReturn:
