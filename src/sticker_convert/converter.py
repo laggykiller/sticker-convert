@@ -647,8 +647,6 @@ class StickerConvert:
         frame_current = 0
         frame_current_float = 0.0
         while True:
-            frame_current_float += frame_increment
-            frame_current = int(rounding(frame_current_float))
             if frame_current <= len(frames_in) - 1 and not (
                 frames_out_max and len(frames_out) == frames_out_max
             ):
@@ -659,6 +657,8 @@ class StickerConvert:
                 ):
                     frames_out.append(frames_in[-1])
                 return frames_out
+            frame_current_float += frame_increment
+            frame_current = int(rounding(frame_current_float))
 
     def frames_export(self) -> None:
         is_animated = len(self.frames_processed) > 1 and self.fps
