@@ -678,10 +678,8 @@ class StickerConvert:
                 self._frames_export_apng()
             else:
                 self._frames_export_png()
-        elif self.out_f.suffix == ".webp" and is_animated:
-            self._frames_export_webp()
-        elif self.out_f.suffix == ".gif":
-            self._frames_export_gif()
+        elif self.out_f.suffix in (".gif", ".webp"):
+            self._frames_export_pil_anim()
         elif self.out_f.suffix in (".webm", ".mp4", ".mkv") or is_animated:
             self._frames_export_pyav()
         else:
@@ -734,7 +732,7 @@ class StickerConvert:
                 output.mux(out_stream.encode(av_frame))
             output.mux(out_stream.encode())
 
-    def _frames_export_gif(self) -> None:
+    def _frames_export_pil_anim(self) -> None:
         extra_kwargs: Dict[str, Any] = {}
 
         # disposal=2 on gif cause flicker in image with transparency
@@ -745,25 +743,32 @@ class StickerConvert:
         else:
             extra_kwargs["optimize"] = True
 
-        # GIF can only have one alpha color
-        # Change lowest alpha to alpha=0
-        # Only keep alpha=0 and alpha=255, nothing in between
-        frames_processed = np.array(self.frames_processed)
-        alpha = frames_processed[:, :, :, 3]
-        alpha_min = np.min(alpha)  # type: ignore
-        if alpha_min < 255:
-            alpha[alpha > alpha_min] = 255
-            alpha[alpha == alpha_min] = 0
+        if self.out_f.suffix == ".gif":
+            # GIF can only have one alpha color
+            # Change lowest alpha to alpha=0
+            # Only keep alpha=0 and alpha=255, nothing in between
+            frames_processed = np.array(self.frames_processed)
+            alpha = frames_processed[:, :, :, 3]
+            alpha_min = np.min(alpha)  # type: ignore
+            if alpha_min < 255:
+                alpha[alpha > alpha_min] = 255
+                alpha[alpha == alpha_min] = 0
 
-        if 0 in alpha:
-            extra_kwargs["transparency"] = 0
-            extra_kwargs["disposal"] = 2
-            im_out = [self.quantize(Image.fromarray(i)) for i in frames_processed]  # type: ignore
+            if 0 in alpha:
+                extra_kwargs["transparency"] = 0
+                extra_kwargs["disposal"] = 2
+                im_out = [self.quantize(Image.fromarray(i)) for i in frames_processed]  # type: ignore
+            else:
+                im_out = [
+                    self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB")  # type: ignore
+                    for i in frames_processed
+                ]
+                extra_kwargs["format"] = "GIF"
+        elif self.out_f.suffix == ".webp":
+            im_out = [Image.fromarray(i) for i in self.frames_processed]  # type: ignore
+            extra_kwargs["format"] = "WebP"
         else:
-            im_out = [
-                self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB")  # type: ignore
-                for i in frames_processed
-            ]
+            raise RuntimeError(f"Invalid format {self.out_f.suffix}")
 
         if self.fps:
             extra_kwargs["save_all"] = True
@@ -773,40 +778,9 @@ class StickerConvert:
 
         im_out[0].save(
             self.tmp_f,
-            format="GIF",
             quality=self.quality,
             **extra_kwargs,
         )
-
-    def _frames_export_webp(self) -> None:
-        import webp  # type: ignore
-
-        assert self.fps
-
-        config = webp.WebPConfig.new(quality=self.quality)  # type: ignore
-        enc = webp.WebPAnimEncoder.new(self.res_w, self.res_h)  # type: ignore
-        timestamp_ms = 0
-        timestamp_inc = int(1000 / self.fps)
-
-        pic = webp.WebPPicture.from_numpy(self.frames_processed[0])  # type: ignore
-        enc.encode_frame(pic, 0, config=config)  # type: ignore
-
-        frame_num = 1
-        frame_num_prev = 1
-        frame_total = len(self.frames_processed)
-        while frame_num < frame_total - 1:
-            while frame_num < frame_total - 1 and np.array_equal(
-                self.frames_processed[frame_num_prev],
-                self.frames_processed[frame_num],
-            ):
-                timestamp_ms += timestamp_inc
-                frame_num += 1
-            pic = webp.WebPPicture.from_numpy(self.frames_processed[frame_num])  # type: ignore
-            enc.encode_frame(pic, timestamp_ms, config=config)  # type: ignore
-            frame_num_prev = frame_num
-
-        anim_data = enc.assemble(timestamp_ms)  # type: ignore
-        self.tmp_f.write(anim_data.buffer())  # type: ignore
 
     def _frames_export_png(self) -> None:
         with Image.fromarray(self.frames_processed[0], "RGBA") as image:  # type: ignore
