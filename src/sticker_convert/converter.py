@@ -767,6 +767,8 @@ class StickerConvert:
         elif self.out_f.suffix == ".webp":
             im_out = [Image.fromarray(i) for i in self.frames_processed]  # type: ignore
             extra_kwargs["format"] = "WebP"
+            extra_kwargs["minimize_size"] = True
+            extra_kwargs["method"] = 6
         else:
             raise RuntimeError(f"Invalid format {self.out_f.suffix}")
 
