@@ -602,6 +602,9 @@ class Job:
                 in_fs.append(i)
 
         in_fs_count = len(in_fs)
+        if in_fs_count == 0:
+            self.executor.cb("No files to compress")
+            return True
 
         self.executor.cb(msg)
         self.executor.cb(
