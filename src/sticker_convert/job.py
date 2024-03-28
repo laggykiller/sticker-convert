@@ -172,8 +172,6 @@ class Executor:
         except KeyboardInterrupt:
             pass
 
-        if self.cb_thread_instance:
-            self.cb_thread_instance.join()
         self.processes.clear()
 
     def kill_workers(self, *_: Any, **__: Any) -> None:
@@ -182,14 +180,14 @@ class Executor:
         for process in self.processes:
             process.terminate()
 
-        self.cleanup(killed=True)
+        self.cb_msg("Job cancelled.")
+        self.cleanup()
 
-    def cleanup(self, killed: bool = False) -> None:
-        if killed:
-            self.cb_msg("Job cancelled.")
+    def cleanup(self) -> None:
         self.cb_bar("clear")
-        # self.cb_queue.put(None)
-        self.manager.shutdown()
+        self.cb_queue.put(None)
+        if self.cb_thread_instance:
+            self.cb_thread_instance.join()
 
 
 class Job:
