@@ -69,6 +69,8 @@ class CompOption(BaseOption):
 
     bg_color: Optional[str] = None
 
+    padding_percent: int = 0
+
     steps: int = 1
     fake_vid: Optional[bool] = None
     quantize_method: Optional[str] = None
@@ -104,6 +106,7 @@ class CompOption(BaseOption):
             "duration": {"min": self.duration_min, "max": self.duration_max},
             "steps": self.steps,
             "bg_color": self.bg_color,
+            "padding_percent": self.padding_percent,
             "fake_vid": self.fake_vid,
             "quantize_method": self.quantize_method,
             "scale_filter": self.scale_filter,

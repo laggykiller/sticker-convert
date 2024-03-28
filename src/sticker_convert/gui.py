@@ -125,6 +125,7 @@ class GUI(Window):
         self.duration_min_var = IntVar(self)
         self.duration_max_var = IntVar(self)
         self.duration_disable_var = BooleanVar()
+        self.padding_percent_var = IntVar(self)
         self.img_size_max_var = IntVar(self)
         self.vid_size_max_var = IntVar(self)
         self.size_disable_var = BooleanVar()
@@ -519,6 +520,7 @@ class GUI(Window):
             if not self.duration_disable_var.get()
             else None,
             bg_color=self.bg_color_var.get(),
+            padding_percent=self.padding_percent_var.get(),
             steps=self.steps_var.get(),
             fake_vid=self.fake_vid_var.get(),
             scale_filter=self.scale_filter_var.get(),
@@ -642,10 +644,10 @@ class GUI(Window):
 
     def cb_bar(
         self,
-        *args: Any,
         set_progress_mode: Optional[str] = None,
         steps: int = 0,
         update_bar: int = 0,
+        *args: Any,
         **kwargs: Any,
     ) -> None:
         self.progress_frame.update_progress_bar(

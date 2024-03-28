@@ -39,6 +39,7 @@
         "duration": "Change playback speed if outside of duration limit.\nDuration set in miliseconds.\n0 will disable limit.",
         "duration_min": "Set minimum output duration in miliseconds.",
         "duration_max": "Set maximum output duration in miliseconds.",
+        "padding_percent": "Set percentage of space used as padding.",
         "bg_color": "Set custom background color.\nExample: 00ff00 for green.\nIf this is not set, background color would be auto set to black if image is bright, or white if image is dark.\nNote: The color should not be visible if output format supports transparency.",
         "size": "Set maximum file size in bytes for video and image.",
         "vid_size_max": "Set maximum file size limit for animated stickers.",

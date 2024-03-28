@@ -227,6 +227,16 @@ class AdvancedCompressionWindow(BaseWindow):
         )
         self.color_power_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
+        self.padding_percent_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["padding_percent"]
+        )
+        self.padding_percent_lbl1 = Label(self.frame_advcomp, text="Padding")
+        self.padding_percent_lbl2 = Label(self.frame_advcomp, text="0-100%")
+        self.padding_percent_entry = Entry(
+            self.frame_advcomp, textvariable=self.gui.padding_percent_var, width=8
+        )
+        self.padding_percent_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+
         self.fake_vid_help_btn = self.add_help_btn(self.gui.help["comp"]["fake_vid"])
         self.fake_vid_lbl = Label(
             self.frame_advcomp, text="Convert (faking) image to video"
@@ -297,113 +307,119 @@ class AdvancedCompressionWindow(BaseWindow):
         self.ph_im = ImageTk.PhotoImage(self.im)
         self.default_emoji_dsp = Label(self.frame_advcomp, image=self.ph_im)
 
-        self.fps_help_btn.grid(column=0, row=2, sticky="w", padx=3, pady=3)
-        self.fps_lbl.grid(column=1, row=2, sticky="w", padx=3, pady=3)
-        self.fps_min_lbl.grid(column=2, row=2, sticky="w", padx=3, pady=3)
-        self.fps_min_entry.grid(column=3, row=2, sticky="nes", padx=3, pady=3)
-        self.fps_max_lbl.grid(column=4, row=2, sticky="w", padx=3, pady=3)
-        self.fps_max_entry.grid(column=5, row=2, sticky="nes", padx=3, pady=3)
-        self.fps_disable_cbox.grid(column=6, row=2, sticky="nes", padx=3, pady=3)
-
-        self.res_w_help_btn.grid(column=0, row=3, sticky="w", padx=3, pady=3)
-        self.res_w_lbl.grid(column=1, row=3, sticky="w", padx=3, pady=3)
-        self.res_w_min_lbl.grid(column=2, row=3, sticky="w", padx=3, pady=3)
-        self.res_w_min_entry.grid(column=3, row=3, sticky="nes", padx=3, pady=3)
-        self.res_w_max_lbl.grid(column=4, row=3, sticky="w", padx=3, pady=3)
-        self.res_w_max_entry.grid(column=5, row=3, sticky="nes", padx=3, pady=3)
-        self.res_w_disable_cbox.grid(column=6, row=3, sticky="nes", padx=3, pady=3)
-
-        self.res_h_help_btn.grid(column=0, row=4, sticky="w", padx=3, pady=3)
-        self.res_h_lbl.grid(column=1, row=4, sticky="w", padx=3, pady=3)
-        self.res_h_min_lbl.grid(column=2, row=4, sticky="w", padx=3, pady=3)
-        self.res_h_min_entry.grid(column=3, row=4, sticky="nes", padx=3, pady=3)
-        self.res_h_max_lbl.grid(column=4, row=4, sticky="w", padx=3, pady=3)
-        self.res_h_max_entry.grid(column=5, row=4, sticky="nes", padx=3, pady=3)
-        self.res_h_disable_cbox.grid(column=6, row=4, sticky="nes", padx=3, pady=3)
-
-        self.quality_help_btn.grid(column=0, row=5, sticky="w", padx=3, pady=3)
-        self.quality_lbl.grid(column=1, row=5, sticky="w", padx=3, pady=3)
-        self.quality_min_lbl.grid(column=2, row=5, sticky="w", padx=3, pady=3)
-        self.quality_min_entry.grid(column=3, row=5, sticky="nes", padx=3, pady=3)
-        self.quality_max_lbl.grid(column=4, row=5, sticky="w", padx=3, pady=3)
-        self.quality_max_entry.grid(column=5, row=5, sticky="nes", padx=3, pady=3)
-        self.quality_disable_cbox.grid(column=6, row=5, sticky="nes", padx=3, pady=3)
-
-        self.color_help_btn.grid(column=0, row=6, sticky="w", padx=3, pady=3)
-        self.color_lbl.grid(column=1, row=6, sticky="w", padx=3, pady=3)
-        self.color_min_lbl.grid(column=2, row=6, sticky="w", padx=3, pady=3)
-        self.color_min_entry.grid(column=3, row=6, sticky="nes", padx=3, pady=3)
-        self.color_max_lbl.grid(column=4, row=6, sticky="w", padx=3, pady=3)
-        self.color_max_entry.grid(column=5, row=6, sticky="nes", padx=3, pady=3)
-        self.color_disable_cbox.grid(column=6, row=6, sticky="nes", padx=3, pady=3)
-
-        self.duration_help_btn.grid(column=0, row=7, sticky="w", padx=3, pady=3)
-        self.duration_lbl.grid(column=1, row=7, sticky="w", padx=3, pady=3)
-        self.duration_min_lbl.grid(column=2, row=7, sticky="w", padx=3, pady=3)
-        self.duration_min_entry.grid(column=3, row=7, sticky="nes", padx=3, pady=3)
-        self.duration_max_lbl.grid(column=4, row=7, sticky="w", padx=3, pady=3)
-        self.duration_max_entry.grid(column=5, row=7, sticky="nes", padx=3, pady=3)
-        self.duration_disable_cbox.grid(column=6, row=7, sticky="nes", padx=3, pady=3)
-
-        self.size_help_btn.grid(column=0, row=8, sticky="w", padx=3, pady=3)
-        self.size_lbl.grid(column=1, row=8, sticky="w", padx=3, pady=3)
-        self.img_size_max_lbl.grid(column=2, row=8, sticky="w", padx=3, pady=3)
-        self.img_size_max_entry.grid(column=3, row=8, sticky="nes", padx=3, pady=3)
-        self.vid_size_max_lbl.grid(column=4, row=8, sticky="w", padx=3, pady=3)
-        self.vid_size_max_entry.grid(column=5, row=8, sticky="nes", padx=3, pady=3)
-        self.size_disable_cbox.grid(column=6, row=8, sticky="nes", padx=3, pady=3)
-
-        self.format_help_btn.grid(column=0, row=9, sticky="w", padx=3, pady=3)
-        self.format_lbl.grid(column=1, row=9, sticky="w", padx=3, pady=3)
-        self.img_format_lbl.grid(column=2, row=9, sticky="w", padx=3, pady=3)
-        self.img_format_entry.grid(column=3, row=9, sticky="nes", padx=3, pady=3)
-        self.vid_format_lbl.grid(column=4, row=9, sticky="w", padx=3, pady=3)
-        self.vid_format_entry.grid(column=5, row=9, sticky="nes", padx=3, pady=3)
-
-        self.power_help_btn1.grid(column=0, row=10, sticky="w", padx=3, pady=3)
-        self.power_lbl1.grid(column=1, row=10, sticky="w", padx=3, pady=3)
-        self.fps_power_lbl.grid(column=2, row=10, sticky="w", padx=3, pady=3)
-        self.fps_power_entry.grid(column=3, row=10, sticky="w", padx=3, pady=3)
-        self.res_power_lbl.grid(column=4, row=10, sticky="w", padx=3, pady=3)
-        self.res_power_entry.grid(column=5, row=10, sticky="w", padx=3, pady=3)
-
-        self.power_help_btn2.grid(column=0, row=11, sticky="w", padx=3, pady=3)
-        self.power_lbl2.grid(column=1, row=11, sticky="w", padx=3, pady=3)
-        self.quality_power_lbl.grid(column=2, row=11, sticky="w", padx=3, pady=3)
-        self.quality_power_entry.grid(column=3, row=11, sticky="w", padx=3, pady=3)
-        self.color_power_lbl.grid(column=4, row=11, sticky="w", padx=3, pady=3)
-        self.color_power_entry.grid(column=5, row=11, sticky="w", padx=3, pady=3)
-
-        self.fake_vid_help_btn.grid(column=0, row=12, sticky="w", padx=3, pady=3)
-        self.fake_vid_lbl.grid(column=1, row=12, sticky="w", padx=3, pady=3)
-        self.fake_vid_cbox.grid(column=6, row=12, sticky="nes", padx=3, pady=3)
-
-        self.bg_color_help_btn.grid(column=0, row=13, sticky="w", padx=3, pady=3)
-        self.bg_color_lbl.grid(column=1, row=13, sticky="w", padx=3, pady=3)
-        self.bg_color_entry.grid(column=5, row=13, sticky="w", padx=3, pady=3)
-        self.bg_color_btn.grid(column=6, row=13, sticky="nes", padx=3, pady=3)
-
-        self.scale_filter_help_btn.grid(column=0, row=14, sticky="w", padx=3, pady=3)
-        self.scale_filter_lbl.grid(column=1, row=14, sticky="w", padx=3, pady=3)
+        r = 0
+        self.fps_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.fps_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.fps_min_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.fps_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.fps_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.fps_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.fps_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.res_w_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.res_w_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.res_w_min_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.res_w_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.res_w_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.res_w_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.res_w_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.res_h_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.res_h_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.res_h_min_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.res_h_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.res_h_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.res_h_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.res_h_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.quality_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.quality_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.quality_min_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.quality_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.quality_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.quality_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.quality_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.color_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.color_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.color_min_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.color_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.color_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.color_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.color_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.duration_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.duration_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.duration_min_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.duration_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.duration_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.duration_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.duration_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.size_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.size_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.img_size_max_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.img_size_max_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.vid_size_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.vid_size_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.size_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.format_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.format_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.img_format_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.img_format_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
+        self.vid_format_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.vid_format_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.power_help_btn1.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.power_lbl1.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.fps_power_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.fps_power_entry.grid(column=3, row=r, sticky="w", padx=3, pady=3)
+        self.res_power_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.res_power_entry.grid(column=5, row=r, sticky="w", padx=3, pady=3)
+        r += 1
+        self.power_help_btn2.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.power_lbl2.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.quality_power_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.quality_power_entry.grid(column=3, row=r, sticky="w", padx=3, pady=3)
+        self.color_power_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
+        self.color_power_entry.grid(column=5, row=r, sticky="w", padx=3, pady=3)
+        r += 1
+        self.padding_percent_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.padding_percent_lbl1.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.padding_percent_lbl2.grid(column=2, row=r, sticky="w", padx=3, pady=3)
+        self.padding_percent_entry.grid(column=3, row=r, sticky="w", padx=3, pady=3)
+        r += 1
+        self.fake_vid_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.fake_vid_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.fake_vid_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.bg_color_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.bg_color_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.bg_color_entry.grid(column=5, row=r, sticky="w", padx=3, pady=3)
+        self.bg_color_btn.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.scale_filter_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.scale_filter_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
         self.scale_filter_opt.grid(
-            column=2, row=14, columnspan=4, sticky="nes", padx=3, pady=3
+            column=2, row=r, columnspan=4, sticky="nes", padx=3, pady=3
         )
-
-        self.quantize_method_help_btn.grid(column=0, row=15, sticky="w", padx=3, pady=3)
-        self.quantize_method_lbl.grid(column=1, row=15, sticky="w", padx=3, pady=3)
+        r += 1
+        self.quantize_method_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.quantize_method_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
         self.quantize_method_opt.grid(
-            column=2, row=15, columnspan=4, sticky="nes", padx=3, pady=3
+            column=2, row=r, columnspan=4, sticky="nes", padx=3, pady=3
         )
-
-        self.cache_dir_help_btn.grid(column=0, row=16, sticky="w", padx=3, pady=3)
-        self.cache_dir_lbl.grid(column=1, row=16, sticky="w", padx=3, pady=3)
+        r += 1
+        self.cache_dir_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.cache_dir_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
         self.cache_dir_entry.grid(
-            column=2, row=16, columnspan=4, sticky="nes", padx=3, pady=3
+            column=2, row=r, columnspan=4, sticky="nes", padx=3, pady=3
         )
-
-        self.default_emoji_help_btn.grid(column=0, row=17, sticky="w", padx=3, pady=3)
-        self.default_emoji_lbl.grid(column=1, row=17, sticky="w", padx=3, pady=3)
-        self.default_emoji_dsp.grid(column=6, row=17, sticky="nes", padx=3, pady=3)
+        r += 1
+        self.default_emoji_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.default_emoji_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.default_emoji_dsp.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
 
         # https://stackoverflow.com/questions/43731784/tkinter-canvas-scrollbar-with-grid
         # Create a frame for the canvas with non-zero row&column weights

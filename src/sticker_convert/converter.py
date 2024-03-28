@@ -597,12 +597,13 @@ class StickerConvert:
             if self.res_h is None:
                 self.res_h = height
 
+            scaling = 1 - (self.opt_comp.padding_percent / 100)
             if width > height:
-                width_new = self.res_w
-                height_new = height * self.res_w // width
+                width_new = int(self.res_w * scaling)
+                height_new = int(height * self.res_w // width * scaling)
             else:
-                height_new = self.res_h
-                width_new = width * self.res_h // height
+                height_new = int(self.res_h * scaling)
+                width_new = int(width * self.res_h // height * scaling)
 
             with im.resize((width_new, height_new), resample=resample) as im_resized:
                 with Image.new(

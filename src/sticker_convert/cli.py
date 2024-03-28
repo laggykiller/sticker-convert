@@ -119,6 +119,7 @@ class CLI:
             "duration_max",
             "vid_size_max",
             "img_size_max",
+            "padding_percent",
         )
         flags_comp_float = ("fps_power", "res_power", "quality_power", "color_power")
         flags_comp_str = (
@@ -372,6 +373,9 @@ class CLI:
             bg_color=self.compression_presets[preset]["bg_color"]
             if args.bg_color is None
             else args.bg_color,
+            padding_percent=self.compression_presets[preset]["padding_percent"]
+            if args.padding_percent is None
+            else args.padding_percent,
             steps=self.compression_presets[preset]["steps"]
             if args.steps is None
             else args.steps,
