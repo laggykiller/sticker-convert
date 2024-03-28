@@ -79,7 +79,7 @@ class CompressWastickers(UploadBase):
                     else:
                         ext = ".png"
 
-                    dst = Path(tempdir, str(num) + ext)
+                    dst = Path(tempdir, f"sticker_{num+1}{ext}")
 
                     if FormatVerify.check_file(
                         src, spec=self.webp_spec
@@ -114,7 +114,7 @@ class CompressWastickers(UploadBase):
         opt_comp_merged.merge(self.spec_cover)
 
         cover_path_old = MetadataHandler.get_cover(self.opt_output.dir)
-        cover_path_new = Path(pack_dir, "100.png")
+        cover_path_new = Path(pack_dir, "tray.png")
         if cover_path_old:
             if FormatVerify.check_file(cover_path_old, spec=self.spec_cover):
                 shutil.copy(cover_path_old, cover_path_new)
@@ -142,7 +142,7 @@ class CompressWastickers(UploadBase):
                 self.cb_return,
             )
 
-        MetadataHandler.set_metadata(pack_dir, author=author, title=title)
+        MetadataHandler.set_metadata(pack_dir, author=author, title=title, newline=True)
 
     @staticmethod
     def start(
