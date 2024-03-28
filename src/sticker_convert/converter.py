@@ -405,7 +405,7 @@ class StickerConvert:
             with open(self.out_f, "wb+") as f:
                 f.write(data)
 
-        if result_step:
+        if result_step is not None:
             msg = MSG_DONE_COMP.format(
                 self.in_f_name, self.out_f_name, self.result_size, result_step
             )
