@@ -17,3 +17,4 @@ signalstickers-client~=3.3.0
 sqlcipher3-wheels~=0.5.2.post1
 tqdm~=4.66.2
 ttkbootstrap-fork-laggykiller~=1.5.1
+webp~=0.3.0

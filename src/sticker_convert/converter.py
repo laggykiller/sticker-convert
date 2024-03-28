@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Uni
 import numpy as np
 from PIL import Image
 from PIL import __version__ as PillowVersion
+from PIL import features
 
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
@@ -32,6 +33,11 @@ MSG_FAIL_COMP = (
     "[F] Failed Compression {} -> {}, "
     "cannot get below limit {} with lowest quality under current settings (Best size: {})"
 )
+MSG_PYWEBP = (
+    "WARNING: System WebP>=0.5.0 was not found, hence Pillow cannot be used "
+    "for creating animated webp. Using pywebp instead, which is known to "
+    "collapse same frames into single frame, causing problem with animation timing."
+)
 
 YUV_RGB_MATRIX = np.array(
     [
@@ -40,6 +46,10 @@ YUV_RGB_MATRIX = np.array(
         [1.164, 2.112, 0.000],
     ]
 )
+
+# Whether animated WebP is supported
+# See https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#saving-sequences
+PIL_WEBP_ANIM = cast(bool, features.check("webp_anim"))  # type: ignore
 
 
 def get_step_value(
@@ -179,6 +189,7 @@ class StickerConvert:
         self.result_step: Optional[int] = None
 
         self.apngasm = None
+        self.pywebp_warning_displayed = False
 
     @staticmethod
     def convert(
@@ -678,8 +689,12 @@ class StickerConvert:
                 self._frames_export_apng()
             else:
                 self._frames_export_png()
-        elif self.out_f.suffix in (".gif", ".webp"):
+        elif self.out_f.suffix == ".gif" or (
+            self.out_f.suffix == ".webp" and (PIL_WEBP_ANIM or not is_animated)
+        ):
             self._frames_export_pil_anim()
+        elif self.out_f.suffix == ".webp":
+            self._frames_export_webp()
         elif self.out_f.suffix in (".webm", ".mp4", ".mkv") or is_animated:
             self._frames_export_pyav()
         else:
@@ -708,7 +723,7 @@ class StickerConvert:
             codec = "apng"
             pixel_format = "rgba"
             options["plays"] = "0"
-        elif self.out_f.suffix in (".webp", ".webm", ".mkv"):
+        elif self.out_f.suffix in (".webm", ".mkv"):
             codec = "libvpx-vp9"
             pixel_format = "yuva420p"
             options["loop"] = "0"
@@ -783,6 +798,29 @@ class StickerConvert:
             quality=self.quality,
             **extra_kwargs,
         )
+
+    def _frames_export_webp(self) -> None:
+        import webp  # type: ignore
+
+        # It was noted that pywebp would collapse all frames.
+        # aed005b attempted to fix this by creating webp with
+        # variable frame duration. However, the webp created would
+        # not be accepted by WhatsApp.
+        # Therefore, we are preferring Pillow over pywebp.
+        if not self.pywebp_warning_displayed:
+            self.cb.put(MSG_PYWEBP)
+
+        assert self.fps
+
+        config = webp.WebPConfig.new(quality=self.quality)  # type: ignore
+        enc = webp.WebPAnimEncoder.new(self.res_w, self.res_h)  # type: ignore
+        timestamp_ms = 0
+        for frame in self.frames_processed:
+            pic = webp.WebPPicture.from_numpy(frame)  # type: ignore
+            enc.encode_frame(pic, timestamp_ms, config=config)  # type: ignore
+            timestamp_ms += int(1000 / self.fps)
+        anim_data = enc.assemble(timestamp_ms)  # type: ignore
+        self.tmp_f.write(anim_data.buffer())  # type: ignore
 
     def _frames_export_png(self) -> None:
         with Image.fromarray(self.frames_processed[0], "RGBA") as image:  # type: ignore
