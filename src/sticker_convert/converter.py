@@ -704,7 +704,7 @@ class StickerConvert:
             self._frames_export_pyav()
         else:
             self._frames_export_pil()
-    
+
     def _check_dup(self) -> bool:
         if len(self.frames_processed) == 1:
             return False
