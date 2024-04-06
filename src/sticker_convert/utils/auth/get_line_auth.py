@@ -5,41 +5,35 @@ from http.cookiejar import CookieJar
 from typing import Any, Callable, Dict, List, Optional, Union
 
 import requests
-import rookiepy  # type: ignore
+import rookiepy
 
 
 class GetLineAuth:
     def get_cred(self) -> Optional[str]:
         browsers: List[Callable[..., Any]] = [
-            rookiepy.load,  # type: ignore # Supposed to load from any browser, but may fail
-            rookiepy.firefox,  # type: ignore
-            rookiepy.libre_wolf,  # type: ignore
-            rookiepy.chrome,  # type: ignore
-            rookiepy.chromium,  # type: ignore
-            rookiepy.brave,  # type: ignore
-            rookiepy.edge,  # type: ignore
-            rookiepy.opera,  # type: ignore
-            rookiepy.vivaldi,  # type: ignore
+            rookiepy.load, # Supposed to load from any browser, but may fail
+            rookiepy.firefox,
+            rookiepy.librewolf,
+            rookiepy.chrome,
+            rookiepy.chromium,
+            rookiepy.brave,
+            rookiepy.edge,
+            rookiepy.opera,
+            rookiepy.vivaldi,
         ]
-
-        # https://github.com/thewh1teagle/rookie/pull/24
-        if "libre_wolf" in rookiepy.__all__:
-            browsers.extend(rookiepy.libre_wolf)  # type: ignore
-        else:
-            browsers.extend(rookiepy.librewolf)  # type: ignore
 
         if platform.system() == "Windows":
             browsers.extend(
                 [
-                    rookiepy.opera_gx,  # type: ignore
-                    rookiepy.internet_explorer,  # type: ignore
+                    rookiepy.opera_gx,
+                    rookiepy.internet_explorer,
                 ]
             )
         elif platform.system() == "Darwin":
             browsers.extend(
                 [
-                    rookiepy.opera_gx,  # type: ignore
-                    rookiepy.safari,  # type: ignore
+                    rookiepy.opera_gx,
+                    rookiepy.safari,
                 ]
             )
 
@@ -48,7 +42,7 @@ class GetLineAuth:
         for browser in browsers:
             try:
                 cookies_dict = browser(["store.line.me"])
-                cookies_jar = rookiepy.to_cookiejar(cookies_dict)  # type: ignore
+                cookies_jar = rookiepy.to_cookiejar(cookies_dict)
 
                 if GetLineAuth.validate_cookies(cookies_jar):
                     break
