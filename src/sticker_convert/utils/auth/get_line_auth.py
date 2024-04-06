@@ -11,7 +11,7 @@ import rookiepy
 class GetLineAuth:
     def get_cred(self) -> Optional[str]:
         browsers: List[Callable[..., Any]] = [
-            rookiepy.load, # Supposed to load from any browser, but may fail
+            rookiepy.load,  # Supposed to load from any browser, but may fail
             rookiepy.firefox,
             rookiepy.librewolf,
             rookiepy.chrome,
