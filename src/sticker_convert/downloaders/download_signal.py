@@ -3,9 +3,9 @@ from pathlib import Path
 from typing import Dict, Optional
 
 import anyio
-from signalstickers_client import StickersClient  # type: ignore
-from signalstickers_client.errors import SignalException  # type: ignore
-from signalstickers_client.models import StickerPack  # type: ignore
+from signalstickers_client.errors import SignalException
+from signalstickers_client.models import StickerPack
+from signalstickers_client.stickersclient import StickersClient
 
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
@@ -21,7 +21,7 @@ class DownloadSignal(DownloadBase):
     @staticmethod
     async def get_pack(pack_id: str, pack_key: str) -> StickerPack:
         async with StickersClient() as client:
-            pack = await client.get_pack(pack_id, pack_key)  # type: ignore
+            pack = await client.get_pack(pack_id, pack_key)
 
         return pack
 
@@ -32,14 +32,14 @@ class DownloadSignal(DownloadBase):
                 None,
                 {
                     "set_progress_mode": "determinate",
-                    "steps": len(pack.stickers),  # type: ignore
+                    "steps": len(pack.stickers),
                 },
             )
         )
 
         emoji_dict: Dict[str, str] = {}
-        for sticker in pack.stickers:  # type: ignore
-            f_id = str(sticker.id).zfill(3)  # type: ignore
+        for sticker in pack.stickers:
+            f_id = str(sticker.id).zfill(3)
             f_path = Path(self.out_dir, f_id)
             with open(f_path, "wb") as f:
                 f.write(sticker.image_data)  # type: ignore

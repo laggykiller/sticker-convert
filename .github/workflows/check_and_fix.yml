@@ -31,8 +31,10 @@ jobs:
       run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json
     - name: mypy
       run: mypy
-    - name: pyright
-      run: pyright
+    # Temporarily disabled due to Pillow typing issue
+    # https://github.com/python/typeshed/issues/11688
+    # - name: pyright
+    #   run: pyright
     - name: Ruff check
       run: ruff check
     - name: Ruff format

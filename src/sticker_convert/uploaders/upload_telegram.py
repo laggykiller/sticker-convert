@@ -2,7 +2,7 @@
 import copy
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 import anyio
 from telegram import InputSticker, Sticker
@@ -96,7 +96,7 @@ class UploadTelegram(UploadBase):
                 "[^0-9a-zA-Z]+", "_", pack_short_name
             )  # name used in url, only alphanum and underscore only
 
-            sticker_set = None
+            sticker_set: Any = None
             try:
                 sticker_set = await bot.get_sticker_set(
                     pack_short_name,
@@ -152,11 +152,10 @@ class UploadTelegram(UploadBase):
             else:
                 sticker_type = Sticker.REGULAR
 
-            input_stickers: List[Tuple[Path, InputSticker]] = []
+            init_input_stickers: List[InputSticker] = []
             sticker_format = None
-            cover_spec_choice = None
-            ext = None
-            for src in stickers:
+            sticker_format_prev = None
+            for count, src in enumerate(stickers):
                 self.cb.put(f"Verifying {src} for uploading to telegram")
 
                 emoji = emoji_dict.get(Path(src).stem, None)
@@ -175,16 +174,13 @@ class UploadTelegram(UploadBase):
                 ext = Path(src).suffix
                 if ext == ".tgs":
                     spec_choice = self.tgs_spec
-                    cover_spec_choice = self.tgs_cover_spec
                     sticker_format = "animated"
                 elif ext == ".webm":
                     spec_choice = self.webm_spec
-                    cover_spec_choice = self.webm_cover_spec
                     sticker_format = "video"
                 else:
                     ext = ".png"
                     spec_choice = self.png_spec
-                    cover_spec_choice = self.png_cover_spec
                     sticker_format = "static"
 
                 if self.opt_output.option == "telegram_emoji":
@@ -203,81 +199,98 @@ class UploadTelegram(UploadBase):
                     )
                     sticker_bytes = cast(bytes, convert_result)
 
-                input_stickers.append(
-                    (src, InputSticker(sticker=sticker_bytes, emoji_list=emoji_list))
+                input_sticker = InputSticker(
+                    sticker=sticker_bytes,
+                    emoji_list=emoji_list,
+                    format=sticker_format,
                 )
 
+                if sticker_set is None:
+                    if count < 50 and (
+                        sticker_format_prev is None
+                        or sticker_format_prev == sticker_format
+                    ):
+                        init_input_stickers.append(input_sticker)
+                    else:
+                        start_msg = f"Creating pack and bulk uploading {count} stickers with same format of {pack_short_name}"
+                        finish_msg = f"Created pack and bulk uploaded {count} stickers with same format of {pack_short_name}"
+                        error_msg = f"Cannot create pack and bulk upload {count} stickers with same format of {pack_short_name} due to"
+                        self.cb.put(start_msg)
+                        try:
+                            await bot.create_new_sticker_set(
+                                user_id=self.telegram_userid,
+                                name=pack_short_name,
+                                title=pack_title,
+                                stickers=init_input_stickers,
+                                sticker_type=sticker_type,
+                            )
+                            sticker_set = True
+                            self.cb.put(finish_msg)
+                        except TelegramError as e:
+                            self.cb.put(f"{error_msg} {e}")
+                            return None
+                else:
+                    try:
+                        # We could use tg.start_soon() here
+                        # But this would disrupt the order of stickers
+                        await bot.add_sticker_to_set(
+                            user_id=self.telegram_userid,
+                            name=pack_short_name,
+                            sticker=input_sticker,
+                        )
+                        self.cb.put(f"Uploaded sticker {src} of {pack_short_name}")
+                    except BadRequest as e:
+                        self.cb.put(
+                            f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
+                        )
+                        if str(e) == "Stickerpack_not_found":
+                            self.cb.put(
+                                "Hint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
+                            )
+                    except TelegramError as e:
+                        self.cb.put(
+                            f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
+                        )
+
+                sticker_format_prev = sticker_format
+
             cover_path = MetadataHandler.get_cover(self.opt_output.dir)
-            thumbnail_bytes: Union[None, bytes, Path] = None
-            if cover_path and cover_spec_choice and ext:
+            if cover_path:
+                thumbnail_bytes: Union[None, bytes, Path] = None
+                cover_ext = Path(cover_path).suffix
+
+                if cover_ext == ".tgs":
+                    thumbnail_format = "animated"
+                    cover_spec_choice = self.tgs_cover_spec
+                elif cover_ext == ".webm":
+                    thumbnail_format = "video"
+                    cover_spec_choice = self.webm_cover_spec
+                else:
+                    cover_ext = ".png"
+                    thumbnail_format = "static"
+                    cover_spec_choice = self.png_cover_spec
+
                 if FormatVerify.check_file(cover_path, spec=cover_spec_choice):
                     with open(cover_path, "rb") as f:
                         thumbnail_bytes = f.read()
                 else:
                     _, _, thumbnail_bytes, _ = StickerConvert.convert(
                         cover_path,
-                        Path(f"bytes{ext}"),
+                        Path(f"bytes{cover_ext}"),
                         self.opt_comp_cover_merged,
                         self.cb,
                         self.cb_return,
                     )
 
-            if sticker_set is None and sticker_format is not None:
-                if len(input_stickers) > 50:
-                    amount_str = "first 50"
-                else:
-                    amount_str = "all"
-                start_msg = f"Creating pack and bulk uploading {amount_str} stickers of {pack_short_name}"
-                finish_msg = f"Created pack and bulk uploaded {amount_str} stickers of {pack_short_name}"
-                error_msg = f"Cannot create pack and bulk upload {amount_str} stickers of {pack_short_name} due to"
-                self.cb.put(start_msg)
-                try:
-                    await bot.create_new_sticker_set(
-                        user_id=self.opt_cred.telegram_userid,
-                        name=pack_short_name,
-                        title=pack_title,
-                        stickers=[a for _, a in input_stickers[:50]],
-                        sticker_format=sticker_format,
-                        sticker_type=sticker_type,
-                    )
-                    self.cb.put(finish_msg)
-                    input_stickers = input_stickers[50:]
-                except TelegramError as e:
-                    self.cb.put(f"{error_msg} {e}")
-                    return None
-
-            for src, sticker in input_stickers:
-                try:
-                    # We could use tg.start_soon() here
-                    # But this would disrupt the order of stickers
-                    await bot.add_sticker_to_set(
-                        user_id=self.opt_cred.telegram_userid,
-                        name=pack_short_name,
-                        sticker=sticker,
-                    )
-                    self.cb.put(f"Uploaded sticker {src} of {pack_short_name}")
-                except BadRequest as e:
-                    self.cb.put(
-                        f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
-                    )
-                    if str(e) == "Stickerpack_not_found":
-                        self.cb.put(
-                            "Hint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
-                        )
-                except TelegramError as e:
-                    self.cb.put(
-                        f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
-                    )
-
-            if thumbnail_bytes is not None:
                 try:
                     self.cb.put(
                         f"Uploading cover (thumbnail) of pack {pack_short_name}"
                     )
                     await bot.set_sticker_set_thumbnail(
                         name=pack_short_name,
-                        user_id=self.opt_cred.telegram_userid,
+                        user_id=self.telegram_userid,
                         thumbnail=thumbnail_bytes,
+                        format=thumbnail_format,
                     )
                     self.cb.put(f"Uploaded cover (thumbnail) of pack {pack_short_name}")
                 except TelegramError as e:
@@ -298,6 +311,12 @@ class UploadTelegram(UploadBase):
 
         if not (self.opt_cred.telegram_token and self.opt_cred.telegram_userid):
             self.cb.put("Token and userid required for uploading to telegram")
+            return urls
+
+        if self.opt_cred.telegram_userid.isnumeric():
+            self.telegram_userid = int(self.opt_cred.telegram_userid)
+        else:
+            self.cb.put("Invalid userid, should contain numbers only")
             return urls
 
         title, _, emoji_dict = MetadataHandler.get_metadata(
@@ -327,11 +346,17 @@ class UploadTelegram(UploadBase):
             )
 
         assert title is not None
+
+        if self.opt_output.option == "telegram_emoji":
+            file_per_pack = 200
+        else:
+            file_per_pack = 120
+
         packs = MetadataHandler.split_sticker_packs(
             self.opt_output.dir,
             title=title,
-            file_per_anim_pack=50,
-            file_per_image_pack=120,
+            file_per_anim_pack=file_per_pack,
+            file_per_image_pack=file_per_pack,
             separate_image_anim=not self.opt_comp.fake_vid,
         )
 

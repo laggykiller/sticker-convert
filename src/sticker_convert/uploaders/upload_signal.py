@@ -4,9 +4,9 @@ from pathlib import Path
 from typing import Any, Dict, List
 
 import anyio
-from signalstickers_client import StickersClient  # type: ignore
-from signalstickers_client.errors import SignalException  # type: ignore
-from signalstickers_client.models import LocalStickerPack, Sticker  # type: ignore
+from signalstickers_client.errors import SignalException
+from signalstickers_client.models import LocalStickerPack, Sticker
+from signalstickers_client.stickersclient import StickersClient
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
@@ -39,7 +39,7 @@ class UploadSignal(UploadBase):
     @staticmethod
     async def upload_pack(pack: LocalStickerPack, uuid: str, password: str) -> str:
         async with StickersClient(uuid, password) as client:
-            pack_id, pack_key = await client.upload_pack(pack)  # type: ignore
+            pack_id, pack_key = await client.upload_pack(pack)
 
         result = (
             f"https://signal.art/addstickers/#pack_id={pack_id}&pack_key={pack_key}"
@@ -53,7 +53,7 @@ class UploadSignal(UploadBase):
             self.cb.put(f"Verifying {src} for uploading to signal")
 
             sticker = Sticker()
-            sticker.id = pack.nb_stickers  # type: ignore
+            sticker.id = pack.nb_stickers
 
             emoji = emoji_dict.get(Path(src).stem, None)
             if not emoji:
@@ -61,7 +61,7 @@ class UploadSignal(UploadBase):
                     f"Warning: Cannot find emoji for file {Path(src).name}, skip uploading this file..."
                 )
                 continue
-            sticker.emoji = emoji[:1]  # type: ignore
+            sticker.emoji = emoji[:1]
 
             if Path(src).suffix == ".webp":
                 spec_choice = self.webp_spec
@@ -84,10 +84,10 @@ class UploadSignal(UploadBase):
 
                 assert isinstance(image_data, bytes)
 
-                sticker.image_data = image_data  # type: ignore
+                sticker.image_data = image_data
             else:
                 with open(src, "rb") as f:
-                    sticker.image_data = f.read()  # type: ignore
+                    sticker.image_data = f.read()
 
             pack._addsticker(sticker)  # type: ignore
 
@@ -140,8 +140,8 @@ class UploadSignal(UploadBase):
         )
         for pack_title, stickers in packs.items():
             pack = LocalStickerPack()
-            pack.title = pack_title  # type: ignore
-            pack.author = author  # type: ignore
+            pack.title = pack_title
+            pack.author = author
 
             self.add_stickers_to_pack(pack, stickers, emoji_dict)
             self.cb.put(f"Uploading pack {pack_title}")
