@@ -346,6 +346,7 @@ class UploadTelegram(UploadBase):
             )
 
         assert title is not None
+        assert emoji_dict is not None
 
         if self.opt_output.option == "telegram_emoji":
             file_per_pack = 200
