@@ -413,6 +413,7 @@ def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
         with_emoji=False,
     )
 
+
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 def test_download_viber_custom_sticker_packs(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
@@ -426,6 +427,7 @@ def test_download_viber_custom_sticker_packs(tmp_path: LocalPath) -> None:
         with_emoji=False,
     )
 
+
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 def test_download_viber_official_sticker_packs(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
@@ -438,6 +440,7 @@ def test_download_viber_official_sticker_packs(tmp_path: LocalPath) -> None:
         with_author=False,
         with_emoji=False,
     )
+
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 def test_download_viber_official_sound_sticker_packs(tmp_path: LocalPath) -> None:
