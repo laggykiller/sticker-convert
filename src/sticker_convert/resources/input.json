@@ -49,6 +49,16 @@
             "author": true
         }
     },
+    "viber": {
+        "full_name": "Download from Viber",
+        "help": "Download viber stickers from a URL as input",
+        "example": "Example: https://stickers.viber.com/pages/example OR https://stickers.viber.com/pages/custom-sticker-packs/example",
+        "address_lbls": "URL address / ID",
+        "metadata_provides": {
+            "title": true,
+            "author": false
+        }
+    },
     "local": {
         "full_name": "From local directory",
         "help": "Load files from local directory on computer",

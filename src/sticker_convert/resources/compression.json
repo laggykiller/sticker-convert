@@ -328,6 +328,53 @@
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
+    "viber": {
+        "size_max": {
+            "img": 0,
+            "vid": 0
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".png"
+        },
+        "fps": {
+            "min": 1,
+            "max": 1,
+            "power": 1
+        },
+        "res": {
+            "w": {
+                "min": 490,
+                "max": 490
+            },
+            "h": {
+                "min": 490,
+                "max": 490
+            },
+            "power": 1
+        },
+        "quality": {
+            "min": 95,
+            "max": 95,
+            "power": 1
+        },
+        "color": {
+            "min": 257,
+            "max": 257,
+            "power": 1
+        },
+        "duration": {
+            "min": 0,
+            "max": 0
+        },
+        "padding_percent": 0,
+        "bg_color": "",
+        "steps": 1,
+        "fake_vid": false,
+        "scale_filter": "bicubic",
+        "quantize_method": "imagequant",
+        "default_emoji": "😀"
+    },
     "imessage_small": {
         "size_max": {
             "img": 500000,

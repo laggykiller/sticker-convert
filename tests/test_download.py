@@ -412,3 +412,42 @@ def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
         with_author=True,
         with_emoji=False,
     )
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_viber_custom_sticker_packs(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="viber",
+        url="https://stickers.viber.com/pages/custom-sticker-packs/11eefcc8e3c228308e3fafd9b834679a19de752fb5c38390",
+        expected_file_count=2,
+        expected_file_formats=[".png"],
+        with_title=True,
+        with_author=False,
+        with_emoji=False,
+    )
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_viber_official_sticker_packs(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="viber",
+        url="https://stickers.viber.com/pages/spring_2024",
+        expected_file_count=14,
+        expected_file_formats=[".png"],
+        with_title=True,
+        with_author=False,
+        with_emoji=False,
+    )
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_viber_official_sound_sticker_packs(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="viber",
+        url="https://stickers.viber.com/pages/spring_2024",
+        expected_file_count=24,
+        expected_file_formats=[".png", ".mp3"],
+        with_title=True,
+        with_author=False,
+        with_emoji=False,
+    )

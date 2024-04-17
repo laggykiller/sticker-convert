@@ -16,6 +16,7 @@ from sticker_convert.downloaders.download_kakao import DownloadKakao
 from sticker_convert.downloaders.download_line import DownloadLine
 from sticker_convert.downloaders.download_signal import DownloadSignal
 from sticker_convert.downloaders.download_telegram import DownloadTelegram
+from sticker_convert.downloaders.download_viber import DownloadViber
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
 from sticker_convert.uploaders.compress_wastickers import CompressWastickers
 from sticker_convert.uploaders.upload_signal import UploadSignal
@@ -526,6 +527,9 @@ class Job:
 
         if self.opt_input.option == "kakao":
             downloaders.append(DownloadKakao.start)
+
+        if self.opt_input.option == "viber":
+            downloaders.append(DownloadViber.start)
 
         if len(downloaders) > 0:
             self.executor.cb("Downloading...")

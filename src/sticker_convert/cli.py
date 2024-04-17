@@ -211,6 +211,7 @@ class CLI:
             "line": args.download_line,
             "telegram": args.download_telegram,
             "kakao": args.download_kakao,
+            "viber": args.download_viber,
         }
 
         download_option = "local"
