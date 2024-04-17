@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
+import anyio
 import requests
 
 from sticker_convert.job_option import CredOption
@@ -28,15 +29,49 @@ class DownloadBase:
     def download_multiple_files(
         self, targets: List[Tuple[str, Path]], retries: int = 3, **kwargs: Any
     ) -> None:
+        anyio.run(self.download_multiple_files_async, targets, retries, **kwargs)
+
+    async def download_multiple_files_async(
+        self, targets: List[Tuple[str, Path]], retries: int = 3, **kwargs: Any
+    ) -> None:
         # targets format: [(url1, dest2), (url2, dest2), ...]
         self.cb.put(
             ("bar", None, {"set_progress_mode": "determinate", "steps": len(targets)})
         )
 
-        for url, dest in targets:
-            self.download_file(url, dest, retries, show_progress=False, **kwargs)
+        async with anyio.create_task_group() as tg:
+            for url, dest in targets:
+                tg.start_soon(self.download_file_async, url, dest, retries, **kwargs)
 
-            self.cb.put("update_bar")
+    async def download_file_async(
+        self,
+        url: str,
+        dest: Path,
+        retries: int = 3,
+        **kwargs: Any,
+    ) -> None:
+        for retry in range(retries):
+            try:
+                response = requests.get(url, allow_redirects=True, **kwargs)
+
+                if not response.ok:
+                    self.cb.put("update_bar")
+                    raise requests.exceptions.RequestException(
+                        f"Error {response.status_code}"
+                    )
+
+                self.cb.put(f"Downloading {url}")
+                with open(dest, "wb+") as f:
+                    f.write(response.content)
+                self.cb.put(f"Downloaded {url}")
+                break
+
+            except requests.exceptions.RequestException as e:
+                self.cb.put(
+                    f"Cannot download {url} (tried {retry+1}/{retries} times): {e}"
+                )
+
+        self.cb.put("update_bar")
 
     def download_file(
         self,
@@ -51,10 +86,12 @@ class DownloadBase:
 
         for retry in range(retries):
             try:
-                response = requests.get(url, stream=True, **kwargs)
+                response = requests.get(
+                    url, stream=True, allow_redirects=True, **kwargs
+                )
                 total_length = int(response.headers.get("content-length"))  # type: ignore
 
-                if response.status_code != 200:
+                if not response.ok:
                     return b""
                 self.cb.put(f"Downloading {url}")
 
@@ -75,16 +112,16 @@ class DownloadBase:
                             self.cb.put("update_bar")
 
                 break
-            except requests.exceptions.RequestException:
-                msg = f"Cannot download {url} (tried {retry+1}/{retries} times)"
-                self.cb.put(msg)
+            except requests.exceptions.RequestException as e:
+                self.cb.put(
+                    f"Cannot download {url} (tried {retry+1}/{retries} times): {e}"
+                )
 
         if not result:
             return b""
         if dest:
             with open(dest, "wb+") as f:
                 f.write(result)
-            msg = f"Downloaded {url}"
-            self.cb.put(msg)
+            self.cb.put(f"Downloaded {url}")
             return b""
         return result
