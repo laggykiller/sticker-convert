@@ -5,7 +5,7 @@
     "manufacturer": "laggykiller",
     "name": "sticker-convert",
     "name_base": "sticker-convert",
-    "comments": "Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage",
+    "comments": "Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, Viber, iMessage",
     "installdir": "sticker-convert",
     "license_file": "msi_res/LICENSE.rtf",
     "startmenu_shortcut": "sticker-convert.exe",

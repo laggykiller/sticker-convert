@@ -88,7 +88,7 @@ jobs:
                 # runtime-fuse2-x86_64 unable to handle xz compression
                 ./appimage-builder --skip-appimage --recipe AppImageBuilder-x86_64.yml
                 # Add .desktop comment
-                sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage/g' ./AppDir/*.desktop
+                sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, Viber, iMessage/g' ./AppDir/*.desktop
                 # Add appdata.xml
                 mkdir -p AppDir/usr/share/metainfo
                 cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
@@ -111,7 +111,7 @@ jobs:
                 # runtime-fuse2-x86_64 unable to handle xz compression
                 ./appimage-builder --skip-appimage --recipe AppImageBuilder-arm64.yml
                 # Add .desktop comment
-                sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, iMessage/g' ./AppDir/*.desktop
+                sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, Viber, iMessage/g' ./AppDir/*.desktop
                 # Add appdata.xml
                 mkdir -p AppDir/usr/share/metainfo
                 cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
