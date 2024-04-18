@@ -26,7 +26,7 @@ class UrlDetect:
             "kakaotalk://store/emoticon/"
         ):
             return "kakao"
-        
+
         if domain == "stickers.viber.com":
             return "viber"
 
