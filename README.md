@@ -381,6 +381,7 @@ See [docs/COMPILING.md](docs/COMPILING.md)
 - [WhatsApp](docs/guide_whatsapp.md)
 - [Line](docs/guide_line.md)
 - [Kakao](docs/guide_kakao.md)
+- [Viber](docs/guide_viber.md)
 - [iMessage](docs/guide_imessage.md)
 
 ### Conversion is slow
