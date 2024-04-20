@@ -199,8 +199,8 @@ Compression options:
                         Set maximum output duration in miliseconds.
   --padding-percent PADDING_PERCENT
                         Set percentage of space used as padding.
-  --bg-color BG_COLOR   Set custom background color.
-                        Example: 00ff00 for green.
+  --bg-color BG_COLOR   Set custom background color in rrggbbaa format.
+                        Example: 00ff00 for green with alpha 0.
                         If this is not set, background color would be auto set to black if image is bright, or white if image is dark.
                         Note: The color should not be visible if output format supports transparency.
   --vid-size-max VID_SIZE_MAX
