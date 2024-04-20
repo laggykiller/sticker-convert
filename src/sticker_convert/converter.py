@@ -228,7 +228,7 @@ class StickerConvert:
         else:
             self.size_max = self.opt_comp.size_max_img
 
-        if self.size_max is None:
+        if self.size_max in (None, 0):
             # No limit to size, create the best quality result
             step_current = 0
         else:
