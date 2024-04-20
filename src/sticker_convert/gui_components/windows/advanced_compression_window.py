@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import re
 from functools import partial
 from tkinter import colorchooser
 from typing import Any, List, Tuple
@@ -580,10 +581,13 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fake_vid_cbox.config(state=state)
 
     def cb_bg_color(self, *_: Any) -> None:
-        color_init = self.gui.bg_color_var.get()[:6]
+        color_init = "#" + self.gui.bg_color_var.get()[:6]
+        color_init = (
+            color_init if re.search(r"^#(?:[0-9a-fA-F]{3}){1,2}$", color_init) else None
+        )
         color = colorchooser.askcolor(
             title="Choose color",
-            initialcolor=color_init,
+            color=color_init,
             parent=self,
         )[1]
         if color:
