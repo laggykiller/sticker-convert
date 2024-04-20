@@ -24,6 +24,7 @@ RELATED_EXTENSIONS = (
     ".webp",
     ".avi",
     ".m4a",
+    ".mp3",
     ".wastickers",
 )
 RELATED_NAME = (
