@@ -186,8 +186,8 @@ class StickerConvert:
 
         self.bg_color: Optional[Tuple[int, int, int, int]] = None
         if self.opt_comp.bg_color:
-            r, g, b = bytes.fromhex(self.opt_comp.bg_color)
-            self.bg_color = (r, g, b, 0)
+            r, g, b, a = bytes.fromhex(self.opt_comp.bg_color)
+            self.bg_color = (r, g, b, a)
 
         self.tmp_f: BytesIO = BytesIO()
         self.result: Optional[bytes] = None

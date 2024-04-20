@@ -580,9 +580,14 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fake_vid_cbox.config(state=state)
 
     def cb_bg_color(self, *_: Any) -> None:
-        color = colorchooser.askcolor(title="Choose color")[1]
+        color_init = self.gui.bg_color_var.get()[:6]
+        color = colorchooser.askcolor(
+            title="Choose color",
+            initialcolor=color_init,
+            parent=self,
+        )[1]
         if color:
-            self.gui.bg_color_var.set(color.replace("#", ""))
+            self.gui.bg_color_var.set(color.replace("#", "") + "00")
         self.lift()
         self.attributes("-topmost", True)  # type: ignore
         self.attributes("-topmost", False)  # type: ignore
