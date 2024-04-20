@@ -804,6 +804,7 @@ class StickerConvert:
             # GIF can only have one alpha color
             # Change lowest alpha to alpha=0
             # Only keep alpha=0 and alpha=255, nothing in between
+            extra_kwargs["format"] = "GIF"
             frames_processed = np.array(self.frames_processed)
             alpha = frames_processed[:, :, :, 3]
             alpha_min = np.min(alpha)  # type: ignore
@@ -820,7 +821,6 @@ class StickerConvert:
                     self.quantize(Image.fromarray(i).convert("RGB")).convert("RGB")  # type: ignore
                     for i in frames_processed
                 ]
-                extra_kwargs["format"] = "GIF"
         elif self.out_f.suffix == ".webp":
             im_out = [Image.fromarray(i) for i in self.frames_processed]  # type: ignore
             extra_kwargs["format"] = "WebP"
