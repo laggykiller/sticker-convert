@@ -439,6 +439,7 @@ See [docs/TODO.md](docs/TODO.md)
 - Information about Kakao animated stickers: https://gist.github.com/chitacan/9802668
 - Downloading and decrypting Kakao animated stickers: https://github.com/blluv/KakaoTalkEmoticonDownloader
 - Application icon taken from [Icons8](https://icons8.com/)
+- Banner generated from [GitHub Socialify](https://socialify.git.ci/)
 
 ## DISCLAIMER
 - The author of this repo is NOT affiliated with Signal, Telegram, WhatsApp, Line, Kakao or Sticker Maker.
