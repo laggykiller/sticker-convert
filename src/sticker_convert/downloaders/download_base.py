@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+from functools import partial
 from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
@@ -29,7 +30,7 @@ class DownloadBase:
     def download_multiple_files(
         self, targets: List[Tuple[str, Path]], retries: int = 3, **kwargs: Any
     ) -> None:
-        anyio.run(self.download_multiple_files_async, targets, retries, **kwargs)
+        anyio.run(partial(self.download_multiple_files_async, targets, retries, **kwargs))
 
     async def download_multiple_files_async(
         self, targets: List[Tuple[str, Path]], retries: int = 3, **kwargs: Any
