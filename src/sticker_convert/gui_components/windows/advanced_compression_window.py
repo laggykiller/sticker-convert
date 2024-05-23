@@ -293,10 +293,10 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
 
-        self.force_pywebp_help_btn = self.add_help_btn(self.gui.help["comp"]["force_pywebp"])
-        self.force_pywebp_lbl = Label(
-            self.frame_advcomp, text="Force pywebp"
+        self.force_pywebp_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["force_pywebp"]
         )
+        self.force_pywebp_lbl = Label(self.frame_advcomp, text="Force pywebp")
         self.force_pywebp_cbox = Checkbutton(
             self.frame_advcomp,
             variable=self.gui.force_pywebp_var,
