@@ -33,11 +33,13 @@ MSG_FAIL_COMP = (
     "[F] Failed Compression {} -> {}, "
     "cannot get below limit {} with lowest quality under current settings (Best size: {})"
 )
+MSG_PYWEBP_FLAG_SET = "`--force-pywebp` was set\n"
+MSG_PYWEBP_NO_LIBWEBP = "system WebP>=0.5.0 was not found.\n"
 MSG_PYWEBP_DUPFRAME = (
     "[W] {} contains duplicated frame.\n"
-    "    System WebP>=0.5.0 was not found, hence Pillow cannot be used\n"
-    "    for creating animated webp. Using pywebp instead, which is known to\n"
-    "    collapse same frames into single frame, causing problem with animation timing."
+    "    Using pywebp instead of Pillow as {}"
+    "    This is faster, but known to collapse same frames into single frame,\n"
+    "    causing problem with animation timing."
 )
 MSG_WEBP_PIL_DUPFRAME = (
     "[W] {} contains duplicated frame.\n"
@@ -718,6 +720,8 @@ class StickerConvert:
         return False
 
     def _frames_export_webp(self) -> None:
+        # TODO: Encode webp with pyav when available
+        # https://github.com/PyAV-Org/PyAV/issues/1352
         has_dup_frames = self._check_dup()
         if self.fps:
             # It was noted that pywebp would collapse all frames.
@@ -726,17 +730,30 @@ class StickerConvert:
             # not be accepted by WhatsApp.
             # Therefore, we are preferring Pillow over pywebp.
             if has_dup_frames:
-                if PIL_WEBP_ANIM:
+                if self.opt_comp.force_pywebp:
+                    if not self.msg_pywebp_dupframe_displayed:
+                        self.cb.put(
+                            MSG_PYWEBP_DUPFRAME.format(
+                                self.in_f_name, MSG_PYWEBP_FLAG_SET
+                            )
+                        )
+                        self.msg_pywebp_dupframe_displayed = True
+                    self._frames_export_pywebp()
+                elif not PIL_WEBP_ANIM:
+                    if not self.msg_pywebp_dupframe_displayed:
+                        self.cb.put(
+                            MSG_PYWEBP_DUPFRAME.format(
+                                self.in_f_name, MSG_PYWEBP_NO_LIBWEBP
+                            )
+                        )
+                        self.msg_pywebp_dupframe_displayed = True
+                    self._frames_export_pywebp()
+                else:
                     # Warn that using Pillow is slower
                     if not self.msg_webp_pil_dupframe_displayed:
                         self.cb.put(MSG_WEBP_PIL_DUPFRAME.format(self.in_f_name))
                         self.msg_webp_pil_dupframe_displayed = True
                     self._frames_export_pil_anim()
-                else:
-                    if not self.msg_pywebp_dupframe_displayed:
-                        self.cb.put(MSG_PYWEBP_DUPFRAME.format(self.in_f_name))
-                        self.msg_pywebp_dupframe_displayed = True
-                    self._frames_export_pywebp()
             else:
                 self._frames_export_pywebp()
         else:
