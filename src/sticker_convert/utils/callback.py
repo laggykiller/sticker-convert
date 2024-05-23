@@ -61,6 +61,7 @@ class Callback(CallbackProtocol):
         ask_str: Optional[Callable[..., str]] = None,
         silent: bool = False,
         no_confirm: bool = False,
+        no_progress: bool = False,
     ) -> None:
         self.progress_bar: Optional[tqdm[Any]] = None
 
@@ -91,6 +92,7 @@ class Callback(CallbackProtocol):
 
         self.silent = silent
         self.no_confirm = no_confirm
+        self.no_progress = no_progress
 
     def cb_msg(self, *args: Any, **kwargs: Any) -> None:
         if self.silent:
@@ -113,7 +115,7 @@ class Callback(CallbackProtocol):
         steps: int = 0,
         update_bar: int = 0,
     ) -> None:
-        if self.silent:
+        if self.silent or self.no_progress:
             return
 
         if self.progress_bar:

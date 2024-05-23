@@ -1,6 +1,7 @@
 {
     "global": {
         "no_confirm": "Do not ask any questions.",
+        "no_progress": "Do not show progress bar in CLI.",
         "custom_presets": "Specify a json file containing custom compression presets.\nSee compression.json for format.\nNote that if present, 'custom_preset.json' from config directory would be auto loaded."
     },
     "input": {

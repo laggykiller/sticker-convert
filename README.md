@@ -92,18 +92,21 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--custom-presets CUSTOM_PRESETS] [--input-dir INPUT_DIR]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--input-dir INPUT_DIR]
                           [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-viber DOWNLOAD_VIBER]
-                          [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE] [--export-signal | --export-telegram | --export-telegram-emoji | --export-whatsapp | --export-imessage]
-                          [--no-compress] [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,imessage_small,imessage_medium,imessage_large,custom}] [--steps STEPS]
-                          [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
-                          [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
-                          [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--padding-percent PADDING_PERCENT]
-                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--scale-filter SCALE_FILTER]
-                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                          [--signal-data-dir SIGNAL_DATA_DIR] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
-                          [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]
-                          [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
+                          [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
+                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-whatsapp | --export-imessage] [--no-compress]
+                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,imessage_small,imessage_medium,imessage_large,custom}] [--steps STEPS]
+                          [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX]
+                          [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
+                          [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
+                          [--color-power COLOR_POWER] [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--padding-percent PADDING_PERCENT]
+                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT]
+                          [--fake-vid] [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--default-emoji DEFAULT_EMOJI]
+                          [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--signal-data-dir SIGNAL_DATA_DIR]
+                          [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
+                          [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
+                          [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth] [--line-cookies LINE_COOKIES] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
@@ -111,6 +114,7 @@ options:
   -h, --help            show this help message and exit
   --version             show program's version number and exit
   --no-confirm          Do not ask any questions.
+  --no-progress         Do not show progress bar in CLI.
   --custom-presets CUSTOM_PRESETS
                         Specify a json file containing custom compression presets.
                         See compression.json for format.
@@ -121,7 +125,7 @@ Input options:
                         Specify input directory.
   --download-auto DOWNLOAD_AUTO
                         Auto detect URL type and download
-                        (Supported input sources: Signal, Telegram, Line, Kakao)
+                        (Supported input sources: Signal, Telegram, Line, Kakao, Viber)
   --download-signal DOWNLOAD_SIGNAL
                         Download signal stickers from a URL as input
                         (Example: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
@@ -200,7 +204,7 @@ Compression options:
   --padding-percent PADDING_PERCENT
                         Set percentage of space used as padding.
   --bg-color BG_COLOR   Set custom background color in rrggbbaa format.
-                        Example: 00ff00 for green with alpha 0.
+                        Example: 00ff0000 for green with alpha 0.
                         If this is not set, background color would be auto set to black if image is bright, or white if image is dark.
                         Note: The color should not be visible if output format supports transparency.
   --vid-size-max VID_SIZE_MAX

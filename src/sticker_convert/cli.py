@@ -53,6 +53,12 @@ class CLI:
             help=self.help["global"]["no_confirm"],
         )
         parser.add_argument(
+            "--no-progress",
+            dest="no_progress",
+            action="store_true",
+            help=self.help["global"]["no_progress"],
+        )
+        parser.add_argument(
             "--custom-presets",
             dest="custom_presets",
             default=None,
@@ -182,6 +188,7 @@ class CLI:
                 print(f"Error: Cannot load custom presets from {args.custom_presets}")
 
         self.cb.no_confirm = args.no_confirm
+        self.cb.no_progress = args.no_progress
 
         self.opt_input = self.get_opt_input(args)
         self.opt_output = self.get_opt_output(args)
