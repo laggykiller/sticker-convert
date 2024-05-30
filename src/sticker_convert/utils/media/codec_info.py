@@ -257,7 +257,7 @@ class CodecInfo:
                 else:
                     duration_gcd = durations_gcd(*durations)
                     frames_apparent = total_duration / duration_gcd
-                    fps = frames_apparent / total_duration * 1000
+                    fps = float(frames_apparent / total_duration * 1000)
                 return fps, frames, total_duration
 
         return 0.0, 1, 0
