@@ -22,7 +22,7 @@ AppDir:
     name: sticker-convert
     icon: sticker-convert
     version: latest
-    exec: usr/bin/python3.12
+    exec: usr/bin/python3.11
     exec_args: "$APPDIR/usr/src/sticker-convert.py $@"
 
   apt:
@@ -43,20 +43,20 @@ AppDir:
     - sourceline: deb http://security.ubuntu.com/ubuntu focal-security multiverse
 
     include:
-      - python3.12
-      - python3.12-tk
-      - python3.12-distutils
+      - python3.11
+      - python3.11-tk
+      - python3.11-distutils
     exclude: []
   
   after_bundle: |
     export PYTHONHOME=$(pwd)/AppDir/usr
-    export PYTHONPATH=$(pwd)/AppDir/usr/lib/python3.12/site-packages:$(pwd)/AppDir/usr/lib/python3.12
+    export PYTHONPATH=$(pwd)/AppDir/usr/lib/python3.11/site-packages:$(pwd)/AppDir/usr/lib/python3.11
     export PATH=$(pwd)/AppDir/usr/bin:$PATH
     # Install pip
-    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.12
+    curl -sS https://bootstrap.pypa.io/get-pip.py | python3.11
     # Install pip packages
-    AppDir/usr/bin/python3.12 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
-    AppDir/usr/bin/python3.12 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
+    AppDir/usr/bin/python3.11 -m pip install --ignore-installed --prefix=/usr --root=AppDir -r ./requirements.txt
+    AppDir/usr/bin/python3.11 -m pip install --ignore-installed --prefix=/usr --root=AppDir certifi opencv-python
 
   runtime:
     env:
@@ -65,9 +65,9 @@ AppDir:
       PYTHONHOME: '${APPDIR}/usr'
       # Path to the site-packages dir or other modules dirs
       # See https://docs.python.org/3/using/cmdline.html#envvar-PYTHONPATH
-      PYTHONPATH: '${APPDIR}/usr/lib/python3.12/site-packages'
+      PYTHONPATH: '${APPDIR}/usr/lib/python3.11/site-packages'
       # SSL Certificates are placed in a different location for every system therefore we ship our own copy
-      SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.12/site-packages/certifi/cacert.pem'
+      SSL_CERT_FILE: '${APPDIR}/usr/lib/python3.11/site-packages/certifi/cacert.pem'
       # Tcl library has to be specified or else cannot find init.tcl
       TCL_LIBRARY: '${APPDIR}/usr/share/tcltk/tcl8.6'
 
