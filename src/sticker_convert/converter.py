@@ -714,34 +714,38 @@ class StickerConvert:
         import av
         from av.video.stream import VideoStream
 
-        options: Dict[str, str] = {}
+        options_container: Dict[str, str] = {}
+        options_stream: Dict[str, str] = {}
 
         if isinstance(self.quality, int):
             # Seems not actually working
-            options["quality"] = str(self.quality)
-            options["lossless"] = "0"
+            options_stream["quality"] = str(self.quality)
+            options_stream["lossless"] = "0"
 
         if self.out_f.suffix in (".apng", ".png"):
             codec = "apng"
             pixel_format = "rgba"
-            options["plays"] = "0"
+            options_container["plays"] = "0"
         elif self.out_f.suffix in (".webm", ".mkv"):
             codec = "libvpx-vp9"
             pixel_format = "yuva420p"
-            options["loop"] = "0"
+            options_container["loop"] = "0"
         elif self.out_f.suffix == ".webp":
             codec = "webp"
             pixel_format = "yuva420p"
-            options["loop"] = "0"
+            options_container["loop"] = "0"
         else:
             codec = "libvpx-vp9"
             pixel_format = "yuv420p"
-            options["loop"] = "0"
+            options_container["loop"] = "0"
 
         with av.open(
-            self.tmp_f, "w", format=self.out_f.suffix.replace(".", "")
+            self.tmp_f,
+            "w",
+            format=self.out_f.suffix.replace(".", ""),
+            options=options_container,
         ) as output:
-            out_stream = output.add_stream(codec, rate=self.fps, options=options)
+            out_stream = output.add_stream(codec, rate=self.fps, options=options_stream)
             out_stream = cast(VideoStream, out_stream)
             assert isinstance(self.res_w, int) and isinstance(self.res_h, int)
             out_stream.width = self.res_w
