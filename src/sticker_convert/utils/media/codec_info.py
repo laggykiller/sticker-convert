@@ -80,9 +80,9 @@ class CodecInfo:
     @staticmethod
     def get_file_fps_frames_duration(
         file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> Tuple[float, int, float]:
+    ) -> Tuple[float, int, int]:
         fps: float
-        duration: float
+        duration: int
 
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
@@ -94,7 +94,7 @@ class CodecInfo:
             else:
                 duration = 0
         elif file_ext == ".webp":
-            fps, frames, duration = CodecInfo._get_file_fps_frames_duration_webp(file)
+            fps, frames, duration, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
         elif file_ext in (".gif", ".apng", ".png"):
             fps, frames, duration = CodecInfo._get_file_fps_frames_duration_pillow(file)
         else:
@@ -115,7 +115,7 @@ class CodecInfo:
         if file_ext == ".tgs":
             return CodecInfo._get_file_fps_tgs(file)
         elif file_ext == ".webp":
-            fps, _, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
+            fps, _, _, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
             return fps
         elif file_ext in (".gif", ".apng", ".png"):
             fps, _, _ = CodecInfo._get_file_fps_frames_duration_pillow(file)
@@ -159,8 +159,8 @@ class CodecInfo:
     @staticmethod
     def get_file_duration(
         file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> float:
-        duration: float
+    ) -> int:
+        duration: int
 
         # Return duration in miliseconds
         if not file_ext and isinstance(file, Path):
@@ -173,7 +173,7 @@ class CodecInfo:
             else:
                 duration = 0
         elif file_ext == ".webp":
-            _, _, duration = CodecInfo._get_file_fps_frames_duration_webp(file)
+            _, _, duration, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
         elif file_ext in (".gif", ".png", ".apng"):
             _, _, duration = CodecInfo._get_file_fps_frames_duration_pillow(file)
         else:
@@ -233,9 +233,9 @@ class CodecInfo:
     @staticmethod
     def _get_file_fps_frames_duration_pillow(
         file: Union[Path, bytes], frames_only: bool = False
-    ) -> Tuple[float, int, float]:
-        total_duration = 0.0
-        durations: List[float] = []
+    ) -> Tuple[float, int, int]:
+        total_duration = 0
+        durations: List[int] = []
 
         with Image.open(file) as im:
             if "n_frames" in dir(im):
@@ -244,7 +244,7 @@ class CodecInfo:
                     return 0.0, frames, 1
                 for i in range(im.n_frames):
                     im.seek(i)
-                    frame_duration = cast(float, im.info.get("duration", 1000))
+                    frame_duration = cast(int, im.info.get("duration", 1000))
                     if frame_duration not in durations and frame_duration != 0:
                         durations.append(frame_duration)
                     total_duration += frame_duration
@@ -263,10 +263,11 @@ class CodecInfo:
     @staticmethod
     def _get_file_fps_frames_duration_webp(
         file: Union[Path, bytes],
-    ) -> Tuple[float, int, int]:
+    ) -> Tuple[float, int, int, List[int]]:
         total_duration = 0
         frames = 0
         durations: List[int] = []
+        durations_unique: List[int] = []
 
         def _open_f(file: Union[Path, bytes]) -> BinaryIO:
             if isinstance(file, Path):
@@ -285,22 +286,23 @@ class CodecInfo:
                         int(frame_duration_32[-1]) & 0b11111100
                     )
                     frame_duration = int.from_bytes(frame_duration_bytes, "little")
-                    if frame_duration not in durations and frame_duration != 0:
-                        durations.append(frame_duration)
+                    if frame_duration not in durations_unique and frame_duration != 0:
+                        durations_unique.append(frame_duration)
+                    durations.append(frame_duration)
                     total_duration += frame_duration
                     frames += 1
 
         if frames <= 1:
-            return 0.0, 1, 0
+            return 0.0, 1, 0, durations
 
-        if len(durations) == 1:
+        if len(durations_unique) == 1:
             fps = frames / total_duration * 1000
         else:
-            duration_gcd = durations_gcd(*durations)
+            duration_gcd = durations_gcd(*durations_unique)
             frames_apparent = total_duration / duration_gcd
             fps = float(frames_apparent / total_duration * 1000)
 
-        return fps, frames, total_duration
+        return fps, frames, total_duration, durations
 
     @staticmethod
     def _get_file_frames_duration_av(

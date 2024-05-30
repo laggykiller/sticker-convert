@@ -430,19 +430,33 @@ class StickerConvert:
                 and im.n_frames != 0
                 and self.codec_info_orig.fps != 0.0
             ):
+                # Pillow is not reliable for getting webp frame durations
+                durations: Optional[List[int]]
+                if im.format == "WEBP":
+                    _, _, _, durations = CodecInfo._get_file_fps_frames_duration_webp(self.in_f)
+                else:
+                    durations = None
+
                 duration_ptr = 0.0
                 duration_inc = 1 / self.codec_info_orig.fps * 1000
-                next_frame_start_duration = im.info.get("duration", 1000)
                 frame = 0
+                if durations is None:
+                    next_frame_start_duration = cast(int, im.info.get("duration", 1000))
+                else:
+                    next_frame_start_duration = durations[0]
                 while True:
                     self.frames_raw.append(np.asarray(im.convert("RGBA")))
                     duration_ptr += duration_inc
                     if duration_ptr >= next_frame_start_duration:
+                        frame += 1
                         if frame == im.n_frames:
                             break
                         im.seek(frame)
-                        next_frame_start_duration += im.info.get("duration", 1000)
-                        frame += 1
+
+                        if durations is None:
+                            next_frame_start_duration += cast(int, im.info.get("duration", 1000))
+                        else:
+                            next_frame_start_duration += durations[frame]
             else:
                 self.frames_raw.append(np.asarray(im.convert("RGBA")))
 
@@ -725,11 +739,11 @@ class StickerConvert:
         if self.out_f.suffix in (".apng", ".png"):
             codec = "apng"
             pixel_format = "rgba"
-            options_container["plays"] = "0"
+            options_stream["plays"] = "0"
         elif self.out_f.suffix in (".webm", ".mkv"):
             codec = "libvpx-vp9"
             pixel_format = "yuva420p"
-            options_container["loop"] = "0"
+            options_stream["loop"] = "0"
         elif self.out_f.suffix == ".webp":
             codec = "webp"
             pixel_format = "yuva420p"
@@ -737,7 +751,7 @@ class StickerConvert:
         else:
             codec = "libvpx-vp9"
             pixel_format = "yuv420p"
-            options_container["loop"] = "0"
+            options_stream["loop"] = "0"
 
         with av.open(
             self.tmp_f,
