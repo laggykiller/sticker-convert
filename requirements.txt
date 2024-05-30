@@ -1,7 +1,7 @@
 aiolimiter~=1.1.0
 anyio~=4.4.0
 apngasm_python~=1.3.1
-av~=12.0.0
+av~=12.1.0
 beautifulsoup4~=4.12.3
 rookiepy~=0.5.1
 imagequant~=1.1.1
@@ -17,4 +17,3 @@ signalstickers-client-fork-laggykiller~=3.3.0.post1
 sqlcipher3-wheels~=0.5.2.post1
 tqdm~=4.66.4
 ttkbootstrap-fork-laggykiller~=1.5.1
-webp~=0.3.0

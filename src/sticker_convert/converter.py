@@ -33,19 +33,6 @@ MSG_FAIL_COMP = (
     "[F] Failed Compression {} -> {}, "
     "cannot get below limit {} with lowest quality under current settings (Best size: {})"
 )
-MSG_PYWEBP_FLAG_SET = "`--force-pywebp` was set\n"
-MSG_PYWEBP_NO_LIBWEBP = "system WebP>=0.5.0 was not found.\n"
-MSG_PYWEBP_DUPFRAME = (
-    "[W] {} contains duplicated frame.\n"
-    "    Using pywebp instead of Pillow as {}"
-    "    This is faster, but known to collapse same frames into single frame,\n"
-    "    causing problem with animation timing."
-)
-MSG_WEBP_PIL_DUPFRAME = (
-    "[W] {} contains duplicated frame.\n"
-    "    Using Pillow to create animated webp to avoid same frames collapse\n"
-    "    into single frame, but this is slower."
-)
 
 YUV_RGB_MATRIX = np.array(
     [
@@ -197,8 +184,6 @@ class StickerConvert:
         self.result_step: Optional[int] = None
 
         self.apngasm = None
-        self.msg_pywebp_dupframe_displayed = False
-        self.msg_webp_pil_dupframe_displayed = False
 
     @staticmethod
     def convert(
@@ -698,11 +683,9 @@ class StickerConvert:
                 self._frames_export_apng()
             else:
                 self._frames_export_png()
-        elif self.out_f.suffix == ".webp":
-            self._frames_export_webp()
         elif self.out_f.suffix == ".gif":
             self._frames_export_pil_anim()
-        elif self.out_f.suffix in (".webm", ".mp4", ".mkv") or is_animated:
+        elif self.out_f.suffix in (".webm", ".mp4", ".mkv", ".webp") or is_animated:
             self._frames_export_pyav()
         else:
             self._frames_export_pil()
@@ -718,46 +701,6 @@ class StickerConvert:
             prev_frame = frame
 
         return False
-
-    def _frames_export_webp(self) -> None:
-        # TODO: Encode webp with pyav when available
-        # https://github.com/PyAV-Org/PyAV/issues/1352
-        has_dup_frames = self._check_dup()
-        if self.fps:
-            # It was noted that pywebp would collapse all frames.
-            # aed005b attempted to fix this by creating webp with
-            # variable frame duration. However, the webp created would
-            # not be accepted by WhatsApp.
-            # Therefore, we are preferring Pillow over pywebp.
-            if has_dup_frames:
-                if self.opt_comp.force_pywebp:
-                    if not self.msg_pywebp_dupframe_displayed:
-                        self.cb.put(
-                            MSG_PYWEBP_DUPFRAME.format(
-                                self.in_f_name, MSG_PYWEBP_FLAG_SET
-                            )
-                        )
-                        self.msg_pywebp_dupframe_displayed = True
-                    self._frames_export_pywebp()
-                elif not PIL_WEBP_ANIM:
-                    if not self.msg_pywebp_dupframe_displayed:
-                        self.cb.put(
-                            MSG_PYWEBP_DUPFRAME.format(
-                                self.in_f_name, MSG_PYWEBP_NO_LIBWEBP
-                            )
-                        )
-                        self.msg_pywebp_dupframe_displayed = True
-                    self._frames_export_pywebp()
-                else:
-                    # Warn that using Pillow is slower
-                    if not self.msg_webp_pil_dupframe_displayed:
-                        self.cb.put(MSG_WEBP_PIL_DUPFRAME.format(self.in_f_name))
-                        self.msg_webp_pil_dupframe_displayed = True
-                    self._frames_export_pil_anim()
-            else:
-                self._frames_export_pywebp()
-        else:
-            self._frames_export_pil()
 
     def _frames_export_pil(self) -> None:
         with Image.fromarray(self.frames_processed[0]) as im:  # type: ignore
@@ -784,6 +727,10 @@ class StickerConvert:
             options["plays"] = "0"
         elif self.out_f.suffix in (".webm", ".mkv"):
             codec = "libvpx-vp9"
+            pixel_format = "yuva420p"
+            options["loop"] = "0"
+        elif self.out_f.suffix == ".webp":
+            codec = "webp"
             pixel_format = "yuva420p"
             options["loop"] = "0"
         else:
@@ -857,21 +804,6 @@ class StickerConvert:
             quality=self.quality,
             **extra_kwargs,
         )
-
-    def _frames_export_pywebp(self) -> None:
-        import webp  # type: ignore
-
-        assert self.fps
-
-        config = webp.WebPConfig.new(quality=self.quality)  # type: ignore
-        enc = webp.WebPAnimEncoder.new(self.res_w, self.res_h)  # type: ignore
-        timestamp_ms = 0
-        for frame in self.frames_processed:
-            pic = webp.WebPPicture.from_numpy(frame)  # type: ignore
-            enc.encode_frame(pic, timestamp_ms, config=config)  # type: ignore
-            timestamp_ms += int(1000 / self.fps)
-        anim_data = enc.assemble(timestamp_ms)  # type: ignore
-        self.tmp_f.write(anim_data.buffer())  # type: ignore
 
     def _frames_export_png(self) -> None:
         with Image.fromarray(self.frames_processed[0], "RGBA") as image:  # type: ignore

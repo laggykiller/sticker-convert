@@ -135,7 +135,6 @@ class CompFrame(LabelFrame):
         self.gui.fake_vid_var.set(preset.get("fake_vid"))
         self.gui.scale_filter_var.set(preset.get("scale_filter"))
         self.gui.quantize_method_var.set(preset.get("quantize_method"))
-        self.gui.force_pywebp_var.set(preset.get("force_pywebp"))
         self.gui.default_emoji_var.set(preset.get("default_emoji"))
         self.gui.steps_var.set(preset.get("steps"))
 

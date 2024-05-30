@@ -44,7 +44,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "signal": {
@@ -92,7 +91,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "telegram": {
@@ -140,7 +138,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "telegram_emoji": {
@@ -188,7 +185,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "whatsapp": {
@@ -236,7 +232,6 @@
         "fake_vid": true,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "line": {
@@ -284,7 +279,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "kakao": {
@@ -332,7 +326,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "viber": {
@@ -380,7 +373,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "imessage_small": {
@@ -428,7 +420,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "imessage_medium": {
@@ -476,7 +467,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "imessage_large": {
@@ -524,7 +514,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     },
     "custom": {
@@ -572,7 +561,6 @@
         "fake_vid": false,
         "scale_filter": "bicubic",
         "quantize_method": "imagequant",
-        "force_pywebp": false,
         "default_emoji": "😀"
     }
 }

@@ -135,7 +135,6 @@ class GUI(Window):
         self.fake_vid_var = BooleanVar()
         self.scale_filter_var = StringVar(self)
         self.quantize_method_var = StringVar(self)
-        self.force_pywebp_var = BooleanVar()
         self.cache_dir_var = StringVar(self)
         self.default_emoji_var = StringVar(self)
         self.steps_var = IntVar(self)
@@ -526,7 +525,6 @@ class GUI(Window):
             fake_vid=self.fake_vid_var.get(),
             scale_filter=self.scale_filter_var.get(),
             quantize_method=self.quantize_method_var.get(),
-            force_pywebp=self.force_pywebp_var.get(),
             cache_dir=self.cache_dir_var.get()
             if self.cache_dir_var.get() != ""
             else None,

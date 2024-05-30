@@ -293,18 +293,6 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
 
-        self.force_pywebp_help_btn = self.add_help_btn(
-            self.gui.help["comp"]["force_pywebp"]
-        )
-        self.force_pywebp_lbl = Label(self.frame_advcomp, text="Force pywebp")
-        self.force_pywebp_cbox = Checkbutton(
-            self.frame_advcomp,
-            variable=self.gui.force_pywebp_var,
-            onvalue=True,
-            offvalue=False,
-            bootstyle="success-round-toggle",  # type: ignore
-        )
-
         self.cache_dir_help_btn = self.add_help_btn(self.gui.help["comp"]["cache_dir"])
         self.cache_dir_lbl = Label(self.frame_advcomp, text="Custom cache directory")
         self.cache_dir_entry = Entry(
@@ -423,10 +411,6 @@ class AdvancedCompressionWindow(BaseWindow):
         self.quantize_method_opt.grid(
             column=2, row=r, columnspan=4, sticky="nes", padx=3, pady=3
         )
-        r += 1
-        self.force_pywebp_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
-        self.force_pywebp_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
-        self.force_pywebp_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
         r += 1
         self.cache_dir_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.cache_dir_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)

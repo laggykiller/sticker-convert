@@ -136,7 +136,7 @@ class CLI:
             "scale_filter",
             "quantize_method",
         )
-        flags_comp_bool = ("fake_vid", "force_pywebp")
+        flags_comp_bool = ("fake_vid",)
         keyword_args: Dict[str, Any]
         for k, v in self.help["comp"].items():
             if k in flags_comp_int:
@@ -390,9 +390,6 @@ class CLI:
             fake_vid=self.compression_presets[preset]["fake_vid"]
             if args.fake_vid is None
             else args.fake_vid,
-            force_pywebp=self.compression_presets[preset]["force_pywebp"]
-            if args.force_pywebp is None
-            else args.force_pywebp,
             cache_dir=args.cache_dir,
             scale_filter=self.compression_presets[preset]["scale_filter"]
             if args.scale_filter is None

@@ -74,7 +74,6 @@ class CompOption(BaseOption):
     steps: int = 1
     fake_vid: Optional[bool] = None
     quantize_method: Optional[str] = None
-    force_pywebp: Optional[bool] = None
     scale_filter: Optional[str] = None
     cache_dir: Optional[str] = None
     default_emoji: str = "😀"
