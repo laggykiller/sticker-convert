@@ -94,7 +94,9 @@ class CodecInfo:
             else:
                 duration = 0
         elif file_ext == ".webp":
-            fps, frames, duration, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
+            fps, frames, duration, _ = CodecInfo._get_file_fps_frames_duration_webp(
+                file
+            )
         elif file_ext in (".gif", ".apng", ".png"):
             fps, frames, duration = CodecInfo._get_file_fps_frames_duration_pillow(file)
         else:

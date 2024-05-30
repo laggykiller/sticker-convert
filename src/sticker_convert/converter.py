@@ -433,7 +433,9 @@ class StickerConvert:
                 # Pillow is not reliable for getting webp frame durations
                 durations: Optional[List[int]]
                 if im.format == "WEBP":
-                    _, _, _, durations = CodecInfo._get_file_fps_frames_duration_webp(self.in_f)
+                    _, _, _, durations = CodecInfo._get_file_fps_frames_duration_webp(
+                        self.in_f
+                    )
                 else:
                     durations = None
 
@@ -454,7 +456,9 @@ class StickerConvert:
                         im.seek(frame)
 
                         if durations is None:
-                            next_frame_start_duration += cast(int, im.info.get("duration", 1000))
+                            next_frame_start_duration += cast(
+                                int, im.info.get("duration", 1000)
+                            )
                         else:
                             next_frame_start_duration += durations[frame]
             else:
