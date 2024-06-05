@@ -92,10 +92,10 @@ def osx_install_universal2_dep() -> None:
     Path("wheel_universal2").mkdir()
 
     osx_run_in_venv(
-        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm"
+        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm --extra-index-url https://www.piwheels.org/simple"
     )
     osx_run_in_venv(
-        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64"
+        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64 --extra-index-url https://www.piwheels.org/simple"
     )
 
     create_universal_wheels(
