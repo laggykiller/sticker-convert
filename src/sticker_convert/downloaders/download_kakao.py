@@ -5,9 +5,10 @@ import json
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, List, Optional, Tuple, cast
 from urllib.parse import urlparse
 
+import js2py  # type: ignore
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
@@ -17,6 +18,26 @@ from sticker_convert.job_option import CredOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
+
+
+def search_bracket(text: str, open_bracket: str = "{", close_bracket: str = "}") -> int:
+    depth = 0
+    is_str = False
+
+    for count, char in enumerate(text):
+        if char == '"':
+            is_str = not is_str
+
+        if is_str is False:
+            if char == open_bracket:
+                depth += 1
+            elif char == close_bracket:
+                depth -= 1
+
+        if depth == 0:
+            return count
+
+    return -1
 
 
 class MetadataKakao:
@@ -36,34 +57,33 @@ class MetadataKakao:
         app_scheme_link_tag = soup.find("a", id="app_scheme_link")  # type: ignore
         assert isinstance(app_scheme_link_tag, Tag)
 
-        data_urls = app_scheme_link_tag.get("data-url")
-        if not data_urls:
-            return None, None
-        if isinstance(data_urls, list):
-            data_url = data_urls[0]
-        else:
-            data_url = data_urls
+        item_code_fake = cast(str, app_scheme_link_tag["data-i"])
 
-        item_code = data_url.replace("kakaotalk://store/emoticon/", "").split("?")[0]
+        js = ""
+        for script_tag in soup.find_all("script"):
+            js = script_tag.string
+            if js and "emoticonDeepLink" in js:
+                break
+        if "emoticonDeepLink" not in js:
+            return None, None
+
+        func_start_pos = js.find("function emoticonDeepLink(")
+        js = js[func_start_pos:]
+        bracket_start_pos = js.find("{")
+        func_end_pos = search_bracket(js[bracket_start_pos:]) + bracket_start_pos
+        js = js[: func_end_pos + 1]
+        web2app_start_pos = js.find("daumtools.web2app(")
+        js = js[:web2app_start_pos] + "return a;}"
+        get_item_code = js2py.eval_js(js)  # type: ignore
+        kakao_scheme_link = cast(
+            str,
+            get_item_code(
+                "kakaotalk://store/emoticon/${i}?referer=share_link", item_code_fake
+            ),
+        )
+        item_code = urlparse(kakao_scheme_link).path.split("/")[-1]
 
         return pack_title, item_code
-
-    @staticmethod
-    def get_info_from_pack_title(
-        pack_title: str,
-    ) -> Tuple[Optional[str], Optional[str], Optional[str]]:
-        pack_meta_r = requests.get(f"https://e.kakao.com/api/v1/items/t/{pack_title}")
-
-        if pack_meta_r.status_code == 200:
-            pack_meta = json.loads(pack_meta_r.text)
-        else:
-            return None, None, None
-
-        author = pack_meta["result"]["artist"]
-        title_ko = pack_meta["result"]["title"]
-        thumbnail_urls = pack_meta["result"]["thumbnailUrls"]
-
-        return author, title_ko, thumbnail_urls
 
     @staticmethod
     def get_item_code(title_ko: str, auth_token: str) -> Optional[str]:
@@ -88,7 +108,22 @@ class MetadataKakao:
         return item_code
 
     @staticmethod
-    def get_title_from_id(item_code: str, auth_token: str) -> Optional[str]:
+    def get_pack_info_unauthed(
+        pack_title: str,
+    ) -> Optional[dict[str, Any]]:
+        pack_meta_r = requests.get(f"https://e.kakao.com/api/v1/items/t/{pack_title}")
+
+        if pack_meta_r.status_code == 200:
+            pack_meta = json.loads(pack_meta_r.text)
+        else:
+            return None
+
+        return pack_meta
+
+    @staticmethod
+    def get_pack_info_authed(
+        item_code: str, auth_token: str
+    ) -> Optional[dict[str, Any]]:
         headers = {
             "Authorization": auth_token,
         }
@@ -102,11 +137,8 @@ class MetadataKakao:
             return None
 
         response_json = json.loads(response.text)
-        title = response_json["itemUnitInfo"][0]["title"]
-        # play_path_format = response_json['itemUnitInfo'][0]['playPathFormat']
-        # stickers_count = len(response_json['itemUnitInfo'][0]['sizes'])
 
-        return title
+        return response_json
 
 
 class DownloadKakao(DownloadBase):
@@ -114,11 +146,15 @@ class DownloadKakao(DownloadBase):
         super().__init__(*args, **kwargs)
         self.pack_title: Optional[str] = None
         self.author: Optional[str] = None
+        self.auth_token: Optional[str] = None
+
+        self.pack_info_unauthed: Optional[dict[str, Any]] = None
+        self.pack_info_authed: Optional[dict[str, Any]] = None
 
     def download_stickers_kakao(self) -> bool:
-        auth_token = None
+        self.auth_token = None
         if self.opt_cred:
-            auth_token = self.opt_cred.kakao_auth_token
+            self.auth_token = self.opt_cred.kakao_auth_token
 
         if urlparse(self.url).netloc == "emoticon.kakao.com":
             self.pack_title, item_code = MetadataKakao.get_info_from_share_link(
@@ -134,9 +170,13 @@ class DownloadKakao(DownloadBase):
             item_code = self.url.replace("kakaotalk://store/emoticon/", "")
 
             self.pack_title = None
-            if auth_token:
-                self.pack_title = MetadataKakao.get_title_from_id(item_code, auth_token)
-                if not self.pack_title:
+            if self.auth_token:
+                self.pack_info_authed = MetadataKakao.get_pack_info_authed(
+                    item_code, self.auth_token
+                )
+                if self.pack_info_authed:
+                    self.pack_title = self.pack_info_authed["itemUnitInfo"][0]["title"]
+                else:
                     self.cb.put("Warning: Cannot get pack_title with auth_token.")
                     self.cb.put(
                         "Is auth_token invalid / expired? Try to regenerate it."
@@ -146,25 +186,23 @@ class DownloadKakao(DownloadBase):
             return self.download_animated(item_code)
 
         if urlparse(self.url).netloc == "e.kakao.com":
-            self.pack_title = self.url.replace("https://e.kakao.com/t/", "")
-            (
-                self.author,
-                title_ko,
-                thumbnail_urls,
-            ) = MetadataKakao.get_info_from_pack_title(self.pack_title)
+            self.pack_title = urlparse(self.url).path.split("/")[-1]
+            self.pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(
+                self.pack_title
+            )
 
-            assert self.author
-            assert title_ko
-            assert thumbnail_urls
-
-            if not thumbnail_urls:
+            if not self.pack_info_unauthed:
                 self.cb.put(
                     "Download failed: Cannot download metadata for sticker pack"
                 )
                 return False
 
-            if auth_token:
-                item_code = MetadataKakao.get_item_code(title_ko, auth_token)
+            self.author = self.pack_info_unauthed["result"]["artist"]
+            title_ko = self.pack_info_unauthed["result"]["title"]
+            thumbnail_urls = self.pack_info_unauthed["result"]["thumbnailUrls"]
+
+            if self.auth_token:
+                item_code = MetadataKakao.get_item_code(title_ko, self.auth_token)
                 if item_code:
                     return self.download_animated(item_code)
                 msg = "Warning: Cannot get item code.\n"
@@ -204,6 +242,118 @@ class DownloadKakao(DownloadBase):
             self.out_dir, title=self.pack_title, author=self.author
         )
 
+        success = self.download_animated_zip(item_code)
+        if not success:
+            self.cb.put("Trying to download one by one")
+            success = self.download_animated_files(item_code)
+
+        return success
+
+    def download_animated_files(self, item_code: str) -> bool:
+        play_exts = [".webp", ".gif", ".png", ""]
+        play_path_format = None
+        sound_exts = [".mp3", ""]
+        sound_path_format = None
+        stickers_count = 32  # https://emoticonstudio.kakao.com/pages/start
+
+        if not self.pack_info_authed and self.auth_token:
+            self.pack_info_authed = MetadataKakao.get_pack_info_authed(
+                item_code, self.auth_token
+            )
+        if self.pack_info_authed:
+            play_path_format = self.pack_info_authed["itemUnitInfo"][0][
+                "playPathFormat"
+            ]
+            sound_path_format = self.pack_info_authed["itemUnitInfo"][0][
+                "soundPathFormat"
+            ]
+            stickers_count = self.pack_info_authed["itemUnitInfo"][0]["num"]
+        else:
+            if not self.pack_info_unauthed:
+                public_url = None
+                if urlparse(self.url).netloc == "emoticon.kakao.com":
+                    r = requests.get(self.url)
+                    # Share url would redirect to public url without headers
+                    public_url = r.url
+                elif urlparse(self.url).netloc == "e.kakao.com":
+                    public_url = self.url
+                if public_url:
+                    pack_title = urlparse(public_url).path.split("/")[-1]
+                    self.pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(
+                        pack_title
+                    )
+
+            if self.pack_info_unauthed:
+                stickers_count = len(self.pack_info_unauthed["result"]["thumbnailUrls"])
+
+        play_ext = ""
+        if play_path_format is None:
+            for play_ext in play_exts:
+                print(f"https://item.kakaocdn.net/dw/{item_code}.emot_001{play_ext}")
+                r = requests.get(
+                    f"https://item.kakaocdn.net/dw/{item_code}.emot_001{play_ext}"
+                )
+                print(r.status_code)
+                if r.ok:
+                    break
+            if play_ext == "":
+                self.cb.put(f"Failed to determine extension of {item_code}")
+                return False
+            else:
+                play_path_format = f"dw/{item_code}.emot_0##{play_ext}"
+        else:
+            play_ext = play_path_format.split(".")[-1]
+
+        sound_ext = ""
+        if sound_path_format is None:
+            for sound_ext in sound_exts:
+                r = requests.get(
+                    f"https://item.kakaocdn.net/dw/{item_code}.sound_001{sound_ext}"
+                )
+                if r.ok:
+                    break
+            if sound_ext != "":
+                sound_path_format = f"dw/{item_code}.sound_0##{sound_ext}"
+        elif sound_path_format != "":
+            sound_ext = sound_path_format.split(".")[-1]
+
+        assert play_path_format
+        targets: list[tuple[str, Path]] = []
+        for num in range(1, stickers_count + 1):
+            play_url = "https://item.kakaocdn.net/" + play_path_format.replace(
+                "##", str(num).zfill(2)
+            )
+            play_dl_path = Path(self.out_dir, str(num).zfill(3) + play_ext)
+            targets.append((play_url, play_dl_path))
+
+            if sound_path_format:
+                sound_url = "https://item.kakaocdn.net/" + sound_path_format.replace(
+                    "##", str(num).zfill(2)
+                )
+                sound_dl_path = Path(self.out_dir, str(num).zfill(3) + sound_ext)
+                targets.append((sound_url, sound_dl_path))
+
+        self.download_multiple_files(targets)
+
+        for target in targets:
+            f_path = target[1]
+            ext = Path(f_path).suffix
+
+            if ext not in (".gif", ".webp"):
+                continue
+
+            with open(f_path, "rb") as f:
+                data = f.read()
+            data = DecryptKakao.xor_data(data)
+            self.cb.put(f"Decrypted {f_path}")
+            with open(f_path, "wb+") as f:
+                f.write(data)
+
+        self.cb.put(f"Finished getting {item_code}")
+
+        return True
+
+    def download_animated_zip(self, item_code: str) -> bool:
         pack_url = f"http://item.kakaocdn.net/dw/{item_code}.file_pack.zip"
 
         zip_file = self.download_file(pack_url)
