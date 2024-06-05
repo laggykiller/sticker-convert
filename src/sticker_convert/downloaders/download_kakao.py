@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import itertools
 import json
 import zipfile
 from io import BytesIO
@@ -126,6 +127,9 @@ class MetadataKakao:
     ) -> Optional[dict[str, Any]]:
         headers = {
             "Authorization": auth_token,
+            "Talk-Agent": "android/10.8.1",
+            "Talk-Language": "en",
+            "User-Agent": "okhttp/4.10.0",
         }
 
         response = requests.post(
@@ -251,6 +255,7 @@ class DownloadKakao(DownloadBase):
 
     def download_animated_files(self, item_code: str) -> bool:
         play_exts = [".webp", ".gif", ".png", ""]
+        play_types = ["emot", "emoji", ""]  # emot = normal; emoji = mini
         play_path_format = None
         sound_exts = [".mp3", ""]
         sound_path_format = None
@@ -261,13 +266,10 @@ class DownloadKakao(DownloadBase):
                 item_code, self.auth_token
             )
         if self.pack_info_authed:
-            play_path_format = self.pack_info_authed["itemUnitInfo"][0][
-                "playPathFormat"
-            ]
-            sound_path_format = self.pack_info_authed["itemUnitInfo"][0][
-                "soundPathFormat"
-            ]
-            stickers_count = self.pack_info_authed["itemUnitInfo"][0]["num"]
+            preview_data = self.pack_info_authed["itemUnitInfo"][0]["previewData"]
+            play_path_format = preview_data["playPathFormat"]
+            sound_path_format = preview_data["soundPathFormat"]
+            stickers_count = preview_data["num"]
         else:
             if not self.pack_info_unauthed:
                 public_url = None
@@ -286,23 +288,22 @@ class DownloadKakao(DownloadBase):
             if self.pack_info_unauthed:
                 stickers_count = len(self.pack_info_unauthed["result"]["thumbnailUrls"])
 
+        play_type = ""
         play_ext = ""
         if play_path_format is None:
-            for play_ext in play_exts:
-                print(f"https://item.kakaocdn.net/dw/{item_code}.emot_001{play_ext}")
+            for play_type, play_ext in itertools.product(play_types, play_exts):
                 r = requests.get(
-                    f"https://item.kakaocdn.net/dw/{item_code}.emot_001{play_ext}"
+                    f"https://item.kakaocdn.net/dw/{item_code}.{play_type}_001{play_ext}"
                 )
-                print(r.status_code)
                 if r.ok:
                     break
             if play_ext == "":
                 self.cb.put(f"Failed to determine extension of {item_code}")
                 return False
             else:
-                play_path_format = f"dw/{item_code}.emot_0##{play_ext}"
+                play_path_format = f"dw/{item_code}.{play_type}_0##{play_ext}"
         else:
-            play_ext = play_path_format.split(".")[-1]
+            play_ext = "." + play_path_format.split(".")[-1]
 
         sound_ext = ""
         if sound_path_format is None:
@@ -315,7 +316,7 @@ class DownloadKakao(DownloadBase):
             if sound_ext != "":
                 sound_path_format = f"dw/{item_code}.sound_0##{sound_ext}"
         elif sound_path_format != "":
-            sound_ext = sound_path_format.split(".")[-1]
+            sound_ext = "." + sound_path_format.split(".")[-1]
 
         assert play_path_format
         targets: list[tuple[str, Path]] = []
