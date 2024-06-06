@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import itertools
+import re
 import json
 import zipfile
 from io import BytesIO
@@ -9,7 +10,6 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple, cast
 from urllib.parse import urlparse
 
-import js2py  # type: ignore
 import requests
 from bs4 import BeautifulSoup
 from bs4.element import Tag
@@ -72,17 +72,39 @@ class MetadataKakao:
         js = js[func_start_pos:]
         bracket_start_pos = js.find("{")
         func_end_pos = search_bracket(js[bracket_start_pos:]) + bracket_start_pos
-        js = js[: func_end_pos + 1]
-        web2app_start_pos = js.find("daumtools.web2app(")
-        js = js[:web2app_start_pos] + "return a;}"
-        get_item_code = js2py.eval_js(js)  # type: ignore
-        kakao_scheme_link = cast(
-            str,
-            get_item_code(
-                "kakaotalk://store/emoticon/${i}?referer=share_link", item_code_fake
-            ),
-        )
-        item_code = urlparse(kakao_scheme_link).path.split("/")[-1]
+        js = js[bracket_start_pos + 1: func_end_pos]
+        js = js.split(";")[0]
+
+        minus_num_regex = re.search(r"\-(.*?)\^", js)
+        if not minus_num_regex:
+            return None, None
+        minus_num_str = minus_num_regex.group(1)
+        if not minus_num_str.isnumeric():
+            return None, None
+        minus_num = int(minus_num_str)
+
+        xor_num_regex = re.search(r"\^(.*?)\)", js)
+        if not xor_num_regex:
+            return None, None
+        xor_num_str = xor_num_regex.group(1)
+        if not xor_num_str.isnumeric():
+            return None, None
+        xor_num = int(xor_num_str)
+
+        item_code = str(int(item_code_fake) - minus_num ^ xor_num)
+
+        # https://github.com/Nuitka/Nuitka/issues/385
+        # js2py not working if compiled by nuitka
+        # web2app_start_pos = js.find("daumtools.web2app(")
+        # js = js[:web2app_start_pos] + "return a;}"
+        # get_item_code = js2py.eval_js(js)  # type: ignore
+        # kakao_scheme_link = cast(
+        #     str,
+        #     get_item_code(
+        #         "kakaotalk://store/emoticon/${i}?referer=share_link", item_code_fake
+        #     ),
+        # )
+        # item_code = urlparse(kakao_scheme_link).path.split("/")[-1]
 
         return pack_title, item_code
 
