@@ -2,8 +2,8 @@
 from __future__ import annotations
 
 import itertools
-import re
 import json
+import re
 import zipfile
 from io import BytesIO
 from pathlib import Path
@@ -72,7 +72,7 @@ class MetadataKakao:
         js = js[func_start_pos:]
         bracket_start_pos = js.find("{")
         func_end_pos = search_bracket(js[bracket_start_pos:]) + bracket_start_pos
-        js = js[bracket_start_pos + 1: func_end_pos]
+        js = js[bracket_start_pos + 1 : func_end_pos]
         js = js.split(";")[0]
 
         minus_num_regex = re.search(r"\-(.*?)\^", js)
