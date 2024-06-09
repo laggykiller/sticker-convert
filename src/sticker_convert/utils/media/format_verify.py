@@ -124,20 +124,16 @@ class FormatVerify:
         else:
             file_animated = CodecInfo.is_anim(file)
 
-        if (
-            file_animated is True
-            and size
-            and size[1] is not None
-            and file_size > size[1]
-        ):
-            return False
-        if (
-            file_animated is False
-            and size
-            and size[0] is not None
-            and file_size > size[0]
-        ):
-            return False
+        if file_animated is True:
+            if not size[1]:
+                return True
+            elif file_size > size[1]:
+                return False
+        else:
+            if not size[0]:
+                return True
+            elif file_size > size[0]:
+                return False
 
         return True
 
