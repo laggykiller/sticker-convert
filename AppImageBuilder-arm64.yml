@@ -22,7 +22,6 @@ script:
   # Install pip packages
   - mkdir wheel
   - pip download --python-version=311 --abi=cp311 --platform manylinux2014_aarch64 --only-binary=':all:' -d wheel -r requirements-linux-arm64.txt
-  - pip download --python-version=311 --abi=cp311 --platform manylinux2014_aarch64 --only-binary=':all:' -d wheel --no-deps PyMemoryEditor
   - pip download --python-version=311 --abi=cp311 --platform manylinux2014_aarch64 --only-binary=':all:' -d wheel certifi opencv-python
   - find ./wheel/*.whl -exec bash -c 'mv $0 ${0/-cp*.whl/-py3-none-any.whl}' {} \;
   - pip install --ignore-installed --prefix=/usr --root=AppDir --no-deps ./wheel/*
@@ -54,7 +53,6 @@ AppDir:
       - python3.11
       - python3.11-tk
       - python3.11-distutils
-      - python3-psutil
     exclude: []
 
   runtime:
