@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import Optional, Tuple, cast
 
 import psutil
-from PyMemoryEditor import OpenProcess  # type: ignore
 
 MSG_NO_BIN = """Viber Desktop not detected.
 Download and install Viber Desktop,
@@ -37,6 +36,8 @@ def killall(name: str) -> bool:
 
 class GetViberAuth:
     def get_auth(self, viber_bin_path: str) -> Tuple[Optional[str], str]:
+        from PyMemoryEditor import OpenProcess  # type: ignore
+
         member_id = None
         m_token = None
         m_ts = None
