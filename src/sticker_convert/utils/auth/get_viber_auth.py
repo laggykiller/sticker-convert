@@ -161,7 +161,7 @@ class GetViberAuth:
                 else:
                     viber_bin_path = viber_which
 
-        if Path(viber_bin_path).is_file():
+        if Path(viber_bin_path).is_file() or Path(viber_bin_path).is_dir():
             return viber_bin_path
 
         return None
