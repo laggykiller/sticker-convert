@@ -11,7 +11,7 @@ from Viber Desktop application automatically:
 Notice:
 - Viber Desktop would be closed, launched and closed again when getting auth data.
 - It may take a minute to get auth data.
-- On macOS, you need to disable SIP and will be asked for user password.
+- On macOS, you need to disable SIP and may be asked for user password.
 - For atypical installation of Viber Desktop, you may specify Viber Desktop application
 location by using `--viber-bin-path`.
 - `m_token`, `m_ts` and `member_id` are required.

@@ -47,7 +47,7 @@ class ViberGetAuthWindow(BaseWindow):
         if platform.system() == "Darwin":
             self.explanation_lbl2 = Label(
                 self.frame_info,
-                text="You need to disable SIP and will be asked for user password.",
+                text="You need to disable SIP and may be asked for user password.",
                 justify="left",
                 anchor="w",
             )
