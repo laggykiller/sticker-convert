@@ -47,7 +47,7 @@ class MetadataKakao:
         headers = {"User-Agent": "Android"}
 
         response = requests.get(url, headers=headers)
-        soup = BeautifulSoup(response.text, "html.parser")
+        soup = BeautifulSoup(response.content.decode("utf-8", "ignore"), "html.parser")
 
         pack_title_tag = soup.find("title")  # type: ignore
         if not pack_title_tag:
