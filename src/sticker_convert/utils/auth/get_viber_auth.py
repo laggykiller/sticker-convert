@@ -11,6 +11,7 @@ from typing import Optional, Tuple, cast
 # Note: There is no Viber Desktop on arm64 linux anyway
 try:
     import psutil
+
     PSUTIL_LOADED = True
 except ModuleNotFoundError:
     PSUTIL_LOADED = False  # type: ignore
@@ -30,6 +31,7 @@ MSG_SIP_ENABLED = """You need to disable SIP:
 4. Restart your computer"""
 
 MSG_NO_PSUTIL = "Python package psutil is necessary"
+
 
 def killall(name: str) -> bool:
     result = False
@@ -65,6 +67,7 @@ class GetViberAuth:
 
         if PSUTIL_LOADED:
             from PyMemoryEditor import OpenProcess  # type: ignore
+
             with OpenProcess(process_name=viber_process_name) as process:
                 for address in process.search_by_value(str, 18, "X-Viber-Auth-Mid: "):  # type: ignore
                     member_id_addr = cast(int, address) + 18
@@ -80,7 +83,9 @@ class GetViberAuth:
                 if m_token is None:
                     return None, MSG_NO_AUTH
 
-                for address in process.search_by_value(str, 24, "X-Viber-Auth-Timestamp: "):  # type: ignore
+                for address in process.search_by_value(
+                    str, 24, "X-Viber-Auth-Timestamp: "
+                ):  # type: ignore
                     m_ts_addr = cast(int, address) + 24
                     m_ts = process.read_process_memory(m_ts_addr, str, 13)
                     break
