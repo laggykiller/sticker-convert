@@ -69,7 +69,11 @@ class GetViberAuth:
         with OpenProcess(process_name=viber_process_name) as process:
             for address in process.search_by_value(str, 18, "X-Viber-Auth-Mid: "):  # type: ignore
                 member_id_addr = cast(int, address) + 18
-                member_id = process.read_process_memory(member_id_addr, str, 12)
+                member_id_bytes = process.read_process_memory(member_id_addr, bytes, 20)
+                member_id_term = member_id_bytes.find(b"\x0d\x0a")
+                if member_id_term == -1:
+                    continue
+                member_id = member_id_bytes[:member_id_term].decode(encoding="ascii")
                 break
             if member_id is None:
                 return None, MSG_NO_AUTH
@@ -148,7 +152,12 @@ class GetViberAuth:
         if member_id_addr == -1 or m_token_addr == -1 or m_ts_addr == -1:
             return None, MSG_NO_AUTH
 
-        member_id = s[member_id_addr : member_id_addr + 12].decode(encoding="ascii")
+        member_id_bytes = s[member_id_addr : member_id_addr + 20]
+        member_id_term = member_id_bytes.find(b"\x0d\x0a")
+        if member_id_term == -1:
+            return None, MSG_NO_AUTH
+        member_id = member_id_bytes[:member_id_term].decode(encoding="ascii")
+
         m_token = s[m_token_addr : m_token_addr + 64].decode(encoding="ascii")
         m_ts = s[m_ts_addr : m_ts_addr + 13].decode(encoding="ascii")
 
