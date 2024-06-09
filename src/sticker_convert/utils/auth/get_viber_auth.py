@@ -34,18 +34,14 @@ MSG_NO_PSUTIL = "Python package psutil is necessary"
 
 
 def killall(name: str) -> bool:
+    if not PSUTIL_LOADED:
+        return False
+
     result = False
 
-    if PSUTIL_LOADED:
-        for proc in psutil.process_iter():  # type: ignore
-            if proc.name() == name:
-                proc.kill()
-                result = True
-    elif platform.system() == "Windows":
-        if subprocess.run(["taskkill", "/f", "/t", "/im", name]).returncode == 0:
-            result = True
-    else:
-        if subprocess.run(["killall", name]).returncode == 0:
+    for proc in psutil.process_iter():  # type: ignore
+        if proc.name() == name:
+            proc.kill()
             result = True
 
     return result
@@ -53,6 +49,9 @@ def killall(name: str) -> bool:
 
 class GetViberAuth:
     def get_auth(self, viber_bin_path: str) -> Tuple[Optional[str], str]:
+        if not PSUTIL_LOADED:
+            return None, MSG_NO_PSUTIL
+
         member_id = None
         m_token = None
         m_ts = None
@@ -65,34 +64,29 @@ class GetViberAuth:
         subprocess.Popen([viber_bin_path])
         time.sleep(10)
 
-        if PSUTIL_LOADED:
-            from PyMemoryEditor import OpenProcess  # type: ignore
+        from PyMemoryEditor import OpenProcess  # type: ignore
 
-            with OpenProcess(process_name=viber_process_name) as process:
-                for address in process.search_by_value(str, 18, "X-Viber-Auth-Mid: "):  # type: ignore
-                    member_id_addr = cast(int, address) + 18
-                    member_id = process.read_process_memory(member_id_addr, str, 12)
-                    break
-                if member_id is None:
-                    return None, MSG_NO_AUTH
+        with OpenProcess(process_name=viber_process_name) as process:
+            for address in process.search_by_value(str, 18, "X-Viber-Auth-Mid: "):  # type: ignore
+                member_id_addr = cast(int, address) + 18
+                member_id = process.read_process_memory(member_id_addr, str, 12)
+                break
+            if member_id is None:
+                return None, MSG_NO_AUTH
 
-                for address in process.search_by_value(str, 20, "X-Viber-Auth-Token: "):  # type: ignore
-                    m_token_addr = cast(int, address) + 20
-                    m_token = process.read_process_memory(m_token_addr, str, 64)
-                    break
-                if m_token is None:
-                    return None, MSG_NO_AUTH
+            for address in process.search_by_value(str, 20, "X-Viber-Auth-Token: "):  # type: ignore
+                m_token_addr = cast(int, address) + 20
+                m_token = process.read_process_memory(m_token_addr, str, 64)
+                break
+            if m_token is None:
+                return None, MSG_NO_AUTH
 
-                for address in process.search_by_value(
-                    str, 24, "X-Viber-Auth-Timestamp: "
-                ):  # type: ignore
-                    m_ts_addr = cast(int, address) + 24
-                    m_ts = process.read_process_memory(m_ts_addr, str, 13)
-                    break
-                if m_ts is None:
-                    return None, MSG_NO_AUTH
-        else:
-            return None, MSG_NO_PSUTIL
+            for address in process.search_by_value(str, 24, "X-Viber-Auth-Timestamp: "):  # type: ignore
+                m_ts_addr = cast(int, address) + 24
+                m_ts = process.read_process_memory(m_ts_addr, str, 13)
+                break
+            if m_ts is None:
+                return None, MSG_NO_AUTH
 
         killall(viber_process_name)
 
