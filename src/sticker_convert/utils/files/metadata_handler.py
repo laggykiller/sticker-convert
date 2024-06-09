@@ -37,7 +37,7 @@ RELATED_NAME = (
 )
 
 BLACKLIST_PREFIX = ("cover",)
-BLACKLIST_SUFFIX = (".txt", ".m4a", ".wastickers", ".DS_Store", "._.DS_Store")
+BLACKLIST_SUFFIX = (".txt", ".m4a", ".wastickers", ".zip", ".DS_Store", "._.DS_Store")
 
 XCODE_IMESSAGE_ICONSET = {
     "App-Store-1024x1024pt.png": (1024, 1024),

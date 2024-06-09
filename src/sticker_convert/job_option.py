@@ -222,6 +222,7 @@ class CredOption(BaseOption):
     kakao_country_code: str = ""
     kakao_phone_number: str = ""
     line_cookies: str = ""
+    viber_auth: str = ""
 
     def to_dict(self) -> Dict[Any, Any]:
         return {
@@ -235,4 +236,5 @@ class CredOption(BaseOption):
                 "phone_number": self.kakao_phone_number,
             },
             "line": {"cookies": self.line_cookies},
+            "viber": {"auth": self.viber_auth},
         }

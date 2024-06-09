@@ -6,7 +6,7 @@ from typing import List, Optional
 import pytest
 from _pytest._py.path import LocalPath
 
-from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SIGNAL_PASSWORD, SIGNAL_UUID, SRC_DIR, TELEGRAM_TOKEN, TELEGRAM_USERID, run_cmd
+from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SIGNAL_PASSWORD, SIGNAL_UUID, SRC_DIR, TELEGRAM_TOKEN, TELEGRAM_USERID, VIBER_AUTH, run_cmd
 
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append("../src")
@@ -129,6 +129,12 @@ def test_upload_telegram_emoji_with_upload(tmp_path: LocalPath) -> None:
     _run_sticker_convert(tmp_path, "telegram_emoji", None)
 
 
+@pytest.mark.skipif(not TEST_UPLOAD, reason="TEST_UPLOAD not set")
+@pytest.mark.skipif(not VIBER_AUTH, reason="No credentials")
+def test_upload_viber_with_upload(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(tmp_path, "viber", "viber")
+
+
 @pytest.mark.skipif(
     TELEGRAM_TOKEN is not None and TELEGRAM_USERID is not None,
     reason="With credentials",
@@ -151,6 +157,14 @@ def test_upload_telegram(tmp_path: LocalPath) -> None:
 )
 def test_upload_telegram_emoji(tmp_path: LocalPath) -> None:
     _run_sticker_convert(tmp_path, "telegram_emoji", None)
+
+
+@pytest.mark.skipif(
+    VIBER_AUTH is not None,
+    reason="With credentials",
+)
+def test_export_viber(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(tmp_path, "viber", None)
 
 
 def test_export_wastickers(tmp_path: LocalPath) -> None:

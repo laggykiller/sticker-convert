@@ -159,6 +159,8 @@ class GUI(Window):
         self.kakao_country_code_var = StringVar(self)
         self.kakao_phone_number_var = StringVar(self)
         self.line_cookies_var = StringVar(self)
+        self.viber_auth_var = StringVar(self)
+        self.viber_bin_path_var = StringVar(self)
 
         # Config
         self.settings_save_cred_var = BooleanVar()
@@ -385,6 +387,7 @@ class GUI(Window):
             self.creds.get("kakao", {}).get("phone_number", "")
         )
         self.line_cookies_var.set(self.creds.get("line", {}).get("cookies", ""))
+        self.viber_auth_var.set(self.creds.get("viber", {}).get("auth", ""))
 
     def get_input_name(self) -> str:
         return [
@@ -545,6 +548,7 @@ class GUI(Window):
             kakao_country_code=self.kakao_country_code_var.get(),
             kakao_phone_number=self.kakao_phone_number_var.get(),
             line_cookies=self.line_cookies_var.get(),
+            viber_auth=self.viber_auth_var.get(),
         )
 
     def start_process(self) -> None:
@@ -770,6 +774,11 @@ class GUI(Window):
             self.cred_frame.telegram_userid_entry.config(bootstyle="warning")  # type: ignore
         else:
             self.cred_frame.telegram_userid_entry.config(bootstyle="default")  # type: ignore
+
+        if output_option == "viber" and not self.viber_auth_var.get():
+            self.cred_frame.viber_auth_entry.config(bootstyle="warning")  # type: ignore
+        else:
+            self.cred_frame.viber_auth_entry.config(bootstyle="default")  # type: ignore
 
         if (
             urlparse(url).netloc == "e.kakao.com"

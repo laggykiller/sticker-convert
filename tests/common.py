@@ -35,6 +35,7 @@ if CREDS_JSON_PATH.is_file():
         TELEGRAM_USERID = CREDS_JSON_DICT.get("telegram", {}).get("userid")
         KAKAO_TOKEN = CREDS_JSON_DICT.get("kakao", {}).get("auth_token")
         LINE_COOKIES = CREDS_JSON_DICT.get("line", {}).get("cookies")
+        VIBER_AUTH = CREDS_JSON_DICT.get("viber", {}).get("auth")
 else:
     SIGNAL_UUID = os.environ.get("SIGNAL_UUID")  # type: ignore
     SIGNAL_PASSWORD = os.environ.get("SIGNAL_PASSWORD")  # type: ignore
@@ -42,6 +43,7 @@ else:
     TELEGRAM_USERID = os.environ.get("TELEGRAM_USERID")  # type: ignore
     KAKAO_TOKEN = os.environ.get("KAKAO_TOKEN")  # type: ignore
     LINE_COOKIES = os.environ.get("LINE_COOKIES")  # type: ignore
+    VIBER_AUTH = os.environ.get("VIBER_AUTH")  # type: ignore
 
 
 def run_cmd(cmd: List[str], **kwargs: Any) -> None:

@@ -17,6 +17,7 @@ from sticker_convert.job_option import CompOption, CredOption, InputOption, Outp
 from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
+from sticker_convert.utils.auth.get_viber_auth import GetViberAuth
 from sticker_convert.utils.callback import Callback
 from sticker_convert.utils.files.json_manager import JsonManager
 from sticker_convert.utils.url_detect import UrlDetect
@@ -452,6 +453,9 @@ class CLI:
             line_cookies=args.line_cookies
             if args.line_cookies
             else creds.get("line", {}).get("cookies"),
+            viber_auth=args.viber_auth
+            if args.viber_auth
+            else creds.get("viber", {}).get("auth"),
         )
 
         if args.kakao_get_auth:
@@ -500,6 +504,20 @@ class CLI:
                 self.cb.msg(
                     "Failed to get Line cookies. Have you logged in the web browser?"
                 )
+
+        if args.viber_get_auth:
+            get_viber_auth = GetViberAuth()
+
+            viber_bin_path = None
+            if args.viber_bin_path:
+                viber_bin_path = args.viber_bin_path
+
+            viber_auth, msg = get_viber_auth.get_cred(viber_bin_path)
+
+            if viber_auth:
+                opt_cred.viber_auth = viber_auth
+
+            self.cb.msg(msg)
 
         if args.save_cred:
             creds_path = CONFIG_DIR / "creds.json"

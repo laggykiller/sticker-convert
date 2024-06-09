@@ -69,6 +69,9 @@
         "kakao_phone_number": "Set Kakao phone number (Phone number associated with your Kakao account)\nDo NOT enter country code\nExample: 7700900142\nUsed for send / receive verification code via SMS.\nRequired for generating Kakao auth_token.",
         "line_get_auth": "Get Line cookies from browser, which is required to create custom message stickers.",
         "line_cookies": "Set Line cookies, which is required to create custom message stickers.",
+        "viber_auth": "Set Viber authentication data.\nRequired for uploading Viber stickers.",
+        "viber_get_auth": "Generate Viber authentication data.",
+        "viber_bin_path": "Specify location of Viber Desktop application.\nUseful for portable installation.",
         "save_cred": "Save Signal and Telegram credentials."
     }
 }

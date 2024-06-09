@@ -21,6 +21,7 @@ from sticker_convert.job_option import CompOption, CredOption, InputOption, Outp
 from sticker_convert.uploaders.compress_wastickers import CompressWastickers
 from sticker_convert.uploaders.upload_signal import UploadSignal
 from sticker_convert.uploaders.upload_telegram import UploadTelegram
+from sticker_convert.uploaders.upload_viber import UploadViber
 from sticker_convert.uploaders.xcode_imessage import XcodeImessage
 from sticker_convert.utils.callback import CallbackReturn, CbQueueType, ResultsListType, WorkQueueType
 from sticker_convert.utils.files.json_resources_loader import OUTPUT_JSON
@@ -303,6 +304,10 @@ class Job:
             self.opt_cred.signal_uuid and self.opt_cred.signal_password
         ):
             error_msg += "[X] Uploading to signal requires uuid and password.\n"
+            error_msg += save_to_local_tip
+
+        if self.opt_output.option == "viber" and not self.opt_cred.viber_auth:
+            error_msg += "[X] Uploading to Viber requires auth data.\n"
             error_msg += save_to_local_tip
 
         output_presets = OUTPUT_JSON
@@ -655,6 +660,9 @@ class Job:
 
         if self.opt_output.option == "imessage":
             exporters.append(XcodeImessage.start)
+
+        if self.opt_output.option == "viber":
+            exporters.append(UploadViber.start)
 
         self.executor.start_workers(processes=1)
 

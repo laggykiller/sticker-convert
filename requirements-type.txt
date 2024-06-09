@@ -1,4 +1,5 @@
 types-beautifulsoup4
+types-psutil
 types-Pillow
 types-requests
 types-tqdm

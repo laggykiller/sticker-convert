@@ -23,6 +23,14 @@
             "author": false
         }
     },
+    "viber": {
+        "full_name": "Upload to Viber",
+        "help": "Upload to Viber",
+        "metadata_requirements": {
+            "title": true,
+            "author": false
+        }
+    },
     "whatsapp": {
         "full_name": "Compress to .wastickers (WhatsApp)",
         "help": "Create a .wastickers file for uploading to WhatsApp",

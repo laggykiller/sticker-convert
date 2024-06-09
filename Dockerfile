@@ -77,6 +77,11 @@ RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > s
     apt update -y && \
     apt install --no-install-recommends -y signal-desktop
 
+# Install Viber Desktop
+RUN curl -o /tmp/viber.deb -L https://download.cdn.viber.com/cdn/desktop/Linux/viber.deb && \
+    apt install --no-install-recommends -y /tmp/viber.deb libgl1 libevent-2.1-7 libwebpdemux2 libxslt1.1 libxkbfile1 libegl1 libopengl0 libqt5gui5 && \
+    rm /tmp/viber.deb
+
 RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \
     apt autoremove --yes && \
