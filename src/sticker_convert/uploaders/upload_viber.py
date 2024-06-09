@@ -148,7 +148,7 @@ class UploadViber(UploadBase):
                     )
                 if rjson["status"] == 103:
                     self.cb.put(
-                        f"Viber auth data may have expired. Try to regenerate it?"
+                        "Viber auth data may have expired. Try to regenerate it?"
                     )
             else:
                 self.cb.put(f"Failed to upload {pack_title}: {r.status_code} {r.text}")
