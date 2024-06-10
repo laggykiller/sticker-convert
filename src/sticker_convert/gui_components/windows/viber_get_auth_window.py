@@ -51,11 +51,17 @@ class ViberGetAuthWindow(BaseWindow):
                 justify="left",
                 anchor="w",
             )
+        else:
+            self.explanation_lbl2 = Label(
+                self.frame_info,
+                text="You may be asked for admin password.",
+                justify="left",
+                anchor="w",
+            )
 
         self.explanation_lbl0.grid(column=0, row=0, sticky="w", padx=3, pady=3)
         self.explanation_lbl1.grid(column=0, row=1, sticky="w", padx=3, pady=3)
-        if self.explanation_lbl2 is not None:
-            self.explanation_lbl2.grid(column=0, row=2, sticky="w", padx=3, pady=3)
+        self.explanation_lbl2.grid(column=0, row=2, sticky="w", padx=3, pady=3)
 
         # Start button frame
         self.launch_btn = Button(
