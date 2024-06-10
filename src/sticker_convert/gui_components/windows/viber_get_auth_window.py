@@ -103,7 +103,7 @@ class ViberGetAuthWindow(BaseWindow):
         GUIUtils.finalize_window(self)
 
     def cb_get_cred(self) -> None:
-        m = GetViberAuth()
+        m = GetViberAuth(self.cb_ask_str_viber)
 
         viber_bin_path = None
         if self.gui.viber_bin_path_var.get():
@@ -123,7 +123,7 @@ class ViberGetAuthWindow(BaseWindow):
         self.cb_msg_block_viber(msg)
 
     def cb_launch_viber(self) -> None:
-        m = GetViberAuth()
+        m = GetViberAuth(self.cb_ask_str_viber)
         viber_bin_path = m.get_viber_desktop()
 
         if self.gui.viber_auth_var.get():

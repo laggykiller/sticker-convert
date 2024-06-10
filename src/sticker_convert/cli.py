@@ -506,7 +506,7 @@ class CLI:
                 )
 
         if args.viber_get_auth:
-            get_viber_auth = GetViberAuth()
+            get_viber_auth = GetViberAuth(self.cb.ask_str)
 
             viber_bin_path = None
             if args.viber_bin_path:
