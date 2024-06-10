@@ -42,7 +42,7 @@
 | [WhatsApp](docs/guide_whatsapp.md)    | ⭕ (By Android or WhatsApp Web)     | ⭕ (Create `.wastickers`, import by Sticker Maker) |
 | [Line](docs/guide_line.md)            | ✅                                  | 🚫 (Need to submit for manual approval)            |
 | [Kakao](docs/guide_kakao.md)          | ✅ (Need 'share link' for animated) | 🚫 (Need to submit for manual approval)            |
-| [Viber](docs/guide_viber.md)          | ✅                                  | 🚫 (Manually upload through Viber app)             |
+| [Viber](docs/guide_viber.md)          | ✅                                  | ✅ (Require `viber_auth`)                          |
 | [iMessage](docs/guide_imessage.md)    | 🚫                                  | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
@@ -71,7 +71,7 @@
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Viber
     - Download: Supported (e.g. `https://stickers.viber.com/pages/example` OR `https://stickers.viber.com/pages/custom-sticker-packs/example`)
-    - Upload: The program can convert images to png with 490x490 for uploading to viber manually. It should be noted that Viber is able to resize images for you, so it may not be necessary to use sticker-convert for creating Viber sticker pack.
+    - Upload: Supported. Viber authentication data required for uploading Viber stickers, which could be fetched from Viber Desktop application automatically.
 - iMessage
     - Download: Not supported.
     - Upload: The program can create Xcode project for iMessage sticker pack, which could then be compiled and sideloaded using Xcode.
