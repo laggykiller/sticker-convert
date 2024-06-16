@@ -4,7 +4,7 @@
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
 - With GUI and CLI that runs on Windows, MacOS and Linux
-- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), Viber (Download only), iMessage (Create Xcode sticker pack project)
+- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), Viber, iMessage (Create Xcode sticker pack project)
 - Supports static and animated stickers, with transparency support
 
 ## Downloads
