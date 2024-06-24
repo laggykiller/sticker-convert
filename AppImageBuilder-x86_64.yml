@@ -3,7 +3,7 @@
 version: 1
 script:
   # Remove any previous build
-  - rm -rf AppDir  | true
+  - rm -rf AppDir | true
 
   # Make usr dirs
   - mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps/
@@ -46,7 +46,6 @@ AppDir:
       - python3.12
       - python3.12-tk
       - python3.12-distutils
-      - procps
     exclude: []
   
   after_bundle: |
