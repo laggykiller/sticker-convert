@@ -92,10 +92,10 @@ class DownloadBase:
                 response = requests.get(
                     url, stream=True, allow_redirects=True, **kwargs
                 )
-                total_length = int(response.headers.get("content-length"))  # type: ignore
-
                 if not response.ok:
                     return b""
+                total_length = int(response.headers.get("content-length"))  # type: ignore
+
                 self.cb.put(f"Downloading {url}")
 
                 if show_progress:
