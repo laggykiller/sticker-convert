@@ -119,6 +119,7 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         "--include-package-data=signalstickers_client",
         "--noinclude-data-file=tcl/opt0.4",
         "--noinclude-data-file=tcl/http1.0",
+        "--user-package-configuration-file=nuitka.config.yml",
     ]
 
     if platform.system() == "Windows":

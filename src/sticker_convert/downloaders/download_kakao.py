@@ -3,20 +3,13 @@ from __future__ import annotations
 
 import itertools
 import json
-import webbrowser
 from pathlib import Path
-from tempfile import TemporaryDirectory
 from typing import Any, List, Optional, Tuple, cast
 from urllib.parse import urlparse
 
-import chromedriver_autoinstaller  # type: ignore
 import requests
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
+from py_mini_racer import MiniRacer
 
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption
@@ -41,17 +34,6 @@ class daumtools {
         return dataDict['urlScheme'];
     }
 }
-"""
-
-HTMLPAGE = """
-<html>
-<body>
-<p id="p1"></p>
-<script>
-{}
-</script>
-</body>
-</html>
 """
 
 
@@ -145,36 +127,10 @@ class DownloadKakao(DownloadBase):
         if "daumtools.web2app" not in js:
             return None, None
 
-        js = js.replace(
-            "daumtools.web2app",
-            'document.getElementById("p1").innerHTML = daumtools.web2app',
-        )
         js = JSINJECT + js
 
-        with TemporaryDirectory() as tempdir:
-            html_page_path = Path(tempdir, "page.html")
-            html_page = HTMLPAGE.format(js)
-            with open(html_page_path, "w+") as f:
-                f.write(html_page)
-
-            try:
-                chromedriver_autoinstaller.install()
-                chrome_options = Options()
-                chrome_options.add_argument("--headless")  # type: ignore
-                driver = webdriver.Chrome(options=chrome_options)
-                driver.get(html_page_path.as_posix())
-                wait = WebDriverWait(driver, 10)
-                wait.until(EC.text_to_be_present_in_element((By.ID, "p1"), "kakaotalk"))  # type: ignore
-                kakao_url_elm = driver.find_element(By.ID, "p1")
-                kakao_url = cast(str, kakao_url_elm.text)  # type: ignore
-                driver.close()
-            except ValueError:
-                webbrowser.open(html_page_path.as_posix())
-                prompt = "Chrome not installed, using manual method.\n"
-                prompt += "Please copy and paste the url you see in the browser"
-                self.cb.put(("ask_str", (prompt,), None))
-                kakao_url = cast(str, self.cb_return.get_response())
-
+        ctx = MiniRacer()
+        kakao_url = cast(str, ctx.eval(js))
         item_code = urlparse(kakao_url).path.split("/")[2]
 
         return pack_title, item_code
