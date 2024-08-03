@@ -63,14 +63,14 @@ jobs:
           - os: macos-14
             TARGET: macos-x86_64
             CMD_BUILD: |
-                SC_COMPILE_ARCH=x86_64 python ./compile.py
+                python ./compile.py
                 cp ./scripts/hold_control_and_click_open_me_first.command ./
                 zip -r9 sticker-convert-macos-x86_64.zip sticker-convert.app hold_control_and_click_open_me_first.command
             OUT_FILE_NAME: ./sticker-convert-macos-x86_64.zip
           - os: macos-14
             TARGET: macos-arm64
             CMD_BUILD: |
-                SC_COMPILE_ARCH=arm64 python ./compile.py
+                python ./compile.py
                 cp ./scripts/hold_control_and_click_open_me_first.command ./
                 zip -r9 sticker-convert-macos-arm64.zip sticker-convert.app hold_control_and_click_open_me_first.command
             OUT_FILE_NAME: ./sticker-convert-macos-arm64.zip
