@@ -60,7 +60,7 @@ jobs:
             OUT_FILE_NAME: |
               ./sticker-convert-windows-x86_64.zip
               ./sticker-convert-windows-x86_64.msi
-          - os: macos-14
+          - os: macos-13
             TARGET: macos-x86_64
             CMD_BUILD: |
                 python ./compile.py
