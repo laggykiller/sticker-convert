@@ -23,7 +23,7 @@ jobs:
   build-wheel:
     name: Build wheel
     needs: createrelease
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
