@@ -18,5 +18,5 @@ requests~=2.32.3
 rlottie_python~=1.3.6
 signalstickers-client-fork-laggykiller~=3.3.0.post2
 sqlcipher3-wheels~=0.5.2.post1
-tqdm~=4.66.4
+tqdm~=4.66.5
 ttkbootstrap-fork-laggykiller~=1.5.1
