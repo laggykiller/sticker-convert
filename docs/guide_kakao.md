@@ -8,7 +8,7 @@
 
 - To download animated stickers, you have two options:
     - Method 1: (RECOMMENDED) Get the share link of the emoticon pack from Kakao app on phone, which does not need auth_token (`https://emoticon.kakao.com/items/xxxxx`)
-    - Method 2: Use `https://e.kakao.com/t/xxxxx` which needs auth_token (Authorization header during request).
+    - Method 2: Use `https://e.kakao.com/t/xxxxx` which needs auth_token (Authorization header during request). **Note that this method may not work in some cases with unclear reasons, so use method 1.**
 
 ## Method 1: Get share link
 ![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
