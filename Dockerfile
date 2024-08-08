@@ -69,18 +69,20 @@ RUN apt purge -y curl wget gpg git && \
 COPY ./src /app/
 
 FROM base-gui AS full
-# Install signal-desktop
+# Install signal-desktop-beta
 RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
     cat signal-desktop-keyring.gpg | tee -a /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null && \
     echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main' |\
     tee -a /etc/apt/sources.list.d/signal-xenial.list && \
     apt update -y && \
-    apt install --no-install-recommends -y signal-desktop
+    apt install --no-install-recommends -y signal-desktop-beta
 
 # Install Viber Desktop
 RUN curl -o /tmp/viber.deb -L https://download.cdn.viber.com/cdn/desktop/Linux/viber.deb && \
     apt install --no-install-recommends -y /tmp/viber.deb libgl1 libevent-2.1-7 libwebpdemux2 libxslt1.1 libxkbfile1 libegl1 libopengl0 libqt5gui5 && \
     rm /tmp/viber.deb
+
+ENV QT_QUICK_BACKEND="software"
 
 RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \

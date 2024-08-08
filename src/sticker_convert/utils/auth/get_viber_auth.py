@@ -3,14 +3,14 @@ import importlib.util
 import os
 import platform
 import shutil
-import signal
 import subprocess
 import time
+from functools import partial
 from getpass import getpass
 from pathlib import Path
 from typing import Callable, List, Optional, Tuple, cast
 
-from sticker_convert.definitions import ROOT_DIR
+from sticker_convert.utils.process import check_admin, find_pid_by_name, get_mem, killall
 
 MSG_NO_BIN = """Viber Desktop not detected.
 Download and install Viber Desktop,
@@ -23,100 +23,8 @@ MSG_SIP_ENABLED = """You need to disable SIP:
 2. Launch Terminal from the Utilities menu
 3. Run the command `csrutil disable`
 4. Restart your computer"""
-MSG_NO_PGREP = "pgrep command or psutil python package is necessary"
 MSG_LAUNCH_FAIL = "Failed to launch Viber"
 MSG_PERMISSION_ERROR = "Failed to read Viber process memory"
-
-
-def check_admin_windows() -> bool:
-    username = os.getenv("username")
-    if username is None:
-        return False
-
-    s = subprocess.run(
-        ["net", "user", username],
-        capture_output=True,
-        text=True,
-    ).stdout
-
-    return True if "*Administrators" in s else False
-
-
-def check_admin_linux() -> bool:
-    s = subprocess.run(
-        ["sudo", "-l"],
-        capture_output=True,
-        text=True,
-    ).stdout
-
-    return True if "may run the following commands" in s else False
-
-
-def killall(name: str) -> bool:
-    result = False
-
-    while True:
-        pid = find_pid_by_name(name)
-        if pid is not None:
-            os.kill(pid, signal.SIGTERM)
-            result = True
-        else:
-            break
-
-    return result
-
-
-def find_pid_by_name(name: str) -> Optional[int]:
-    if platform.system() == "Windows":
-        s = subprocess.run(
-            ["powershell", "-c", "Get-Process", f"*{name}*"],
-            capture_output=True,
-            text=True,
-        ).stdout
-
-        for line in s.split("\n"):
-            if name in line.lower():
-                info = name.split()
-                pid = info[5]
-                if pid.isnumeric():
-                    return int(pid)
-
-        return None
-    else:
-        if platform.system() == "Darwin":
-            pattern = "Viber"
-        else:
-            pattern = ".*[Vv]iber.*"
-        pid = (
-            subprocess.run(["pgrep", pattern], capture_output=True, text=True)
-            .stdout.split("\n")[0]
-            .strip()
-        )
-        if pid == "" or pid.isnumeric() is False:
-            return None
-        else:
-            return int(pid)
-
-
-if importlib.util.find_spec("psutil"):
-    import psutil
-
-    def killall(name: str) -> bool:
-        result = False
-
-        for proc in psutil.process_iter():  # type: ignore
-            if name in proc.name().lower():
-                proc.kill()
-                result = True
-
-        return result
-
-    def find_pid_by_name(name: str) -> Optional[int]:
-        for proc in psutil.process_iter():  # type: ignore
-            if name in proc.name().lower():
-                return proc.pid
-
-        return None
 
 
 class GetViberAuth:
@@ -136,113 +44,6 @@ class GetViberAuth:
         time.sleep(10)
 
         return find_pid_by_name("viber")
-
-    def get_mem_windows(self, viber_pid: int) -> Tuple[Optional[bytes], str]:
-        from pathlib import WindowsPath
-
-        memdump_ps_path = str(WindowsPath(ROOT_DIR / "resources/memdump_windows.ps1"))
-        arglist = (
-            f'-NoProfile -ExecutionPolicy Bypass -File "{memdump_ps_path}" {viber_pid}'
-        )
-        dump_fpath = os.path.expandvars(f"%temp%/memdump.bin.{viber_pid}")
-
-        cmd = [
-            "powershell",
-            "-NoProfile",
-            "-ExecutionPolicy",
-            "Bypass",
-            "-Command",
-            f"Start-Process -Verb RunAs powershell -ArgumentList '{arglist}'",
-        ]
-
-        subprocess.run(cmd, capture_output=True, text=True)
-
-        while True:
-            try:
-                with open(dump_fpath, "rb") as f:
-                    s = f.read()
-                if len(s) != 0:
-                    break
-                time.sleep(1)
-            except (FileNotFoundError, PermissionError):
-                pass
-
-        while True:
-            try:
-                os.remove(dump_fpath)
-                break
-            except PermissionError:
-                pass
-
-        return s, ""
-
-    def get_mem_linux(self, viber_pid: int) -> Tuple[Optional[bytes], str]:
-        memdump_sh_path = (ROOT_DIR / "resources/memdump_linux.sh").as_posix()
-
-        s = subprocess.run(
-            [
-                memdump_sh_path,
-                str(viber_pid),
-            ],
-            capture_output=True,
-        ).stdout
-
-        if len(s) > 1000:
-            pass
-        elif shutil.which("pkexec") and os.getenv("DISPLAY"):
-            s = subprocess.run(
-                [
-                    "pkexec",
-                    memdump_sh_path,
-                    str(viber_pid),
-                ],
-                capture_output=True,
-            ).stdout
-        else:
-            prompt = "Enter sudo password: "
-            if self.cb_ask_str != input:
-                sudo_password = self.cb_ask_str(
-                    prompt, initialvalue="", cli_show_initialvalue=False
-                )
-            else:
-                sudo_password = getpass(prompt)
-            sudo_password_pipe = subprocess.Popen(
-                ("echo", sudo_password), stdout=subprocess.PIPE
-            )
-            s = subprocess.run(
-                [
-                    "sudo",
-                    "-S",
-                    memdump_sh_path,
-                    str(viber_pid),
-                ],
-                capture_output=True,
-                stdin=sudo_password_pipe.stdout,
-            ).stdout
-
-        return s, ""
-
-    def get_mem_darwin(self, viber_pid: int) -> Tuple[Optional[bytes], str]:
-        subprocess.run(
-            [
-                "lldb",
-                "--attach-pid",
-                str(viber_pid),
-                "-o",
-                "process save-core /tmp/viber.dmp",
-                "-o",
-                "quit",
-            ],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-        )
-
-        with open("/tmp/viber.dmp", "rb") as f:
-            s = f.read()
-
-        os.remove("/tmp/viber.dmp")
-
-        return s, ""
 
     def get_auth_by_pme(
         self, viber_bin_path: str, relaunch: bool = True
@@ -315,12 +116,6 @@ class GetViberAuth:
 
             if "enabled" in csrutil_status:
                 return None, MSG_SIP_ENABLED
-        elif (
-            platform.system() != "Windows"
-            and shutil.which("pgrep") is None
-            and importlib.find_loader("psutil") is None
-        ):
-            return None, MSG_NO_PGREP
 
         if relaunch:
             viber_pid = self.relaunch_viber(viber_bin_path)
@@ -329,12 +124,13 @@ class GetViberAuth:
         if viber_pid is None:
             return None, MSG_LAUNCH_FAIL
 
-        if platform.system() == "Windows":
-            s, msg = self.get_mem_windows(viber_pid)
-        elif platform.system() == "Darwin":
-            s, msg = self.get_mem_darwin(viber_pid)
+        if self.cb_ask_str == input:
+            pw_func = getpass
         else:
-            s, msg = self.get_mem_linux(viber_pid)
+            pw_func = partial(
+                self.cb_ask_str, initialvalue="", cli_show_initialvalue=False
+            )
+        s, msg = get_mem(viber_pid, pw_func)
 
         if s is None:
             return None, msg
@@ -421,14 +217,14 @@ class GetViberAuth:
             methods.append(self.get_auth_by_dump)
             if pme_present:
                 methods.append(self.get_auth_by_pme)
-            if check_admin_windows() is False:
+            if check_admin() is False:
                 methods.reverse()
         else:
             if not os.path.isfile("/.dockerenv"):
                 methods.append(self.get_auth_by_dump)
             if pme_present:
                 methods.append(self.get_auth_by_pme)
-            if check_admin_linux() is False:
+            if check_admin() is False:
                 methods.reverse()
 
         for method in methods:
