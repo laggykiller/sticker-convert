@@ -5,11 +5,7 @@
 ## Method 1: Automatic
 You can get them easily with `Generate` button (In GUI) or `--signal-get-auth` (In CLI)
 
-Since v2.7.0, you can get Signal uuid and password from non-beta version of Signal.
-
-If you are using custom Signal installation such as portapps, you need to specify Signal
-data directory (`--signal-data-dir` In CLI). Choose the `data` directory of your Signal
-portable installation.
+Note that you need to install Signal Desktop BETA VERSIOn
 
 ## Method 2: Manual
 ![../imgs/signal-uuid-password.png](../imgs/signal-uuid-password.png)

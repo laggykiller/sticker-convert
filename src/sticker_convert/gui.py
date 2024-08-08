@@ -150,7 +150,6 @@ class GUI(Window):
         # Credentials
         self.signal_uuid_var = StringVar(self)
         self.signal_password_var = StringVar(self)
-        self.signal_data_dir_var = StringVar(self)
         self.telegram_token_var = StringVar(self)
         self.telegram_userid_var = StringVar(self)
         self.kakao_auth_token_var = StringVar(self)

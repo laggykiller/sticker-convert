@@ -473,23 +473,22 @@ class CLI:
                 self.cb.msg(f"Got auth_token successfully: {auth_token}")
 
         if args.signal_get_auth:
-            get_signal_auth = GetSignalAuth()
+            m = GetSignalAuth(cb_msg=self.cb.msg, cb_ask_str=self.cb.ask_str)
+            m.launch_signal_desktop()
 
-            signal_bin_path = None
-            signal_user_data_dir = None
-            if args.signal_data_dir:
-                signal_bin_path = "(User specified)"
-                signal_user_data_dir = args.signal_data_dir
+            uuid, password = None, None
+            while True:
+                uuid, password = m.get_cred()
 
-            uuid, password, msg = get_signal_auth.get_cred(
-                signal_bin_path, signal_user_data_dir
-            )
+                if uuid and password:
+                    opt_cred.signal_uuid = uuid
+                    opt_cred.signal_password = password
 
-            if uuid and password:
-                opt_cred.signal_uuid = uuid
-                opt_cred.signal_password = password
-
-            self.cb.msg(msg)
+                    self.cb.msg(
+                        f"Got uuid and password successfully: {uuid}, {password}"
+                    )
+                    m.close()
+                    break
 
         if args.line_get_auth:
             get_line_auth = GetLineAuth()
