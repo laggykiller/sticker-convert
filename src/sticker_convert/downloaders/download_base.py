@@ -6,23 +6,24 @@ from pathlib import Path
 from typing import Any, List, Optional, Tuple
 
 import anyio
+import httpx
 import requests
 
-from sticker_convert.job_option import CredOption
+from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 
 
 class DownloadBase:
     def __init__(
         self,
-        url: str,
-        out_dir: Path,
+        opt_input: InputOption,
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> None:
-        self.url = url
-        self.out_dir = out_dir
+        self.url = opt_input.url
+        self.out_dir = opt_input.dir
+        self.input_option = opt_input.option
         self.opt_cred = opt_cred
         self.cb = cb
         self.cb_return = cb_return
@@ -42,36 +43,32 @@ class DownloadBase:
             ("bar", None, {"set_progress_mode": "determinate", "steps": len(targets)})
         )
 
-        async with anyio.create_task_group() as tg:
-            for url, dest in targets:
-                tg.start_soon(self.download_file_async, url, dest, retries, **kwargs)
+        async with httpx.AsyncClient() as client:
+            async with anyio.create_task_group() as tg:
+                for url, dest in targets:
+                    tg.start_soon(
+                        self.download_file_async, client, url, dest, retries, **kwargs
+                    )
 
     async def download_file_async(
         self,
+        client: httpx.AsyncClient,
         url: str,
         dest: Path,
         retries: int = 3,
         **kwargs: Any,
     ) -> None:
+        self.cb.put(f"Downloading {url}")
         for retry in range(retries):
-            try:
-                response = requests.get(url, allow_redirects=True, **kwargs)
+            response = await client.get(url, follow_redirects=True, **kwargs)
 
-                if not response.ok:
-                    self.cb.put("update_bar")
-                    raise requests.exceptions.RequestException(
-                        f"Error {response.status_code}"
-                    )
-
-                self.cb.put(f"Downloading {url}")
-                with open(dest, "wb+") as f:
-                    f.write(response.content)
+            if response.is_success:
+                async with await anyio.open_file(dest, "wb+") as f:
+                    await f.write(response.content)
                 self.cb.put(f"Downloaded {url}")
-                break
-
-            except requests.exceptions.RequestException as e:
+            else:
                 self.cb.put(
-                    f"Cannot download {url} (tried {retry+1}/{retries} times): {e}"
+                    f"Error {response.status_code}: {url} (tried {retry+1}/{retries} times)"
                 )
 
         self.cb.put("update_bar")

@@ -8,7 +8,7 @@ from signalstickers_client.models import StickerPack
 from signalstickers_client.stickersclient import StickersClient
 
 from sticker_convert.downloaders.download_base import DownloadBase
-from sticker_convert.job_option import CredOption
+from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
@@ -82,11 +82,10 @@ class DownloadSignal(DownloadBase):
 
     @staticmethod
     def start(
-        url: str,
-        out_dir: Path,
+        opt_input: InputOption,
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> bool:
-        downloader = DownloadSignal(url, out_dir, opt_cred, cb, cb_return)
+        downloader = DownloadSignal(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_signal()

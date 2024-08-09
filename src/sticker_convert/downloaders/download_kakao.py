@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 from py_mini_racer import MiniRacer
 
 from sticker_convert.downloaders.download_base import DownloadBase
-from sticker_convert.job_option import CredOption
+from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
@@ -326,11 +326,10 @@ class DownloadKakao(DownloadBase):
 
     @staticmethod
     def start(
-        url: str,
-        out_dir: Path,
+        opt_input: InputOption,
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> bool:
-        downloader = DownloadKakao(url, out_dir, opt_cred, cb, cb_return)
+        downloader = DownloadKakao(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_kakao()
