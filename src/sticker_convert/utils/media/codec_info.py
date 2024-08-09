@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import json
 import mmap
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
@@ -10,6 +11,7 @@ from pathlib import Path
 from typing import BinaryIO, List, Optional, Tuple, Union, cast
 
 from PIL import Image, UnidentifiedImageError
+from rlottie_python.rlottie_wrapper import LottieAnimation
 
 
 def lcm(a: int, b: int):
@@ -61,6 +63,24 @@ def durations_gcd(*durations: Union[int, float]) -> Union[float, Fraction]:
         return Fraction(gcd(*durations), 1)  # type: ignore
 
 
+def open_lottie(file: Union[Path, bytes]) -> LottieAnimation:
+    if isinstance(file, Path):
+        if file.suffix == ".tgs":
+            return LottieAnimation.from_tgs(file.as_posix())
+        else:
+            return LottieAnimation.from_file(file.as_posix())
+    else:
+        import gzip
+
+        try:
+            with gzip.open(BytesIO(file)) as f:
+                data = f.read().decode(encoding="utf-8")
+        except gzip.BadGzipFile:
+            data = json.loads(file.decode())
+
+        return LottieAnimation.from_data(data)
+
+
 class CodecInfo:
     def __init__(
         self, file: Union[Path, bytes], file_ext: Optional[str] = None
@@ -87,8 +107,8 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext == ".tgs":
-            fps, frames = CodecInfo._get_file_fps_frames_tgs(file)
+        if file_ext in (".tgs", ".json", ".lottie"):
+            fps, frames = CodecInfo._get_file_fps_frames_lottie(file)
             if fps > 0:
                 duration = int(frames / fps * 1000)
             else:
@@ -114,8 +134,8 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext == ".tgs":
-            return CodecInfo._get_file_fps_tgs(file)
+        if file_ext in (".tgs", ".json", ".lottie"):
+            return CodecInfo._get_file_fps_lottie(file)
         elif file_ext == ".webp":
             fps, _, _, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
             return fps
@@ -141,8 +161,8 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext == ".tgs":
-            return CodecInfo._get_file_frames_tgs(file)
+        if file_ext in (".tgs", ".json", ".lottie"):
+            return CodecInfo._get_file_frames_lottie(file)
         if file_ext in (".gif", ".webp", ".png", ".apng"):
             _, frames, _ = CodecInfo._get_file_fps_frames_duration_pillow(
                 file, frames_only=True
@@ -168,8 +188,8 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext == ".tgs":
-            fps, frames = CodecInfo._get_file_fps_frames_tgs(file)
+        if file_ext in (".tgs", ".json", ".lottie"):
+            fps, frames = CodecInfo._get_file_fps_frames_lottie(file)
             if fps > 0:
                 duration = int(frames / fps * 1000)
             else:
@@ -184,51 +204,25 @@ class CodecInfo:
         return duration
 
     @staticmethod
-    def _get_file_fps_tgs(file: Union[Path, bytes]) -> int:
-        from rlottie_python.rlottie_wrapper import LottieAnimation
+    def _get_file_fps_lottie(file: Union[Path, bytes]) -> int:
+        anim = open_lottie(file)
+        fps = anim.lottie_animation_get_framerate()
 
-        if isinstance(file, Path):
-            with LottieAnimation.from_tgs(file.as_posix()) as anim:
-                return anim.lottie_animation_get_framerate()
-        else:
-            import gzip
-
-            with gzip.open(BytesIO(file)) as f:
-                data = f.read().decode(encoding="utf-8")
-            with LottieAnimation.from_data(data) as anim:
-                return anim.lottie_animation_get_framerate()
+        return fps
 
     @staticmethod
-    def _get_file_frames_tgs(file: Union[Path, bytes]) -> int:
-        from rlottie_python.rlottie_wrapper import LottieAnimation
+    def _get_file_frames_lottie(file: Union[Path, bytes]) -> int:
+        anim = open_lottie(file)
+        frames = anim.lottie_animation_get_totalframe()
 
-        if isinstance(file, Path):
-            with LottieAnimation.from_tgs(file.as_posix()) as anim:
-                return anim.lottie_animation_get_totalframe()
-        else:
-            import gzip
-
-            with gzip.open(BytesIO(file)) as f:
-                data = f.read().decode(encoding="utf-8")
-            with LottieAnimation.from_data(data) as anim:
-                return anim.lottie_animation_get_totalframe()
+        return frames
 
     @staticmethod
-    def _get_file_fps_frames_tgs(file: Union[Path, bytes]) -> Tuple[int, int]:
-        from rlottie_python.rlottie_wrapper import LottieAnimation
-
-        if isinstance(file, Path):
-            with LottieAnimation.from_tgs(file.as_posix()) as anim:
-                fps = anim.lottie_animation_get_framerate()
-                frames = anim.lottie_animation_get_totalframe()
-        else:
-            import gzip
-
-            with gzip.open(BytesIO(file)) as f:
-                data = f.read().decode(encoding="utf-8")
-            with LottieAnimation.from_data(data) as anim:
-                fps = anim.lottie_animation_get_framerate()
-                frames = anim.lottie_animation_get_totalframe()
+    def _get_file_fps_frames_lottie(file: Union[Path, bytes]) -> Tuple[int, int]:
+        anim = open_lottie(file)
+        fps = anim.lottie_animation_get_framerate()
+        frames = anim.lottie_animation_get_totalframe()
+        anim.lottie_animation_destroy()
 
         return fps, frames
 
@@ -408,19 +402,10 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext == ".tgs":
-            from rlottie_python.rlottie_wrapper import LottieAnimation
-
-            if isinstance(file, Path):
-                with LottieAnimation.from_tgs(file.as_posix()) as anim:
-                    width, height = anim.lottie_animation_get_size()
-            else:
-                import gzip
-
-                with gzip.open(BytesIO(file)) as f:
-                    data = f.read().decode(encoding="utf-8")
-                with LottieAnimation.from_data(data) as anim:
-                    width, height = anim.lottie_animation_get_size()
+        if file_ext in (".tgs", ".json", ".lottie"):
+            anim = open_lottie(file)
+            width, height = anim.lottie_animation_get_size()
+            anim.lottie_animation_destroy()
         elif file_ext in (".webp", ".png", ".apng"):
             with Image.open(file) as im:
                 width = im.width
