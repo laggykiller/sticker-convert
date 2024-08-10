@@ -160,6 +160,7 @@ class GUI(Window):
         self.line_cookies_var = StringVar(self)
         self.viber_auth_var = StringVar(self)
         self.viber_bin_path_var = StringVar(self)
+        self.discord_token_var = StringVar(self)
 
         # Config
         self.settings_save_cred_var = BooleanVar()
@@ -387,6 +388,7 @@ class GUI(Window):
         )
         self.line_cookies_var.set(self.creds.get("line", {}).get("cookies", ""))
         self.viber_auth_var.set(self.creds.get("viber", {}).get("auth", ""))
+        self.discord_token_var.set(self.creds.get("discord", {}).get("token", ""))
 
     def get_input_name(self) -> str:
         return [
@@ -548,6 +550,7 @@ class GUI(Window):
             kakao_phone_number=self.kakao_phone_number_var.get(),
             line_cookies=self.line_cookies_var.get(),
             viber_auth=self.viber_auth_var.get(),
+            discord_token=self.discord_token_var.get(),
         )
 
     def start_process(self) -> None:
@@ -701,8 +704,13 @@ class GUI(Window):
             if not url:
                 self.input_frame.address_entry.config(bootstyle="warning")  # type: ignore
 
-            elif download_option != input_option and not (
-                input_option in ("kakao", "line") and url.isnumeric()
+            elif (
+                download_option is None
+                or input_option.startswith(download_option) is False
+                and not (
+                    input_option in ("kakao", "line", "discord", "discord_emoji")
+                    and url.isnumeric()
+                )
             ):
                 self.input_frame.address_entry.config(bootstyle="danger")  # type: ignore
                 self.input_frame.address_tip.config(
@@ -786,6 +794,11 @@ class GUI(Window):
             self.cred_frame.kakao_auth_token_entry.config(bootstyle="warning")  # type: ignore
         else:
             self.cred_frame.kakao_auth_token_entry.config(bootstyle="default")  # type: ignore
+
+        if input_option.startswith("discord") and not self.discord_token_var.get():
+            self.cred_frame.discord_token_entry.config(bootstyle="warning")  # type: ignore
+        else:
+            self.cred_frame.discord_token_entry.config(bootstyle="default")  # type: ignore
 
         # Check for Input and Compression mismatch
         if (

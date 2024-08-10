@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any
 from ttkbootstrap import Button, Entry, Label, LabelFrame  # type: ignore
 
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
+from sticker_convert.gui_components.windows.discord_get_auth_window import DiscordGetAuthWindow
 from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGetAuthWindow
 from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
 from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
@@ -118,6 +119,20 @@ class CredFrame(LabelFrame):
             bootstyle="secondary",  # type: ignore
         )
 
+        self.discord_token_lbl = Label(
+            self, text="Discord token", width=18, justify="left", anchor="w"
+        )
+        self.discord_token_entry = Entry(
+            self, textvariable=self.gui.discord_token_var, width=35
+        )
+        self.discord_token_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+        self.discord_get_auth_btn = Button(
+            self,
+            text="Generate",
+            command=self.cb_discord_get_auth,
+            bootstyle="secondary",  # type: ignore
+        )
+
         self.help_btn = Button(
             self,
             text="Get help",
@@ -151,7 +166,10 @@ class CredFrame(LabelFrame):
         self.viber_auth_lbl.grid(column=0, row=7, sticky="w", padx=3, pady=3)
         self.viber_auth_entry.grid(column=1, row=7, sticky="w", padx=3, pady=3)
         self.viber_get_auth_btn.grid(column=2, row=7, sticky="e", padx=3, pady=3)
-        self.help_btn.grid(column=2, row=8, sticky="e", padx=3, pady=3)
+        self.discord_token_lbl.grid(column=0, row=8, sticky="w", padx=3, pady=3)
+        self.discord_token_entry.grid(column=1, row=8, sticky="w", padx=3, pady=3)
+        self.discord_get_auth_btn.grid(column=2, row=8, sticky="e", padx=3, pady=3)
+        self.help_btn.grid(column=2, row=9, sticky="e", padx=3, pady=3)
 
     def cb_cred_help(self, *_: Any) -> None:
         faq_site = "https://github.com/laggykiller/sticker-convert#faq"
@@ -170,6 +188,9 @@ class CredFrame(LabelFrame):
 
     def cb_viber_get_auth(self, *_: Any) -> None:
         ViberGetAuthWindow(self.gui)
+
+    def cb_discord_get_auth(self, *_: Any) -> None:
+        DiscordGetAuthWindow(self.gui)
 
     def set_states(self, state: str) -> None:
         self.signal_uuid_entry.config(state=state)

@@ -14,7 +14,7 @@ class RunBin:
         if Path(executable).is_file():
             return executable
 
-        if platform.system() == "Windows":
+        if platform.system() == "Windows" and executable.endswith(".exe") is False:
             executable = executable + ".exe"
 
         which_result = shutil.which(executable)

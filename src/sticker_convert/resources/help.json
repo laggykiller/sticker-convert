@@ -71,6 +71,8 @@
         "viber_auth": "Set Viber authentication data.\nRequired for uploading Viber stickers.",
         "viber_get_auth": "Generate Viber authentication data.",
         "viber_bin_path": "Specify location of Viber Desktop application.\nUseful for portable installation.",
+        "discord_get_auth": "Get Discord token.",
+        "discord_token": "Set Discord token. Required for downloading Discord stickers and emojis.",
         "save_cred": "Save Signal and Telegram credentials."
     }
 }

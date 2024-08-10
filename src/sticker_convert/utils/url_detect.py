@@ -30,4 +30,7 @@ class UrlDetect:
         if domain == "stickers.viber.com":
             return "viber"
 
+        if domain == "discord.com":
+            return "discord"
+
         return None

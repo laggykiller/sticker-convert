@@ -468,3 +468,31 @@ def test_download_viber_official_sound_sticker_packs(tmp_path: LocalPath) -> Non
         with_author=False,
         with_emoji=False,
     )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_discord_stickers(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="discord",
+        url="https://discord.com/channels/169256939211980800/@home",
+        expected_file_count=37,
+        expected_file_formats=[".png", ".json"],
+        with_title=True,
+        with_author=True,
+        with_emoji=True,
+    )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_discord_emojis(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="discord_emoji",
+        url="https://discord.com/channels/169256939211980800/@home",
+        expected_file_count=91,
+        expected_file_formats=[".png", ".gif"],
+        with_title=True,
+        with_author=True,
+        with_emoji=False,
+    )

@@ -375,6 +375,100 @@
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
+    "discord": {
+        "size_max": {
+            "img": 512000,
+            "vid": 512000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".png"
+        },
+        "fps": {
+            "min": 1,
+            "max": 60,
+            "power": -0.3
+        },
+        "res": {
+            "w": {
+                "min": 320,
+                "max": 320
+            },
+            "h": {
+                "min": 320,
+                "max": 320
+            },
+            "power": 1
+        },
+        "quality": {
+            "min": 10,
+            "max": 95,
+            "power": 5
+        },
+        "color": {
+            "min": 32,
+            "max": 257,
+            "power": 3
+        },
+        "duration": {
+            "min": 0,
+            "max": 5000
+        },
+        "padding_percent": 0,
+        "bg_color": "",
+        "steps": 16,
+        "fake_vid": false,
+        "scale_filter": "bicubic",
+        "quantize_method": "imagequant",
+        "default_emoji": "😀"
+    },
+    "discord_emoji": {
+        "size_max": {
+            "img": 256000,
+            "vid": 256000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".gif"
+        },
+        "fps": {
+            "min": 1,
+            "max": 60,
+            "power": -0.3
+        },
+        "res": {
+            "w": {
+                "min": 32,
+                "max": 128
+            },
+            "h": {
+                "min": 32,
+                "max": 128
+            },
+            "power": 1
+        },
+        "quality": {
+            "min": 10,
+            "max": 95,
+            "power": 5
+        },
+        "color": {
+            "min": 32,
+            "max": 257,
+            "power": 3
+        },
+        "duration": {
+            "min": 0,
+            "max": 5000
+        },
+        "padding_percent": 0,
+        "bg_color": "",
+        "steps": 16,
+        "fake_vid": false,
+        "scale_filter": "bicubic",
+        "quantize_method": "imagequant",
+        "default_emoji": "😀"
+    },
     "imessage_small": {
         "size_max": {
             "img": 500000,

@@ -14,6 +14,7 @@ from mergedeep import merge  # type: ignore
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR
 from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
+from sticker_convert.utils.auth.get_discord_auth import GetDiscordAuth
 from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
@@ -164,7 +165,12 @@ class CLI:
         )
 
         parser_cred = parser.add_argument_group("Credentials options")
-        flags_cred_bool = ("signal_get_auth", "kakao_get_auth", "line_get_auth")
+        flags_cred_bool = (
+            "signal_get_auth",
+            "kakao_get_auth",
+            "line_get_auth",
+            "discord_get_auth",
+        )
         for k, v in self.help["cred"].items():
             keyword_args = {}
             if k in flags_cred_bool:
@@ -220,6 +226,8 @@ class CLI:
             "telegram": args.download_telegram,
             "kakao": args.download_kakao,
             "viber": args.download_viber,
+            "discord": args.download_discord,
+            "discord_emoji": args.download_discord_emoji,
         }
 
         download_option = "local"
@@ -456,6 +464,9 @@ class CLI:
             viber_auth=args.viber_auth
             if args.viber_auth
             else creds.get("viber", {}).get("auth"),
+            discord_token=args.discord_token
+            if args.discord_token
+            else creds.get("discord", {}).get("token"),
         )
 
         if args.kakao_get_auth:
@@ -509,6 +520,15 @@ class CLI:
 
             if viber_auth:
                 opt_cred.viber_auth = viber_auth
+
+            self.cb.msg(msg)
+
+        if args.discord_get_auth:
+            get_discord_auth = GetDiscordAuth(self.cb.msg)
+            discord_token, msg = get_discord_auth.get_cred()
+
+            if discord_token:
+                opt_cred.discord_token = discord_token
 
             self.cb.msg(msg)
 

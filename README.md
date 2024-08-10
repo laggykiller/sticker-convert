@@ -4,7 +4,7 @@
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
 - With GUI and CLI that runs on Windows, MacOS and Linux
-- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), Viber, iMessage (Create Xcode sticker pack project)
+- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), Viber, Discord (Download only), iMessage (Create Xcode sticker pack project)
 - Supports static and animated stickers, with transparency support
 
 ## Downloads
@@ -43,6 +43,7 @@
 | [Line](docs/guide_line.md)            | ✅                                  | 🚫 (Need to submit for manual approval)            |
 | [Kakao](docs/guide_kakao.md)          | ✅ (Need 'share link' for animated) | 🚫 (Need to submit for manual approval)            |
 | [Viber](docs/guide_viber.md)          | ✅                                  | ✅ (Require `viber_auth`)                          |
+| [Discord](docs/guide_discord.md)      | ✅ (Required `token`)               | 🚫                                                 |
 | [iMessage](docs/guide_imessage.md)    | 🚫                                  | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
@@ -52,14 +53,14 @@
     - Upload: Supported
         - `uuid` and `password` are needed if you want to automatically upload the pack with the program. View FAQ for more information.
         - Alternatively, you may use Signal Desktop to manually upload and create sticker pack with the output of this prorgam.
-- Telegram (e.g. `https://telegram.me/addstickers/xxxxx`)
-    - Download: Supported for both stickers and custom emoji, but require bot token
+- Telegram
+    - Download: Supported (e.g. `https://telegram.me/addstickers/xxxxx`) for both stickers and custom emoji, but require bot token.
     - Upload: Supported for both stickers and custom emoji, but require bot token and user_id. Alternatively, you may manually upload and create sticker pack with the output of this program.
 - WhatsApp
-    - Download: You have to manually find sticker packs / extract from your phone or from WhatsApp Web
+    - Download: You have to manually find sticker packs / extract from your phone or from WhatsApp Web.
         - Android Phone: Inside `/storage/emulated/0/Whatsapp/media/Whatsapp Stickers` OR `/storage/emulated/0/Android/media/com.whatsapp/WhatsApp/Media/WhatsApp Stickers`
         - Any: Go to WhatsApp Web, right click on sticker and click "Save image as..."
-    - Upload: The program can create .wastickers file, which could then be imported into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information
+    - Upload: The program can create .wastickers file, which could then be imported into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information.
 - Line
     - Download: Supported (e.g. `https://store.line.me/stickershop/product/1234/en` OR `line://shop/detail/1234` OR `1234`)
         - Search on official site: https://store.line.me/stickershop
@@ -72,6 +73,9 @@
 - Viber
     - Download: Supported (e.g. `https://stickers.viber.com/pages/example` OR `https://stickers.viber.com/pages/custom-sticker-packs/example`)
     - Upload: Supported. Viber authentication data required for uploading Viber stickers, which could be fetched from Viber Desktop application automatically.
+- Discord
+    - Download: Supported (e.g. `https://discord.com/channels/169256939211980800/@home` OR `169256939211980800`), but require user token.
+    - Upload: Not supported.
 - iMessage
     - Download: Not supported.
     - Upload: The program can create Xcode project for iMessage sticker pack, which could then be compiled and sideloaded using Xcode.
@@ -92,31 +96,15 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
-                          [--input-dir INPUT_DIR]
-                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-viber DOWNLOAD_VIBER]
-                          [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
-                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-whatsapp | --export-viber | --export-imessage]
-                          [--no-compress]
-                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                          [--res-power RES_POWER] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
-                          [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                          [--color-power COLOR_POWER] [--duration-min DURATION_MIN] [--duration-max DURATION_MAX]
-                          [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX]
-                          [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT]
-                          [--fake-vid] [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD]
-                          [--cache-dir CACHE_DIR] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
-                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                          [--telegram-token TELEGRAM_TOKEN]
-                          [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN]
-                          [--kakao-get-auth] [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
-                          [--line-get-auth] [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH]
-                          [--viber-get-auth VIBER_GET_AUTH] [--viber-bin-path VIBER_BIN_PATH]
-                          [--save-cred SAVE_CRED]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--input-dir INPUT_DIR]
+                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
+                          [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE] [--export-signal | --export-telegram | --export-telegram-emoji | --export-viber | --export-whatsapp | --export-imessage] [--no-compress]
+                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}] [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER]
+                          [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
+                          [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
+                          [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth] [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
+                          [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth] [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH] [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--save-cred SAVE_CRED]
 
 CLI for stickers-convert
 
@@ -155,6 +143,14 @@ Input options:
                         Download viber stickers from a URL as input
                         (Example: https://stickers.viber.com/pages/example
                         OR https://stickers.viber.com/pages/custom-sticker-packs/example)
+  --download-discord DOWNLOAD_DISCORD
+                        Download discord stickers from a channel URL / ID as input
+                        (Example: https://discord.com/channels/169256939211980800/@home
+                        OR 169256939211980800)
+  --download-discord-emoji DOWNLOAD_DISCORD_EMOJI
+                        Download discord emojis from a channel URL / ID as input
+                        (Example: https://discord.com/channels/169256939211980800/@home
+                        OR 169256939211980800)
 
 Output options:
   --output-dir OUTPUT_DIR
@@ -165,13 +161,13 @@ Output options:
   --export-telegram     Upload to Telegram
   --export-telegram-emoji
                         Upload to Telegram (Custom emoji)
-  --export-whatsapp     Create a .wastickers file for uploading to WhatsApp
   --export-viber        Upload to Viber
+  --export-whatsapp     Create a .wastickers file for uploading to WhatsApp
   --export-imessage     Create Xcode project for importing to iMessage
 
 Compression options:
   --no-compress         Do not compress files. Useful for only downloading stickers.
-  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}
                         Apply preset for compression.
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
@@ -290,6 +286,9 @@ Credentials options:
   --viber-bin-path VIBER_BIN_PATH
                         Specify location of Viber Desktop application.
                         Useful for portable installation.
+  --discord-get-auth    Get Discord token.
+  --discord-token DISCORD_TOKEN
+                        Set Discord token. Required for downloading Discord stickers and emojis.
   --save-cred SAVE_CRED
                         Save Signal and Telegram credentials.
 ```
@@ -402,6 +401,7 @@ See [docs/COMPILING.md](docs/COMPILING.md)
 - [Line](docs/guide_line.md)
 - [Kakao](docs/guide_kakao.md)
 - [Viber](docs/guide_viber.md)
+- [Discord](docs/guide_discord.md)
 - [iMessage](docs/guide_imessage.md)
 
 ### Conversion is slow
@@ -462,5 +462,5 @@ See [docs/TODO.md](docs/TODO.md)
 - Banner generated from [GitHub Socialify](https://socialify.git.ci/)
 
 ## DISCLAIMER
-- The author of this repo is NOT affiliated with Signal, Telegram, WhatsApp, Line, Kakao, Viber, iMessage or Sticker Maker.
+- The author of this repo is NOT affiliated with Signal, Telegram, WhatsApp, Line, Kakao, Viber, Discord, iMessage or Sticker Maker.
 - The author of this repo is NOT repsonsible for any legal consequences and loss incurred from using this repo.

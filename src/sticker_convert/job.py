@@ -12,6 +12,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
+from sticker_convert.downloaders.download_discord import DownloadDiscord
 from sticker_convert.downloaders.download_kakao import DownloadKakao
 from sticker_convert.downloaders.download_line import DownloadLine
 from sticker_convert.downloaders.download_signal import DownloadSignal
@@ -295,6 +296,12 @@ class Job:
             )
             error_msg += save_to_local_tip
 
+        if (
+            self.opt_input.option.startswith("discord")
+            and not self.opt_cred.discord_token
+        ):
+            error_msg += "[X] Downloading from Discord requires token.\n"
+
         if self.opt_output.option == "telegram" and not self.opt_cred.telegram_userid:
             error_msg += "[X] Uploading to telegram requires user_id \n"
             error_msg += "    (From real account, not bot account).\n"
@@ -536,6 +543,9 @@ class Job:
         if self.opt_input.option == "viber":
             downloaders.append(DownloadViber.start)
 
+        if self.opt_input.option.startswith("discord"):
+            downloaders.append(DownloadDiscord.start)
+
         if len(downloaders) > 0:
             self.executor.cb("Downloading...")
         else:
@@ -547,7 +557,7 @@ class Job:
         for downloader in downloaders:
             self.executor.add_work(
                 work_func=downloader,
-                work_args=(self.opt_input.url, self.opt_input.dir, self.opt_cred),
+                work_args=(self.opt_input, self.opt_cred),
             )
 
         self.executor.join_workers()
