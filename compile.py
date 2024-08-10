@@ -10,6 +10,8 @@ from typing import Optional
 sys.path.append("./src")
 from sticker_convert import __version__
 
+UNIVERSAL_WHEEL_EXCEPTIONS = ["mini_racer"]
+
 
 def osx_run_in_venv(cmd: str, get_stdout: bool = False) -> Optional[str]:
     if Path("/bin/zsh").is_file():
@@ -36,7 +38,85 @@ def search_wheel_in_dir(package: str, dir: Path) -> Path:
     raise RuntimeError(f"Cannot find wheel for {package}")
 
 
-def nuitka(python_bin: str) -> None:
+def copy_if_universal(wheel_name: Path, in_dir: Path, out_dir: Path) -> bool:
+    if wheel_name.name.endswith("universal2.whl") or wheel_name.name.endswith(
+        "any.whl"
+    ):
+        src_path = Path(in_dir, wheel_name.name)
+        dst_path = Path(
+            out_dir,
+            wheel_name.name.replace("x86_64", "universal2").replace(
+                "arm64", "universal2"
+            ),
+        )
+
+        shutil.copy(src_path, dst_path)
+        return True
+    else:
+        return False
+
+
+def create_universal_wheels(in_dir1: Path, in_dir2: Path, out_dir: Path) -> None:
+    for wheel_name_1 in in_dir1.iterdir():
+        package = wheel_name_1.name.split("-")[0]
+        if package in UNIVERSAL_WHEEL_EXCEPTIONS:
+            src_path = Path(in_dir1, wheel_name_1.name)
+            dst_path = Path(out_dir, wheel_name_1.name)
+            shutil.copy(src_path, dst_path)
+            continue
+        wheel_name_2 = search_wheel_in_dir(package, in_dir2)
+        if copy_if_universal(wheel_name_1, in_dir1, out_dir):
+            continue
+        if copy_if_universal(wheel_name_2, in_dir2, out_dir):
+            continue
+
+        wheel_path_1 = Path(in_dir1, wheel_name_1.name)
+        wheel_path_2 = Path(in_dir2, wheel_name_2.name)
+        subprocess.run(
+            ["delocate-fuse", wheel_path_1, wheel_path_2, "-w", str(out_dir)]
+        )
+        print(f"Created universal wheel {wheel_path_1} {wheel_path_2}")
+
+    for wheel_path in out_dir.iterdir():
+        wheel_name_new = wheel_path.name.replace("x86_64", "universal2").replace(
+            "arm64", "universal2"
+        )
+
+        src_path = Path(out_dir, wheel_path.name)
+        dst_path = Path(out_dir, wheel_name_new)
+
+        src_path.rename(dst_path)
+        print(f"Renamed universal wheel {dst_path}")
+
+
+def osx_install_universal2_dep(arch: str) -> None:
+    shutil.rmtree("wheel_arm", ignore_errors=True)
+    shutil.rmtree("wheel_x64", ignore_errors=True)
+    shutil.rmtree("wheel_universal2", ignore_errors=True)
+
+    Path("wheel_arm").mkdir()
+    Path("wheel_x64").mkdir()
+    Path("wheel_universal2").mkdir()
+
+    osx_run_in_venv(
+        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm"
+    )
+    osx_run_in_venv(
+        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64"
+    )
+
+    if arch == "arm64":
+        w1 = "./wheel_arm"
+        w2 = "./wheel_x64"
+    else:
+        w1 = "./wheel_x64"
+        w2 = "./wheel_arm"
+
+    create_universal_wheels(Path(w1), Path(w2), Path("wheel_universal2"))
+    osx_run_in_venv("python -m pip install --require-virtualenv ./wheel_universal2/*")
+
+
+def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
     cmd_list = [
         python_bin,
         "-m",
@@ -62,6 +142,8 @@ def nuitka(python_bin: str) -> None:
         cmd_list.append("--disable-console")
         cmd_list.append("--macos-create-app-bundle")
         cmd_list.append("--macos-app-icon=src/sticker_convert/resources/appicon.icns")
+        if arch is not None:
+            cmd_list.append(f"--macos-target-arch={arch}")
         cmd_list.append(f"--macos-app-version={__version__}")
     else:
         cmd_list.append("--linux-icon=src/sticker_convert/resources/appicon.png")
@@ -95,6 +177,7 @@ def osx_patch() -> None:
 
 
 def compile() -> None:
+    arch = os.getenv("SC_COMPILE_ARCH")
     python_bin = str(Path(sys.executable).resolve())
 
     ios_stickers_path = "src/sticker_convert/ios-message-stickers-template"
@@ -120,11 +203,14 @@ def compile() -> None:
         subprocess.run(f"{python_bin} -m venv venv".split(" "))
         python_bin = "python"
         osx_run_in_venv("python -m pip install -r requirements-build.txt")
-        osx_run_in_venv(
-            "python -m pip install --require-virtualenv -r requirements.txt"
-        )
+        if arch is None:
+            osx_run_in_venv(
+                "python -m pip install --require-virtualenv -r requirements.txt"
+            )
+        else:
+            osx_install_universal2_dep(arch)
 
-    nuitka(python_bin)
+    nuitka(python_bin, arch)
 
     if platform.system() == "Windows":
         win_patch()
