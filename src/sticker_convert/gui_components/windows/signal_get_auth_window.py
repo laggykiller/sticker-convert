@@ -3,7 +3,7 @@ from functools import partial
 from threading import Thread
 from typing import Any
 
-from ttkbootstrap import Button, Frame, Label, Toplevel  # type: ignore
+from ttkbootstrap import Button, Frame, Label  # type: ignore
 
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
@@ -28,7 +28,7 @@ class SignalGetAuthWindow(BaseWindow):
         # Info frame
         self.explanation1_lbl = Label(
             self.frame_info,
-            text="Please install Signal Desktop BETA VERSION",
+            text="Please install Signal Desktop",
             justify="left",
             anchor="w",
         )
@@ -69,26 +69,21 @@ class SignalGetAuthWindow(BaseWindow):
 
     def cb_login_thread(self, *args: Any):
         m = GetSignalAuth(cb_msg=self.gui.cb_msg, cb_ask_str=self.cb_ask_str_signal)
-        m.launch_signal_desktop()
 
-        uuid, password = None, None
-        while Toplevel.winfo_exists(self):
-            uuid, password = m.get_cred()
+        uuid, password = m.get_cred()
+        if uuid and password:
+            if not self.gui.creds.get("signal"):
+                self.gui.creds["signal"] = {}
+            self.gui.creds["signal"]["uuid"] = uuid
+            self.gui.creds["signal"]["password"] = password
+            self.gui.signal_uuid_var.set(uuid)
+            self.gui.signal_password_var.set(password)
 
-            if uuid and password:
-                if not self.gui.creds.get("signal"):
-                    self.gui.creds["signal"] = {}
-                self.gui.creds["signal"]["uuid"] = uuid
-                self.gui.creds["signal"]["password"] = password
-                self.gui.signal_uuid_var.set(uuid)
-                self.gui.signal_password_var.set(password)
-                m.close()
-
-                self.cb_msg_block_signal(
-                    f"Got uuid and password successfully:\nuuid={uuid}\npassword={password}"
-                )
-                self.gui.save_creds()
-                self.gui.highlight_fields()
-                return
+            self.cb_msg_block_signal(
+                f"Got uuid and password successfully:\nuuid={uuid}\npassword={password}"
+            )
+            self.gui.save_creds()
+            self.gui.highlight_fields()
+            return
 
         self.cb_msg_block_signal("Failed to get uuid and password")

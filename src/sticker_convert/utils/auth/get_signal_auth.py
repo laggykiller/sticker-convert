@@ -1,347 +1,129 @@
 #!/usr/bin/env python3
-import io
 import json
 import os
 import platform
 import shutil
-import stat
-import string
+import time
 import webbrowser
-import zipfile
-from pathlib import Path
-from typing import Callable, Generator, Iterable, Optional, Tuple
-
-import requests
-from selenium import webdriver
-from selenium.common.exceptions import JavascriptException
-from selenium.webdriver.chrome.service import Service
+from typing import Callable, Optional, Tuple, cast
 
 from sticker_convert.definitions import CONFIG_DIR
-from sticker_convert.utils.files.run_bin import RunBin
+from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.process import killall
-
-
-# https://stackoverflow.com/a/17197027
-def strings(filename: str, min: int = 4) -> Generator[str, None, None]:
-    with open(filename, "r", errors="ignore") as f:
-        result = ""
-        for c in f.read():
-            if c in string.printable:
-                result += c
-                continue
-            if len(result) >= min:
-                yield result
-            result = ""
-        if len(result) >= min:  # catch result at EOF
-            yield result
 
 
 class GetSignalAuth:
     def __init__(
         self,
-        signal_bin_version: str = "beta",
         cb_msg: Callable[..., None] = print,
         cb_ask_str: Callable[..., str] = input,
     ):
         chromedriver_download_dir = CONFIG_DIR / "bin"
         os.makedirs(chromedriver_download_dir, exist_ok=True)
 
-        self.signal_bin_version = signal_bin_version
         self.chromedriver_download_dir = chromedriver_download_dir
 
         self.cb_ask_str = cb_ask_str
         self.cb_msg = cb_msg
 
-    def download_signal_desktop(self, download_url: str, signal_bin_path: str):
+    def download_signal_desktop(self):
+        download_url = "https://signal.org/en/download/"
+
         webbrowser.open(download_url)
 
         self.cb_msg(download_url)
 
         prompt = "Signal Desktop not detected.\n"
-        prompt += "Download and install Signal Desktop BETA version\n"
+        prompt += "Download and install Signal Desktop version\n"
         prompt += "After installation, quit Signal Desktop before continuing"
-        while not (Path(signal_bin_path).is_file() or shutil.which(signal_bin_path)):
-            if self.cb_ask_str != input:
-                self.cb_ask_str(
-                    prompt, initialvalue=download_url, cli_show_initialvalue=False
-                )
-            else:
-                input(prompt)
-
-    def get_signal_chromedriver_version(self, electron_bin_path: str) -> Optional[str]:
-        ss: Iterable[str]
-
-        if RunBin.get_bin("strings", silent=True):
-            status, output_str = RunBin.run_cmd(
-                cmd_list=["strings", electron_bin_path], silence=True
+        if self.cb_ask_str != input:
+            self.cb_ask_str(
+                prompt, initialvalue=download_url, cli_show_initialvalue=False
             )
-            if status is False:
-                return None
-            ss = output_str.split("\n")
         else:
-            ss = strings(electron_bin_path)
+            self.cb_msg(prompt)
 
-        for s in ss:
-            if "Chrome/" in s and " Electron/" in s:
-                major_version = s.replace("Chrome/", "").split(".", 1)[0]
-                if major_version.isnumeric():
-                    return major_version
+    def get_signal_bin_path(self) -> Optional[str]:
+        if platform.system() == "Windows":
+            signal_paths = (
+                os.path.expandvars("%localappdata%/Programs/signal-desktop/Signal.exe"),
+                os.path.expandvars(
+                    "%localappdata%/Programs/signal-desktop-beta/Signal Beta.exe"
+                ),
+            )
+        elif platform.system() == "Darwin":
+            signal_paths = (
+                "/Applications/Signal.app/Contents/MacOS/Signal",
+                "/Applications/Signal Beta.app/Contents/MacOS/Signal Beta",
+            )
+        else:
+            signal_paths = (
+                shutil.which("signal-desktop"),
+                shutil.which("signal-desktop-beta"),
+            )
 
+        for signal_path in signal_paths:
+            if signal_path is not None and os.path.isfile(signal_path):
+                return signal_path
         return None
 
-    def get_local_chromedriver(
-        self, chromedriver_download_dir: Path
-    ) -> Tuple[Optional[Path], Optional[str]]:
-        local_chromedriver_version = None
-        if platform.system() == "Windows":
-            chromedriver_name = "chromedriver.exe"
-        else:
-            chromedriver_name = "chromedriver"
-
-        chromedriver_path: Optional[Path]
-        chromedriver_path = Path(chromedriver_download_dir, chromedriver_name).resolve()
-        if not chromedriver_path.is_file():
-            chromedriver_which = shutil.which("chromedriver")
-            if chromedriver_which:
-                chromedriver_path = Path(chromedriver_which)
-            else:
-                chromedriver_path = None
-
-        if chromedriver_path:
-            status, output_str = RunBin.run_cmd(
-                cmd_list=[str(chromedriver_path), "-v"], silence=True
-            )
-            if status is False:
-                local_chromedriver_version = None
-            local_chromedriver_version = output_str.split(" ")[1].split(".", 1)[0]
-        else:
-            local_chromedriver_version = None
-
-        return chromedriver_path, local_chromedriver_version
-
-    def download_chromedriver(
-        self, major_version: str, chromedriver_download_dir: Path
-    ) -> Optional[Path]:
-        if platform.system() == "Windows":
-            chromedriver_platform = "win32"
-            if "64" in platform.architecture()[0]:
-                chromedriver_platform_new = "win64"
-            else:
-                chromedriver_platform_new = "win32"
-        elif platform.system() == "Darwin":
-            if platform.processor().lower() == "arm64":
-                chromedriver_platform = "mac_arm64"
-                chromedriver_platform_new = "mac-arm64"
-            else:
-                chromedriver_platform = "mac64"
-                chromedriver_platform_new = "mac-x64"
-        else:
-            chromedriver_platform = "linux64"
-            chromedriver_platform_new = "linux64"
-
-        chromedriver_url = None
-        chromedriver_version_url = f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major_version}"
-        r = requests.get(chromedriver_version_url)
-        if r.ok:
-            new_chrome = False
-            chromedriver_version = r.text
-            chromedriver_url = f"https://chromedriver.storage.googleapis.com/{chromedriver_version}/chromedriver_{chromedriver_platform}.zip"
-        else:
-            new_chrome = True
-            r = requests.get(
-                "https://googlechromelabs.github.io/chrome-for-testing/latest-versions-per-milestone-with-downloads.json"
-            )
-            versions_dict = json.loads(r.text)
-            chromedriver_list = (
-                versions_dict.get("milestones", {})
-                .get(major_version, {})
-                .get("downloads", {})
-                .get("chromedriver", {})
-            )
-
-            chromedriver_url = None
-            for i in chromedriver_list:
-                if i.get("platform") == chromedriver_platform_new:
-                    chromedriver_url = i.get("url")
-
-        if not chromedriver_url:
-            return None
+    def get_cred(self) -> Tuple[Optional[str], Optional[str]]:
+        signal_bin_path = self.get_signal_bin_path()
+        if signal_bin_path is None:
+            self.download_signal_desktop()
+            return None, None
 
         if platform.system() == "Windows":
-            chromedriver_name = "chromedriver.exe"
-        else:
-            chromedriver_name = "chromedriver"
-
-        if new_chrome:
-            chromedriver_zip_path = (
-                f"chromedriver-{chromedriver_platform_new}/{chromedriver_name}"
-            )
-        else:
-            chromedriver_zip_path = chromedriver_name
-
-        chromedriver_path = Path(chromedriver_download_dir, chromedriver_name).resolve()
-
-        with io.BytesIO() as f:
-            f.write(requests.get(chromedriver_url).content)  # type: ignore
-            with zipfile.ZipFile(f, "r") as z, open(chromedriver_path, "wb+") as g:
-                g.write(z.read(chromedriver_zip_path))
-
-        if platform.system() != "Windows":
-            st = os.stat(chromedriver_path)
-            os.chmod(chromedriver_path, st.st_mode | stat.S_IEXEC)
-
-        return chromedriver_path
-
-    def killall_signal(self):
-        if platform.system() == "Windows":
-            os.system('taskkill /F /im "Signal.exe"')
-            os.system('taskkill /F /im "Signal Beta.exe"')
+            killall("signal")
         else:
             killall("signal-desktop")
-            killall("signal-desktop-beta")
 
-    def launch_signal(
-        self, signal_bin_path: str, signal_user_data_dir: str, chromedriver_path: str
-    ):
-        options = webdriver.ChromeOptions()
-        options.binary_location = signal_bin_path
-        options.add_argument(f"user-data-dir={signal_user_data_dir}")  # type: ignore
-        options.add_argument("no-sandbox")  # type: ignore
-        service = Service(executable_path=chromedriver_path)
+        crd = CRD(signal_bin_path)
+        crd.connect()
+        # crd.runtime_enable()
+        # crd.reload()
+        # while True:
+        #     r = crd.ws.recv()
+        #     data = json.loads(r)
+        #     if data.get("method") == "Runtime.executionContextCreated":
+        #         print(data)
+        #     if (data.get("method") == "Runtime.executionContextCreated" and
+        #         data["params"]["context"]["name"] == "Electron Isolated Context"
+        #     ):
+        #         context_id = data["params"]["context"]["id"]
+        #         break
+        # crd.runtime_disable()
+        context_id = 2
 
-        self.driver = webdriver.Chrome(options=options, service=service)
+        uuid, password = None, None
+        while True:
+            try:
+                r = crd.exec_js(
+                    "window.reduxStore.getState().items.uuid_id", context_id
+                )
+            except RuntimeError:
+                break
+            if (
+                json.loads(r).get("result", {}).get("result", {}).get("type", "")
+                == "string"
+            ):
+                uuid = cast(str, json.loads(r)["result"]["result"]["value"])
+                break
+            time.sleep(1)
+        while True:
+            try:
+                r = crd.exec_js(
+                    "window.reduxStore.getState().items.password", context_id
+                )
+            except RuntimeError:
+                break
+            if (
+                json.loads(r).get("result", {}).get("result", {}).get("type", "")
+                == "string"
+            ):
+                password = cast(str, json.loads(r)["result"]["result"]["value"])
+                break
+            time.sleep(1)
 
-    def get_cred(self) -> Tuple[Optional[str], Optional[str]]:
-        # https://stackoverflow.com/a/73456344
-        uuid: Optional[str] = None
-        password: Optional[str] = None
-        try:
-            if self.signal_bin_version == "prod":
-                uuid = self.driver.execute_script(  # type: ignore
-                    "return window.reduxStore.getState().items.uuid_id"
-                )
-                password = self.driver.execute_script(  # type: ignore
-                    "return window.reduxStore.getState().items.password"
-                )
-            else:
-                uuid = self.driver.execute_script(  # type: ignore
-                    "return window.SignalDebug.getReduxState().items.uuid_id"
-                )
-                password = self.driver.execute_script(  # type: ignore
-                    "return window.SignalDebug.getReduxState().items.password"
-                )
-        except JavascriptException:
-            pass
-
-        assert uuid is None or isinstance(uuid, str)
-        assert password is None or isinstance(password, str)
+        crd.close()
         return uuid, password
-
-    def close(self):
-        self.cb_msg("Closing Signal Desktop")
-        self.driver.quit()
-
-    def launch_signal_desktop(self) -> bool:
-        if platform.system() == "Windows":
-            signal_bin_path_prod = os.path.expandvars(
-                "%localappdata%/Programs/signal-desktop/Signal.exe"
-            )
-            signal_bin_path_beta = os.path.expandvars(
-                "%localappdata%/Programs/signal-desktop-beta/Signal Beta.exe"
-            )
-            signal_user_data_dir_prod = os.path.abspath(
-                os.path.expandvars("%appdata%/Signal")
-            )
-            signal_user_data_dir_beta = os.path.abspath(
-                os.path.expandvars("%appdata%/Signal Beta")
-            )
-            electron_bin_path_prod = signal_bin_path_prod
-            electron_bin_path_beta = signal_bin_path_beta
-        elif platform.system() == "Darwin":
-            signal_bin_path_prod = "/Applications/Signal.app/Contents/MacOS/Signal"
-            signal_bin_path_beta = (
-                "/Applications/Signal Beta.app/Contents/MacOS/Signal Beta"
-            )
-            signal_user_data_dir_prod = os.path.expanduser(
-                "~/Library/Application Support/Signal"
-            )
-            signal_user_data_dir_beta = os.path.expanduser(
-                "~/Library/Application Support/Signal Beta"
-            )
-            electron_bin_path_prod = "/Applications/Signal.app/Contents/Frameworks/Electron Framework.framework/Electron Framework"
-            electron_bin_path_beta = "/Applications/Signal Beta.app/Contents/Frameworks/Electron Framework.framework/Electron Framework"
-        else:
-            signal_bin_path_prod = "signal-desktop"
-            signal_bin_path_beta = "signal-desktop-beta"
-            signal_user_data_dir_prod = os.path.expanduser("~/.config/Signal")
-            signal_user_data_dir_beta = os.path.expanduser("~/.config/Signal Beta")
-            electron_bin_path_prod = signal_bin_path_prod
-            electron_bin_path_beta = signal_bin_path_beta
-
-        electron_bin_path: Optional[str]
-        if self.signal_bin_version == "prod":
-            signal_bin_path = signal_bin_path_prod
-            signal_user_data_dir = signal_user_data_dir_prod
-            electron_bin_path = electron_bin_path_prod
-            signal_download_url = "https://signal.org/en/download/"
-        else:
-            signal_bin_path = signal_bin_path_beta
-            signal_user_data_dir = signal_user_data_dir_beta
-            electron_bin_path = electron_bin_path_beta
-            signal_download_url = (
-                "https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta"
-            )
-
-        if not (Path(signal_bin_path).is_file() or shutil.which(signal_bin_path)):
-            success = self.download_signal_desktop(signal_download_url, signal_bin_path)
-
-            if not success:
-                return False
-
-        if Path(electron_bin_path).is_file() is False:
-            electron_bin_path_which = shutil.which(electron_bin_path)
-            if electron_bin_path_which is not None:
-                electron_bin_path = electron_bin_path_which
-            else:
-                self.cb_msg("Cannot find Electron Framework inside Signal installation")
-                return False
-
-        if Path(signal_bin_path).is_file() is False:
-            signal_bin_path_which = shutil.which(signal_bin_path)
-            if signal_bin_path_which is not None:
-                signal_bin_path = signal_bin_path_which
-            else:
-                self.cb_msg("Cannot find Signal installation")
-                return False
-
-        major_version = self.get_signal_chromedriver_version(electron_bin_path)
-        if major_version:
-            self.cb_msg(f"Signal Desktop is using chrome version {major_version}")
-        else:
-            self.cb_msg("Unable to determine Signal Desktop chrome version")
-            return False
-
-        chromedriver_path, local_chromedriver_version = self.get_local_chromedriver(
-            chromedriver_download_dir=self.chromedriver_download_dir
-        )
-        if chromedriver_path and local_chromedriver_version == major_version:
-            self.cb_msg(
-                f"Found chromedriver version {local_chromedriver_version}, skip downloading"
-            )
-        else:
-            chromedriver_path = self.download_chromedriver(
-                major_version, chromedriver_download_dir=self.chromedriver_download_dir
-            )
-            if not chromedriver_path:
-                self.cb_msg("Unable to download suitable chromedriver")
-                return False
-
-        self.cb_msg("Killing all Signal Desktop processes")
-        self.killall_signal()
-
-        self.cb_msg("Starting Signal Desktop with Selenium")
-        self.launch_signal(
-            signal_bin_path, signal_user_data_dir, str(chromedriver_path)
-        )
-
-        return True
