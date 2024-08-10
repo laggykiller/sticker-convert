@@ -13,6 +13,7 @@ from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
+from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.format_verify import FormatVerify
 
@@ -158,18 +159,18 @@ class UploadTelegram(UploadBase):
             for count, src in enumerate(stickers):
                 self.cb.put(f"Verifying {src} for uploading to telegram")
 
-                emoji = emoji_dict.get(Path(src).stem, None)
-                if emoji:
-                    if len(emoji) > 20:
-                        self.cb.put(
-                            f"Warning: {len(emoji)} emoji for file {Path(src).name}, exceeding limit of 20, keep first 20 only..."
-                        )
-                    emoji_list = [*emoji][:20]
-                else:
+                emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
+                if emoji == "":
                     self.cb.put(
-                        f"Warning: Cannot find emoji for file {Path(src).name}, skip uploading this file..."
+                        f"Warning: Cannot find emoji for file {Path(src).name}, using default emoji..."
                     )
-                    continue
+                    emoji_list = [self.opt_comp.default_emoji]
+
+                if len(emoji) > 20:
+                    self.cb.put(
+                        f"Warning: {len(emoji)} emoji for file {Path(src).name}, exceeding limit of 20, keep first 20 only..."
+                    )
+                emoji_list = [*emoji][:20]
 
                 ext = Path(src).suffix
                 if ext == ".tgs":
