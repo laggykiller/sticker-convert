@@ -1,5 +1,5 @@
 # sticker-convert
-![imgs/banner.png](imgs/banner.png)
+![imgs/banner.png](https://socialify.git.ci/laggykiller/sticker-convert/image?description=1&font=Inter&logo=https%3A%2F%2Fgithub.com%2Flaggykiller%2Fsticker-convert%2Fblob%2Fmaster%2Fsrc%2Fsticker_convert%2Fresources%2Fappicon.png%3Fraw%3Dtrue&name=1&owner=1&theme=Dark)
 ![imgs/screenshot](imgs/screenshot.png)
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
