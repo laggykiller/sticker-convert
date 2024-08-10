@@ -123,7 +123,7 @@ Input options:
                         Specify input directory.
   --download-auto DOWNLOAD_AUTO
                         Auto detect URL type and download
-                        (Supported input sources: Signal, Telegram, Line, Kakao, Viber)
+                        (Supported input sources: Signal, Telegram, Line, Kakao, Viber, Discord)
   --download-signal DOWNLOAD_SIGNAL
                         Download signal stickers from a URL as input
                         (Example: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
