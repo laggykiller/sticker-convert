@@ -1,10 +1,10 @@
 [project]
 name = "sticker-convert"
-description = "Convert (animated) stickers to/from WhatsApp, Telegram, Signal, Line, Kakao, Viber, iMessage. Written in Python."
+description = "Convert (animated) stickers to/from WhatsApp, Telegram, Signal, Line, Kakao, Viber, Discord, iMessage. Written in Python."
 readme = "README.md"
 requires-python = ">=3.8"
 license = {file = "LICENSE"}
-keywords = ["telegram", "line", "tgs", "whatsapp", "kakao", "signal", "imessage", "wastickers", "viber"]
+keywords = ["telegram", "line", "tgs", "whatsapp", "kakao", "signal", "imessage", "wastickers", "viber", "discord"]
 authors = [
   {name = "laggykiller", email = "chaudominic2@gmail.com" } # Optional
 ]
