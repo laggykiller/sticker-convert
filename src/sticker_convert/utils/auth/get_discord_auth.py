@@ -22,8 +22,10 @@ class GetDiscordAuth:
         self.cb_msg = cb_msg
 
     def get_discord_bin_path(self) -> Optional[str]:
+        discord_bin: Optional[str]
         if platform.system() == "Windows":
-            discord_dirs = (
+            discord_win_dirs: Tuple[Tuple[str, str], ...]
+            discord_win_dirs = (
                 (
                     os.path.expandvars("%localappdata%/Discord"),
                     "Discord.exe",
@@ -37,7 +39,7 @@ class GetDiscordAuth:
                     "DiscordPTB.exe",
                 ),
             )
-            for discord_dir, discord_bin in discord_dirs:
+            for discord_dir, discord_bin in discord_win_dirs:
                 app_dir: Optional[str] = None
                 chrome_path: Optional[str] = None
                 for i in [j for j in os.listdir(discord_dir) if j.startswith("app-")]:
@@ -46,6 +48,7 @@ class GetDiscordAuth:
                     if os.path.isfile(chrome_path):
                         return chrome_path
         else:
+            discord_dirs: Tuple[Optional[str], ...]
             if platform.system() == "Darwin":
                 discord_dirs = (
                     "/Applications/Discord.app/Contents/MacOS/Discord",

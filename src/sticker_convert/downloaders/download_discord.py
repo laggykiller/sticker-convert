@@ -51,7 +51,7 @@ class DownloadDiscord(DownloadBase):
             stickers = r_json["stickers"]
 
         targets: List[Tuple[str, Path]] = []
-        emoji_dict: Optional[Dict[str, str]] = {}
+        emoji_dict: Dict[str, str] = {}
         for i, sticker in enumerate(stickers):
             f_id = str(i).zfill(3)
             sticker_id = sticker["id"]
@@ -67,13 +67,15 @@ class DownloadDiscord(DownloadBase):
             f_name = f_id + f_ext
             f_path = Path(self.out_dir, f_name)
             targets.append((sticker_url, f_path))
-        emoji_dict = emoji_dict if self.input_option == "discord" else None
 
         self.download_multiple_files(targets)
 
         server_name = r_json["name"]
         MetadataHandler.set_metadata(
-            self.out_dir, title=server_name, author=server_name, emoji_dict=emoji_dict
+            self.out_dir,
+            title=server_name,
+            author=server_name,
+            emoji_dict=emoji_dict if self.input_option == "discord" else None,
         )
 
         return True

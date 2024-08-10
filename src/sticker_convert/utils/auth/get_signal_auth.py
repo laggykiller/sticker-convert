@@ -44,6 +44,7 @@ class GetSignalAuth:
             self.cb_msg(prompt)
 
     def get_signal_bin_path(self) -> Optional[str]:
+        signal_paths: Tuple[Optional[str], ...]
         if platform.system() == "Windows":
             signal_paths = (
                 os.path.expandvars("%localappdata%/Programs/signal-desktop/Signal.exe"),
