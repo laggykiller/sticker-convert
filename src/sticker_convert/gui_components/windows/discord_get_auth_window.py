@@ -3,7 +3,7 @@ from functools import partial
 from threading import Thread
 from typing import Any
 
-from ttkbootstrap import Button, Frame, Label, Toplevel  # type: ignore
+from ttkbootstrap import Button, Frame, Label  # type: ignore
 
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
