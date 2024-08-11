@@ -27,7 +27,7 @@ cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
 
 # Bundling into appimage
 wget https://github.com/AppImage/AppImageKit/releases/download/13/runtime-${SC_COMPILE_ARCH}
-if [ ${SC_COMPILE_ARCH} == "aarch64" ]; then
+if [ ${SC_COMPILE_ARCH} = "aarch64" ]; then
     ARCH="arm_aarch64"
 else
     ARCH=${SC_COMPILE_ARCH}
