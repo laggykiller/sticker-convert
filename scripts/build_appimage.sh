@@ -16,7 +16,7 @@ chmod +x ./appimagetool
 # That would be not possible to be verified by https://appimage.github.io/apps/
 # Due to https://github.com/AppImage/appimage.github.io/blob/master/code/worker.sh
 # runtime-fuse2-x86_64 unable to handle xz compression
-./appimage-builder --skip-appimage --recipe AppImageBuilder-x86_64.yml
+./appimage-builder --skip-appimage --recipe AppImageBuilder-${SC_COMPILE_ARCH}.yml
 
 # Add .desktop comment
 sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, Viber, Discord, iMessage/g' ./AppDir/*.desktop
