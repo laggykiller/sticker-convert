@@ -46,7 +46,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: windows-2019
+          - os: windows-2022
             TARGET: windows
             CMD_BUILD: |
                 python compile.py
