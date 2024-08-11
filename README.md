@@ -43,7 +43,7 @@
 | [Line](docs/guide_line.md)            | ✅                                  | 🚫 (Need to submit for manual approval)            |
 | [Kakao](docs/guide_kakao.md)          | ✅ (Need 'share link' for animated) | 🚫 (Need to submit for manual approval)            |
 | [Viber](docs/guide_viber.md)          | ✅                                  | ✅ (Require `viber_auth`)                          |
-| [Discord](docs/guide_discord.md)      | ✅ (Required `token`)               | 🚫                                                 |
+| [Discord](docs/guide_discord.md)      | ✅ (Require `token`)               | 🚫                                                 |
 | [iMessage](docs/guide_imessage.md)    | 🚫                                  | ⭕ (Create Xcode stickerpack project for sideload) |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
