@@ -123,7 +123,9 @@ class CRD:
 
     def get_curr_url(self) -> str:
         r = self.exec_js("window.location.href")
-        return cast(str, json.loads(r)["result"]["result"]["value"])
+        return cast(
+            str, json.loads(r).get("result", {}).get("result", {}).get("value", "")
+        )
 
     def navigate(self, url: str):
         command = {"id": self.cmd_id, "method": "Page.navigate", "params": {"url": url}}
