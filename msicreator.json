@@ -8,6 +8,7 @@
     "comments": "Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, Viber, iMessage",
     "installdir": "sticker-convert",
     "license_file": "msi_res/LICENSE.rtf",
+    "addremove_icon": "src/sticker_convert/resources/appicon.ico",
     "startmenu_shortcut": "sticker-convert.exe",
     "desktop_shortcut": "sticker-convert.exe",
     "graphics":
