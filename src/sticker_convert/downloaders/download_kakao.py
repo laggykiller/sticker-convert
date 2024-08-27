@@ -231,6 +231,8 @@ class DownloadKakao(DownloadBase):
         sound_path_format = None
         stickers_count = 32  # https://emoticonstudio.kakao.com/pages/start
 
+        headers = {"User-Agent": "Android"}
+
         if not self.pack_info_authed and self.auth_token:
             self.pack_info_authed = MetadataKakao.get_pack_info_authed(
                 item_code, self.auth_token
@@ -263,7 +265,8 @@ class DownloadKakao(DownloadBase):
         if play_path_format is None:
             for play_type, play_ext in itertools.product(play_types, play_exts):
                 r = requests.get(
-                    f"https://item.kakaocdn.net/dw/{item_code}.{play_type}_001{play_ext}"
+                    f"https://item.kakaocdn.net/dw/{item_code}.{play_type}_001{play_ext}",
+                    headers=headers,
                 )
                 if r.ok:
                     break
@@ -279,7 +282,8 @@ class DownloadKakao(DownloadBase):
         if sound_path_format is None:
             for sound_ext in sound_exts:
                 r = requests.get(
-                    f"https://item.kakaocdn.net/dw/{item_code}.sound_001{sound_ext}"
+                    f"https://item.kakaocdn.net/dw/{item_code}.sound_001{sound_ext}",
+                    headers=headers,
                 )
                 if r.ok:
                     break
@@ -304,7 +308,7 @@ class DownloadKakao(DownloadBase):
                 sound_dl_path = Path(self.out_dir, str(num).zfill(3) + sound_ext)
                 targets.append((sound_url, sound_dl_path))
 
-        self.download_multiple_files(targets)
+        self.download_multiple_files(targets, headers=headers)
 
         for target in targets:
             f_path = target[1]
