@@ -29,14 +29,24 @@ class DownloadBase:
         self.cb_return = cb_return
 
     def download_multiple_files(
-        self, targets: List[Tuple[str, Path]], retries: int = 3, headers: Optional[dict[Any, Any]] = None, **kwargs: Any
+        self,
+        targets: List[Tuple[str, Path]],
+        retries: int = 3,
+        headers: Optional[dict[Any, Any]] = None,
+        **kwargs: Any,
     ) -> None:
         anyio.run(
-            partial(self.download_multiple_files_async, targets, retries, headers, **kwargs)
+            partial(
+                self.download_multiple_files_async, targets, retries, headers, **kwargs
+            )
         )
 
     async def download_multiple_files_async(
-        self, targets: List[Tuple[str, Path]], retries: int = 3, headers: Optional[dict[Any, Any]] = None, **kwargs: Any
+        self,
+        targets: List[Tuple[str, Path]],
+        retries: int = 3,
+        headers: Optional[dict[Any, Any]] = None,
+        **kwargs: Any,
     ) -> None:
         # targets format: [(url1, dest2), (url2, dest2), ...]
         self.cb.put(
@@ -47,7 +57,13 @@ class DownloadBase:
             async with anyio.create_task_group() as tg:
                 for url, dest in targets:
                     tg.start_soon(
-                        self.download_file_async, client, url, dest, retries, headers, **kwargs
+                        self.download_file_async,
+                        client,
+                        url,
+                        dest,
+                        retries,
+                        headers,
+                        **kwargs,
                     )
 
     async def download_file_async(
@@ -61,7 +77,9 @@ class DownloadBase:
     ) -> None:
         self.cb.put(f"Downloading {url}")
         for retry in range(retries):
-            response = await client.get(url, follow_redirects=True, headers=headers, **kwargs)
+            response = await client.get(
+                url, follow_redirects=True, headers=headers, **kwargs
+            )
 
             if response.is_success:
                 async with await anyio.open_file(dest, "wb+") as f:

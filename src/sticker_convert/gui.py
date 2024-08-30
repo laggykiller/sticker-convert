@@ -157,6 +157,7 @@ class GUI(Window):
         self.kakao_password_var = StringVar(self)
         self.kakao_country_code_var = StringVar(self)
         self.kakao_phone_number_var = StringVar(self)
+        self.kakao_bin_path_var = StringVar(self)
         self.line_cookies_var = StringVar(self)
         self.viber_auth_var = StringVar(self)
         self.viber_bin_path_var = StringVar(self)

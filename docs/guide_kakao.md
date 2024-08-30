@@ -8,39 +8,57 @@
 
 - To download animated stickers, you have two options:
     - Method 1: (RECOMMENDED) Get the share link of the emoticon pack from Kakao app on phone, which does not need auth_token (`https://emoticon.kakao.com/items/xxxxx`)
-    - Method 2: Use `https://e.kakao.com/t/xxxxx` which needs auth_token (Authorization header during request). **Note that this method may not work in some cases with unclear reasons, so use method 1.**
+    - Method 2-4: Use `https://e.kakao.com/t/xxxxx` which needs auth_token (Authorization header during request). **Note that this method may not work in some cases with unclear reasons, so use method 1.**
 
 ## Method 1: Get share link
 ![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
 
-## Method 2: Get auth_token
-- You can get auth_token easily from GUI generate button, via CLI `--kakao-get-auth` or manually get from rooted Android device (You are recommended to do it on emulated Android device)
-- Explanation of login information
-    - Username: Email or Phone number used for signing up Kakao account. (e.g. `+447700900142`)
-    - Password: Password of Kakao account
-    - Country code: Example would be 82 (For korea), 44 (For UK), 1 (For USA)
-    - Phone number: Phone number associated with your Kakao account. Used for send / receive verification code via SMS
-- `sticker-convert` will simulate login to Android Kakao app
+## Method 2: Get auth_token from KakaoTalk Desktop application
+- `sticker-convert` will get auth_token from KakaoTalk Desktop application.
+- Note that this only work on Windows.
+
+GUI:
+1. Download and Login to KakaoTalk Desktop
+2. Press on `Generate` button in sticker-convert GUI
+3. (Optional) if you installed KakaoTalk Desktop in non-default location, you may specify `Kakao app path`
+4. Press on `Get auth_token` and wait
+
+CLI:
+1. Download and Login to KakaoTalk Desktop
+2. Add `--kakao-get-auth-desktop` as arguments
+3. (Optional) Add `--kakao-bin-path <KAKAO_APP_PATH>` if you installed KakaoTalk Desktop in non-default location
+3. Execute command
+
+
+## Method 3: Get auth_token by simulating login
+- `sticker-convert` will simulate login to Android Kakao app to get auth_token
     - You will send / receive verification code via SMS
     - You will most likely receive verification code
     - You have to send verification SMS if you requested to receive verification code too many times
     - You maybe logged out of existing device
 - The auth_token will expire after a period of time (About a week?), which you have to regenerate it.
+- Explanation of login information
+    - Username: Email or Phone number used for signing up Kakao account. (e.g. `+447700900142`)
+    - Password: Password of Kakao account
+    - Country code: Example would be 82 (For korea), 44 (For UK), 1 (For USA)
+    - Phone number: Phone number associated with your Kakao account. Used for send / receive verification code via SMS
 
-### How to get auth_token (GUI)
+GUI:
 1. Create KakaoTalk account on Phone
 2. Press on `Generate` button in sticker-convert GUI
 3. Enter account detail in the window
 4. Press on `Login and get auth_token` and follow instructions
 
-### How to get auth_token (CLI)
+CLI:
 1. Create KakaoTalk account on Phone
-2. Add `--kakao-gen-auth-token --kakao-username <YOUR_USERNAME> --kakao-password <YOUR_PASSWORD> --kakao-country-code <YOUR_COUNTRY_CODE> --kakao-phone-number <YOUR_PHONE_NUMBER>` as arguments
+2. Add `--kakao-get-auth --kakao-username <YOUR_USERNAME> --kakao-password <YOUR_PASSWORD> --kakao-country-code <YOUR_COUNTRY_CODE> --kakao-phone-number <YOUR_PHONE_NUMBER>` as arguments
     - Note: If you had saved username, password, country_code and phone_number before, you may choose not to add them as arguments
     - You may also add `--save-cred` to save the auth_token and login information for later use
 3. Execute command and follow instructions
 
-### How to get auth_token (Manually) or get emoticon ID
+## Method 4: Get auth_token manually or get emoticon ID
+You can manually get auth_token from rooted Android device (You are recommended to do it on emulated Android device)
+
 1. Create KakaoTalk account on Phone
 2. Install Android Studio and create an emulated device, then install KakaoTalk on the device
 3. Install BurpSuite
