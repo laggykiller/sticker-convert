@@ -3,6 +3,7 @@ import platform
 from functools import partial
 from pathlib import Path
 from subprocess import Popen
+from threading import Thread
 from tkinter import filedialog
 from typing import Any
 
@@ -108,7 +109,10 @@ class ViberGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_get_cred(self) -> None:
+    def cb_get_cred(self):
+        Thread(target=self.cb_get_cred_thread, daemon=True).start()
+
+    def cb_get_cred_thread(self) -> None:
         m = GetViberAuth(self.cb_ask_str_viber)
 
         viber_bin_path = None
