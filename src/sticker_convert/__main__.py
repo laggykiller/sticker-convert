@@ -9,6 +9,9 @@ def main() -> None:
 
     multiprocessing.freeze_support()
     print(f"sticker-convert {__version__}")
+    print("Free and Opensource software by laggykiller")
+    print("https://github.com/laggykiller/sticker-convert")
+    print()
     if len(sys.argv) == 1:
         print("Launching GUI...")
         from sticker_convert.gui import GUI

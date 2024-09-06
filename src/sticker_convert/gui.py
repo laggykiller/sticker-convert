@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import locale
 import os
 import platform
 import signal
@@ -9,7 +10,7 @@ from math import ceil
 from multiprocessing import Event, cpu_count
 from pathlib import Path
 from threading import Thread
-from typing import Any, Callable, Dict, Optional, Union
+from typing import Any, Callable, Dict, Optional, Union, cast
 from urllib.parse import urlparse
 
 from mergedeep import merge  # type: ignore
@@ -62,6 +63,7 @@ class GUI(Window):
         self.apply_creds()
         self.init_frames()
         self.pack_frames()
+        self.author_info()
         self.warn_tkinter_bug()
         GUIUtils.finalize_window(self)
 
@@ -206,6 +208,34 @@ class GUI(Window):
             column=0, row=4, columnspan=2, sticky="news", padx=5, pady=5
         )
 
+    def is_cn(self) -> bool:
+        cn_locs = ("zh_CHS", "zh_CN")
+        loc = cast(str, locale.getdefaultlocale()[0])
+        winloc = ""
+        if platform.system() == "Windows":
+            import ctypes
+
+            windll = ctypes.windll.kernel32  # type: ignore
+            winloc_id = cast(int, windll.GetUserDefaultUILanguage())  # type: ignore
+            winloc = cast(str, locale.windows_locale[winloc_id])  # type: ignore
+
+        if loc.startswith(cn_locs) or winloc.startswith(cn_locs):
+            return True
+        return False
+
+    def author_info(self) -> None:
+        if self.is_cn():
+            msg = "sticker-convert是laggykiller创作的免费开源项目，严禁翻售\n"
+            msg += "https://github.com/laggykiller/sticker-convert\n"
+            msg += "尊重知识产权，做个文明人，请不要转售贴图！\n"
+        else:
+            msg = "sticker-convert is Free and Opensource software by laggykiller\n"
+            msg += "https://github.com/laggykiller/sticker-convert\n"
+            msg += "Please use the stickers with your friends only.\n"
+            msg += "It is illegal and immoral to sell stickers downloaded from this program.\n"
+
+        self.cb_msg(msg)
+
     def warn_tkinter_bug(self) -> None:
         if (
             platform.system() == "Darwin"
@@ -215,13 +245,9 @@ class GUI(Window):
             and sys.version_info[2] <= 6
         ):
             msg = "NOTICE: If buttons are not responsive, try to press "
-            msg += "on title bar or move mouse cursor away from window for a while."
-            self.cb_msg(msg)
-            msg = (
-                "(This is due to a bug in tkinter specific to macOS 14 python <=3.11.6)"
-            )
-            self.cb_msg(msg)
-            msg = "(https://github.com/python/cpython/issues/110218)"
+            msg += "on title bar or move mouse cursor away from window for a while.\n"
+            msg += "(This is a bug in tkinter specific to macOS 14 python <=3.11.6)\n"
+            msg += "(https://github.com/python/cpython/issues/110218)\n"
             self.cb_msg(msg)
 
     def load_jsons(self) -> None:
