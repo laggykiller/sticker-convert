@@ -324,6 +324,7 @@ class StickerConvert:
 
     def generate_steps_list(self) -> List[Tuple[Optional[int], ...]]:
         steps_list: List[Tuple[Optional[int], ...]] = []
+        need_even = self.out_f.suffix in (".webm", ".mp4", ".mkv", ".webp")
         for step in range(self.opt_comp.steps, -1, -1):
             steps_list.append(
                 (
@@ -333,7 +334,7 @@ class StickerConvert:
                         step,
                         self.opt_comp.steps,
                         self.opt_comp.res_power,
-                        True,
+                        need_even,
                     ),
                     get_step_value(
                         self.opt_comp.res_h_max,
@@ -341,7 +342,7 @@ class StickerConvert:
                         step,
                         self.opt_comp.steps,
                         self.opt_comp.res_power,
-                        True,
+                        need_even,
                     ),
                     get_step_value(
                         self.opt_comp.quality_max,
