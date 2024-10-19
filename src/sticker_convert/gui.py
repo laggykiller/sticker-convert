@@ -209,8 +209,8 @@ class GUI(Window):
         )
 
     def is_cn(self) -> bool:
-        cn_locs = ("zh_CHS", "zh_CN")
-        loc = cast(str, locale.getdefaultlocale()[0])
+        cn_locs = ("zh_chs", "zh_cn", "chinese")
+        loc = locale.getlocale()[0]
         winloc = ""
         if platform.system() == "Windows":
             import ctypes
@@ -219,7 +219,9 @@ class GUI(Window):
             winloc_id = cast(int, windll.GetUserDefaultUILanguage())  # type: ignore
             winloc = cast(str, locale.windows_locale[winloc_id])  # type: ignore
 
-        if loc.startswith(cn_locs) or winloc.startswith(cn_locs):
+        if loc is not None and (
+            loc.lower().startswith(cn_locs) or winloc.lower().startswith(cn_locs)
+        ):
             return True
         return False
 
