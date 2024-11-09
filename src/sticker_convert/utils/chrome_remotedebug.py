@@ -84,7 +84,7 @@ class CRD:
     def connect(self):
         self.cmd_id = 1
         r = None
-        for _ in range(3):
+        for _ in range(5):
             try:
                 r = requests.get(f"http://localhost:{self.port}/json")
                 break
@@ -95,6 +95,15 @@ class CRD:
             raise RuntimeError("Cannot connect to chrome debugging port")
 
         targets = json.loads(r.text)
+        for _ in range(5):
+            if len(targets) == 0:
+                time.sleep(1)
+            else:
+                break
+        
+        if len(targets) == 0:
+            raise RuntimeError("Cannot create websocket connection with debugger")
+
         self.ws = websocket.create_connection(targets[0]["webSocketDebuggerUrl"])  # type: ignore
 
     def send_cmd(self, command: Dict[Any, Any]) -> Union[str, bytes]:
