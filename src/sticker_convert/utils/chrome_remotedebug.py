@@ -100,7 +100,7 @@ class CRD:
                 time.sleep(1)
             else:
                 break
-        
+
         if len(targets) == 0:
             raise RuntimeError("Cannot create websocket connection with debugger")
 
