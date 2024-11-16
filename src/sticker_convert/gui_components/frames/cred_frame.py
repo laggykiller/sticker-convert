@@ -202,5 +202,7 @@ class CredFrame(LabelFrame):
         self.kakao_get_auth_btn.config(state=state)
         self.line_cookies_entry.config(state=state)
         self.line_get_auth_btn.config(state=state)
-        self.viber_auth_lbl.config(state=state)
         self.viber_auth_entry.config(state=state)
+        self.viber_get_auth_btn.config(state=state)
+        self.discord_token_entry.config(state=state)
+        self.discord_get_auth_btn.config(state=state)
