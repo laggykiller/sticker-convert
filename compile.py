@@ -137,6 +137,7 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         cmd_list.append(
             "--windows-icon-from-ico=src/sticker_convert/resources/appicon.ico"
         )
+        cmd_list.append("--mingw64")
     elif platform.system() == "Darwin":
         cmd_list.append("--disable-console")
         cmd_list.append("--macos-create-app-bundle")
