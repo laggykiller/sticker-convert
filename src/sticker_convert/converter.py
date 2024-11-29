@@ -535,7 +535,7 @@ class StickerConvert:
                         rgba_array = yuva_to_rgba(frame_resized)
 
                     # Remove pixels that was added to make dimensions even
-                    rgba_array = rgba_array[0:width_orig, 0:height_orig]
+                    rgba_array = rgba_array[0:height_orig, 0:width_orig]
                     self.frames_raw.append(rgba_array)
 
     def _frames_import_lottie(self) -> None:
@@ -622,12 +622,12 @@ class StickerConvert:
                 self.res_h = height
 
             scaling = 1 - (self.opt_comp.padding_percent / 100)
-            if width > height:
+            if width / self.res_w > height / self.res_h:
                 width_new = int(self.res_w * scaling)
-                height_new = int(height * self.res_w // width * scaling)
+                height_new = int(height * self.res_w / width * scaling)
             else:
                 height_new = int(self.res_h * scaling)
-                width_new = int(width * self.res_h // height * scaling)
+                width_new = int(width * self.res_h / height * scaling)
 
             with im.resize((width_new, height_new), resample=resample) as im_resized:
                 with Image.new(
