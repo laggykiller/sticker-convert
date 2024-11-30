@@ -23,7 +23,6 @@ class CompressWastickers(UploadBase):
         self.base_spec.size_max_vid = 500000
         self.base_spec.duration_min = 8
         self.base_spec.duration_max = 10000
-        self.base_spec.square = True
         self.base_spec.set_res(512)
         self.base_spec.set_format((".webp",))
 

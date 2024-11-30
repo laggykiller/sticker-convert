@@ -25,7 +25,6 @@ class UploadSignal(UploadBase):
         self.base_spec.set_size_max(300000)
         self.base_spec.set_res_max(512)
         self.base_spec.duration_max = 3000
-        self.base_spec.square = True
 
         self.png_spec = copy.deepcopy(self.base_spec)
         self.png_spec.set_format((".apng",))

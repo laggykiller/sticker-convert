@@ -24,7 +24,6 @@ class UploadTelegram(UploadBase):
 
         self.base_spec.size_max_img = 512000
         self.base_spec.size_max_vid = 256000
-        self.base_spec.square = True
         self.base_spec.duration_max = 3000
         self.base_spec.set_res(512)
 
@@ -48,7 +47,7 @@ class UploadTelegram(UploadBase):
         self.opt_comp_merged.merge(self.base_spec)
 
         base_cover_spec = CompOption(
-            size_max_img=128000, size_max_vid=32000, square=True, duration_max=3000
+            size_max_img=128000, size_max_vid=32000, duration_max=3000
         )
         base_cover_spec.set_res(100)
 

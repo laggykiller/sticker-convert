@@ -25,7 +25,6 @@ class XcodeImessage(UploadBase):
         self.base_spec.set_size_max(500000)
         self.base_spec.set_res(300)
         self.base_spec.set_format(("png", ".apng", ".gif", ".jpeg", "jpg"))
-        self.base_spec.square = True
 
         self.small_spec = copy.deepcopy(self.base_spec)
 

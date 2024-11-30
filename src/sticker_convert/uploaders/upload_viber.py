@@ -23,7 +23,6 @@ class UploadViber(UploadBase):
         super().__init__(*args, **kwargs)
 
         self.base_spec.set_size_max(0)
-        self.base_spec.square = True
 
         self.png_spec = copy.deepcopy(self.base_spec)
         self.png_spec.set_res_max(490)

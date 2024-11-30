@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+from fractions import Fraction
 from pathlib import Path
 from typing import Optional, Tuple, Union
 
@@ -16,9 +17,7 @@ class FormatVerify:
         file_info = CodecInfo(file)
 
         return (
-            FormatVerify.check_file_res(
-                file, res=spec.get_res(), square=spec.square, file_info=file_info
-            )
+            FormatVerify.check_file_res(file, res=spec.get_res(), file_info=file_info)
             and FormatVerify.check_file_fps(
                 file, fps=spec.get_fps(), file_info=file_info
             )
@@ -48,7 +47,6 @@ class FormatVerify:
         res: Tuple[
             Tuple[Optional[int], Optional[int]], Tuple[Optional[int], Optional[int]]
         ],
-        square: Optional[bool] = None,
         file_info: Optional[CodecInfo] = None,
     ) -> bool:
         if file_info:
@@ -65,8 +63,27 @@ class FormatVerify:
                 return False
             if res[1][1] and file_height > res[1][1]:
                 return False
-        if square and file_height != file_width:
-            return False
+
+        min_ratio = None
+        if res[0][0] and res[1][0]:
+            min_ratio = Fraction(res[0][0], res[1][0])
+
+        max_ratio = None
+        if res[0][1] and res[1][1]:
+            max_ratio = Fraction(res[0][1], res[1][1])
+
+        file_ratio = Fraction(file_width, file_height)
+
+        if min_ratio is not None and max_ratio is not None:
+            if min_ratio == max_ratio:
+                return True if file_ratio == min_ratio else False
+            else:
+                return True
+
+        if min_ratio is not None:
+            return True if file_ratio == min_ratio else False
+        if max_ratio is not None:
+            return True if file_ratio == max_ratio else False
 
         return True
 

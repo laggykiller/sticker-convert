@@ -80,7 +80,6 @@ class CompOption(BaseOption):
     no_compress: Optional[bool] = None
     processes: int = ceil(cpu_count() / 2)
     animated: Optional[bool] = None
-    square: Optional[bool] = None
 
     def to_dict(self) -> Dict[Any, Any]:
         return {
@@ -115,7 +114,6 @@ class CompOption(BaseOption):
             "no_compress": self.no_compress,
             "processes": self.processes,
             "animated": self.animated,
-            "square": self.square,
         }
 
     def get_size_max(self) -> Tuple[Optional[int], Optional[int]]:
