@@ -154,8 +154,7 @@ class UploadTelegram(UploadBase):
 
             init_input_stickers: List[InputSticker] = []
             sticker_format = None
-            sticker_format_prev = None
-            for count, src in enumerate(stickers):
+            for src in stickers:
                 self.cb.put(f"Verifying {src} for uploading to telegram")
 
                 emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
@@ -206,29 +205,7 @@ class UploadTelegram(UploadBase):
                 )
 
                 if sticker_set is None:
-                    if count < 50 and (
-                        sticker_format_prev is None
-                        or sticker_format_prev == sticker_format
-                    ):
-                        init_input_stickers.append(input_sticker)
-                    else:
-                        start_msg = f"Creating pack and bulk uploading {count} stickers with same format of {pack_short_name}"
-                        finish_msg = f"Created pack and bulk uploaded {count} stickers with same format of {pack_short_name}"
-                        error_msg = f"Cannot create pack and bulk upload {count} stickers with same format of {pack_short_name} due to"
-                        self.cb.put(start_msg)
-                        try:
-                            await bot.create_new_sticker_set(
-                                user_id=self.telegram_userid,
-                                name=pack_short_name,
-                                title=pack_title,
-                                stickers=init_input_stickers,
-                                sticker_type=sticker_type,
-                            )
-                            sticker_set = True
-                            self.cb.put(finish_msg)
-                        except TelegramError as e:
-                            self.cb.put(f"{error_msg} {e}")
-                            return None
+                    init_input_stickers.append(input_sticker)
                 else:
                     try:
                         # We could use tg.start_soon() here
@@ -252,7 +229,24 @@ class UploadTelegram(UploadBase):
                             f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
                         )
 
-                sticker_format_prev = sticker_format
+            if sticker_set is None and len(init_input_stickers) > 0:
+                start_msg = f"Creating pack and bulk uploading {len(init_input_stickers)} stickers with same format of {pack_short_name}"
+                finish_msg = f"Created pack and bulk uploaded {len(init_input_stickers)} stickers with same format of {pack_short_name}"
+                error_msg = f"Cannot create pack and bulk upload {len(init_input_stickers)} stickers with same format of {pack_short_name} due to"
+                self.cb.put(start_msg)
+                try:
+                    await bot.create_new_sticker_set(
+                        user_id=self.telegram_userid,
+                        name=pack_short_name,
+                        title=pack_title,
+                        stickers=init_input_stickers,
+                        sticker_type=sticker_type,
+                    )
+                    sticker_set = True
+                    self.cb.put(finish_msg)
+                except TelegramError as e:
+                    self.cb.put(f"{error_msg} {e}")
+                    return None
 
             cover_path = MetadataHandler.get_cover(self.opt_output.dir)
             if cover_path:
