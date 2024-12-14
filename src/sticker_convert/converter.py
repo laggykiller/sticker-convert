@@ -702,9 +702,9 @@ class StickerConvert:
                 self._frames_export_apng()
             else:
                 self._frames_export_png()
-        elif self.out_f.suffix == ".gif":
+        elif self.out_f.suffix in (".gif", ".webp"):
             self._frames_export_pil_anim()
-        elif self.out_f.suffix in (".webm", ".mp4", ".mkv", ".webp") or is_animated:
+        elif self.out_f.suffix in (".webm", ".mp4", ".mkv") or is_animated:
             self._frames_export_pyav()
         else:
             self._frames_export_pil()
@@ -811,8 +811,9 @@ class StickerConvert:
         elif self.out_f.suffix == ".webp":
             im_out = [Image.fromarray(i) for i in self.frames_processed]  # type: ignore
             extra_kwargs["format"] = "WebP"
-            extra_kwargs["minimize_size"] = True
-            extra_kwargs["method"] = 6
+            # Enabling below is too slow
+            # extra_kwargs["minimize_size"] = True
+            # extra_kwargs["method"] = 6
         else:
             raise RuntimeError(f"Invalid format {self.out_f.suffix}")
 
