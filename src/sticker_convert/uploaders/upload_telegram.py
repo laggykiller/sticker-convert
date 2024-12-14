@@ -2,7 +2,7 @@
 import copy
 import re
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
 import anyio
 from telegram import InputSticker, Sticker
@@ -153,6 +153,7 @@ class UploadTelegram(UploadBase):
                 sticker_type = Sticker.REGULAR
 
             init_input_stickers: List[InputSticker] = []
+            extra_input_stickers: List[Tuple[InputSticker, Path]] = []
             sticker_format = None
             for src in stickers:
                 self.cb.put(f"Verifying {src} for uploading to telegram")
@@ -204,36 +205,15 @@ class UploadTelegram(UploadBase):
                     format=sticker_format,
                 )
 
-                if sticker_set is None:
+                if sticker_set is None and len(init_input_stickers) < 50:
                     init_input_stickers.append(input_sticker)
                 else:
-                    try:
-                        # We could use tg.start_soon() here
-                        # But this would disrupt the order of stickers
-                        await bot.add_sticker_to_set(
-                            user_id=self.telegram_userid,
-                            name=pack_short_name,
-                            sticker=input_sticker,
-                        )
-                        self.cb.put(f"Uploaded sticker {src} of {pack_short_name}")
-                    except BadRequest as e:
-                        self.cb.put(
-                            f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
-                        )
-                        if str(e) == "Stickerpack_not_found":
-                            self.cb.put(
-                                "Hint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
-                            )
-                    except TelegramError as e:
-                        self.cb.put(
-                            f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
-                        )
+                    extra_input_stickers.append((input_sticker, src))
 
-            if sticker_set is None and len(init_input_stickers) > 0:
-                start_msg = f"Creating pack and bulk uploading {len(init_input_stickers)} stickers with same format of {pack_short_name}"
-                finish_msg = f"Created pack and bulk uploaded {len(init_input_stickers)} stickers with same format of {pack_short_name}"
-                error_msg = f"Cannot create pack and bulk upload {len(init_input_stickers)} stickers with same format of {pack_short_name} due to"
-                self.cb.put(start_msg)
+            if len(init_input_stickers) > 0:
+                self.cb.put(
+                    f"Creating pack and bulk uploading {len(init_input_stickers)} stickers of {pack_short_name}"
+                )
                 try:
                     await bot.create_new_sticker_set(
                         user_id=self.telegram_userid,
@@ -243,10 +223,37 @@ class UploadTelegram(UploadBase):
                         sticker_type=sticker_type,
                     )
                     sticker_set = True
-                    self.cb.put(finish_msg)
+                    self.cb.put(
+                        f"Created pack and bulk uploaded {len(init_input_stickers)} stickers of {pack_short_name}"
+                    )
                 except TelegramError as e:
-                    self.cb.put(f"{error_msg} {e}")
+                    self.cb.put(
+                        f"Cannot create pack and bulk upload {len(init_input_stickers)} stickers of {pack_short_name} due to {e}"
+                    )
                     return None
+
+            for input_sticker, src in extra_input_stickers:
+                try:
+                    # We could use tg.start_soon() here
+                    # But this would disrupt the order of stickers
+                    await bot.add_sticker_to_set(
+                        user_id=self.telegram_userid,
+                        name=pack_short_name,
+                        sticker=input_sticker,
+                    )
+                    self.cb.put(f"Uploaded sticker {src} of {pack_short_name}")
+                except BadRequest as e:
+                    self.cb.put(
+                        f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
+                    )
+                    if str(e) == "Stickerpack_not_found":
+                        self.cb.put(
+                            "Hint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
+                        )
+                except TelegramError as e:
+                    self.cb.put(
+                        f"Cannot upload sticker {src} of {pack_short_name} due to {e}"
+                    )
 
             cover_path = MetadataHandler.get_cover(self.opt_output.dir)
             if cover_path:
