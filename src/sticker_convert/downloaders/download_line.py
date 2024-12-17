@@ -400,13 +400,13 @@ class DownloadLine(DownloadBase):
 
                 self.cb.put(f"Combined {i.name.replace('-text.png', '.png')}")
 
-    def download_stickers_line(self) -> bool:
+    def download_stickers_line(self) -> Tuple[int, int]:
         url_data = MetadataLine.analyze_url(self.url)
         if url_data:
             self.pack_id, self.region, self.is_emoji = url_data
         else:
             self.cb.put("Download failed: Unsupported URL format")
-            return False
+            return 0, 0
 
         if self.is_emoji:
             metadata = MetadataLine.get_metadata_sticon(self.pack_id, self.region)
@@ -423,7 +423,7 @@ class DownloadLine(DownloadBase):
             ) = metadata
         else:
             self.cb.put("Download failed: Failed to get metadata")
-            return False
+            return 0, 0
 
         MetadataHandler.set_metadata(self.out_dir, title=self.title, author=self.author)
 
@@ -434,7 +434,7 @@ class DownloadLine(DownloadBase):
             self.cb.put(f"Downloaded {pack_url}")
         else:
             self.cb.put(f"Cannot download {pack_url}")
-            return False
+            return 0, 0
 
         if self.is_emoji:
             self.decompress_emoticon(zip_file)
@@ -458,7 +458,7 @@ class DownloadLine(DownloadBase):
         self.download_multiple_files(custom_sticker_text_urls, headers=self.headers)
         self.combine_custom_text()
 
-        return True
+        return len(self.pack_files), len(self.pack_files)
 
     @staticmethod
     def start(
@@ -466,6 +466,6 @@ class DownloadLine(DownloadBase):
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> bool:
+    ) -> Tuple[int, int]:
         downloader = DownloadLine(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_line()

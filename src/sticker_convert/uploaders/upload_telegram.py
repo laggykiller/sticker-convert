@@ -307,18 +307,18 @@ class UploadTelegram(UploadBase):
             result = f"https://t.me/addstickers/{pack_short_name}"
         return result
 
-    def upload_stickers_telegram(self) -> List[str]:
+    def upload_stickers_telegram(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []
 
         if not (self.opt_cred.telegram_token and self.opt_cred.telegram_userid):
             self.cb.put("Token and userid required for uploading to telegram")
-            return urls
+            return 0, 0, urls
 
         if self.opt_cred.telegram_userid.isnumeric():
             self.telegram_userid = int(self.opt_cred.telegram_userid)
         else:
             self.cb.put("Invalid userid, should contain numbers only")
-            return urls
+            return 0, 0, urls
 
         title, _, emoji_dict = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -362,14 +362,18 @@ class UploadTelegram(UploadBase):
             separate_image_anim=not self.opt_comp.fake_vid,
         )
 
+        stickers_total = 0
+        stickers_ok = 0
         for pack_title, stickers in packs.items():
+            stickers_total += len(stickers)
             self.cb.put(f"Uploading pack {pack_title}")
             result = anyio.run(self.upload_pack, pack_title, stickers, emoji_dict)
             if result:
                 self.cb.put((result))
                 urls.append(result)
+                stickers_ok += len(stickers)
 
-        return urls
+        return stickers_ok, stickers_total, urls
 
     @staticmethod
     def start(
@@ -378,7 +382,7 @@ class UploadTelegram(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> List[str]:
+    ) -> Tuple[int, int, List[str]]:
         exporter = UploadTelegram(
             opt_output,
             opt_comp,

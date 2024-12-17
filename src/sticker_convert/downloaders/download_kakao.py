@@ -135,7 +135,7 @@ class DownloadKakao(DownloadBase):
 
         return pack_title, item_code
 
-    def download_stickers_kakao(self) -> bool:
+    def download_stickers_kakao(self) -> Tuple[int, int]:
         self.auth_token = None
         if self.opt_cred:
             self.auth_token = self.opt_cred.kakao_auth_token
@@ -146,7 +146,7 @@ class DownloadKakao(DownloadBase):
             if item_code:
                 return self.download_animated(item_code)
             self.cb.put("Download failed: Cannot download metadata for sticker pack")
-            return False
+            return 0, 0
 
         if self.url.isnumeric() or self.url.startswith("kakaotalk://store/emoticon/"):
             item_code = self.url.replace("kakaotalk://store/emoticon/", "")
@@ -177,7 +177,7 @@ class DownloadKakao(DownloadBase):
                 self.cb.put(
                     "Download failed: Cannot download metadata for sticker pack"
                 )
-                return False
+                return 0, 0
 
             self.author = self.pack_info_unauthed["result"]["artist"]
             title_ko = self.pack_info_unauthed["result"]["title"]
@@ -197,14 +197,14 @@ class DownloadKakao(DownloadBase):
                     response = False
 
                 if response is False:
-                    return False
+                    return 0, 0
 
             return self.download_static(thumbnail_urls)
 
         self.cb.put("Download failed: Unrecognized URL")
-        return False
+        return 0, 0
 
-    def download_static(self, thumbnail_urls: str) -> bool:
+    def download_static(self, thumbnail_urls: str) -> Tuple[int, int]:
         MetadataHandler.set_metadata(
             self.out_dir, title=self.pack_title, author=self.author
         )
@@ -215,11 +215,11 @@ class DownloadKakao(DownloadBase):
             dest = Path(self.out_dir, str(num).zfill(3) + ".png")
             targets.append((url, dest))
 
-        self.download_multiple_files(targets)
+        results = self.download_multiple_files(targets)
 
-        return True
+        return sum(results.values()), len(targets)
 
-    def download_animated(self, item_code: str) -> bool:
+    def download_animated(self, item_code: str) -> Tuple[int, int]:
         MetadataHandler.set_metadata(
             self.out_dir, title=self.pack_title, author=self.author
         )
@@ -272,7 +272,7 @@ class DownloadKakao(DownloadBase):
                     break
             if play_ext == "":
                 self.cb.put(f"Failed to determine extension of {item_code}")
-                return False
+                return 0, 0
             else:
                 play_path_format = f"dw/{item_code}.{play_type}_0##{play_ext}"
         else:
@@ -308,7 +308,7 @@ class DownloadKakao(DownloadBase):
                 sound_dl_path = Path(self.out_dir, str(num).zfill(3) + sound_ext)
                 targets.append((sound_url, sound_dl_path))
 
-        self.download_multiple_files(targets, headers=headers)
+        results = self.download_multiple_files(targets, headers=headers)
 
         for target in targets:
             f_path = target[1]
@@ -326,7 +326,7 @@ class DownloadKakao(DownloadBase):
 
         self.cb.put(f"Finished getting {item_code}")
 
-        return True
+        return sum(results.values()), len(targets)
 
     @staticmethod
     def start(
@@ -334,6 +334,6 @@ class DownloadKakao(DownloadBase):
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> bool:
+    ) -> Tuple[int, int]:
         downloader = DownloadKakao(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_kakao()

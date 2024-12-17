@@ -216,7 +216,6 @@ class Job:
         self.cb_ask_bool = cb_ask_bool
         self.cb_ask_str = cb_ask_str
 
-        self.compress_fails: List[str] = []
         self.out_urls: List[str] = []
 
         self.executor = Executor(
@@ -236,19 +235,21 @@ class Job:
 
         self.executor.cb("msg", kwargs={"cls": True})
 
-        tasks = (
+        tasks: Tuple[Callable[..., Tuple[bool, Optional[str]]], ...] = (
             self.verify_input,
             self.cleanup,
             self.download,
             self.compress,
             self.export,
-            self.report,
         )
 
         code = 0
+        summaries: List[str] = []
         for task in tasks:
             self.executor.cb("bar", kwargs={"set_progress_mode": "indeterminate"})
-            success = task()
+            success, summary = task()
+            if summary is not None:
+                summaries.append(summary)
 
             if self.executor.is_cancel_job.value == 1:  # type: ignore
                 code = 2
@@ -258,6 +259,22 @@ class Job:
                 self.executor.cb("An error occured during this run.")
                 break
 
+        msg = "##########\n"
+        msg += "Summary:\n"
+        msg += "##########\n"
+
+        msg += "\n"
+        msg += "\n".join(summaries)
+        msg += "\n"
+
+        if self.out_urls:
+            msg += "Export results:\n"
+            msg += "\n".join(self.out_urls)
+        else:
+            msg += "Export result: None"
+
+        self.executor.cb(msg)
+
         self.executor.cleanup()
 
         return code
@@ -265,7 +282,7 @@ class Job:
     def cancel(self, *_: Any, **_kwargs: Any) -> None:
         self.executor.kill_workers()
 
-    def verify_input(self) -> bool:
+    def verify_input(self) -> Tuple[bool, None]:
         info_msg = ""
         error_msg = ""
 
@@ -352,7 +369,7 @@ class Job:
 
         if error_msg != "":
             self.executor.cb(error_msg)
-            return False
+            return False, None
 
         # Check if preset not equal to export option
         # Only warn if the compression option is available in export preset
@@ -372,7 +389,7 @@ class Job:
             response = self.executor.cb_return.get_response()
 
             if response is False:
-                return False
+                return False, None
 
         for param, value in (
             ("fps_power", self.opt_comp.fps_power),
@@ -431,7 +448,7 @@ class Job:
             response = self.executor.cb_return.get_response()
 
             if response is False:
-                return False
+                return False, None
 
         # Warn about in/output directories that might contain other files
         # Directory is safe if the name is stickers_input/stickers_output, or
@@ -468,13 +485,13 @@ class Job:
                 response = self.executor.cb_return.get_response()
 
                 if response is False:
-                    return False
+                    return False, None
 
                 break
 
-        return True
+        return True, None
 
-    def cleanup(self) -> bool:
+    def cleanup(self) -> Tuple[bool, None]:
         # If input is 'From local directory', then we should keep files in input/output directory as it maybe edited by user
         # If input is not 'From local directory', then we should move files in input/output directory as new files will be downloaded
         # Output directory should be cleanup unless no_compress is true (meaning files in output directory might be edited by user)
@@ -523,10 +540,10 @@ class Job:
                 new_path = Path(archive_dir, old_path.name)
                 old_path.rename(new_path)
 
-        return True
+        return True, None
 
-    def download(self) -> bool:
-        downloaders: List[Callable[..., bool]] = []
+    def download(self) -> Tuple[bool, str]:
+        downloaders: List[Callable[..., Tuple[int, int]]] = []
 
         if self.opt_input.option == "signal":
             downloaders.append(DownloadSignal.start)
@@ -549,8 +566,8 @@ class Job:
         if len(downloaders) > 0:
             self.executor.cb("Downloading...")
         else:
-            self.executor.cb("Nothing to download")
-            return True
+            self.executor.cb("Skipped download (No files to download)")
+            return True, "Download: Skipped (No files to download)"
 
         self.executor.start_workers(processes=1)
 
@@ -563,15 +580,24 @@ class Job:
         self.executor.join_workers()
 
         # Return False if any of the job returns failure
+        stickers_ok = 0
+        stickers_total = 0
+        success = True
         for result in self.executor.results_list:
-            if result is False:
-                return False
+            stickers_ok += result[0]
+            stickers_total += result[1]
+            success = (
+                success if stickers_ok == stickers_total and stickers_ok > 0 else False
+            )
 
-        return True
+        return (
+            success,
+            f"Download: {stickers_ok}/{stickers_total} stickers success",
+        )
 
-    def compress(self) -> bool:
+    def compress(self) -> Tuple[bool, str]:
         if self.opt_comp.no_compress is True:
-            self.executor.cb("no_compress is set to True, skip compression")
+            self.executor.cb("Skipped compression (no_compress is set to True)")
             in_dir_files = [
                 i
                 for i in sorted(self.opt_input.dir.iterdir())
@@ -598,7 +624,7 @@ class Job:
                     src_f = Path(self.opt_input.dir, i.name)
                     dst_f = Path(self.opt_output.dir, i.name)
                     shutil.copy(src_f, dst_f)
-            return True
+            return True, "Compress: Skipped (no_compress is set to True)"
         msg = "Compressing..."
 
         input_dir = Path(self.opt_input.dir)
@@ -620,8 +646,8 @@ class Job:
 
         in_fs_count = len(in_fs)
         if in_fs_count == 0:
-            self.executor.cb("No files to compress")
-            return True
+            self.executor.cb("Skipped compression (No files to compress)")
+            return True, "Compress: Skipped (No files to compress)"
 
         self.executor.cb(msg)
         self.executor.cb(
@@ -640,21 +666,35 @@ class Job:
 
         self.executor.join_workers()
 
-        # Return False if any of the job returns failure
+        success = True
+        stickers_ok = 0
+        stickers_total = 0
+        fails: List[str] = []
         for result in self.executor.results_list:
+            stickers_total += 1
             if result[0] is False:
-                return False
+                success = False
+                fails.append(str(result[1]))
+            else:
+                stickers_ok += 1
 
-        return True
+        msg_append = ""
+        if success is False:
+            msg_append = " (Failed: " + ", ".join(fails) + ")"
 
-    def export(self) -> bool:
+        return (
+            success,
+            f"Compress: {stickers_ok}/{stickers_total} stickers success" + msg_append,
+        )
+
+    def export(self) -> Tuple[bool, str]:
         if self.opt_output.option == "local":
-            self.executor.cb("Saving to local directory only, nothing to export")
-            return True
+            self.executor.cb("Skipped export (Saving to local directory only)")
+            return True, "Export: Skipped (Saving to local directory only)"
 
         self.executor.cb("Exporting...")
 
-        exporters: List[Callable[..., List[str]]] = []
+        exporters: List[Callable[..., Tuple[int, int, List[str]]]] = []
 
         if self.opt_output.option == "whatsapp":
             exporters.append(CompressWastickers.start)
@@ -684,8 +724,12 @@ class Job:
 
         self.executor.join_workers()
 
+        stickers_ok = 0
+        stickers_total = 0
         for result in self.executor.results_list:
-            self.out_urls.extend(result)
+            stickers_ok += result[0]
+            stickers_total += result[1]
+            self.out_urls.extend(result[2])
 
         if self.out_urls:
             with open(
@@ -694,29 +738,6 @@ class Job:
                 f.write("\n".join(self.out_urls))
         else:
             self.executor.cb("An error occured while exporting stickers")
-            return False
+            return False, f"Export: {stickers_ok}/{stickers_total} stickers success"
 
-        return True
-
-    def report(self) -> bool:
-        msg = "##########\n"
-        msg += "Summary:\n"
-        msg += "##########\n"
-        msg += "\n"
-
-        if self.compress_fails:
-            msg += f'Warning: Could not compress the following {len(self.compress_fails)} file{"s" if len(self.compress_fails) > 1 else ""}:\n'
-            msg += "\n".join(self.compress_fails)
-            msg += "\n"
-            msg += "\nConsider adjusting compression parameters"
-            msg += "\n"
-
-        if self.out_urls:
-            msg += "Export results:\n"
-            msg += "\n".join(self.out_urls)
-        else:
-            msg += "Export result: None"
-
-        self.executor.cb(msg)
-
-        return True
+        return True, f"Export: {stickers_ok}/{stickers_total} stickers success"

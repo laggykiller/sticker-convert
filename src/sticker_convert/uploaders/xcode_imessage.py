@@ -6,7 +6,7 @@ import plistlib
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.definitions import ROOT_DIR
@@ -34,7 +34,7 @@ class XcodeImessage(UploadBase):
         self.large_spec = copy.deepcopy(self.base_spec)
         self.large_spec.set_res(618)
 
-    def create_imessage_xcode(self) -> List[str]:
+    def create_imessage_xcode(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -43,10 +43,10 @@ class XcodeImessage(UploadBase):
         )
         if not author:
             self.cb.put("author is required for creating Xcode iMessage sticker pack")
-            return urls
+            return 0, 0, urls
         if not title:
             self.cb.put("title is required for creating Xcode iMessage sticker pack")
-            return urls
+            return 0, 0, urls
 
         author = author.replace(" ", "_")
         title = title.replace(" ", "_")
@@ -61,6 +61,7 @@ class XcodeImessage(UploadBase):
         spec_choice = None
         opt_comp_merged = copy.deepcopy(self.opt_comp)
 
+        stickers_total = 0
         for pack_title, stickers in packs.items():
             pack_title = sanitize_filename(pack_title)
 
@@ -87,6 +88,7 @@ class XcodeImessage(UploadBase):
                     StickerConvert.convert(
                         fpath, fpath, opt_comp_merged, self.cb, self.cb_return
                     )
+                stickers_total += 1
 
             self.add_metadata(author, pack_title)
             self.create_xcode_proj(author, pack_title)
@@ -95,7 +97,7 @@ class XcodeImessage(UploadBase):
             self.cb.put(result)
             urls.append(result)
 
-        return urls
+        return stickers_total, stickers_total, urls
 
     def add_metadata(self, author: str, title: str) -> None:
         first_image_path = Path(
@@ -279,6 +281,6 @@ class XcodeImessage(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> List[str]:
+    ) -> Tuple[int, int, List[str]]:
         exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.create_imessage_xcode()

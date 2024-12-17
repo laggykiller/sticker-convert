@@ -3,7 +3,7 @@ import copy
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Tuple
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
@@ -47,7 +47,7 @@ class CompressWastickers(UploadBase):
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
         self.opt_comp_merged.merge(self.base_spec)
 
-    def compress_wastickers(self) -> List[str]:
+    def compress_wastickers(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -56,10 +56,10 @@ class CompressWastickers(UploadBase):
         )
         if not title:
             self.cb.put("Title is required for compressing .wastickers")
-            return urls
+            return 0, 0, urls
         if not author:
             self.cb.put("Author is required for compressing .wastickers")
-            return urls
+            return 0, 0, urls
         packs = MetadataHandler.split_sticker_packs(
             self.opt_output.dir,
             title=title,
@@ -67,7 +67,9 @@ class CompressWastickers(UploadBase):
             separate_image_anim=not self.opt_comp.fake_vid,
         )
 
+        stickers_total = 0
         for pack_title, stickers in packs.items():
+            stickers_total += len(stickers)
             # Originally the Sticker Maker application name the files with int(time.time())
             with CacheStore.get_cache_store(path=self.opt_comp.cache_dir) as tempdir:
                 for num, src in enumerate(stickers):
@@ -106,7 +108,7 @@ class CompressWastickers(UploadBase):
             self.cb.put((out_f))
             urls.append(out_f)
 
-        return urls
+        return stickers_total, stickers_total, urls
 
     def add_metadata(self, pack_dir: Path, title: str, author: str) -> None:
         opt_comp_merged = copy.deepcopy(self.opt_comp)
@@ -150,6 +152,6 @@ class CompressWastickers(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> List[str]:
+    ) -> Tuple[int, int, List[str]]:
         exporter = CompressWastickers(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.compress_wastickers()

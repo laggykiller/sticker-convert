@@ -4,7 +4,7 @@ import json
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import requests
 
@@ -35,12 +35,12 @@ class UploadViber(UploadBase):
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
         self.opt_comp_merged.merge(self.png_spec)
 
-    def upload_stickers_viber(self) -> List[str]:
+    def upload_stickers_viber(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []
 
         if not self.opt_cred.viber_auth:
             self.cb.put("Viber auth required for uploading to viber")
-            return urls
+            return 0, 0, urls
 
         upload_data_base: Dict[str, str] = {}
         for i in self.opt_cred.viber_auth.split(";"):
@@ -49,13 +49,13 @@ class UploadViber(UploadBase):
 
         if upload_data_base.get("member_id") is None:
             self.cb.put("Invalid Viber auth: Missing member_id")
-            return urls
+            return 0, 0, urls
         if upload_data_base.get("m_token") is None:
             self.cb.put("Invalid Viber auth: Missing m_token")
-            return urls
+            return 0, 0, urls
         if upload_data_base.get("m_ts") is None:
             self.cb.put("Invalid Viber auth: Missing m_ts")
-            return urls
+            return 0, 0, urls
 
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -92,7 +92,10 @@ class UploadViber(UploadBase):
                 self.cb_return,
             )
 
+        stickers_total = 0
+        stickers_ok = 0
         for pack_title, stickers in packs.items():
+            stickers_total += len(stickers)
             with CacheStore.get_cache_store(path=self.opt_comp.cache_dir) as tempdir:
                 for num, src in enumerate(stickers):
                     self.cb.put(f"Verifying {src} for uploading to Viber")
@@ -141,6 +144,7 @@ class UploadViber(UploadBase):
                     url = f"https://stickers.viber.com/pages/custom-sticker-packs/{pack_id}"
                     urls.append(url)
                     self.cb.put(f"Uploaded {pack_title}")
+                    stickers_ok += len(stickers)
                 else:
                     self.cb.put(
                         f"Failed to upload {pack_title}: {r.status_code} {r.text}"
@@ -152,7 +156,7 @@ class UploadViber(UploadBase):
             else:
                 self.cb.put(f"Failed to upload {pack_title}: {r.status_code} {r.text}")
 
-        return urls
+        return stickers_ok, stickers_total, urls
 
     @staticmethod
     def start(
@@ -161,6 +165,6 @@ class UploadViber(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> List[str]:
+    ) -> Tuple[int, int, List[str]]:
         exporter = UploadViber(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.upload_stickers_viber()

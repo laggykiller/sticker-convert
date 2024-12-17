@@ -21,10 +21,10 @@ class DownloadDiscord(DownloadBase):
     # def __init__(self, *args: Any, **kwargs: Any) -> None:
     #     super().__init__(*args, **kwargs)
 
-    def download_stickers_discord(self) -> bool:
+    def download_stickers_discord(self) -> Tuple[int, int]:
         if self.opt_cred is None or self.opt_cred.discord_token == "":
             self.cb.put("Error: Downloading from Discord requires token")
-            return False
+            return 0, 0
 
         gid: Optional[str] = None
         if self.url.isnumeric():
@@ -36,7 +36,7 @@ class DownloadDiscord(DownloadBase):
 
         if gid is None or gid.isnumeric() is False:
             self.cb.put("Error: Invalid url")
-            return False
+            return 0, 0
 
         headers = {
             "Authorization": self.opt_cred.discord_token,
@@ -68,7 +68,7 @@ class DownloadDiscord(DownloadBase):
             f_path = Path(self.out_dir, f_name)
             targets.append((sticker_url, f_path))
 
-        self.download_multiple_files(targets)
+        results = self.download_multiple_files(targets)
 
         server_name = r_json["name"]
         MetadataHandler.set_metadata(
@@ -78,7 +78,7 @@ class DownloadDiscord(DownloadBase):
             emoji_dict=emoji_dict if self.input_option == "discord" else None,
         )
 
-        return True
+        return sum(results.values()), len(targets)
 
     @staticmethod
     def start(
@@ -86,6 +86,6 @@ class DownloadDiscord(DownloadBase):
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> bool:
+    ) -> Tuple[int, int]:
         downloader = DownloadDiscord(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_discord()

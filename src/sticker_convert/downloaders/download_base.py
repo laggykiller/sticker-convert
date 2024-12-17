@@ -34,18 +34,26 @@ class DownloadBase:
         retries: int = 3,
         headers: Optional[dict[Any, Any]] = None,
         **kwargs: Any,
-    ) -> None:
+    ) -> dict[str, bool]:
+        results: dict[str, bool] = {}
         anyio.run(
             partial(
-                self.download_multiple_files_async, targets, retries, headers, **kwargs
+                self.download_multiple_files_async,
+                targets,
+                retries,
+                headers,
+                results,
+                **kwargs,
             )
         )
+        return results
 
     async def download_multiple_files_async(
         self,
         targets: List[Tuple[str, Path]],
         retries: int = 3,
         headers: Optional[dict[Any, Any]] = None,
+        results: Optional[dict[str, bool]] = None,
         **kwargs: Any,
     ) -> None:
         # targets format: [(url1, dest2), (url2, dest2), ...]
@@ -63,6 +71,7 @@ class DownloadBase:
                         dest,
                         retries,
                         headers,
+                        results,
                         **kwargs,
                     )
 
@@ -73,15 +82,18 @@ class DownloadBase:
         dest: Path,
         retries: int = 3,
         headers: Optional[dict[Any, Any]] = None,
+        results: Optional[dict[str, bool]] = None,
         **kwargs: Any,
     ) -> None:
         self.cb.put(f"Downloading {url}")
+        success = False
         for retry in range(retries):
             response = await client.get(
                 url, follow_redirects=True, headers=headers, **kwargs
             )
+            success = response.is_success
 
-            if response.is_success:
+            if success:
                 async with await anyio.open_file(dest, "wb+") as f:
                     await f.write(response.content)
                 self.cb.put(f"Downloaded {url}")
@@ -89,6 +101,9 @@ class DownloadBase:
                 self.cb.put(
                     f"Error {response.status_code}: {url} (tried {retry+1}/{retries} times)"
                 )
+
+        if results is not None:
+            results[url] = success
 
         self.cb.put("update_bar")
 

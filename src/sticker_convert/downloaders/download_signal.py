@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from typing import Dict, Optional
+from typing import Dict, Optional, Tuple
 
 import anyio
 from signalstickers_client.errors import SignalException
@@ -62,10 +62,10 @@ class DownloadSignal(DownloadBase):
             self.out_dir, title=pack.title, author=pack.author, emoji_dict=emoji_dict
         )
 
-    def download_stickers_signal(self) -> bool:
+    def download_stickers_signal(self) -> Tuple[int, int]:
         if "signal.art" not in self.url:
             self.cb.put("Download failed: Unrecognized URL format")
-            return False
+            return 0, 0
 
         pack_id = self.url.split("#pack_id=")[1].split("&pack_key=")[0]
         pack_key = self.url.split("&pack_key=")[1]
@@ -74,11 +74,11 @@ class DownloadSignal(DownloadBase):
             pack = anyio.run(DownloadSignal.get_pack, pack_id, pack_key)
         except SignalException as e:
             self.cb.put(f"Failed to download pack due to {repr(e)}")
-            return False
+            return 0, 0
 
         self.save_stickers(pack)
 
-        return True
+        return len(pack.stickers), len(pack.stickers)
 
     @staticmethod
     def start(
@@ -86,6 +86,6 @@ class DownloadSignal(DownloadBase):
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> bool:
+    ) -> Tuple[int, int]:
         downloader = DownloadSignal(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_signal()

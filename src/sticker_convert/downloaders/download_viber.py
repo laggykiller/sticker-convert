@@ -44,7 +44,7 @@ class DownloadViber(DownloadBase):
 
         return title, zip_url
 
-    def decompress(self, zip_file: bytes) -> None:
+    def decompress(self, zip_file: bytes) -> int:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
             self.cb.put("Unzipping...")
 
@@ -69,19 +69,21 @@ class DownloadViber(DownloadBase):
 
                 self.cb.put("update_bar")
 
-    def download_stickers_viber(self) -> bool:
+            return len(zf_files)
+
+    def download_stickers_viber(self) -> Tuple[int, int]:
         pack_info = self.get_pack_info(self.url)
         if pack_info is None:
             self.cb.put("Download failed: Cannot get pack info")
-            return False
+            return 0, 0
         title, zip_url = pack_info
 
         zip_file = self.download_file(zip_url)
-        self.decompress(zip_file)
+        count = self.decompress(zip_file)
 
         MetadataHandler.set_metadata(self.out_dir, title=title)
 
-        return True
+        return count, count
 
     @staticmethod
     def start(
@@ -89,6 +91,6 @@ class DownloadViber(DownloadBase):
         opt_cred: Optional[CredOption],
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> bool:
+    ) -> Tuple[int, int]:
         downloader = DownloadViber(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_viber()

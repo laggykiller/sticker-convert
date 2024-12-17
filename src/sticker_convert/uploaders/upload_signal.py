@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import copy
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 import anyio
 from signalstickers_client.errors import SignalException
@@ -91,15 +91,15 @@ class UploadSignal(UploadBase):
 
             pack._addsticker(sticker)  # type: ignore
 
-    def upload_stickers_signal(self) -> List[str]:
+    def upload_stickers_signal(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []
 
         if not self.opt_cred.signal_uuid:
             self.cb.put("uuid required for uploading to Signal")
-            return urls
+            return 0, 0, urls
         if not self.opt_cred.signal_password:
             self.cb.put("password required for uploading to Signal")
-            return urls
+            return 0, 0, urls
 
         title, author, emoji_dict = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -138,7 +138,10 @@ class UploadSignal(UploadBase):
             file_per_pack=200,
             separate_image_anim=False,
         )
+        stickers_total = 0
+        stickers_ok = 0
         for pack_title, stickers in packs.items():
+            stickers_total += len(stickers)
             pack = LocalStickerPack()
             pack.title = pack_title
             pack.author = author
@@ -155,11 +158,12 @@ class UploadSignal(UploadBase):
                 )
                 self.cb.put((result))
                 urls.append(result)
+                stickers_ok += len(stickers)
 
             except SignalException as e:
                 self.cb.put(f"Failed to upload pack {pack_title} due to {repr(e)}")
 
-        return urls
+        return stickers_ok, stickers_total, urls
 
     @staticmethod
     def start(
@@ -168,6 +172,6 @@ class UploadSignal(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> List[str]:
+    ) -> Tuple[int, int, List[str]]:
         exporter = UploadSignal(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.upload_stickers_signal()
