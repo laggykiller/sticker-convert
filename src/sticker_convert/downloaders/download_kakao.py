@@ -138,6 +138,20 @@ class DownloadKakao(DownloadBase):
         kakao_url = cast(str, ctx.eval(js))
         item_code = urlparse(kakao_url).path.split("/")[2]
 
+        # Share link redirect to preview link if use desktop headers
+        # This allows us to find pack author
+        headers_desktop = {"User-Agent": "Chrome"}
+
+        response = requests.get(url, headers=headers_desktop, allow_redirects=True)
+        response.url
+
+        pack_title_url = urlparse(response.url).path.split("/")[-1]
+        pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(
+            pack_title_url
+        )
+        if pack_info_unauthed:
+            self.author = pack_info_unauthed["result"]["artist"]
+
         return pack_title, item_code
 
     def download_stickers_kakao(self) -> Tuple[int, int]:
