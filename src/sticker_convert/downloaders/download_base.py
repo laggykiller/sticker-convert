@@ -61,11 +61,14 @@ class DownloadBase:
             ("bar", None, {"set_progress_mode": "determinate", "steps": len(targets)})
         )
 
+        semaphore = anyio.Semaphore(4)
+
         async with httpx.AsyncClient() as client:
             async with anyio.create_task_group() as tg:
                 for url, dest in targets:
                     tg.start_soon(
                         self.download_file_async,
+                        semaphore,
                         client,
                         url,
                         dest,
@@ -77,6 +80,7 @@ class DownloadBase:
 
     async def download_file_async(
         self,
+        semaphore: anyio.Semaphore,
         client: httpx.AsyncClient,
         url: str,
         dest: Path,
@@ -85,27 +89,28 @@ class DownloadBase:
         results: Optional[dict[str, bool]] = None,
         **kwargs: Any,
     ) -> None:
-        self.cb.put(f"Downloading {url}")
-        success = False
-        for retry in range(retries):
-            response = await client.get(
-                url, follow_redirects=True, headers=headers, **kwargs
-            )
-            success = response.is_success
-
-            if success:
-                async with await anyio.open_file(dest, "wb+") as f:
-                    await f.write(response.content)
-                self.cb.put(f"Downloaded {url}")
-            else:
-                self.cb.put(
-                    f"Error {response.status_code}: {url} (tried {retry+1}/{retries} times)"
+        async with semaphore:
+            self.cb.put(f"Downloading {url}")
+            success = False
+            for retry in range(retries):
+                response = await client.get(
+                    url, follow_redirects=True, headers=headers, **kwargs
                 )
+                success = response.is_success
 
-        if results is not None:
-            results[url] = success
+                if success:
+                    async with await anyio.open_file(dest, "wb+") as f:
+                        await f.write(response.content)
+                    self.cb.put(f"Downloaded {url}")
+                else:
+                    self.cb.put(
+                        f"Error {response.status_code}: {url} (tried {retry+1}/{retries} times)"
+                    )
 
-        self.cb.put("update_bar")
+            if results is not None:
+                results[url] = success
+
+            self.cb.put("update_bar")
 
     def download_file(
         self,
