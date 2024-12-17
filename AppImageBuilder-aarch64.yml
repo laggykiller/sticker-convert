@@ -49,7 +49,6 @@ AppDir:
     include:
       - python3.12
       - python3.12-tk
-      - python3.12-distutils
     exclude: []
 
   runtime:
