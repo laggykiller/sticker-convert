@@ -20,7 +20,7 @@ def _run_sticker_convert(
     with_author: bool,
     with_emoji: bool,
     file_count_start: int = 0,
-    file_formats_or: bool = False
+    file_formats_or: bool = False,
 ):
     input_dir = Path(tmp_path) / "input"
     output_dir = Path(tmp_path) / "output"

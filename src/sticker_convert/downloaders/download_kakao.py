@@ -146,9 +146,7 @@ class DownloadKakao(DownloadBase):
         response.url
 
         pack_title_url = urlparse(response.url).path.split("/")[-1]
-        pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(
-            pack_title_url
-        )
+        pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(pack_title_url)
         if pack_info_unauthed:
             self.author = pack_info_unauthed["result"]["artist"]
 
