@@ -34,6 +34,11 @@ class daumtools {
         return dataDict['urlScheme'];
     }
 }
+class document {
+    static querySelectorAll(selectors) {
+        return [];
+    }
+}
 """
 
 
