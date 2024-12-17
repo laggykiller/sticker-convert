@@ -8,7 +8,7 @@ fi
 sudo apt install -y libpng-dev libxft-dev libfontconfig1-dev libfreetype6-dev
 
 wget -O appimage-builder https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
-wget -O appimagetool https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-x86_64.AppImage
+wget -O appimagetool https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
 chmod +x ./appimage-builder
 chmod +x ./appimagetool
 
@@ -26,7 +26,7 @@ mkdir -p AppDir/usr/share/metainfo
 cp ./sticker-convert.appdata.xml AppDir/usr/share/metainfo
 
 # Bundling into appimage
-wget https://github.com/AppImage/AppImageKit/releases/download/13/runtime-${SC_COMPILE_ARCH}
+wget https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-${SC_COMPILE_ARCH}
 if [ ${SC_COMPILE_ARCH} = "aarch64" ]; then
     ARCH="arm_aarch64"
 else
