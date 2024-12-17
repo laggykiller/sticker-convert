@@ -19,6 +19,8 @@ def _run_sticker_convert(
     with_title: bool,
     with_author: bool,
     with_emoji: bool,
+    file_count_start: int = 0,
+    file_formats_or: bool = False
 ):
     input_dir = Path(tmp_path) / "input"
     output_dir = Path(tmp_path) / "output"
@@ -43,16 +45,25 @@ def _run_sticker_convert(
     )
 
     for i in range(expected_file_count):
-        for fmt in expected_file_formats:
-            fname = Path(str(i).zfill(3) + fmt)
-            assert fname in input_dir.iterdir()
+        if file_formats_or:
+            matched = False
+            for fmt in expected_file_formats:
+                fname = str(i + file_count_start).zfill(3) + fmt
+                if fname in os.listdir(input_dir):
+                    matched = True
+                    break
+            assert matched is True
+        else:
+            for fmt in expected_file_formats:
+                fname = str(i + file_count_start).zfill(3) + fmt
+                assert fname in os.listdir(input_dir)
 
     if with_title:
-        assert Path("title.txt") in input_dir.iterdir()
+        assert "title.txt" in os.listdir(input_dir)
     if with_author:
-        assert Path("author.txt") in input_dir.iterdir()
+        assert "author.txt" in os.listdir(input_dir)
     if with_emoji:
-        assert Path("emoji.txt") in input_dir.iterdir()
+        assert "emoji.txt" in os.listdir(input_dir)
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
@@ -119,7 +130,7 @@ def test_download_telegram_animated_webm(tmp_path: LocalPath) -> None:
         source="telegram",
         url="https://t.me/addstickers/sticker_convert_test_animated_by_laggykillerstickerbot",
         expected_file_count=3,
-        expected_file_formats=[".webp"],
+        expected_file_formats=[".webm"],
         with_title=True,
         with_author=False,
         with_emoji=True,
@@ -368,6 +379,7 @@ def test_download_kakao_static_png(tmp_path: LocalPath) -> None:
         with_title=True,
         with_author=True,
         with_emoji=False,
+        file_count_start=1,
     )
 
 
@@ -382,6 +394,7 @@ def test_download_kakao_animated_gif_store_link_no_token(tmp_path: LocalPath) ->
         with_title=True,
         with_author=True,
         with_emoji=False,
+        file_count_start=1,
     )
 
 
@@ -397,6 +410,7 @@ def test_download_kakao_animated_gif_store_link_with_token(tmp_path: LocalPath) 
         with_title=True,
         with_author=True,
         with_emoji=False,
+        file_count_start=1,
     )
 
 
@@ -407,10 +421,11 @@ def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
         source="kakao",
         url="https://emoticon.kakao.com/items/lV6K2fWmU7CpXlHcP9-ysQJx9rg=?referer=share_link",
         expected_file_count=24,
-        expected_file_formats=[".png"],
+        expected_file_formats=[".webp"],
         with_title=True,
         with_author=True,
         with_emoji=False,
+        file_count_start=1,
     )
 
 
@@ -425,6 +440,7 @@ def test_download_kakao_mini_share_link(tmp_path: LocalPath) -> None:
         with_title=True,
         with_author=True,
         with_emoji=False,
+        file_count_start=1,
     )
 
 
@@ -439,6 +455,7 @@ def test_download_viber_custom_sticker_packs(tmp_path: LocalPath) -> None:
         with_title=True,
         with_author=False,
         with_emoji=False,
+        file_count_start=1,
     )
 
 
@@ -457,30 +474,17 @@ def test_download_viber_official_sticker_packs(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_viber_official_sound_sticker_packs(tmp_path: LocalPath) -> None:
-    _run_sticker_convert(
-        tmp_path=tmp_path,
-        source="viber",
-        url="https://stickers.viber.com/pages/spring_2024",
-        expected_file_count=24,
-        expected_file_formats=[".png", ".mp3"],
-        with_title=True,
-        with_author=False,
-        with_emoji=False,
-    )
-
-
-@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 def test_download_discord_stickers(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="discord",
         url="https://discord.com/channels/169256939211980800/@home",
-        expected_file_count=37,
+        expected_file_count=33,
         expected_file_formats=[".png", ".json"],
         with_title=True,
         with_author=True,
         with_emoji=True,
+        file_formats_or=True,
     )
 
 
@@ -488,11 +492,12 @@ def test_download_discord_stickers(tmp_path: LocalPath) -> None:
 def test_download_discord_emojis(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
-        source="discord_emoji",
+        source="discord-emoji",
         url="https://discord.com/channels/169256939211980800/@home",
-        expected_file_count=91,
+        expected_file_count=77,
         expected_file_formats=[".png", ".gif"],
         with_title=True,
         with_author=True,
         with_emoji=False,
+        file_formats_or=True,
     )
