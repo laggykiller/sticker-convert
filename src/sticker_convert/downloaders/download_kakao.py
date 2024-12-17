@@ -205,6 +205,7 @@ class DownloadKakao(DownloadBase):
         return 0, 0
 
     def download_static(self, thumbnail_urls: str) -> Tuple[int, int]:
+        headers = {"User-Agent": "Android"}
         MetadataHandler.set_metadata(
             self.out_dir, title=self.pack_title, author=self.author
         )
@@ -215,7 +216,7 @@ class DownloadKakao(DownloadBase):
             dest = Path(self.out_dir, str(num).zfill(3) + ".png")
             targets.append((url, dest))
 
-        results = self.download_multiple_files(targets)
+        results = self.download_multiple_files(targets, headers=headers)
 
         return sum(results.values()), len(targets)
 
