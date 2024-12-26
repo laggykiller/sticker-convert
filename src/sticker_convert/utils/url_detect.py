@@ -9,7 +9,7 @@ class UrlDetect:
     def detect(url: str) -> Optional[str]:
         domain = urlparse(url).netloc
 
-        if domain == "signal.art":
+        if domain == "signal.art" or url.startswith("sgnl://addstickers/"):
             return "signal"
 
         if domain in ("telegram.me", "t.me"):
