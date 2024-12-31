@@ -103,7 +103,12 @@ def osx_install_universal2_dep(arch: str) -> None:
             if "telethon" not in line:
                 g.write(line)
 
-    for dep in ("-r requirements-universal2.txt", "--no-deps telethon", "rsa", "'https://www.piwheels.org/simple/pyaes/pyaes-1.6.1-py3-none-any.whl'"):
+    for dep in (
+        "-r requirements-universal2.txt",
+        "--no-deps telethon",
+        "rsa",
+        "'https://www.piwheels.org/simple/pyaes/pyaes-1.6.1-py3-none-any.whl'",
+    ):
         osx_run_in_venv(
             f"python -m pip download --require-virtualenv {dep} --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm"
         )
