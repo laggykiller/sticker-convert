@@ -98,12 +98,18 @@ def osx_install_universal2_dep(arch: str) -> None:
     Path("wheel_x64").mkdir()
     Path("wheel_universal2").mkdir()
 
-    osx_run_in_venv(
-        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm"
-    )
-    osx_run_in_venv(
-        "python -m pip download --require-virtualenv -r requirements.txt --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64"
-    )
+    with open("requirements.txt") as f, open("requirements-universal2.txt", "w+") as g:
+        for line in f.readlines():
+            if "telethon" not in line:
+                g.write(line)
+
+    for dep in ("-r requirements-universal2.txt", "--no-deps telethon", "rsa", "'https://www.piwheels.org/simple/pyaes/pyaes-1.6.1-py3-none-any.whl'"):
+        osx_run_in_venv(
+            f"python -m pip download --require-virtualenv {dep} --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm"
+        )
+        osx_run_in_venv(
+            f"python -m pip download --require-virtualenv {dep} --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64"
+        )
 
     if arch == "arm64":
         w1 = "./wheel_arm"
