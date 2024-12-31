@@ -213,8 +213,8 @@
             "power": 3
         },
         "quality": {
-            "min": 10,
-            "max": 95,
+            "min": 0,
+            "max": 100,
             "power": 5
         },
         "color": {
