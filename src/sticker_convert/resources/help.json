@@ -59,7 +59,8 @@
         "signal_password": "Set Signal password. Required for uploading Signal stickers.",
         "signal_get_auth": "Generate Signal uuid and password.",
         "telegram_token": "Set Telegram token. Required for uploading and downloading Telegram stickers.",
-        "telegram_userid": "Set telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.",
+        "telegram_userid": "Set Telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.",
+        "telethon_setup": "Setup Telethon",
         "kakao_auth_token": "Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx",
         "kakao_get_auth": "Generate Kakao auth_token by simulating login. Kakao username, password, country code and phone number are also required.",
         "kakao_get_auth_desktop": "Get Kakao auth_token from Kakao Desktop application.\n(Only working on Windows.)",
@@ -75,6 +76,6 @@
         "viber_bin_path": "Specify location of Viber Desktop application.\nUseful for portable installation.",
         "discord_get_auth": "Get Discord token.",
         "discord_token": "Set Discord token. Required for downloading Discord stickers and emojis.",
-        "save_cred": "Save Signal and Telegram credentials."
+        "save_cred": "Save credentials."
     }
 }

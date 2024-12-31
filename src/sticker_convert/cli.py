@@ -20,6 +20,7 @@ from sticker_convert.utils.auth.get_kakao_desktop_auth import GetKakaoDesktopAut
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
 from sticker_convert.utils.auth.get_viber_auth import GetViberAuth
+from sticker_convert.utils.auth.telethon_setup import TelethonSetup
 from sticker_convert.utils.callback import Callback
 from sticker_convert.utils.files.json_manager import JsonManager
 from sticker_convert.utils.url_detect import UrlDetect
@@ -168,10 +169,12 @@ class CLI:
         parser_cred = parser.add_argument_group("Credentials options")
         flags_cred_bool = (
             "signal_get_auth",
+            "telethon_setup",
             "kakao_get_auth",
             "kakao_get_auth_desktop",
             "line_get_auth",
             "discord_get_auth",
+            "save_cred",
         )
         for k, v in self.help["cred"].items():
             keyword_args = {}
@@ -226,6 +229,7 @@ class CLI:
             "signal": args.download_signal,
             "line": args.download_line,
             "telegram": args.download_telegram,
+            "telegram_telethon": args.download_telegram_telethon,
             "kakao": args.download_kakao,
             "viber": args.download_viber,
             "discord": args.download_discord,
@@ -266,6 +270,14 @@ class CLI:
             export_option = "signal"
         elif args.export_telegram:
             export_option = "telegram"
+        elif args.export_telegram_emoji:
+            export_option = "telegram_emoji"
+        elif args.export_telegram_telethon:
+            export_option = "telegram_telethon"
+        elif args.export_telegram_emoji_telethon:
+            export_option = "telegram_emoji_telethon"
+        elif args.export_viber:
+            export_option = "viber"
         elif args.export_imessage:
             export_option = "imessage"
         else:
@@ -291,6 +303,10 @@ class CLI:
                         args.export_whatsapp,
                         args.export_signal,
                         args.export_telegram,
+                        args.export_telegram_emoji,
+                        args.export_telegram_telethon,
+                        args.export_telegram_emoji_telethon,
+                        args.export_viber,
                         args.export_imessage,
                     )
                 )
@@ -302,8 +318,12 @@ class CLI:
                 preset = "whatsapp"
             elif args.export_signal:
                 preset = "signal"
-            elif args.export_telegram:
+            elif args.export_telegram or args.export_telegram_telethon:
                 preset = "telegram"
+            elif args.export_telegram_emoji or args.export_telegram_emoji_telethon:
+                preset = "telegram_emoji"
+            elif args.export_viber:
+                preset = "viber"
             elif args.export_imessage:
                 preset = "imessage_small"
         elif args.preset == "auto":
@@ -316,6 +336,12 @@ class CLI:
                 self.cb.msg(
                     "Auto compression option set to no_compress (Reason: Export to local directory only)"
                 )
+            elif "telegram_emoji" in output_option:
+                preset = "telegram_emoji"
+                self.cb.msg(f"Auto compression option set to {preset}")
+            elif "telegram" in output_option:
+                preset = "telegram"
+                self.cb.msg(f"Auto compression option set to {preset}")
             elif output_option == "imessage":
                 preset = "imessage_small"
                 self.cb.msg(f"Auto compression option set to {preset}")
@@ -445,6 +471,8 @@ class CLI:
             telegram_userid=args.telegram_userid
             if args.telegram_userid
             else creds.get("telegram", {}).get("userid"),
+            telethon_api_id=creds.get("telethon", {}).get("api_id"),
+            telethon_api_hash=creds.get("telethon", {}).get("api_hash"),
             kakao_auth_token=args.kakao_auth_token
             if args.kakao_auth_token
             else creds.get("kakao", {}).get("auth_token"),
@@ -510,6 +538,16 @@ class CLI:
                 self.cb.msg(f"Got uuid and password successfully: {uuid}, {password}")
 
             self.cb.msg("Failed to get uuid and password")
+
+        if args.telethon_setup:
+            telethon_setup = TelethonSetup(opt_cred, self.cb.ask_str)
+            success, _, telethon_api_id, telethon_api_hash = telethon_setup.start()
+
+            if success:
+                opt_cred.telethon_api_id = telethon_api_id
+                opt_cred.telethon_api_hash = telethon_api_hash
+
+                self.cb.msg("Telethon setup successful")
 
         if args.line_get_auth:
             get_line_auth = GetLineAuth()

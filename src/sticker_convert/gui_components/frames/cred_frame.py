@@ -10,6 +10,7 @@ from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGe
 from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
 from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
 from sticker_convert.gui_components.windows.viber_get_auth_window import ViberGetAuthWindow
+from sticker_convert.utils.auth.telethon_setup import TelethonSetup
 
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
@@ -76,6 +77,16 @@ class CredFrame(LabelFrame):
             validatecommand=self.gui.highlight_fields,
         )
         self.telegram_userid_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+
+        self.telethon_auth_lbl = Label(
+            self, text="Telethon authorization", justify="left", anchor="w"
+        )
+        self.telethon_auth_btn = Button(
+            self,
+            text="Generate",
+            command=self.cb_telethon_get_auth,
+            bootstyle="secondary",  # type: ignore
+        )
 
         self.kakao_auth_token_lbl = Label(
             self, text="Kakao auth_token", justify="left", anchor="w"
@@ -157,25 +168,39 @@ class CredFrame(LabelFrame):
         self.telegram_userid_entry.grid(
             column=1, row=4, columnspan=2, sticky="w", padx=3, pady=3
         )
-        self.kakao_auth_token_lbl.grid(column=0, row=5, sticky="w", padx=3, pady=3)
-        self.kakao_auth_token_entry.grid(column=1, row=5, sticky="w", padx=3, pady=3)
-        self.kakao_get_auth_btn.grid(column=2, row=5, sticky="e", padx=3, pady=3)
-        self.line_cookies_lbl.grid(column=0, row=6, sticky="w", padx=3, pady=3)
-        self.line_cookies_entry.grid(column=1, row=6, sticky="w", padx=3, pady=3)
-        self.line_get_auth_btn.grid(column=2, row=6, sticky="e", padx=3, pady=3)
-        self.viber_auth_lbl.grid(column=0, row=7, sticky="w", padx=3, pady=3)
-        self.viber_auth_entry.grid(column=1, row=7, sticky="w", padx=3, pady=3)
-        self.viber_get_auth_btn.grid(column=2, row=7, sticky="e", padx=3, pady=3)
-        self.discord_token_lbl.grid(column=0, row=8, sticky="w", padx=3, pady=3)
-        self.discord_token_entry.grid(column=1, row=8, sticky="w", padx=3, pady=3)
-        self.discord_get_auth_btn.grid(column=2, row=8, sticky="e", padx=3, pady=3)
-        self.help_btn.grid(column=2, row=9, sticky="e", padx=3, pady=3)
+        self.telethon_auth_lbl.grid(column=0, row=5, sticky="w", padx=3, pady=3)
+        self.telethon_auth_btn.grid(column=2, row=5, sticky="e", padx=3, pady=3)
+        self.kakao_auth_token_lbl.grid(column=0, row=6, sticky="w", padx=3, pady=3)
+        self.kakao_auth_token_entry.grid(column=1, row=6, sticky="w", padx=3, pady=3)
+        self.kakao_get_auth_btn.grid(column=2, row=6, sticky="e", padx=3, pady=3)
+        self.line_cookies_lbl.grid(column=0, row=7, sticky="w", padx=3, pady=3)
+        self.line_cookies_entry.grid(column=1, row=7, sticky="w", padx=3, pady=3)
+        self.line_get_auth_btn.grid(column=2, row=7, sticky="e", padx=3, pady=3)
+        self.viber_auth_lbl.grid(column=0, row=8, sticky="w", padx=3, pady=3)
+        self.viber_auth_entry.grid(column=1, row=8, sticky="w", padx=3, pady=3)
+        self.viber_get_auth_btn.grid(column=2, row=8, sticky="e", padx=3, pady=3)
+        self.discord_token_lbl.grid(column=0, row=9, sticky="w", padx=3, pady=3)
+        self.discord_token_entry.grid(column=1, row=9, sticky="w", padx=3, pady=3)
+        self.discord_get_auth_btn.grid(column=2, row=9, sticky="e", padx=3, pady=3)
+        self.help_btn.grid(column=2, row=10, sticky="e", padx=3, pady=3)
 
     def cb_cred_help(self, *_: Any) -> None:
         faq_site = "https://github.com/laggykiller/sticker-convert#faq"
         success = webbrowser.open(faq_site)
         if not success:
             self.gui.cb_ask_str("You can get help from:", initialvalue=faq_site)
+
+    def cb_telethon_get_auth(self, *_: Any) -> None:
+        success, _client, api_id, api_hash = TelethonSetup(
+            self.gui.get_opt_cred(), self.gui.cb_ask_str
+        ).start()
+        if success:
+            self.gui.telethon_api_id_var.set(api_id)
+            self.gui.telethon_api_hash_var.set(api_hash)
+            self.gui.save_creds()
+            self.gui.cb_msg_block("Telethon setup successful")
+        else:
+            self.gui.cb_msg_block("Telethon setup failed")
 
     def cb_kakao_get_auth(self, *_: Any) -> None:
         KakaoGetAuthWindow(self.gui)

@@ -23,6 +23,22 @@
             "author": false
         }
     },
+    "telegram_telethon": {
+        "full_name": "Upload to Telegram with Telethon",
+        "help": "Upload to Telegram with Telethon *Not recommended, but allow link not end with _by_xxxbot*",
+        "metadata_requirements": {
+            "title": true,
+            "author": false
+        }
+    },
+    "telegram_emoji_telethon": {
+        "full_name": "Upload to Telegram with Telethon (Custom emoji)",
+        "help": "Upload to Telegram with Telethon (Custom emoji) *Not recommended, but allow link not end with _by_xxxbot*",
+        "metadata_requirements": {
+            "title": true,
+            "author": false
+        }
+    },
     "viber": {
         "full_name": "Upload to Viber",
         "help": "Upload to Viber",

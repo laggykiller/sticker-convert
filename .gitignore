@@ -80,3 +80,4 @@ config.json
 ._.DS_Store
 **/sticker-convert
 src/sticker_convert/ios-message-stickers-template.zip
+**/telethon-*.session*

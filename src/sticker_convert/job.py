@@ -379,7 +379,10 @@ class Job:
             not self.opt_comp.no_compress
             and self.opt_output.option != "local"
             and self.opt_comp.preset != "custom"
-            and self.opt_output.option not in self.opt_comp.preset
+            and (
+                self.opt_output.option not in self.opt_comp.preset
+                and self.opt_comp.preset not in self.opt_output.option
+            )
         ):
             msg = "Compression preset does not match export option\n"
             msg += "You may continue, but the files will need to be compressed again before export\n"
@@ -551,7 +554,7 @@ class Job:
         if self.opt_input.option == "line":
             downloaders.append(DownloadLine.start)
 
-        if self.opt_input.option == "telegram":
+        if self.opt_input.option.startswith("telegram"):
             downloaders.append(DownloadTelegram.start)
 
         if self.opt_input.option == "kakao":
@@ -702,10 +705,7 @@ class Job:
         if self.opt_output.option == "signal":
             exporters.append(UploadSignal.start)
 
-        if self.opt_output.option == "telegram":
-            exporters.append(UploadTelegram.start)
-
-        if self.opt_output.option == "telegram_emoji":
+        if self.opt_output.option.startswith("telegram"):
             exporters.append(UploadTelegram.start)
 
         if self.opt_output.option == "imessage":

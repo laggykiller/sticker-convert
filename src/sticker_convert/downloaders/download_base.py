@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from functools import partial
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import anyio
 import httpx
@@ -34,8 +34,8 @@ class DownloadBase:
         retries: int = 3,
         headers: Optional[dict[Any, Any]] = None,
         **kwargs: Any,
-    ) -> dict[str, bool]:
-        results: dict[str, bool] = {}
+    ) -> Dict[str, bool]:
+        results: Dict[str, bool] = {}
         anyio.run(
             partial(
                 self.download_multiple_files_async,

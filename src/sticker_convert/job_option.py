@@ -214,6 +214,8 @@ class CredOption(BaseOption):
     signal_password: str = ""
     telegram_token: str = ""
     telegram_userid: str = ""
+    telethon_api_id: int = 0
+    telethon_api_hash: str = ""
     kakao_auth_token: str = ""
     kakao_username: str = ""
     kakao_password: str = ""
@@ -227,6 +229,10 @@ class CredOption(BaseOption):
         return {
             "signal": {"uuid": self.signal_uuid, "password": self.signal_password},
             "telegram": {"token": self.telegram_token, "userid": self.telegram_userid},
+            "telethon": {
+                "api_id": self.telethon_api_id,
+                "api_hash": self.telethon_api_hash,
+            },
             "kakao": {
                 "auth_token": self.kakao_auth_token,
                 "username": self.kakao_username,

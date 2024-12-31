@@ -154,6 +154,8 @@ class GUI(Window):
         self.signal_password_var = StringVar(self)
         self.telegram_token_var = StringVar(self)
         self.telegram_userid_var = StringVar(self)
+        self.telethon_api_id_var = IntVar(self)
+        self.telethon_api_hash_var = StringVar(self)
         self.kakao_auth_token_var = StringVar(self)
         self.kakao_username_var = StringVar(self)
         self.kakao_password_var = StringVar(self)
@@ -406,6 +408,10 @@ class GUI(Window):
         self.signal_password_var.set(self.creds.get("signal", {}).get("password", ""))
         self.telegram_token_var.set(self.creds.get("telegram", {}).get("token", ""))
         self.telegram_userid_var.set(self.creds.get("telegram", {}).get("userid", ""))
+        self.telethon_api_id_var.set(self.creds.get("telethon", {}).get("api_id", 0))
+        self.telethon_api_hash_var.set(
+            self.creds.get("telethon", {}).get("api_hash", "")
+        )
         self.kakao_auth_token_var.set(self.creds.get("kakao", {}).get("auth_token", ""))
         self.kakao_username_var.set(self.creds.get("kakao", {}).get("username", ""))
         self.kakao_password_var.set(self.creds.get("kakao", {}).get("password", ""))
@@ -451,6 +457,10 @@ class GUI(Window):
         selection = self.comp_preset_var.get()
         if selection == "auto":
             output_option = self.get_output_name()
+            if "telegram_emoji" in output_option:
+                return "telegram_emoji"
+            if "telegram" in output_option:
+                return "telegram"
             if output_option == "imessage":
                 return "imessage_small"
             if output_option == "local":
@@ -572,6 +582,8 @@ class GUI(Window):
             signal_password=self.signal_password_var.get(),
             telegram_token=self.telegram_token_var.get(),
             telegram_userid=self.telegram_userid_var.get(),
+            telethon_api_id=self.telethon_api_id_var.get(),
+            telethon_api_hash=self.telethon_api_hash_var.get(),
             kakao_auth_token=self.kakao_auth_token_var.get(),
             kakao_username=self.kakao_username_var.get(),
             kakao_password=self.kakao_password_var.get(),

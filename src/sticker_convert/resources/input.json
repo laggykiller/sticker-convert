@@ -29,6 +29,16 @@
             "author": false
         }
     },
+    "telegram_telethon": {
+        "full_name": "Download from Telegram with Telethon",
+        "help": "Download telegram stickers from a URL as input with Telethon",
+        "example": "Example: https://telegram.me/addstickers/xxxxx\n OR https://telegram.me/addemoji/xxxxx",
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": true,
+            "author": false
+        }
+    },
     "line": {
         "full_name": "Download from Line",
         "help": "Download line stickers from a URL / ID as input",
