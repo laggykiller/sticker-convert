@@ -434,7 +434,7 @@ class StickerConvert:
                 # Pillow is not reliable for getting webp frame durations
                 durations: Optional[List[int]]
                 if im.format == "WEBP":
-                    _, _, _, durations = CodecInfo._get_file_fps_frames_duration_webp(
+                    _, _, _, durations = CodecInfo._get_file_fps_frames_duration_webp(  # type: ignore
                         self.in_f
                     )
                 else:
@@ -764,7 +764,7 @@ class StickerConvert:
             format=self.out_f.suffix.replace(".", ""),
             options=options_container,
         ) as output:
-            out_stream = output.add_stream(codec, rate=self.fps, options=options_stream)
+            out_stream = output.add_stream(codec, rate=self.fps, options=options_stream)  # type: ignore
             out_stream = cast(VideoStream, out_stream)
             assert isinstance(self.res_w, int) and isinstance(self.res_h, int)
             out_stream.width = self.res_w

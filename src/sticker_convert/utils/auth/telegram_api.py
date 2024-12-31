@@ -355,9 +355,7 @@ class TelethonAPI(TelegramAPI):
         self, msg: Optional[str] = None, initialvalue: Optional[str] = None
     ) -> str:
         self.cb.put(("ask_str", (msg,), None))
-        response = ""
-        if self.cb_return:
-            response = self.cb_return.get_response()
+        response = self.cb_return.get_response()
 
         assert isinstance(response, str)
         return response
