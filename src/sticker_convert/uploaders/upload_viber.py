@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import copy
 import json
-import shutil
 import zipfile
 from pathlib import Path
 from typing import Any, Dict, List, Tuple
@@ -12,7 +11,6 @@ from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
-from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.format_verify import FormatVerify
@@ -96,31 +94,32 @@ class UploadViber(UploadBase):
         stickers_ok = 0
         for pack_title, stickers in packs.items():
             stickers_total += len(stickers)
-            with CacheStore.get_cache_store(path=self.opt_comp.cache_dir) as tempdir:
+            out_f = Path(
+                self.opt_output.dir, sanitize_filename(pack_title + ".zip")
+            ).as_posix()
+            with zipfile.ZipFile(out_f, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for num, src in enumerate(stickers):
                     self.cb.put(f"Verifying {src} for uploading to Viber")
 
-                    dst = Path(tempdir, f"{str(num).zfill(2)}.png")
-
                     if FormatVerify.check_file(src, spec=self.png_spec):
-                        shutil.copy(src, dst)
+                        with open(src, "rb") as f:
+                            image_data = f.read()
                     else:
-                        StickerConvert.convert(
-                            Path(src),
-                            Path(dst),
+                        success, _, image_data, _ = StickerConvert.convert(
+                            src,
+                            Path("bytes.png"),
                             self.opt_comp_merged,
                             self.cb,
                             self.cb_return,
                         )
+                        assert isinstance(image_data, bytes)
+                        if not success:
+                            self.cb.put(
+                                f"Warning: Cannot compress file {src.name}, skip this file..."
+                            )
+                            continue
 
-                out_f = Path(
-                    self.opt_output.dir, sanitize_filename(pack_title + ".zip")
-                ).as_posix()
-
-                with zipfile.ZipFile(out_f, "w", zipfile.ZIP_DEFLATED) as zipf:
-                    for file in Path(tempdir).iterdir():
-                        file_path = Path(tempdir, file.name)
-                        zipf.write(file_path, arcname=file_path.name)
+                    zipf.writestr(f"{str(num).zfill(2)}.png", image_data)
 
             upload_data = copy.deepcopy(upload_data_base)
             upload_data["title"] = pack_title
