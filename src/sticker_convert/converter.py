@@ -909,10 +909,10 @@ class StickerConvert:
     def _quantize_by_imagequant(self, image: Image.Image) -> Image.Image:
         import imagequant  # type: ignore
 
-        assert self.quality
-        assert self.opt_comp.quality_min
-        assert self.opt_comp.quality_max
-        assert self.color
+        assert isinstance(self.quality, int)
+        assert isinstance(self.opt_comp.quality_min, int)
+        assert isinstance(self.opt_comp.quality_max, int)
+        assert isinstance(self.color, int)
 
         dither = 1 - (self.quality - self.opt_comp.quality_min) / (
             self.opt_comp.quality_max - self.opt_comp.quality_min
