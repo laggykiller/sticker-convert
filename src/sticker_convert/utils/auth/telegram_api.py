@@ -76,7 +76,7 @@ class BotAPI(TelegramAPI):
         self.application = (  # type: ignore
             ApplicationBuilder()
             .token(opt_cred.telegram_token)
-            .rate_limiter(AIORateLimiter(max_retries=3))
+            .rate_limiter(AIORateLimiter(overall_max_rate=4, max_retries=3))
             .connect_timeout(self.timeout)
             .pool_timeout(self.timeout)
             .read_timeout(self.timeout)
@@ -389,13 +389,15 @@ class TelethonAPI(TelegramAPI):
             sent_message = cast(Message, await self.client.send_file("Stickers", msg))  # type: ignore
 
         for _ in range(5):
+            # https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
+            # In a single chat, avoid sending more than one message per second.
+            time.sleep(1)
             last_message = cast(
                 List[Message],
                 await self.client.get_messages("Stickers", 1),  # type: ignore
             )[0]
             if sent_message.id != last_message.id:
                 return last_message.message
-            time.sleep(1)
 
         return "timeout"
 
