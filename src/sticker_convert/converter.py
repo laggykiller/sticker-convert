@@ -24,8 +24,7 @@ if TYPE_CHECKING:
 MSG_START_COMP = "[I] Start compressing {} -> {}"
 MSG_SKIP_COMP = "[S] Compatible file found, skip compress and just copy {} -> {}"
 MSG_COMP = (
-    "[C] Compressing {} -> {} res={}x{}, "
-    "quality={}, fps={}, color={} (step {}-{}-{})"
+    "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-{})"
 )
 MSG_REDO_COMP = "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 MSG_DONE_COMP = "[S] Successful compression {} -> {} size {} (step {})"

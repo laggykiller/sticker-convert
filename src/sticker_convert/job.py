@@ -346,7 +346,7 @@ class Job:
                 if not MetadataHandler.check_metadata_provided(
                     self.opt_input.dir, input_option, metadata
                 ):
-                    error_msg += f'[X] {output_presets[output_option]["full_name"]} requires {metadata}\n'
+                    error_msg += f"[X] {output_presets[output_option]['full_name']} requires {metadata}\n"
                     if self.opt_input.option == "local":
                         error_msg += f"    {metadata} was not supplied and {metadata}.txt is absent\n"
                     else:
@@ -356,7 +356,7 @@ class Job:
                     )
                     error_msg += f"    Create {metadata}.txt with the {metadata} name\n"
                 else:
-                    info_msg += f'[!] {output_presets[output_option]["full_name"]} requires {metadata}\n'
+                    info_msg += f"[!] {output_presets[output_option]['full_name']} requires {metadata}\n"
                     if self.opt_input.option == "local":
                         info_msg += f"    {metadata} was not supplied but {metadata}.txt is present\n"
                         info_msg += f"    Using {metadata} name in {metadata}.txt\n"

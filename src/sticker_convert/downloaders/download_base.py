@@ -104,7 +104,7 @@ class DownloadBase:
                     self.cb.put(f"Downloaded {url}")
                 else:
                     self.cb.put(
-                        f"Error {response.status_code}: {url} (tried {retry+1}/{retries} times)"
+                        f"Error {response.status_code}: {url} (tried {retry + 1}/{retries} times)"
                     )
 
             if results is not None:
@@ -153,7 +153,7 @@ class DownloadBase:
                 break
             except requests.exceptions.RequestException as e:
                 self.cb.put(
-                    f"Cannot download {url} (tried {retry+1}/{retries} times): {e}"
+                    f"Cannot download {url} (tried {retry + 1}/{retries} times): {e}"
                 )
 
         if not result:

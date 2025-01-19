@@ -81,24 +81,7 @@ class CompressWastickers(UploadBase):
 
                 cover_path_old = MetadataHandler.get_cover(self.opt_output.dir)
                 cover_path_new = Path("bytes.png")
-                if cover_path_old:
-                    if FormatVerify.check_file(cover_path_old, spec=self.spec_cover):
-                        with open(cover_path_old, "rb") as f:
-                            cover_data = f.read()
-                    else:
-                        success, _, cover_data, _ = StickerConvert.convert(
-                            cover_path_old,
-                            cover_path_new,
-                            cover_opt_comp_merged,
-                            self.cb,
-                            self.cb_return,
-                        )
-                        if not success:
-                            self.cb.put(
-                                f"Warning: Cannot compress cover {cover_path_old.name}, unable to create .wastickers"
-                            )
-                            continue
-                else:
+                if cover_path_old is None:
                     # First image in the directory, extracting first frame
                     first_image = [
                         i
@@ -119,6 +102,25 @@ class CompressWastickers(UploadBase):
                             f"Warning: Cannot compress cover {first_image.name}, unable to create .wastickers"
                         )
                         continue
+                else:
+                    if not FormatVerify.check_file(
+                        cover_path_old, spec=self.spec_cover
+                    ):
+                        success, _, cover_data, _ = StickerConvert.convert(
+                            cover_path_old,
+                            cover_path_new,
+                            cover_opt_comp_merged,
+                            self.cb,
+                            self.cb_return,
+                        )
+                        if not success:
+                            self.cb.put(
+                                f"Warning: Cannot compress cover {cover_path_old.name}, unable to create .wastickers"
+                            )
+                            continue
+                    else:
+                        with open(cover_path_old, "rb") as f:
+                            cover_data = f.read()
 
                 assert isinstance(cover_data, bytes)
                 zipf.writestr("tray.png", cover_data)
@@ -134,12 +136,10 @@ class CompressWastickers(UploadBase):
                         ext = ".png"
                     dst = f"bytes{ext}"
 
-                    if FormatVerify.check_file(
-                        src, spec=self.webp_spec
-                    ) or FormatVerify.check_file(src, spec=self.png_spec):
-                        with open(src, "rb") as f:
-                            image_data = f.read()
-                    else:
+                    if not (
+                        FormatVerify.check_file(src, spec=self.webp_spec)
+                        or FormatVerify.check_file(src, spec=self.png_spec)
+                    ):
                         success, _, image_data, _ = StickerConvert.convert(
                             Path(src),
                             Path(dst),
@@ -153,9 +153,12 @@ class CompressWastickers(UploadBase):
                                 f"Warning: Cannot compress file {Path(src).name}, skip this file..."
                             )
                             continue
+                    else:
+                        with open(src, "rb") as f:
+                            image_data = f.read()
 
                     # Originally the Sticker Maker application name the files with int(time.time())
-                    zipf.writestr(f"sticker_{num+1}{ext}", image_data)
+                    zipf.writestr(f"sticker_{num + 1}{ext}", image_data)
 
             self.cb.put((out_f))
             urls.append(out_f)

@@ -77,19 +77,46 @@ jobs:
           - os: ubuntu-20.04
             TARGET: linux-x86_64
             CMD_BUILD: |
-                SC_COMPILE_ARCH=x86_64 ./scripts/build_appimage.sh
-            OUT_FILE_NAME: ./sticker-convert-x86_64.AppImage
-          - os: ubuntu-20.04
+                docker build \
+                  -t nuitka_build_x86_64 \
+                  -f ./scripts/nuitka_build_x86_64.dockerfile \
+                  --platform linux/amd64 \
+                  ./
+                docker run \
+                  --rm \
+                  -v $(pwd):/${GITHUB_WORKSPACE}  \
+                  -w ${GITHUB_WORKSPACE}  \
+                  --platform linux/amd64 \
+                  nuitka_build_x86_64 \
+                  python3.12 ./compile.py
+                mv ./sticker-convert.dist ./sticker-convert-linux-x86_64
+                zip -r9 sticker-convert-linux-x86_64.zip ./sticker-convert-linux-x86_64
+            OUT_FILE_NAME: ./sticker-convert-linux-x86_64.zip
+          - os: ubuntu-22.04-arm
             TARGET: linux-aarch64
             CMD_BUILD: |
-                SC_COMPILE_ARCH=aarch64 ./scripts/build_appimage.sh
-            OUT_FILE_NAME: ./sticker-convert-aarch64.AppImage
+                docker build \
+                  -t nuitka_build_aarch64 \
+                  -f scripts/nuitka_build_aarch64.dockerfile \
+                  --platform linux/arm64 \
+                  ./
+                docker run \
+                  --rm \
+                  -v $(pwd):/${GITHUB_WORKSPACE}  \
+                  -w ${GITHUB_WORKSPACE}  \
+                  --platform linux/arm64 \
+                  nuitka_build_aarch64 \
+                  python3.12 ./compile.py
+                mv ./sticker-convert.dist ./sticker-convert-linux-aarch64
+                zip -r9 sticker-convert-linux-aarch64.zip ./sticker-convert-linux-aarch64
+            OUT_FILE_NAME: ./sticker-convert-linux-aarch64.zip
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
     - name: Set up Python 3.12
       uses: actions/setup-python@v5
+      if: runner.os != 'Linux'
       with:
         python-version: "3.12"
         allow-prereleases: true
@@ -102,6 +129,36 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: ${{ matrix.OUT_FILE_NAME }}
+
+  build-appimage:
+    name: Build appimage
+    runs-on: ubuntu-20.04
+    needs: build-binary
+    strategy:
+      matrix:
+        include:
+          - arch: x86_64
+          - arch: aarch64
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    - uses: robinraju/release-downloader@v1
+      with:
+        latest: true
+        fileName: sticker-convert-linux-${{matrix.arch}}.zip
+    - name: Build appiamge for ${{matrix.arch}}
+      run: |
+        unzip sticker-convert-linux-${{matrix.arch}}.zip
+        mv sticker-convert-linux-${{matrix.arch}} ./sticker-convert.dist
+        SC_COMPILE_ARCH=${{matrix.arch}} ./scripts/build_appimage.sh
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: softprops/action-gh-release@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        files: ./sticker-convert-${{matrix.arch}}.AppImage
 
   build-docker:
     name: Build Docker image and push
@@ -185,7 +242,7 @@ jobs:
   
   upload-pypi:
     name: Upload to pypi
-    needs: [build-wheel, build-binary]
+    needs: [build-wheel, build-binary, build-appimage]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4

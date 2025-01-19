@@ -101,10 +101,7 @@ class UploadViber(UploadBase):
                 for num, src in enumerate(stickers):
                     self.cb.put(f"Verifying {src} for uploading to Viber")
 
-                    if FormatVerify.check_file(src, spec=self.png_spec):
-                        with open(src, "rb") as f:
-                            image_data = f.read()
-                    else:
+                    if not FormatVerify.check_file(src, spec=self.png_spec):
                         success, _, image_data, _ = StickerConvert.convert(
                             src,
                             Path("bytes.png"),
@@ -118,6 +115,9 @@ class UploadViber(UploadBase):
                                 f"Warning: Cannot compress file {src.name}, skip this file..."
                             )
                             continue
+                    else:
+                        with open(src, "rb") as f:
+                            image_data = f.read()
 
                     zipf.writestr(f"{str(num).zfill(2)}.png", image_data)
 
