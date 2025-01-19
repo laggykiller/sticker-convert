@@ -264,7 +264,7 @@ class MetadataHandler:
                 if len(anim_stickers) == file_per_anim_pack or (
                     finished_all and len(anim_stickers) > 0
                 ):
-                    suffix = f'{"-anim" if image_present else ""}{"-" + str(anim_pack_count) if anim_pack_count > 0 else ""}'
+                    suffix = f"{'-anim' if image_present else ''}{'-' + str(anim_pack_count) if anim_pack_count > 0 else ''}"
                     title_current = str(title) + suffix
                     packs[title_current] = anim_stickers.copy()
                     anim_stickers = []
@@ -272,7 +272,7 @@ class MetadataHandler:
                 if len(image_stickers) == file_per_image_pack or (
                     finished_all and len(image_stickers) > 0
                 ):
-                    suffix = f'{"-image" if anim_present else ""}{"-" + str(image_pack_count) if image_pack_count > 0 else ""}'
+                    suffix = f"{'-image' if anim_present else ''}{'-' + str(image_pack_count) if image_pack_count > 0 else ''}"
                     title_current = str(title) + suffix
                     packs[title_current] = image_stickers.copy()
                     image_stickers = []
@@ -292,7 +292,7 @@ class MetadataHandler:
                 if len(stickers) == file_per_pack or (
                     finished_all and len(stickers) > 0
                 ):
-                    suffix = f'{"-" + str(pack_count) if pack_count > 0 else ""}'
+                    suffix = f"{'-' + str(pack_count) if pack_count > 0 else ''}"
                     title_current = str(title) + suffix
                     packs[title_current] = stickers.copy()
                     stickers = []

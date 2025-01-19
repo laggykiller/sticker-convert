@@ -10,10 +10,10 @@ from typing import Optional
 sys.path.append("./src")
 from sticker_convert import __version__
 
-UNIVERSAL_WHEEL_EXCEPTIONS = ["mini_racer"]
+UNIVERSAL_WHEEL_EXCEPTIONS = ["mini_racer", "py_mini_racer"]
 
 
-def osx_run_in_venv(cmd: str, get_stdout: bool = False) -> Optional[str]:
+def run_in_venv(cmd: str, get_stdout: bool = False) -> Optional[str]:
     if Path("/bin/zsh").is_file():
         sh_cmd = ["/bin/zsh", "-c"]
     else:
@@ -109,10 +109,10 @@ def osx_install_universal2_dep(arch: str) -> None:
         "rsa",
         "'https://www.piwheels.org/simple/pyaes/pyaes-1.6.1-py3-none-any.whl'",
     ):
-        osx_run_in_venv(
+        run_in_venv(
             f"python -m pip download --require-virtualenv {dep} --platform macosx_11_0_arm64 --only-binary=:all: -d wheel_arm"
         )
-        osx_run_in_venv(
+        run_in_venv(
             f"python -m pip download --require-virtualenv {dep} --platform macosx_11_0_x86_64 --only-binary=:all: -d wheel_x64"
         )
 
@@ -124,7 +124,7 @@ def osx_install_universal2_dep(arch: str) -> None:
         w2 = "./wheel_arm"
 
     create_universal_wheels(Path(w1), Path(w2), Path("wheel_universal2"))
-    osx_run_in_venv("python -m pip install --require-virtualenv ./wheel_universal2/*")
+    run_in_venv("python -m pip install --require-virtualenv ./wheel_universal2/*")
 
 
 def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
@@ -138,7 +138,6 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         "--include-data-files=src/sticker_convert/ios-message-stickers-template.zip=ios-message-stickers-template.zip",
         "--include-data-dir=src/sticker_convert/resources=resources",
         "--enable-plugin=tk-inter",
-        "--enable-plugin=multiprocessing",
         "--include-package-data=signalstickers_client",
         "--noinclude-data-file=tcl/opt0.4",
         "--noinclude-data-file=tcl/http1.0",
@@ -160,10 +159,10 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         cmd_list.append("--linux-icon=src/sticker_convert/resources/appicon.png")
 
     cmd_list.append("src/sticker-convert.py")
-    if platform.system() == "Darwin":
-        osx_run_in_venv(" ".join(cmd_list))
-    else:
+    if platform.system() == "Windows":
         subprocess.run(cmd_list, shell=True)
+    else:
+        run_in_venv(" ".join(cmd_list))
 
 
 def win_patch() -> None:
@@ -184,7 +183,7 @@ def osx_patch() -> None:
         f.write("open ./sticker-convert-cli")
     os.chmod(sticker_bin, 0o744)
 
-    osx_run_in_venv("codesign --force --deep -s - sticker-convert.app")
+    run_in_venv("codesign --force --deep -s - sticker-convert.app")
 
 
 def compile() -> None:
@@ -198,28 +197,44 @@ def compile() -> None:
     shutil.make_archive(ios_stickers_path, "zip", ios_stickers_path)
 
     if platform.system() == "Windows":
+        subprocess.run(f"{python_bin} -m pip install --upgrade pip".split(" "))
         subprocess.run(
-            f"{python_bin} -m pip install --upgrade pip".split(" "), shell=True
+            f"{python_bin} -m pip install -r requirements-build.txt".split(" ")
         )
-        subprocess.run(
-            f"{python_bin} -m pip install -r requirements-build.txt".split(" "),
-            shell=True,
-        )
-        subprocess.run(
-            f"{python_bin} -m pip install -r requirements.txt".split(" "), shell=True
-        )
-    elif platform.system() == "Darwin":
+        subprocess.run(f"{python_bin} -m pip install -r requirements.txt".split(" "))
+    else:
         shutil.rmtree("venv", ignore_errors=True)
         subprocess.run(f"{python_bin} -m pip install --upgrade pip delocate".split(" "))
         subprocess.run(f"{python_bin} -m venv venv".split(" "))
         python_bin = "python"
-        osx_run_in_venv("python -m pip install -r requirements-build.txt")
-        if arch is None:
-            osx_run_in_venv(
-                "python -m pip install --require-virtualenv -r requirements.txt"
-            )
+        run_in_venv("python -m pip install -r requirements-build.txt")
+        if platform.system() == "Darwin":
+            if arch is None:
+                run_in_venv(
+                    "python -m pip install --require-virtualenv -r requirements.txt"
+                )
+            else:
+                osx_install_universal2_dep(arch)
         else:
-            osx_install_universal2_dep(arch)
+            # Workaround for crashing on Arch Linux x86_64 when creating MiniRacer()
+            # https://github.com/bpcreech/PyMiniRacer/issues/72
+            if platform.machine().lower() in ("amd64", "x86_64", "x64"):
+                with (
+                    open("requirements.txt") as f,
+                    open("requirements-linux-x86_64.txt", "w+") as g,
+                ):
+                    for line in f.readlines():
+                        if "mini-racer" in line:
+                            g.write("py-mini-racer~=0.6.0\n")
+                        else:
+                            g.write(line)
+                run_in_venv(
+                    "python -m pip install --require-virtualenv -r requirements-linux-x86_64.txt"
+                )
+            else:
+                run_in_venv(
+                    "python -m pip install --require-virtualenv -r requirements.txt"
+                )
 
     nuitka(python_bin, arch)
 

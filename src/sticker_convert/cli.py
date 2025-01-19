@@ -71,26 +71,26 @@ class CLI:
 
         parser_input = parser.add_argument_group("Input options")
         for k, v_str in self.help["input"].items():
-            parser_input.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v_str)
+            parser_input.add_argument(f"--{k.replace('_', '-')}", dest=k, help=v_str)
         parser_input_src = parser_input.add_mutually_exclusive_group()
         for k, v_dict in self.input_presets.items():
             if k == "local":
                 continue
             parser_input_src.add_argument(
-                f'--download-{k.replace("_", "-")}',
+                f"--download-{k.replace('_', '-')}",
                 dest=f"download_{k}",
-                help=f'{v_dict["help"]}\n({v_dict["example"]})',
+                help=f"{v_dict['help']}\n({v_dict['example']})",
             )
 
         parser_output = parser.add_argument_group("Output options")
         for k, v_str in self.help["output"].items():
-            parser_output.add_argument(f'--{k.replace("_", "-")}', dest=k, help=v_str)
+            parser_output.add_argument(f"--{k.replace('_', '-')}", dest=k, help=v_str)
         parser_output_dst = parser_output.add_mutually_exclusive_group()
         for k, v_dict in self.output_presets.items():
             if k == "local":
                 continue
             parser_output_dst.add_argument(
-                f'--export-{k.replace("_", "-")}',
+                f"--export-{k.replace('_', '-')}",
                 dest=f"export_{k}",
                 action="store_true",
                 help=v_dict["help"],
@@ -154,7 +154,7 @@ class CLI:
             else:
                 continue
             parser_comp.add_argument(
-                f'--{k.replace("_", "-")}',
+                f"--{k.replace('_', '-')}",
                 **keyword_args,
                 dest=k,
                 help=v,
@@ -181,7 +181,7 @@ class CLI:
             if k in flags_cred_bool:
                 keyword_args = {"action": "store_true"}
             parser_cred.add_argument(
-                f'--{k.replace("_", "-")}',
+                f"--{k.replace('_', '-')}",
                 **keyword_args,
                 dest=k,
                 help=v,

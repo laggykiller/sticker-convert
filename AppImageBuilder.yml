@@ -1,0 +1,33 @@
+# appimage-builder recipe see https://appimage-builder.readthedocs.io for details
+version: 1
+script:
+  # Remove any previous build
+  - rm -rf AppDir | true
+
+  # Make dirs
+  - mkdir -p AppDir/opt
+  - mkdir -p AppDir/usr/share/icons/hicolor/256x256/apps/
+
+  # Copy the python application code into the AppDir
+  - rsync -av sticker-convert.dist/ AppDir/opt/sticker-convert
+  # Copy appicon
+  - cp ./sticker-convert.dist/resources/appicon.png AppDir/usr/share/icons/hicolor/256x256/apps/sticker-convert.png
+
+AppDir:
+  path: ./AppDir
+
+  app_info:
+    id: com.laggykiller.sticker_convert
+    name: sticker-convert
+    icon: sticker-convert
+    version: latest
+    exec: opt/sticker-convert/sticker-convert.bin
+
+  files:
+    include: []
+    exclude:
+    - usr/share/man
+    - usr/share/doc/*/README.*
+    - usr/share/doc/*/changelog.*
+    - usr/share/doc/*/NEWS.*
+    - usr/share/doc/*/TODO.*

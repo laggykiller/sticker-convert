@@ -81,3 +81,7 @@ config.json
 **/sticker-convert
 src/sticker_convert/ios-message-stickers-template.zip
 **/telethon-*.session*
+appimage-builder
+appimagetool
+runtime-*
+*.AppImage
