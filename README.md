@@ -11,7 +11,10 @@
 - [Pre-compiled releases](https://github.com/laggykiller/sticker-convert/releases) for Windows, MacOS and Linux (As AppImage).
     - Windows: Unzip the downloaded file and run `sticker-convert.exe`
     - MacOS: Unzip the downloaded file, hold control and open `hold_control_and_click_open_me.command` for the first time, then `sticker-convert.app` in the future
-    - Linux: `chmod +x` the downloaded AppImage and run it
+    - Linux:
+        - AppImage: `chmod +x` the downloaded AppImage and run it
+        - Zip: unzip and run `sticker-convert.bin`
+        - [AUR package](https://aur.archlinux.org/packages/sticker-convert): `makepkg -si`
 - [pip package](https://pypi.org/project/sticker-convert/): `pip install sticker-convert`. Launch with `sticker-convert` or `python -m sticker_convert`
 - [Docker image](https://hub.docker.com/r/laggykiller/sticker-convert) for running on Linux.
 - [Try in Google Colab without downloading](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) (Requires Google account), which runs the code on Google server and get the result from Google Drive. However, it maybe slower than running on your computer. (~15 seconds per file if not converting to .apng, ~1 minute per file if you convert to .apng)
