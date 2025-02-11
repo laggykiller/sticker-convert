@@ -63,7 +63,7 @@ class DownloadSignal(DownloadBase):
         )
 
     def download_stickers_signal(self) -> Tuple[int, int]:
-        if "signal.art" not in self.url or not self.url.startswith(
+        if "signal.art" not in self.url and not self.url.startswith(
             "sgnl://addstickers/"
         ):
             self.cb.put("Download failed: Unrecognized URL format")
