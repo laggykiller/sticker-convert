@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 ARG PYVER=3.12.8-1+focal1_amd64
 
 RUN apt update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential tzdata software-properties-common patchelf libz-dev && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential curl tzdata software-properties-common patchelf libz-dev && \
     add-apt-repository ppa:deadsnakes/ppa && \
     apt update -y && \
     # apt install python3.12 python3.12-tk python3.12-dev -y
