@@ -88,7 +88,7 @@ jobs:
                   -w ${GITHUB_WORKSPACE}  \
                   --platform linux/amd64 \
                   nuitka_build_x86_64 \
-                  python3.12 ./compile.py
+                  python ./compile.py
                 mv ./sticker-convert.dist ./sticker-convert-linux-x86_64
                 zip -r9 sticker-convert-linux-x86_64.zip ./sticker-convert-linux-x86_64
             OUT_FILE_NAME: ./sticker-convert-linux-x86_64.zip
@@ -106,7 +106,7 @@ jobs:
                   -w ${GITHUB_WORKSPACE}  \
                   --platform linux/arm64 \
                   nuitka_build_aarch64 \
-                  python3.12 ./compile.py
+                  python ./compile.py
                 mv ./sticker-convert.dist ./sticker-convert-linux-aarch64
                 zip -r9 sticker-convert-linux-aarch64.zip ./sticker-convert-linux-aarch64
             OUT_FILE_NAME: ./sticker-convert-linux-aarch64.zip

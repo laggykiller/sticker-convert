@@ -1,21 +1,14 @@
-FROM ubuntu:20.04
+FROM ubuntu:18.04
 
-ARG PYVER=3.12.8-1+focal1_amd64
+ENV PYTHON_VERSION 3.12
+ENV PYENV_ROOT=/root/.pyenv
+ENV PATH $PYENV_ROOT/shims:$PYENV_ROOT/bin:$PATH
 
 RUN apt update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y build-essential curl tzdata software-properties-common patchelf libz-dev && \
-    add-apt-repository ppa:deadsnakes/ppa && \
-    apt update -y && \
-    # apt install python3.12 python3.12-tk python3.12-dev python3.12-venv -y
-    curl -O -L "https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa/+files/libpython3.12-stdlib_${PYVER}.deb" && \
-    curl -O -L "https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa/+files/libpython3.12_${PYVER}.deb" && \
-    curl -O -L "https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa/+files/libpython3.12-dev_${PYVER}.deb" && \
-    curl -O -L "https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa/+files/python3.12_${PYVER}.deb" && \
-    curl -O -L "https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa/+files/python3.12-tk_${PYVER}.deb" && \
-    curl -O -L "https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa/+files/python3.12-venv_${PYVER}.deb" && \
-    apt -f install -y "./libpython3.12-stdlib_${PYVER}.deb" \
-    "./libpython3.12_${PYVER}.deb" \
-    "./libpython3.12-dev_${PYVER}.deb" \
-    "./python3.12_${PYVER}.deb" \
-    "./python3.12-tk_${PYVER}.deb" \
-    "./python3.12-venv_${PYVER}.deb"
+    DEBIAN_FRONTEND=noninteractive apt-get install -y make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget ca-certificates curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev mecab-ipadic-utf8 git tzdata software-properties-common patchelf libz-dev && \
+    curl -fsSL https://pyenv.run | bash && \
+    set -ex && \
+    pyenv update && \
+    pyenv install ${PYTHON_VERSION} && \
+    pyenv global ${PYTHON_VERSION} && \
+    pyenv rehash
