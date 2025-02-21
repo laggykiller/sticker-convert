@@ -701,9 +701,9 @@ class GUI(Window):
             set_progress_mode, steps, update_bar, *args, **kwargs
         )
 
-    def highlight_fields(self) -> bool:
+    def highlight_fields(self):
         if not self.init_done:
-            return True
+            return
 
         input_option = self.get_input_name()
         input_option_display = self.get_input_display_name()
@@ -853,5 +853,3 @@ class GUI(Window):
         else:
             self.comp_frame.comp_preset_opt.config(bootstyle="secondary")  # type: ignore
             self.output_frame.output_option_opt.config(bootstyle="secondary")  # type: ignore
-
-        return True
