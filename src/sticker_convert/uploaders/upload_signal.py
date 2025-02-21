@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import copy
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 import anyio
 from signalstickers_client.errors import SignalException
@@ -46,50 +46,76 @@ class UploadSignal(UploadBase):
         )
         return result
 
+    def create_sticker(
+        self, src: Path, emoji_dict: Dict[str, str]
+    ) -> Optional[Sticker]:
+        self.cb.put(f"Verifying {src} for uploading to signal")
+
+        sticker = Sticker()
+
+        emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
+        if emoji == "":
+            self.cb.put(
+                f"Warning: Cannot find emoji for file {Path(src).name}, using default emoji..."
+            )
+            emoji = self.opt_comp.default_emoji
+        sticker.emoji = emoji[:1]
+
+        if Path(src).suffix == ".webp":
+            spec_choice = self.webp_spec
+        else:
+            spec_choice = self.png_spec
+
+        if not FormatVerify.check_file(src, spec=spec_choice):
+            if self.opt_comp.fake_vid or CodecInfo.is_anim(src):
+                dst = "bytes.apng"
+            else:
+                dst = "bytes.png"
+            success, _, image_data, _ = StickerConvert.convert(
+                Path(src), Path(dst), self.opt_comp_merged, self.cb, self.cb_return
+            )
+            if not success:
+                self.cb.put(
+                    f"Warning: Cannot compress file {Path(src).name}, skip uploading this file..."
+                )
+                return None
+
+            assert isinstance(image_data, bytes)
+
+            sticker.image_data = image_data
+        else:
+            with open(src, "rb") as f:
+                sticker.image_data = f.read()
+
+        return sticker
+
     def add_stickers_to_pack(
         self, pack: LocalStickerPack, stickers: List[Path], emoji_dict: Dict[str, str]
     ) -> None:
+        cover_file = MetadataHandler.get_cover(self.opt_output.dir)
+        cover_file_bytes = None
+        if cover_file:
+            with open(cover_file, "rb") as f:
+                cover_file_bytes = f.read()
         for src in stickers:
-            self.cb.put(f"Verifying {src} for uploading to signal")
-
-            sticker = Sticker()
+            sticker = self.create_sticker(src, emoji_dict)
+            if sticker is None:
+                continue
             sticker.id = pack.nb_stickers
-
-            emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
-            if emoji == "":
-                self.cb.put(
-                    f"Warning: Cannot find emoji for file {Path(src).name}, using default emoji..."
-                )
-                emoji = self.opt_comp.default_emoji
-            sticker.emoji = emoji[:1]
-
-            if Path(src).suffix == ".webp":
-                spec_choice = self.webp_spec
-            else:
-                spec_choice = self.png_spec
-
-            if not FormatVerify.check_file(src, spec=spec_choice):
-                if self.opt_comp.fake_vid or CodecInfo.is_anim(src):
-                    dst = "bytes.apng"
-                else:
-                    dst = "bytes.png"
-                success, _, image_data, _ = StickerConvert.convert(
-                    Path(src), Path(dst), self.opt_comp_merged, self.cb, self.cb_return
-                )
-                if not success:
-                    self.cb.put(
-                        f"Warning: Cannot compress file {Path(src).name}, skip uploading this file..."
-                    )
-                    continue
-
-                assert isinstance(image_data, bytes)
-
-                sticker.image_data = image_data
-            else:
-                with open(src, "rb") as f:
-                    sticker.image_data = f.read()
-
             pack._addsticker(sticker)  # type: ignore
+
+            if (
+                cover_file
+                and pack.cover is None
+                and sticker.image_data == cover_file_bytes
+            ):
+                pack.cover = sticker
+
+        if cover_file and pack.cover is None:
+            sticker = self.create_sticker(cover_file, emoji_dict)
+            if sticker is not None:
+                sticker.id = pack.nb_stickers
+                pack.cover = sticker
 
     def upload_stickers_signal(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []

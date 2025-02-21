@@ -642,7 +642,12 @@ class Job:
 
             if not in_f.is_file():
                 continue
-            if CodecInfo.get_file_ext(i) in (".txt", ".m4a") or Path(i).stem == "cover":
+            if (
+                CodecInfo.get_file_ext(i) in (".txt", ".m4a")
+                or (
+                    self.opt_comp.preset != "signal" and Path(i).stem == "cover"
+                )  # Signal cover has same spec as normal sticker
+            ):
                 shutil.copy(in_f, output_dir / i.name)
             else:
                 in_fs.append(i)
