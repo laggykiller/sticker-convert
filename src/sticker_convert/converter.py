@@ -581,9 +581,9 @@ class StickerConvert:
             colors = colors[colors[:, 3] != 0]
             if colors.shape[0] != 0:
                 alphas = colors[:, 3] / 255
-                r_mean = np.mean(colors[:, 0] * alphas)
-                g_mean = np.mean(colors[:, 1] * alphas)
-                b_mean = np.mean(colors[:, 2] * alphas)
+                r_mean = cast(float, np.mean(colors[:, 0] * alphas))
+                g_mean = cast(float, np.mean(colors[:, 1] * alphas))
+                b_mean = cast(float, np.mean(colors[:, 2] * alphas))
                 mean_total += (r_mean + g_mean + b_mean) / 3
 
         if mean_total / len(self.frames_raw) < 128:
