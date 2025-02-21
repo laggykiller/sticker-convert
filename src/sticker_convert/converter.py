@@ -284,10 +284,14 @@ class StickerConvert:
                 return self.compress_fail()
 
     def check_if_compatible(self) -> Optional[bytes]:
+        f_fmt = self.opt_comp.get_format()
         if (
-            FormatVerify.check_format(
+            # Issue #260: Some webp file not accepted by Whatsapp
+            ".webp" not in f_fmt[0]
+            and ".webp" not in f_fmt[1]
+            and FormatVerify.check_format(
                 self.in_f,
-                fmt=self.opt_comp.get_format(),
+                fmt=f_fmt,
                 file_info=self.codec_info_orig,
             )
             and FormatVerify.check_file_res(
