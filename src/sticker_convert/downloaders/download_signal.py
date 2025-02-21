@@ -58,6 +58,18 @@ class DownloadSignal(DownloadBase):
 
             self.cb.put("update_bar")
 
+        if pack.cover is not None and pack.cover.image_data is not None:
+            cover_path = Path(self.out_dir, "cover")
+            with open(cover_path, "wb") as f:
+                f.write(pack.cover.image_data)
+
+            cover_codec = CodecInfo.get_file_codec(cover_path)
+            if cover_codec == "":
+                cover_codec = "png"
+            cover_path_new = Path(self.out_dir, f"cover.{cover_codec}")
+            cover_path.rename(cover_path_new)
+            self.cb.put(f"Downloaded cover.{cover_codec}")
+
         MetadataHandler.set_metadata(
             self.out_dir, title=pack.title, author=pack.author, emoji_dict=emoji_dict
         )
