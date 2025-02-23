@@ -634,7 +634,7 @@ class GUI(Window):
         initialvalue: Optional[str] = None,
         cli_show_initialvalue: bool = True,
         parent: Optional[object] = None,
-    ) -> Any:
+    ) -> str:
         self.action = partial(
             Querybox.get_string,  # type: ignore
             question,
@@ -646,7 +646,12 @@ class GUI(Window):
         self.response_event.wait()
         self.response_event.clear()
 
-        return self.response
+        if self.response is None:
+            return ""
+        elif isinstance(self.response, str):
+            return self.response
+        else:
+            raise RuntimeError(f"Invalid response in cb_ask_str: {self.response}")
 
     def cb_ask_bool(
         self, question: str, parent: Union[Window, Toplevel, None] = None
