@@ -59,7 +59,7 @@ class UploadSignal(UploadBase):
                 f"Warning: Cannot find emoji for file {Path(src).name}, using default emoji..."
             )
             emoji = self.opt_comp.default_emoji
-        sticker.emoji = emoji[:1]
+        sticker.emoji = emoji
 
         if Path(src).suffix == ".webp":
             spec_choice = self.webp_spec
