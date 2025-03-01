@@ -61,6 +61,9 @@ class GetSignalAuth:
             signal_paths = (
                 shutil.which("signal-desktop"),
                 shutil.which("signal-desktop-beta"),
+                shutil.which("org.signal.Signal"),  # Flatpak
+                os.path.expanduser("~/.local/share/flatpak/exports/bin/org.signal.Signal"),
+                "/var/lib/flatpak/exports/bin/org.signal.Signal",
             )
 
         for signal_path in signal_paths:
