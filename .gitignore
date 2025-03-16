@@ -84,4 +84,5 @@ src/sticker_convert/ios-message-stickers-template.zip
 appimage-builder
 appimagetool
 runtime-*
+requirements-linux-*.txt
 *.AppImage
