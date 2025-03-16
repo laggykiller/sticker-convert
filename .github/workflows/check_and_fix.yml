@@ -28,7 +28,7 @@ jobs:
         pip install -r requirements-type.txt
         pip install .
     - name: Update emoji.json
-      run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json
+      run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/rhysd/gemoji/refs/heads/unicode-16.0/db/emoji.json
     - name: mypy
       run: mypy
     # Temporarily disabled due to Pillow typing issue
