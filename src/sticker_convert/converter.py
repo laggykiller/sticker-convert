@@ -524,7 +524,10 @@ class StickerConvert:
                         rgba_array = np.dstack(
                             (
                                 rgb_array,
-                                np.zeros(rgb_array.shape[:2], dtype=np.uint8) + 255,
+                                cast(
+                                    np.typing.NDArray[np.uint8],
+                                    np.zeros(rgb_array.shape[:2], dtype=np.uint8) + 255,
+                                ),
                             )
                         )
                     else:
