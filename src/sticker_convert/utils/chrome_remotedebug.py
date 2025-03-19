@@ -28,14 +28,22 @@ class CRD:
         if port is None:
             port = get_free_port()
         self.port = port
-        self.chrome_proc = subprocess.Popen(
-            [
-                chrome_bin,
-                "--no-sandbox",
-                f"--remote-debugging-port={port}",
-                f"--remote-allow-origins=http://localhost:{port}",
-            ]
-        )
+        launch_cmd = [
+            chrome_bin,
+            f"--remote-debugging-port={port}",
+            f"--remote-allow-origins=http://localhost:{port}",
+        ]
+
+        # Adding --no-sandbox in Windows may cause Signal fail to launch
+        # https://github.com/laggykiller/sticker-convert/issues/274
+        if (
+            platform.system() != "Windows"
+            and "geteuid" in dir(os)
+            and os.geteuid() == 0
+        ):
+            launch_cmd.append("--no-sandbox")
+
+        self.chrome_proc = subprocess.Popen(launch_cmd)
 
     @staticmethod
     def get_chrome_path() -> Optional[str]:
