@@ -818,7 +818,9 @@ class StickerConvert:
             im_out = [Image.fromarray(i) for i in self.frames_processed]  # type: ignore
             extra_kwargs["format"] = "WebP"
             extra_kwargs["allow_mixed"] = True
-            extra_kwargs["kmax"] = 1  # Keyframe every frame, otherwise black lines artifact can appear
+            extra_kwargs["kmax"] = (
+                1  # Keyframe every frame, otherwise black lines artifact can appear
+            )
             if self.quality:
                 if self.quality < 20:
                     extra_kwargs["minimize_size"] = True
