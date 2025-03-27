@@ -135,6 +135,7 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         "--standalone",
         "--follow-imports",
         "--assume-yes-for-downloads",
+        "--include-package=socksio",
         "--include-data-files=src/sticker_convert/ios-message-stickers-template.zip=ios-message-stickers-template.zip",
         "--include-data-dir=src/sticker_convert/resources=resources",
         "--enable-plugin=tk-inter",
