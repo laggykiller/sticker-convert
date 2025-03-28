@@ -172,6 +172,10 @@ class Executor:
         try:
             for process in self.processes:
                 process.join()
+                if process.exitcode != 0 and self.is_cancel_job.value == 0:
+                    self.cb_msg(
+                        f"Warning: A process exited with error (code {process.exitcode})"
+                    )
         except KeyboardInterrupt:
             pass
 
