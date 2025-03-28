@@ -123,9 +123,9 @@ class DownloadKakao(DownloadBase):
             # This allows us to find pack author
             headers_desktop = {"User-Agent": "Chrome"}
 
-            response = requests.get(self.url, headers=headers_desktop, allow_redirects=True)
+            r = requests.get(self.url, headers=headers_desktop, allow_redirects=True)
 
-            self.pack_title = urlparse(response.url).path.split("/")[-1]
+            self.pack_title = urlparse(r.url).path.split("/")[-1]
             pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(self.pack_title)
             if pack_info_unauthed is None:
                 self.cb.put(f"Download failed: Cannot download metadata for sticker pack")
