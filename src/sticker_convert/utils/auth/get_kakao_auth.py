@@ -5,8 +5,8 @@ import uuid
 from typing import Any, Callable, Dict, Optional
 from urllib.parse import parse_qs, urlparse
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 
 from sticker_convert.job_option import CredOption
 
@@ -33,7 +33,7 @@ class GetKakaoAuth:
         self.uuid_c = str(uuid.uuid4())
         self.device_info = (
             f"android/30; uuid={self.device_uuid}; ssaid={self.device_ssaid}; "
-            + 'model=SDK_GPHONE_X86_64; screen_resolution=1080x1920; sim=310260/1/us; onestore=false; uvc3=null'
+            + "model=SDK_GPHONE_X86_64; screen_resolution=1080x1920; sim=310260/1/us; onestore=false; uvc3=null"
         )
         self.app_platform = "android"
         self.app_version_number = self.get_version()
@@ -52,10 +52,12 @@ class GetKakaoAuth:
             "Content-Type": "application/json",
             "Connection": "close",
         }
-    
+
     def get_version(self) -> str:
         # It is difficult to get app version number from Google Play
-        r = requests.get("https://apkpure.net/kakaotalk-messenger/com.kakao.talk/versions")
+        r = requests.get(
+            "https://apkpure.net/kakaotalk-messenger/com.kakao.talk/versions"
+        )
         soup = BeautifulSoup(r.text, "html.parser")
         for li in soup.find_all("li"):
             a = li.find("a", class_="dt-version-icon")

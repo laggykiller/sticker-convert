@@ -205,7 +205,9 @@ class DownloadKakao(DownloadBase):
             thumbnail_urls = self.pack_info_unauthed["result"]["thumbnailUrls"]
 
             if self.auth_token:
-                item_code = MetadataKakao.get_item_code_from_title(title_ko, self.auth_token)
+                item_code = MetadataKakao.get_item_code_from_title(
+                    title_ko, self.auth_token
+                )
                 if item_code:
                     return self.download_animated(item_code)
                 msg = "Warning: Cannot get item code.\n"
