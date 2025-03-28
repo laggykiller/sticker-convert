@@ -108,44 +108,41 @@ class DownloadKakao(DownloadBase):
         self.pack_info_unauthed: Optional[dict[str, Any]] = None
         self.pack_info_authed: Optional[dict[str, Any]] = None
 
-    def get_info_from_share_link(self, url: str) -> Tuple[Optional[str], Optional[str]]:
-        if self.auth_token is None:
-            self.cb.put("Downloading with share link requires auth_token")
-            return None, None
-
-        hash = urlparse(url).path.split("/")[-1]
-        item_code = MetadataKakao.get_item_code_from_hash(hash, self.auth_token)
-
-        # Share link redirect to preview link if use desktop headers
-        # This allows us to find pack author
-        headers_desktop = {"User-Agent": "Chrome"}
-
-        response = requests.get(url, headers=headers_desktop, allow_redirects=True)
-        response.url
-
-        pack_title_url = urlparse(response.url).path.split("/")[-1]
-        pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(pack_title_url)
-        if pack_info_unauthed is None:
-            self.cb.put(f"Unable to get pack info from {pack_title_url}")
-            return None, None
-
-        pack_title = pack_info_unauthed["result"]["title"]
-        self.author = pack_info_unauthed["result"]["artist"]
-
-        return pack_title, item_code
-
     def download_stickers_kakao(self) -> Tuple[int, int]:
         self.auth_token = None
         if self.opt_cred:
             self.auth_token = self.opt_cred.kakao_auth_token
 
         if urlparse(self.url).netloc == "emoticon.kakao.com":
-            self.pack_title, item_code = self.get_info_from_share_link(self.url)
+            item_code = None
+            if self.auth_token is not None:
+                hash = urlparse(self.url).path.split("/")[-1]
+                item_code = MetadataKakao.get_item_code_from_hash(hash, self.auth_token)
 
-            if item_code:
+            # Share link redirect to preview link if use desktop headers
+            # This allows us to find pack author
+            headers_desktop = {"User-Agent": "Chrome"}
+
+            response = requests.get(self.url, headers=headers_desktop, allow_redirects=True)
+
+            self.pack_title = urlparse(response.url).path.split("/")[-1]
+            pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(self.pack_title)
+            if pack_info_unauthed is None:
+                self.cb.put(f"Download failed: Cannot download metadata for sticker pack")
+                return 0, 0
+
+            self.author = pack_info_unauthed["result"]["artist"]
+            thumbnail_urls = pack_info_unauthed["result"]["thumbnailUrls"]
+
+            if item_code is None:
+                if self.auth_token is None:
+                    self.cb.put("Warning: Downloading animated sticker requires auth_token")
+                else:
+                    self.cb.put("Warning: auth_token invalid, cannot download animated sticker")
+                self.cb.put("Downloading static stickers...")
+                self.download_static(thumbnail_urls)
+            else:
                 return self.download_animated(item_code)
-            self.cb.put("Download failed: Cannot download metadata for sticker pack")
-            return 0, 0
 
         if self.url.isnumeric():
             self.pack_title = None
