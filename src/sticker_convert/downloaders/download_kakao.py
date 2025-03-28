@@ -128,7 +128,7 @@ class DownloadKakao(DownloadBase):
             self.pack_title = urlparse(r.url).path.split("/")[-1]
             pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(self.pack_title)
             if pack_info_unauthed is None:
-                self.cb.put(f"Download failed: Cannot download metadata for sticker pack")
+                self.cb.put("Download failed: Cannot download metadata for sticker pack")
                 return 0, 0
 
             self.author = pack_info_unauthed["result"]["artist"]
