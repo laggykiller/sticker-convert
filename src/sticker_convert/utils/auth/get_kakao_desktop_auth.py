@@ -105,7 +105,7 @@ class GetKakaoDesktopAuth:
             return None, msg
 
         auth_token = None
-        for i in re.finditer(b"\x00authorization\x00", s):
+        for i in re.finditer(b"authorization: ", s):
             auth_token_addr = i.start() + 15
 
             auth_token_bytes = s[auth_token_addr : auth_token_addr + 200]
