@@ -5,6 +5,7 @@ import uuid
 from typing import Any, Callable, Dict, Optional
 from urllib.parse import parse_qs, urlparse
 
+from bs4 import BeautifulSoup
 import requests
 
 from sticker_convert.job_option import CredOption
@@ -32,10 +33,10 @@ class GetKakaoAuth:
         self.uuid_c = str(uuid.uuid4())
         self.device_info = (
             f"android/30; uuid={self.device_uuid}; ssaid={self.device_ssaid}; "
-            + 'model=ANDROID-SDK-BUILT-FOR-X86; screen_resolution=1080x1920; sim=310260/1/us; onestore=false; uvc2={"volume":5,"network_operator":"310260","is_roaming":"false","va":[],"brightness":102,"totalMemory":30866040,"batteryPct":1,"webviewVersion":"83.0.4103.106"}'
+            + 'model=SDK_GPHONE_X86_64; screen_resolution=1080x1920; sim=310260/1/us; onestore=false; uvc3=null'
         )
         self.app_platform = "android"
-        self.app_version_number = "10.0.3"
+        self.app_version_number = self.get_version()
         self.app_language = "en"
         self.app_version = (
             f"{self.app_platform}/{self.app_version_number}/{self.app_language}"
@@ -44,13 +45,25 @@ class GetKakaoAuth:
         self.headers = {
             "Host": "katalk.kakao.com",
             "Accept-Language": "en",
-            "User-Agent": "KT/10.0.3 An/11 en",
+            "User-Agent": f"KT/{self.app_version_number} An/11 en",
             "Device-Info": self.device_info,
             "A": self.app_version,
             "C": self.uuid_c,
             "Content-Type": "application/json",
             "Connection": "close",
         }
+    
+    def get_version(self) -> str:
+        # It is difficult to get app version number from Google Play
+        r = requests.get("https://apkpure.net/kakaotalk-messenger/com.kakao.talk/versions")
+        soup = BeautifulSoup(r.text, "html.parser")
+        for li in soup.find_all("li"):
+            a = li.find("a", class_="dt-version-icon")
+            if a is None:
+                continue
+            if "/kakaotalk-messenger/com.kakao.talk/download/" in a.get("href", ""):
+                return a.get("href").split("/")[-1]
+        return "25.2.1"
 
     def login(self) -> bool:
         self.cb_msg("Logging in")
@@ -96,7 +109,6 @@ class GetKakaoAuth:
             "countryCode": self.country_code,
             "countryIso": self.country_iso,
             "phoneNumber": self.phone_number,
-            "method": "sms",
             "termCodes": [],
             "simPhoneNumber": f"+{self.country_code}{self.phone_number}",
         }
@@ -244,6 +256,21 @@ class GetKakaoAuth:
             self.cb_msg_block(f"Failed at passcode callback: {response.text}")
             return False
 
+        return True
+
+    def skip_restoration(self) -> bool:
+        self.cb_msg("Skip restoration")
+
+        response = requests.post(
+            "https://katalk.kakao.com/android/account2/skip-restoration",
+            headers=self.headers,
+        )
+        response_json = json.loads(response.text)
+
+        if response_json["status"] != 0:
+            self.cb_msg_block(f"Failed at skip restoration: {response.text}")
+            return False
+
         self.nickname = response_json.get("viewData", {}).get("nickname")
 
         if self.nickname is None:
@@ -288,6 +315,7 @@ class GetKakaoAuth:
             self.enter_phone,
             self.confirm_device_change,
             self.passcode_callback,
+            self.skip_restoration,
             self.get_profile,
         )
 
