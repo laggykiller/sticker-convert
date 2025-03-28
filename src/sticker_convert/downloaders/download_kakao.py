@@ -128,7 +128,9 @@ class DownloadKakao(DownloadBase):
             self.pack_title = urlparse(r.url).path.split("/")[-1]
             pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(self.pack_title)
             if pack_info_unauthed is None:
-                self.cb.put("Download failed: Cannot download metadata for sticker pack")
+                self.cb.put(
+                    "Download failed: Cannot download metadata for sticker pack"
+                )
                 return 0, 0
 
             self.author = pack_info_unauthed["result"]["artist"]
@@ -136,9 +138,13 @@ class DownloadKakao(DownloadBase):
 
             if item_code is None:
                 if self.auth_token is None:
-                    self.cb.put("Warning: Downloading animated sticker requires auth_token")
+                    self.cb.put(
+                        "Warning: Downloading animated sticker requires auth_token"
+                    )
                 else:
-                    self.cb.put("Warning: auth_token invalid, cannot download animated sticker")
+                    self.cb.put(
+                        "Warning: auth_token invalid, cannot download animated sticker"
+                    )
                 self.cb.put("Downloading static stickers...")
                 self.download_static(thumbnail_urls)
             else:
