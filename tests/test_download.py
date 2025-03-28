@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import List
 
 import pytest
-from _pytest._py.path import LocalPath
+from _pytest._py.path import LocalPath  # type: ignore
 
 from tests.common import KAKAO_TOKEN, LINE_COOKIES, PYTHON_EXE, SRC_DIR, TELEGRAM_TOKEN, run_cmd
 

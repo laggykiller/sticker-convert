@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from _pytest._py.path import LocalPath
+from _pytest._py.path import LocalPath  # type: ignore
 
 from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SRC_DIR, run_cmd
 

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import List, Optional
 
 import pytest
-from _pytest._py.path import LocalPath
+from _pytest._py.path import LocalPath  # type: ignore
 
 from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SIGNAL_PASSWORD, SIGNAL_UUID, SRC_DIR, TELEGRAM_TOKEN, TELEGRAM_USERID, VIBER_AUTH, run_cmd
 
