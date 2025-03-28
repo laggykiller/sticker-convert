@@ -4,12 +4,10 @@ from __future__ import annotations
 import itertools
 import json
 from pathlib import Path
-from typing import Any, List, Optional, Tuple, cast
+from typing import Any, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import requests
-from bs4 import BeautifulSoup
-from py_mini_racer import MiniRacer
 
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption, InputOption
@@ -44,7 +42,29 @@ class document {
 
 class MetadataKakao:
     @staticmethod
-    def get_item_code(title_ko: str, auth_token: str) -> Optional[str]:
+    def get_item_code_from_hash(hash: str, auth_token: str) -> Optional[str]:
+        headers = {
+            "Authorization": auth_token,
+        }
+
+        data = {"hashedItemCode": hash}
+
+        response = requests.post(
+            "https://talk-pilsner.kakao.com/emoticon/api/store/v3/item-code-by-hash",
+            headers=headers,
+            data=data,
+        )
+
+        if response.status_code != 200:
+            return None
+
+        response_json = json.loads(response.text)
+        item_code = response_json["itemCode"]
+
+        return item_code
+
+    @staticmethod
+    def get_item_code_from_title(title_ko: str, auth_token: str) -> Optional[str]:
         headers = {
             "Authorization": auth_token,
         }
@@ -113,30 +133,12 @@ class DownloadKakao(DownloadBase):
         self.pack_info_authed: Optional[dict[str, Any]] = None
 
     def get_info_from_share_link(self, url: str) -> Tuple[Optional[str], Optional[str]]:
-        headers = {"User-Agent": "Android"}
-
-        response = requests.get(url, headers=headers)
-        soup = BeautifulSoup(response.content.decode("utf-8", "ignore"), "html.parser")
-
-        pack_title_tag = soup.find("title")  # type: ignore
-        if not pack_title_tag:
+        if self.auth_token is None:
+            self.cb.put("Downloading with share link requires auth_token")
             return None, None
 
-        pack_title: str = pack_title_tag.string  # type: ignore
-
-        js = ""
-        for script_tag in soup.find_all("script"):
-            js = script_tag.string
-            if js and "daumtools.web2app" in js:
-                break
-        if "daumtools.web2app" not in js:
-            return None, None
-
-        js = JSINJECT + js
-
-        ctx = MiniRacer()
-        kakao_url = cast(str, ctx.eval(js))
-        item_code = urlparse(kakao_url).path.split("/")[2]
+        hash = urlparse(url).path.split("/")[-1]
+        item_code = MetadataKakao.get_item_code_from_hash(hash, self.auth_token)
 
         # Share link redirect to preview link if use desktop headers
         # This allows us to find pack author
@@ -147,8 +149,12 @@ class DownloadKakao(DownloadBase):
 
         pack_title_url = urlparse(response.url).path.split("/")[-1]
         pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(pack_title_url)
-        if pack_info_unauthed:
-            self.author = pack_info_unauthed["result"]["artist"]
+        if pack_info_unauthed is None:
+            self.cb.put(f"Unable to get pack info from {pack_title_url}")
+            return None, None
+
+        pack_title = pack_info_unauthed["result"]["title"]
+        self.author = pack_info_unauthed["result"]["artist"]
 
         return pack_title, item_code
 
@@ -165,13 +171,11 @@ class DownloadKakao(DownloadBase):
             self.cb.put("Download failed: Cannot download metadata for sticker pack")
             return 0, 0
 
-        if self.url.isnumeric() or self.url.startswith("kakaotalk://store/emoticon/"):
-            item_code = self.url.replace("kakaotalk://store/emoticon/", "")
-
+        if self.url.isnumeric():
             self.pack_title = None
             if self.auth_token:
                 self.pack_info_authed = MetadataKakao.get_pack_info_authed(
-                    item_code, self.auth_token
+                    self.url, self.auth_token
                 )
                 if self.pack_info_authed:
                     self.pack_title = self.pack_info_authed["itemUnitInfo"][0]["title"]
@@ -182,7 +186,7 @@ class DownloadKakao(DownloadBase):
                     )
                     self.cb.put("Continuing without getting pack_title")
 
-            return self.download_animated(item_code)
+            return self.download_animated(self.url)
 
         if urlparse(self.url).netloc == "e.kakao.com":
             self.pack_title = urlparse(self.url).path.split("/")[-1]
@@ -201,7 +205,7 @@ class DownloadKakao(DownloadBase):
             thumbnail_urls = self.pack_info_unauthed["result"]["thumbnailUrls"]
 
             if self.auth_token:
-                item_code = MetadataKakao.get_item_code(title_ko, self.auth_token)
+                item_code = MetadataKakao.get_item_code_from_title(title_ko, self.auth_token)
                 if item_code:
                     return self.download_animated(item_code)
                 msg = "Warning: Cannot get item code.\n"

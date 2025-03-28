@@ -52,7 +52,7 @@
     "kakao": {
         "full_name": "Download from Kakao",
         "help": "Download kakao stickers from a URL / ID as input",
-        "example": "Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400\nOR https://emoticon.kakao.com/items/xxxxx OR 4404400",
+        "example": "Example: https://e.kakao.com/t/xxxxx \nOR https://emoticon.kakao.com/items/xxxxx OR 4404400",
         "address_lbls": "URL address / ID",
         "metadata_provides": {
             "title": true,

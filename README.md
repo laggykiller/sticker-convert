@@ -69,7 +69,7 @@
         - For more information: https://github.com/doubleplusc/Line-sticker-downloader
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Kakao
-    - Download: Supported (e.g. `https://e.kakao.com/t/xxxxx` OR `kakaotalk://store/emoticon/4404400` OR `https://emoticon.kakao.com/items/xxxxx` OR `4404400`). It is rather complicated, learn more from [docs/guide_kakao.md](docs/guide_kakao.md)
+    - Download: Supported (e.g. `https://e.kakao.com/t/xxxxx`  OR `https://emoticon.kakao.com/items/xxxxx` OR `4404400`). It is rather complicated, learn more from [docs/guide_kakao.md](docs/guide_kakao.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Viber
     - Download: Supported (e.g. `https://stickers.viber.com/pages/example` OR `https://stickers.viber.com/pages/custom-sticker-packs/example`)
@@ -157,7 +157,7 @@ Input options:
                          OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234)
   --download-kakao DOWNLOAD_KAKAO
                         Download kakao stickers from a URL / ID as input
-                        (Example: https://e.kakao.com/t/xxxxx OR kakaotalk://store/emoticon/4404400
+                        (Example: https://e.kakao.com/t/xxxxx 
                         OR https://emoticon.kakao.com/items/xxxxx OR 4404400)
   --download-viber DOWNLOAD_VIBER
                         Download viber stickers from a URL as input

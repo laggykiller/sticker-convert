@@ -3,7 +3,6 @@
 | ---------------------------------------- | -------------------------------------------------|
 | `https://emoticon.kakao.com/items/xxxxx` | Not required (Recommended method)                |
 | `https://e.kakao.com/t/xxxxx`            | Required                                         |
-| `kakaotalk://store/emoticon/4404400`     | Not required (But no easy way to get it)         |
 | `4404400`                                | Not required (But no easy way to get it)         |
 
 - To download animated stickers, you have two options:

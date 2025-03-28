@@ -22,9 +22,7 @@ class UrlDetect:
         ):
             return "line"
 
-        if domain in ("e.kakao.com", "emoticon.kakao.com") or url.startswith(
-            "kakaotalk://store/emoticon/"
-        ):
+        if domain in ("e.kakao.com", "emoticon.kakao.com"):
             return "kakao"
 
         if domain == "stickers.viber.com":
