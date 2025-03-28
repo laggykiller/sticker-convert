@@ -15,30 +15,6 @@ from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
 
-JSINJECT = """
-class osclass {
-    android = true;
-}
-class uaclass {
-    os = new osclass();
-}
-class util {
-    static userAgent() {
-        return new uaclass();
-    }
-}
-class daumtools {
-    static web2app(dataDict) {
-        return dataDict['urlScheme'];
-    }
-}
-class document {
-    static querySelectorAll(selectors) {
-        return [];
-    }
-}
-"""
-
 
 class MetadataKakao:
     @staticmethod

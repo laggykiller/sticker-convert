@@ -10,8 +10,6 @@ from typing import Optional
 sys.path.append("./src")
 from sticker_convert import __version__
 
-UNIVERSAL_WHEEL_EXCEPTIONS = ["mini_racer", "py_mini_racer"]
-
 
 def run_in_venv(cmd: str, get_stdout: bool = False) -> Optional[str]:
     if Path("/bin/zsh").is_file():
@@ -59,11 +57,6 @@ def copy_if_universal(wheel_name: Path, in_dir: Path, out_dir: Path) -> bool:
 def create_universal_wheels(in_dir1: Path, in_dir2: Path, out_dir: Path) -> None:
     for wheel_name_1 in in_dir1.iterdir():
         package = wheel_name_1.name.split("-")[0]
-        if package in UNIVERSAL_WHEEL_EXCEPTIONS:
-            src_path = Path(in_dir1, wheel_name_1.name)
-            dst_path = Path(out_dir, wheel_name_1.name)
-            shutil.copy(src_path, dst_path)
-            continue
         wheel_name_2 = search_wheel_in_dir(package, in_dir2)
         if copy_if_universal(wheel_name_1, in_dir1, out_dir):
             continue
@@ -217,25 +210,9 @@ def compile() -> None:
             else:
                 osx_install_universal2_dep(arch)
         else:
-            # Workaround for crashing on Arch Linux x86_64 when creating MiniRacer()
-            # https://github.com/bpcreech/PyMiniRacer/issues/72
-            if platform.machine().lower() in ("amd64", "x86_64", "x64"):
-                with (
-                    open("requirements.txt") as f,
-                    open("requirements-linux-x86_64.txt", "w+") as g,
-                ):
-                    for line in f.readlines():
-                        if "mini-racer" in line:
-                            g.write("py-mini-racer~=0.6.0\n")
-                        else:
-                            g.write(line)
-                run_in_venv(
-                    "python -m pip install --require-virtualenv -r requirements-linux-x86_64.txt"
-                )
-            else:
-                run_in_venv(
-                    "python -m pip install --require-virtualenv -r requirements.txt"
-                )
+            run_in_venv(
+                "python -m pip install --require-virtualenv -r requirements.txt"
+            )
 
     nuitka(python_bin, arch)
 
