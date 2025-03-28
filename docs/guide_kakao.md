@@ -1,18 +1,18 @@
-# Summary of downloading animated stickers in Kakao
-| Link                                     | Require auth token to download animated sticker? |
-| ---------------------------------------- | -------------------------------------------------|
-| `https://emoticon.kakao.com/items/xxxxx` | Not required (Recommended method)                |
-| `https://e.kakao.com/t/xxxxx`            | Required                                         |
-| `4404400`                                | Not required (But no easy way to get it)         |
+# Summary of downloading stickers in Kakao
+| Link                                                   | Require auth token to download animated sticker? |
+| ------------------------------------------------------ | -------------------------------------------------|
+| "Share link": `https://emoticon.kakao.com/items/xxxxx` | Required (Recommended method)                    |
+| "Web link": `https://e.kakao.com/t/xxxxx`              | Required                                         |
+| "Item code": `4404400`                                 | Not required (But no easy way to get it)         |
 
-- To download animated stickers, you have two options:
-    - Method 1: (RECOMMENDED) Get the share link of the emoticon pack from Kakao app on phone, which does not need auth_token (`https://emoticon.kakao.com/items/xxxxx`)
-    - Method 2-4: Use `https://e.kakao.com/t/xxxxx` which needs auth_token (Authorization header during request). **Note that this method may not work in some cases with unclear reasons, so use method 1.**
+- auth_token needed only for downloading animated sticker. It is not necessary for static sticker.
+- For downloading animated sticker, there is small chance of failing if you are using `https://e.kakao.com/t/xxxxx` instead of `https://emoticon.kakao.com/items/xxxxx`
 
-## Method 1: Get share link
+## How to get share link
 ![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
 
-## Method 2: Get auth_token from KakaoTalk Desktop application
+## How to get auth_token
+### Method 1: Get auth_token from KakaoTalk Desktop application (Recommended)
 - `sticker-convert` will get auth_token from KakaoTalk Desktop application.
 - Note that this only work on Windows.
 
@@ -28,8 +28,7 @@ CLI:
 3. (Optional) Add `--kakao-bin-path <KAKAO_APP_PATH>` if you installed KakaoTalk Desktop in non-default location
 3. Execute command
 
-
-## Method 3: Get auth_token by simulating login
+### Method 2: Get auth_token by simulating login
 - `sticker-convert` will simulate login to Android Kakao app to get auth_token
     - You will send / receive verification code via SMS
     - You will most likely receive verification code
@@ -55,7 +54,7 @@ CLI:
     - You may also add `--save-cred` to save the auth_token and login information for later use
 3. Execute command and follow instructions
 
-## Method 4: Get auth_token manually or get emoticon ID
+### Method 3: Get auth_token manually or get emoticon ID
 You can manually get auth_token from rooted Android device (You are recommended to do it on emulated Android device)
 
 1. Create KakaoTalk account on Phone
@@ -70,7 +69,7 @@ You can manually get auth_token from rooted Android device (You are recommended 
     - To get auth_token, copy `Authorization` from header of request seen in BurpSuite
     - To get emoticon ID, look for URL such as `https://item.kakaocdn.net/dw/4404400.emot_001.webp`. Emoticon ID would be `4404400`
 
-# Technical sidenote: Decoding of animated emoticon
+## Technical sidenote: Decoding of animated emoticon
 Emoticon that are in webp and gif need to be decoded. For Kakao Android application, `com/kakao/digitalitem/image/lib/ImageDecode.java` calls `libdigitalitem_image_decoder.so`...
 
 1. `nativeWebpImageResizeDecode()` or `nativeGifImageDecode()`
