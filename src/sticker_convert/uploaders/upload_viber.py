@@ -72,23 +72,22 @@ class UploadViber(UploadBase):
             separate_image_anim=False,
         )
 
-        cover_path_old = MetadataHandler.get_cover(self.opt_output.dir)
-        if cover_path_old:
-            cover_path = cover_path_old
-        else:
-            cover_path_old = MetadataHandler.get_stickers_present(self.opt_output.dir)[
-                0
-            ]
-            cover_path = self.opt_output.dir / "cover.png"
+        cover_path = MetadataHandler.get_cover(self.opt_output.dir)
+        if cover_path is None:
+            cover_path = MetadataHandler.get_stickers_present(self.opt_output.dir)[0]
 
-        if not FormatVerify.check_file(cover_path_old, spec=self.png_cover_spec):
-            StickerConvert.convert(
-                cover_path_old,
+        if FormatVerify.check_file(cover_path, spec=self.png_cover_spec):
+            with open(cover_path, "rb") as f:
+                cover_bytes = f.read()
+        else:
+            _, _, cover_bytes, _ = StickerConvert.convert(
                 cover_path,
+                Path("bytes.png"),
                 self.opt_comp_merged,
                 self.cb,
                 self.cb_return,
             )
+            assert isinstance(cover_bytes, bytes)
 
         stickers_total = 0
         stickers_ok = 0
@@ -126,12 +125,12 @@ class UploadViber(UploadBase):
             upload_data["description"] = author
             upload_data["shareable"] = "1"
 
-            with open(out_f, "rb") as f, open(cover_path, "rb") as g:
+            with open(out_f, "rb") as f:
                 r = requests.post(
                     "https://market.api.viber.com/2/users/custom-sticker-packs/create",
                     files={
                         "file": ("upload.zip", f),
-                        "file_icon": ("color_icon.png", g),
+                        "file_icon": ("color_icon.png", cover_bytes),
                     },
                     data=upload_data,
                 )
