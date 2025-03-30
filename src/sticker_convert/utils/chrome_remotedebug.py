@@ -38,7 +38,6 @@ class CRD:
         self.port = port
 
         launch_cmd: List[str] = []
-        self.display = None
         if (
             platform.system() == "Linux"
             and os.environ.get("DISPLAY", False) is False
@@ -230,5 +229,3 @@ class CRD:
     def close(self):
         self.ws.close()
         self.chrome_proc.kill()
-        if self.display:
-            self.display.stop()
