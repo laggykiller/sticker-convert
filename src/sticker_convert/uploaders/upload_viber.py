@@ -80,7 +80,7 @@ class UploadViber(UploadBase):
             with open(cover_path, "rb") as f:
                 cover_bytes = f.read()
         else:
-            _, _, cover_bytes, _ = StickerConvert.convert(
+            _, _, cover_bytes, _ = StickerConvert.convert(  # type: ignore
                 cover_path,
                 Path("bytes.png"),
                 self.opt_comp_merged,
@@ -129,7 +129,7 @@ class UploadViber(UploadBase):
                 r = requests.post(
                     "https://market.api.viber.com/2/users/custom-sticker-packs/create",
                     files={
-                        "file": ("upload.zip", f),
+                        "file": ("upload.zip", f.read()),
                         "file_icon": ("color_icon.png", cover_bytes),
                     },
                     data=upload_data,

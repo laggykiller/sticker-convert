@@ -17,6 +17,7 @@ services:
       - ./stickers_input:/home/app/stickers_input
       - ./stickers_output:/home/app/stickers_output
       # - ./creds.json:/home/app/.config/sticker-convert/creds.json
+      - /dev/shm:/dev/shm
 
     ports:
       - 5800:5800 # Port for Web UI

@@ -17,6 +17,7 @@ RELATED_EXTENSIONS = (
     ".tgs",
     ".lottie",
     ".json",
+    ".svg",
     ".mp4",
     ".mkv",
     ".mov",

@@ -3,15 +3,21 @@ from __future__ import annotations
 
 import json
 import mmap
+import warnings
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
 from io import BytesIO
-from math import gcd
+from math import ceil, gcd
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Tuple, Union, cast
 
+from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 from PIL import Image, UnidentifiedImageError
 from rlottie_python.rlottie_wrapper import LottieAnimation
+
+from sticker_convert.definitions import SVG_DEFAULT_HEIGHT, SVG_DEFAULT_WIDTH, SVG_SAMPLE_FPS
+
+warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
 def lcm(a: int, b: int):
@@ -90,11 +96,17 @@ class CodecInfo:
             self.file_ext = CodecInfo.get_file_ext(file)
         else:
             self.file_ext = file_ext
-        self.fps, self.frames, self.duration = CodecInfo.get_file_fps_frames_duration(
-            file
-        )
-        self.codec = CodecInfo.get_file_codec(file)
-        self.res = CodecInfo.get_file_res(file)
+        if self.file_ext == ".svg":
+            self.fps, self.frames, self.duration, self.res = CodecInfo.get_svg_info(
+                file
+            )
+            self.codec = "svg"
+        else:
+            self.fps, self.frames, self.duration = (
+                CodecInfo.get_file_fps_frames_duration(file)
+            )
+            self.codec = CodecInfo.get_file_codec(file)
+            self.res = CodecInfo.get_file_res(file)
         self.is_animated = self.fps > 1
 
     @staticmethod
@@ -435,3 +447,38 @@ class CodecInfo:
         if CodecInfo.get_file_frames(file, check_anim=True) > 1:
             return True
         return False
+
+    @staticmethod
+    def get_svg_info(
+        file: Union[Path, bytes],
+    ) -> Tuple[float, int, int, Tuple[int, int]]:
+        if isinstance(file, Path):
+            with open(file) as f:
+                svg = f.read()
+        else:
+            svg = file.decode()
+
+        soup = BeautifulSoup(svg, "html.parser")
+        svg_tag = soup.find_all("svg")[0]
+        width = int(svg_tag.get("width", SVG_DEFAULT_WIDTH))
+        height = int(svg_tag.get("height", SVG_DEFAULT_HEIGHT))
+
+        animate_elements = [*soup.find_all("animate")] + [
+            *soup.find_all("animateTransform")
+        ]
+        duration = 0
+        for element in animate_elements:
+            dur = cast(str, element.get("dur"))
+            if dur.endswith("s"):
+                duration = int(max(duration, float(dur[:-1]) * 1000))
+            elif dur.endswith("ms"):
+                duration = int(max(duration, float(dur[:-2])))
+
+        if duration != 0:
+            fps = SVG_SAMPLE_FPS
+            frames = ceil(fps * duration / 1000)
+        else:
+            fps = 0
+            frames = 1
+
+        return fps, frames, duration, (width, height)

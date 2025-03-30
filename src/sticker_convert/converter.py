@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import json
 import os
 from fractions import Fraction
 from io import BytesIO
@@ -7,12 +8,14 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import numpy as np
+from bs4 import BeautifulSoup
 from PIL import Image
 from PIL import __version__ as PillowVersion
 from PIL import features
 
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
+from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo, rounding
 from sticker_convert.utils.media.format_verify import FormatVerify
@@ -423,8 +426,77 @@ class StickerConvert:
             # ffmpeg do not support webp decoding (yet)
             # ffmpeg could fail to decode apng if file is buggy
             self._frames_import_pillow()
+        elif suffix == ".svg":
+            self._frames_import_svg()
         else:
             self._frames_import_pyav()
+
+    def _frames_import_svg(self) -> None:
+        width = self.codec_info_orig.res[0]
+        height = self.codec_info_orig.res[1]
+
+        chrome_path = CRD.get_chrome_path()
+        args = [
+            "--headless",
+            "--disable-extensions",
+            "--disable-infobars",
+            "--disable-gpu",
+            "--disable-gpu-rasterization",
+            "--hide-scrollbars",
+            f"--window-size={width + 100},{height + 100}",
+            "about:blank",
+        ]
+        if chrome_path is None:
+            raise RuntimeError("[F] Chrome/Chromium required for importing svg")
+        self.cb.put("[W] Importing SVG takes long time")
+
+        if isinstance(self.in_f, bytes):
+            svg = self.in_f.decode()
+        else:
+            with open(self.in_f) as f:
+                svg = f.read()
+        soup = BeautifulSoup(svg, "html.parser")
+        svg_tag = soup.find_all("svg")[0]
+
+        if svg_tag.get("width") is None:
+            svg_tag["width"] = width
+        if svg_tag.get("height") is None:
+            svg_tag["height"] = height
+        svg = str(soup)
+
+        crd = None
+        try:
+            crd = CRD(chrome_path, args=args)
+            crd.connect(-1)
+            crd.open_html_str(svg)
+            crd.set_transparent_bg()
+            crd.exec_js('svg = document.getElementsByTagName("svg")[0]')
+            x = json.loads(crd.exec_js("svg.getBoundingClientRect().x"))["result"][
+                "result"
+            ]["value"]
+            y = json.loads(crd.exec_js("svg.getBoundingClientRect().y"))["result"][
+                "result"
+            ]["value"]
+            clip = {"x": x, "y": y, "width": width, "height": height, "scale": 1}
+
+            if self.codec_info_orig.fps > 0:
+                crd.exec_js("svg.pauseAnimations()")
+                for i in range(self.codec_info_orig.frames):
+                    curr_time = (
+                        i
+                        / self.codec_info_orig.frames
+                        * self.codec_info_orig.duration
+                        / 1000
+                    )
+                    crd.exec_js(f"svg.setCurrentTime({curr_time})")
+                    self.frames_raw.append(
+                        np.asarray(crd.screenshot(clip).convert("RGBA"))
+                    )
+            else:
+                self.frames_raw.append(np.asarray(crd.screenshot(clip).convert("RGBA")))
+        finally:
+            if crd is not None:
+                crd.close()
 
     def _frames_import_pillow(self) -> None:
         with Image.open(self.in_f) as im:

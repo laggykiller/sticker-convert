@@ -82,10 +82,8 @@ RUN curl -o /tmp/viber.deb -L https://download.cdn.viber.com/cdn/desktop/Linux/v
     apt install --no-install-recommends -y /tmp/viber.deb libgl1 libevent-2.1-7 libwebpdemux2 libxslt1.1 libxkbfile1 libegl1 libopengl0 libqt5gui5 && \
     rm /tmp/viber.deb
 
-# Install Discord Desktop
-RUN curl -o /tmp/discord.deb -L "https://discord.com/api/download?platform=linux&format=deb" && \
-    apt install --no-install-recommends -y /tmp/discord.deb && \
-    rm /tmp/discord.deb
+# Install Chromium
+RUN apt install --no-install-recommends -y chromium xvfb
 
 ENV QT_QUICK_BACKEND="software"
 

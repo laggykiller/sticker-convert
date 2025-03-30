@@ -474,6 +474,34 @@ def test_download_viber_official_sticker_packs(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_viber_official_sticker_packs_sound(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="viber",
+        url="https://stickers.viber.com/pages/onenationunderloveUA",
+        expected_file_count=24,
+        expected_file_formats=[".png", ".mp3"],
+        with_title=True,
+        with_author=False,
+        with_emoji=False,
+    )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_viber_official_sticker_packs_animated(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="viber",
+        url="https://stickers.viber.com/pages/earthday",
+        expected_file_count=32,
+        expected_file_formats=[".svg"],
+        with_title=True,
+        with_author=False,
+        with_emoji=False,
+    )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 def test_download_discord_stickers(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,

@@ -82,3 +82,10 @@ def get_config_dir() -> Path:
 
 # Directory for saving configs
 CONFIG_DIR = get_config_dir()
+
+# When importing SVG, import at this fps
+SVG_SAMPLE_FPS = 30
+
+# If width and height not set in SVG tag, import at this dimension
+SVG_DEFAULT_WIDTH = 1024
+SVG_DEFAULT_HEIGHT = 1024
