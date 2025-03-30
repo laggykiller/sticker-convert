@@ -19,7 +19,10 @@ Note that you need to install Discord Desktop or Chrome browser.
 
 Token looks something like `mfa.ABcd1e2Fgh3i-jKlmnoPQRstu4VWx4yz5A6b7cDEFGhiJk8LmNOPqR_sSTUV9XyzabcdeF0Xd`
 
-## References
+# Importing SVG
+Note that importing SVG requires chromium / chrome installed
+
+# References
 - https://github.com/ThaTiemsz/Discord-Emoji-Downloader/blob/master/assets/app.js
 - https://github.com/zgibberish/discord-emoji-scraper/blob/main/emoji_scraper.py
 - https://discord.com/developers/docs/resources/sticker
