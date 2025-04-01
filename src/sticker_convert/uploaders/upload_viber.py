@@ -25,13 +25,14 @@ class UploadViber(UploadBase):
         self.png_spec = copy.deepcopy(self.base_spec)
         self.png_spec.set_res_max(490)
         self.png_spec.set_format((".png",))
+        self.opt_comp_merged = copy.deepcopy(self.opt_comp)
+        self.opt_comp_merged.merge(self.png_spec)
 
         self.png_cover_spec = copy.deepcopy(self.base_spec)
         self.png_cover_spec.set_res_max(120)
-        self.png_spec.set_format((".png",))
-
-        self.opt_comp_merged = copy.deepcopy(self.opt_comp)
-        self.opt_comp_merged.merge(self.png_spec)
+        self.png_cover_spec.set_format((".png",))
+        self.opt_comp_cover_merged = copy.deepcopy(self.opt_comp)
+        self.opt_comp_cover_merged.merge(self.png_cover_spec)
 
     def upload_stickers_viber(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []
@@ -83,7 +84,7 @@ class UploadViber(UploadBase):
             _, _, cover_bytes, _ = StickerConvert.convert(  # type: ignore
                 cover_path,
                 Path("bytes.png"),
-                self.opt_comp_merged,
+                self.opt_comp_cover_merged,
                 self.cb,
                 self.cb_return,
             )
