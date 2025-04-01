@@ -146,7 +146,7 @@ class DownloadKakao(DownloadBase):
                         "Warning: auth_token invalid, cannot download animated sticker"
                     )
                 self.cb.put("Downloading static stickers...")
-                self.download_static(thumbnail_urls)
+                return self.download_static(thumbnail_urls)
             else:
                 return self.download_animated(item_code)
 
