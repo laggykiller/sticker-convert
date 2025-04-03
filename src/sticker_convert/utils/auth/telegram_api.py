@@ -386,7 +386,7 @@ class TelethonAPI(TelegramAPI):
         if isinstance(msg, str):
             sent_message = await self.client.send_message("Stickers", msg)
         else:
-            sent_message = cast(Message, await self.client.send_file("Stickers", msg))  # type: ignore
+            sent_message = cast(Message, await self.client.send_file("Stickers", msg, force_document=True))  # type: ignore
 
         for _ in range(5):
             # https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
@@ -426,7 +426,7 @@ class TelethonAPI(TelegramAPI):
     ) -> Tuple[int, int]:
         stickers_ok = 0
         if self.is_emoji:
-            repl = await self._send_and_recv("/newemojipack")
+            repl = await self._send_and_recv("/newpack")
         elif stickers_list[0][3] == "static":
             repl = await self._send_and_recv("/newsticker")
         elif stickers_list[0][3] == "video":

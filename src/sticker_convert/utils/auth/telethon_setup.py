@@ -3,6 +3,7 @@ from typing import Callable, Tuple
 
 import anyio
 from telethon import TelegramClient  # type: ignore
+from telethon.errors import SessionPasswordNeededError
 
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.job_option import CredOption
@@ -38,7 +39,11 @@ class TelethonSetup:
             phone_number = self.cb_ask_str("Enter phone number: ")
             await client.send_code_request(phone_number)
             code = self.cb_ask_str("Enter code: ")
-            await client.sign_in(phone_number, code)
+            try:
+                await client.sign_in(phone_number, code)
+            except SessionPasswordNeededError:
+                password = self.cb_ask_str("Enter password: ")
+                await client.sign_in(password=password)
             authed = await client.is_user_authorized()
 
         return (
