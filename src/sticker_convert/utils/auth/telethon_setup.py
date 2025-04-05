@@ -3,7 +3,7 @@ from typing import Callable, Tuple
 
 import anyio
 from telethon import TelegramClient  # type: ignore
-from telethon.errors import SessionPasswordNeededError
+from telethon.errors import SessionPasswordNeededError  # type: ignore
 
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.job_option import CredOption
