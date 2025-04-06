@@ -388,8 +388,8 @@ class TelethonAPI(TelegramAPI):
         else:
             sent_message = cast(
                 Message,
-                await self.client.send_file("Stickers", msg, force_document=True),
-            )  # type: ignore
+                await self.client.send_file("Stickers", msg, force_document=True), # type: ignore
+            ) 
 
         for _ in range(5):
             # https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
