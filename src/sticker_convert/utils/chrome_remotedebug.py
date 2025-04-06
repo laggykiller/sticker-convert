@@ -33,8 +33,9 @@ BROWSER_PREF = [
     "brave-nightly",
     "opera",
     "opera-beta",
-    "opera-developer"
+    "opera-developer",
 ]
+
 
 def get_free_port() -> int:
     with socket.socket() as sock:

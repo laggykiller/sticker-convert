@@ -74,7 +74,10 @@ class GetDiscordAuth:
         else:
             chrome_path = CRD.get_chrome_path()
         if chrome_path is None:
-            return None, "Please install Discord Desktop or Chrome/Chromium and try again"
+            return (
+                None,
+                "Please install Discord Desktop or Chrome/Chromium and try again",
+            )
 
         token = None
         if using_discord_app:

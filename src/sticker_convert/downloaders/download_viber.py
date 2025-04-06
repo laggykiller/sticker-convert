@@ -43,9 +43,13 @@ class DownloadViber(DownloadBase):
         zip_url = "/".join(first_sticker_url.split("/")[:-1]) + ".zip"
         pack_id = pack_dict["id"].split(".")[-1]
         if is_custom:
-            cover_url = "https://custom-sticker-pack.cdn.viber.com/custom-stickers/{}/thumb.png"
+            cover_url = (
+                "https://custom-sticker-pack.cdn.viber.com/custom-stickers/{}/thumb.png"
+            )
         else:
-            cover_url = "https://sm-content.viber.com/static/images/product/{}/sticker.png"
+            cover_url = (
+                "https://sm-content.viber.com/static/images/product/{}/sticker.png"
+            )
         cover_url = cover_url.format(pack_dict["id"])
 
         return title, zip_url, cover_url, pack_id
