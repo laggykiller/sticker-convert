@@ -415,6 +415,7 @@ def test_download_kakao_animated_gif_store_link_with_token(tmp_path: LocalPath) 
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
 def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
@@ -430,6 +431,7 @@ def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
 def test_download_kakao_mini_share_link(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
