@@ -19,7 +19,7 @@ class DownloadViber(DownloadBase):
     # def __init__(self, *args: Any, **kwargs: Any) -> None:
     #     super().__init__(*args, **kwargs)
 
-    def get_pack_info(self, url: str) -> Optional[Tuple[str, str, str]]:
+    def get_pack_info(self, url: str) -> Optional[Tuple[str, str, str, str]]:
         r = requests.get(url, allow_redirects=True)
         soup = BeautifulSoup(r.text, "html.parser")
 
@@ -42,8 +42,13 @@ class DownloadViber(DownloadBase):
         first_sticker_url = cast(str, pack_dict["stickerFirstItemUrl"])
         zip_url = "/".join(first_sticker_url.split("/")[:-1]) + ".zip"
         pack_id = pack_dict["id"].split(".")[-1]
+        if is_custom:
+            cover_url = "https://custom-sticker-pack.cdn.viber.com/custom-stickers/{}/thumb.png"
+        else:
+            cover_url = "https://sm-content.viber.com/static/images/product/{}/sticker.png"
+        cover_url = cover_url.format(pack_dict["id"])
 
-        return title, zip_url, pack_id
+        return title, zip_url, cover_url, pack_id
 
     def decompress(
         self, zip_file: bytes, exts: Optional[Tuple[str, ...]] = None
@@ -84,7 +89,7 @@ class DownloadViber(DownloadBase):
         if pack_info is None:
             self.cb.put("Download failed: Cannot get pack info")
             return 0, 0
-        title, zip_url, pack_id = pack_info
+        title, zip_url, cover_url, pack_id = pack_info
 
         anim_url = f"https://content.cdn.viber.com/stickers/ASVG/{pack_id}.zip"
         anim_file = self.download_file(anim_url)
@@ -94,6 +99,7 @@ class DownloadViber(DownloadBase):
             count += self.decompress(zip_file, (".mp3",))
         else:
             count = self.decompress(zip_file, (".mp3", ".png"))
+        self.download_file(cover_url, self.out_dir / "cover.png")
 
         MetadataHandler.set_metadata(self.out_dir, title=title)
 
