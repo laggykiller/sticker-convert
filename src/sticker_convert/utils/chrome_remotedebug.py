@@ -8,8 +8,9 @@ import shutil
 import socket
 import subprocess
 import time
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
+import browsers  # type: ignore
 import requests
 import websocket
 from PIL import Image
@@ -18,6 +19,22 @@ from PIL import Image
 # https://github.com/yeongbin-jo/python-chromedriver-autoinstaller/blob/master/chromedriver_autoinstaller/utils.py
 # https://chromedevtools.github.io/devtools-protocol/
 
+
+BROWSER_PREF = [
+    "chrome",
+    "chrome-canary",
+    "chromium",
+    "msedge",
+    "msedge-beta",
+    "msedge-dev",
+    "msedge-canary",
+    "brave",
+    "brave-beta",
+    "brave-nightly",
+    "opera",
+    "opera-beta",
+    "opera-developer"
+]
 
 def get_free_port() -> int:
     with socket.socket() as sock:
@@ -66,47 +83,19 @@ class CRD:
 
     @staticmethod
     def get_chrome_path() -> Optional[str]:
-        chrome_bin: Optional[str]
-        if platform.system() == "Darwin":
-            chrome_bin = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
-
-            if os.path.isfile(chrome_bin) is False:
-                return None
-
-            return chrome_bin
-
-        elif platform.system() == "Windows":
-            chrome_x64 = f"{os.environ.get('PROGRAMW6432') or os.environ.get('PROGRAMFILES')}\\Google\\Chrome\\Application"
-            chrome_x86 = (
-                f"{os.environ.get('PROGRAMFILES(X86)')}\\Google\\Chrome\\Application"
-            )
-
-            chrome_dir = (
-                chrome_x64
-                if os.path.isdir(chrome_x64)
-                else chrome_x86
-                if os.path.isdir(chrome_x86)
-                else None
-            )
-
-            if chrome_dir is None:
-                return None
-
-            return chrome_dir + "\\chrome.exe"
-
-        else:
-            for executable in (
-                "google-chrome",
-                "google-chrome-stable",
-                "google-chrome-beta",
-                "google-chrome-dev",
-                "chromium-browser",
-                "chromium",
-            ):
-                chrome_bin = shutil.which(executable)
-                if chrome_bin is not None:
-                    return chrome_bin
+        bs: List[Tuple[int, str]] = []
+        for b in browsers.browsers():
+            browser_type = b["browser_type"]
+            path = b["path"]
+            try:
+                rank = BROWSER_PREF.index(browser_type)
+            except ValueError:
+                continue
+            bs.append((rank, path))
+        if len(bs) == 0:
             return None
+        bs = sorted(bs, key=lambda x: x[0])
+        return bs[0][1]
 
     def connect(self, target_id: int = 0):
         self.cmd_id = 1

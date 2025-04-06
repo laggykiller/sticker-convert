@@ -438,12 +438,13 @@ class StickerConvert:
         chrome_path = CRD.get_chrome_path()
         args = [
             "--headless",
+            "--kiosk",
             "--disable-extensions",
             "--disable-infobars",
             "--disable-gpu",
             "--disable-gpu-rasterization",
             "--hide-scrollbars",
-            f"--window-size={width + 100},{height + 100}",
+            f"--window-size={width + 200},{height + 200}",
             "about:blank",
         ]
         if chrome_path is None:
