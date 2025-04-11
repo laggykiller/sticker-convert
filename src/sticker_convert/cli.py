@@ -139,6 +139,7 @@ class CLI:
             "cache_dir",
             "scale_filter",
             "quantize_method",
+            "chromium_path",
         )
         flags_comp_bool = ("fake_vid",)
         keyword_args: Dict[str, Any]
@@ -427,6 +428,7 @@ class CLI:
             fake_vid=self.compression_presets[preset]["fake_vid"]
             if args.fake_vid is None
             else args.fake_vid,
+            chromium_path=args.chromium_path,
             cache_dir=args.cache_dir,
             scale_filter=self.compression_presets[preset]["scale_filter"]
             if args.scale_filter is None

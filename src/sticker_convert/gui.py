@@ -137,6 +137,7 @@ class GUI(Window):
         self.fake_vid_var = BooleanVar()
         self.scale_filter_var = StringVar(self)
         self.quantize_method_var = StringVar(self)
+        self.chromium_path_var = StringVar(self)
         self.cache_dir_var = StringVar(self)
         self.default_emoji_var = StringVar(self)
         self.steps_var = IntVar(self)
@@ -321,6 +322,7 @@ class GUI(Window):
             "comp": {
                 "no_compress": self.no_compress_var.get(),
                 "preset": self.comp_preset_var.get(),
+                "chromium_path": self.chromium_path_var.get(),
                 "cache_dir": self.cache_dir_var.get(),
                 "processes": self.processes_var.get(),
             },
@@ -377,6 +379,9 @@ class GUI(Window):
                 self.compression_presets["custom"], comp_custom
             )
         self.cache_dir_var.set(self.settings.get("comp", {}).get("cache_dir", ""))
+        self.chromium_path_var.set(
+            self.settings.get("comp", {}).get("chromium_path", "")
+        )
         self.processes_var.set(
             self.settings.get("comp", {}).get("processes", ceil(cpu_count() / 2))
         )
@@ -568,6 +573,9 @@ class GUI(Window):
             fake_vid=self.fake_vid_var.get(),
             scale_filter=self.scale_filter_var.get(),
             quantize_method=self.quantize_method_var.get(),
+            chromium_path=self.chromium_path_var.get()
+            if self.chromium_path_var.get() != ""
+            else None,
             cache_dir=self.cache_dir_var.get()
             if self.cache_dir_var.get() != ""
             else None,

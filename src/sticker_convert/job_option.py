@@ -75,6 +75,7 @@ class CompOption(BaseOption):
     fake_vid: Optional[bool] = None
     quantize_method: Optional[str] = None
     scale_filter: Optional[str] = None
+    chromium_path: Optional[str] = None
     cache_dir: Optional[str] = None
     default_emoji: str = "😀"
     no_compress: Optional[bool] = None
@@ -109,6 +110,7 @@ class CompOption(BaseOption):
             "fake_vid": self.fake_vid,
             "quantize_method": self.quantize_method,
             "scale_filter": self.scale_filter,
+            "chromium_path": self.chromium_path,
             "cache_dir": self.cache_dir,
             "default_emoji": self.default_emoji,
             "no_compress": self.no_compress,

@@ -435,7 +435,11 @@ class StickerConvert:
         width = self.codec_info_orig.res[0]
         height = self.codec_info_orig.res[1]
 
-        chrome_path = CRD.get_chrome_path()
+        chrome_path: Optional[str]
+        if self.opt_comp.chromium_path:
+            chrome_path = self.opt_comp.chromium_path
+        else:
+            chrome_path = CRD.get_chrome_path()
         args = [
             "--headless",
             "--kiosk",

@@ -293,6 +293,17 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
 
+        self.chromium_path_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["chromium_path"]
+        )
+        self.chromium_path_lbl = Label(
+            self.frame_advcomp, text="Chromium/Chrome directory"
+        )
+        self.chromium_path_entry = Entry(
+            self.frame_advcomp, textvariable=self.gui.chromium_path_var, width=30
+        )
+        self.chromium_path_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+
         self.cache_dir_help_btn = self.add_help_btn(self.gui.help["comp"]["cache_dir"])
         self.cache_dir_lbl = Label(self.frame_advcomp, text="Custom cache directory")
         self.cache_dir_entry = Entry(
@@ -409,6 +420,12 @@ class AdvancedCompressionWindow(BaseWindow):
         self.quantize_method_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.quantize_method_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
         self.quantize_method_opt.grid(
+            column=2, row=r, columnspan=4, sticky="nes", padx=3, pady=3
+        )
+        r += 1
+        self.chromium_path_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.chromium_path_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.chromium_path_entry.grid(
             column=2, row=r, columnspan=4, sticky="nes", padx=3, pady=3
         )
         r += 1
