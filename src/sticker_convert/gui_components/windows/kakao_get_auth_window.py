@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import platform
-import subprocess
 from functools import partial
 from threading import Thread
 from typing import Any, Optional
@@ -37,7 +35,7 @@ class KakaoGetAuthWindow(BaseWindow):
         # Method 1 frame
         self.explanation1_1_lbl = Label(
             self.frame_from_desktop,
-            text="This will get Kakao auth_token from Kakao Desktop (Windows only)",
+            text="This will get Kakao auth_token from Kakao Desktop",
             justify="left",
             anchor="w",
         )
@@ -70,14 +68,12 @@ class KakaoGetAuthWindow(BaseWindow):
             command=self.cb_launch_desktop,
             width=24,
             bootstyle="secondary",  # type: ignore
-            state="normal" if platform.system() == "Windows" else "disabled",
         )
         self.get_auth_desktop_btn = Button(
             self.frame_from_desktop,
             text="Get auth_token",
             command=self.cb_from_desktop,
             width=24,
-            state="normal" if platform.system() == "Windows" else "disabled",
         )
 
         self.explanation1_1_lbl.grid(
@@ -270,7 +266,7 @@ class KakaoGetAuthWindow(BaseWindow):
             bin_path = m.get_kakao_desktop()
 
         if bin_path is not None:
-            subprocess.Popen([bin_path])
+            m.launch_kakao(bin_path)
         else:
             self.cb_msg_block_kakao(
                 "Error: Cannot launch Kakao Desktop. Is it installed?"

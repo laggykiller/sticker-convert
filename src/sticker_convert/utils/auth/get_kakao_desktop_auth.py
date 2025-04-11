@@ -18,21 +18,33 @@ then login to Kakao Desktop and try again."""
 MSG_NO_AUTH = """Kakao Desktop installed,
 but kakao_auth not found.
 Please login to Kakao Desktop and try again."""
+MSG_SIP_ENABLED = """You need to disable SIP:
+1. Restart computer in Recovery mode
+2. Launch Terminal from the Utilities menu
+3. Run the command `csrutil disable`
+4. Restart your computer"""
 MSG_LAUNCH_FAIL = "Failed to launch Kakao"
 MSG_PERMISSION_ERROR = "Failed to read Kakao process memory"
-MSG_UNSUPPORTED = "Only Windows is supported for this method"
 
 
 class GetKakaoDesktopAuth:
     def __init__(self, cb_ask_str: Callable[..., str] = input):
         self.cb_ask_str = cb_ask_str
 
+    def launch_kakao(self, kakao_bin_path: str):
+        if platform.system() == "Windows":
+            subprocess.Popen([kakao_bin_path])
+        elif platform.system() == "Darwin":
+            subprocess.Popen(["open", kakao_bin_path])
+        else:
+            subprocess.Popen(["wine", kakao_bin_path])
+
     def relaunch_kakao(self, kakao_bin_path: str) -> Optional[int]:
         killed = killall("kakaotalk")
         if killed:
             time.sleep(5)
 
-        subprocess.Popen([kakao_bin_path])
+        self.launch_kakao(kakao_bin_path)
         time.sleep(20)
 
         return find_pid_by_name("kakaotalk")
@@ -54,7 +66,7 @@ class GetKakaoDesktopAuth:
         try:
             with OpenProcess(pid=int(kakao_pid)) as process:
                 for address in process.search_by_value(  # type: ignore
-                    str, 15, "\x00authorization\x00"
+                    str, 15, "authorization: "
                 ):
                     auth_token_addr = cast(int, address) + 15
                     auth_token_bytes = process.read_process_memory(
@@ -127,11 +139,77 @@ class GetKakaoDesktopAuth:
 
             return auth_token, msg
 
-    def get_kakao_desktop(self) -> Optional[str]:
-        kakao_bin_path = os.path.expandvars(
-            "%programfiles(x86)%\\Kakao\\KakaoTalk\\KakaoTalk.exe"
+    def get_auth_darwin(self, kakao_bin_path: str) -> Tuple[Optional[str], str]:
+        killall("kakaotalk")
+
+        subprocess.run(
+            [
+                "lldb",
+                kakao_bin_path,
+                "-o",
+                "b ptrace",
+                "-o",
+                "r",
+                "-o",
+                "thread return",
+                "-o",
+                "con",
+                "-o",
+                "process save-core /tmp/memdump.kakaotalk.dmp",
+                "-o",
+                "con",
+                "-o",
+                "quit",
+            ],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
         )
-        if Path(kakao_bin_path).is_file():
+
+        with open("/tmp/memdump.kakaotalk.dmp", "rb") as f:
+            mem = f.read()
+
+        os.remove("/tmp/memdump.kakaotalk.dmp")
+
+        auth_token = None
+        for i in re.finditer(b"]mac/", mem):
+            auth_token_term = i.start()
+
+            auth_token_bytes = mem[auth_token_term - 200 : auth_token_term]
+            auth_token_start = auth_token_bytes.find(b"application/json_\x10\x8a") + 19
+            if auth_token_start == -1:
+                continue
+            try:
+                auth_token_candidate = auth_token_bytes[auth_token_start:].decode(
+                    encoding="ascii"
+                )
+            except UnicodeDecodeError:
+                continue
+
+            if 150 > len(auth_token_candidate) > 100:
+                auth_token = auth_token_candidate
+                break
+
+        if auth_token is None:
+            return None, MSG_NO_AUTH
+        else:
+            msg = "Got auth_token successfully:\n"
+            msg += f"{auth_token=}\n"
+
+            return auth_token, msg
+
+    def get_kakao_desktop(self) -> Optional[str]:
+        if platform.system() == "Windows":
+            kakao_bin_path = os.path.expandvars(
+                "%programfiles(x86)%\\Kakao\\KakaoTalk\\KakaoTalk.exe"
+            )
+        elif platform.system() == "Darwin":
+            kakao_bin_path = "/Applications/KakaoTalk.app"
+        else:
+            kakao_bin_path = os.path.expanduser(
+                "~/.wine/drive_c/Program Files (x86)/Kakao/KakaoTalk/KakaoTalk.exe"
+            )
+
+        if Path(kakao_bin_path).exists():
             return kakao_bin_path
 
         return None
@@ -140,15 +218,6 @@ class GetKakaoDesktopAuth:
         self,
         kakao_bin_path: Optional[str] = None,
     ) -> Tuple[Optional[str], str]:
-        if platform.system() != "Windows":
-            return None, MSG_UNSUPPORTED
-
-        if not kakao_bin_path:
-            kakao_bin_path = self.get_kakao_desktop()
-
-        if not kakao_bin_path:
-            return None, MSG_NO_BIN
-
         # get_auth_by_dump()
         # + Fast
         # - Requires admin
@@ -158,23 +227,38 @@ class GetKakaoDesktopAuth:
         # - Slow
         # - Cannot run on macOS
 
-        # If admin, prefer get_auth_by_dump() over get_auth_by_pme(), vice versa
-        methods: List[Callable[[str, bool], Tuple[Optional[str], str]]] = []
-        relaunch = True
-        kakao_auth = None
-        msg = ""
+        if not kakao_bin_path:
+            kakao_bin_path = self.get_kakao_desktop()
 
-        pme_present = importlib.util.find_spec("PyMemoryEditor") is not None
-        methods.append(self.get_auth_by_dump)
-        if pme_present:
-            methods.append(self.get_auth_by_pme)
-        if check_admin() is False:
-            methods.reverse()
+        if not kakao_bin_path:
+            return None, MSG_NO_BIN
 
-        for method in methods:
-            kakao_auth, msg = method(kakao_bin_path, relaunch)
-            relaunch = False
-            if kakao_auth is not None:
-                break
+        if platform.system() != "Darwin":
+            # If admin, prefer get_auth_by_dump() over get_auth_by_pme(), vice versa
+            methods: List[Callable[[str, bool], Tuple[Optional[str], str]]] = []
+            relaunch = True
+            kakao_auth = None
+            msg = ""
+
+            pme_present = importlib.util.find_spec("PyMemoryEditor") is not None
+            methods.append(self.get_auth_by_dump)
+            if pme_present:
+                methods.append(self.get_auth_by_pme)
+            if check_admin() is False:
+                methods.reverse()
+
+            for method in methods:
+                kakao_auth, msg = method(kakao_bin_path, relaunch)
+                relaunch = False
+                if kakao_auth is not None:
+                    break
+        else:
+            csrutil_status = subprocess.run(
+                ["csrutil", "status"], capture_output=True, text=True
+            ).stdout
+
+            if "enabled" in csrutil_status:
+                return None, MSG_SIP_ENABLED
+            kakao_auth, msg = self.get_auth_darwin(kakao_bin_path)
 
         return kakao_auth, msg
