@@ -22,7 +22,9 @@ Continue when done"""
 
 
 class TelethonSetup:
-    def __init__(self, opt_cred: CredOption, cb_ask_str: Callable[..., str] = input):
+    def __init__(
+        self, opt_cred: CredOption, cb_ask_str: Callable[..., str] = input
+    ) -> None:
         self.cb_ask_str = cb_ask_str
         self.opt_cred = opt_cred
 

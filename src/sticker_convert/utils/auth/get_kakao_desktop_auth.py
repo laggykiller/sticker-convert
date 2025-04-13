@@ -28,10 +28,10 @@ MSG_PERMISSION_ERROR = "Failed to read Kakao process memory"
 
 
 class GetKakaoDesktopAuth:
-    def __init__(self, cb_ask_str: Callable[..., str] = input):
+    def __init__(self, cb_ask_str: Callable[..., str] = input) -> None:
         self.cb_ask_str = cb_ask_str
 
-    def launch_kakao(self, kakao_bin_path: str):
+    def launch_kakao(self, kakao_bin_path: str) -> None:
         if platform.system() == "Windows":
             subprocess.Popen([kakao_bin_path])
         elif platform.system() == "Darwin":

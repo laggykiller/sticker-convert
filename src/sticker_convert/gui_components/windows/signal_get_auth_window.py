@@ -11,7 +11,7 @@ from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
 
 
 class SignalGetAuthWindow(BaseWindow):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(SignalGetAuthWindow, self).__init__(*args, **kwargs)
 
         self.title("Get Signal uuid and password")
@@ -64,10 +64,10 @@ class SignalGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_login(self):
+    def cb_login(self) -> None:
         Thread(target=self.cb_login_thread, daemon=True).start()
 
-    def cb_login_thread(self, *args: Any):
+    def cb_login_thread(self, *args: Any) -> None:
         m = GetSignalAuth(cb_msg=self.gui.cb_msg, cb_ask_str=self.cb_ask_str_signal)
 
         uuid, password = m.get_cred()

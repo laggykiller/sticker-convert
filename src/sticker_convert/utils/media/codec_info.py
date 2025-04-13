@@ -20,7 +20,7 @@ from sticker_convert.definitions import SVG_DEFAULT_HEIGHT, SVG_DEFAULT_WIDTH, S
 warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
-def lcm(a: int, b: int):
+def lcm(a: int, b: int) -> int:
     return abs(a * b) // gcd(a, b)
 
 

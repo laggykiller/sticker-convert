@@ -28,7 +28,7 @@ MSG_PERMISSION_ERROR = "Failed to read Viber process memory"
 
 
 class GetViberAuth:
-    def __init__(self, cb_ask_str: Callable[..., str] = input):
+    def __init__(self, cb_ask_str: Callable[..., str] = input) -> None:
         self.cb_ask_str = cb_ask_str
 
     def relaunch_viber(self, viber_bin_path: str) -> Optional[int]:

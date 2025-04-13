@@ -109,7 +109,7 @@ class ViberGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_get_cred(self):
+    def cb_get_cred(self) -> None:
         Thread(target=self.cb_get_cred_thread, daemon=True).start()
 
     def cb_get_cred_thread(self) -> None:

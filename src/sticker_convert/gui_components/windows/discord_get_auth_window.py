@@ -11,7 +11,7 @@ from sticker_convert.utils.auth.get_discord_auth import GetDiscordAuth
 
 
 class DiscordGetAuthWindow(BaseWindow):
-    def __init__(self, *args: Any, **kwargs: Any):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(DiscordGetAuthWindow, self).__init__(*args, **kwargs)
 
         self.title("Get Discord token")
@@ -64,10 +64,10 @@ class DiscordGetAuthWindow(BaseWindow):
 
         GUIUtils.finalize_window(self)
 
-    def cb_login(self):
+    def cb_login(self) -> None:
         Thread(target=self.cb_login_thread, daemon=True).start()
 
-    def cb_login_thread(self, *args: Any):
+    def cb_login_thread(self, *args: Any) -> None:
         m = GetDiscordAuth(cb_msg=self.gui.cb_msg)
         discord_token, msg = m.get_cred()
         if discord_token:

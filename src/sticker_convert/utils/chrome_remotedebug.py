@@ -50,7 +50,7 @@ class CRD:
         chrome_bin: str,
         port: Optional[int] = None,
         args: Optional[List[str]] = None,
-    ):
+    ) -> None:
         if port is None:
             port = get_free_port()
         self.port = port
@@ -98,7 +98,7 @@ class CRD:
         bs = sorted(bs, key=lambda x: x[0])
         return bs[0][1]
 
-    def connect(self, target_id: int = 0):
+    def connect(self, target_id: int = 0) -> None:
         self.cmd_id = 1
         r = None
         targets: List[Any] = []
@@ -137,7 +137,7 @@ class CRD:
 
         raise RuntimeError("Websocket keep disconnecting")
 
-    def exec_js(self, js: str, context_id: Optional[int] = None):
+    def exec_js(self, js: str, context_id: Optional[int] = None) -> Union[str, bytes]:
         command: Dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Runtime.evaluate",
@@ -155,7 +155,7 @@ class CRD:
         }
         return self.send_cmd(command)
 
-    def screenshot(self, clip: Optional[Dict[str, int]] = None):
+    def screenshot(self, clip: Optional[Dict[str, int]] = None) -> Image.Image:
         command: Dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Page.captureScreenshot",
@@ -174,11 +174,11 @@ class CRD:
             str, json.loads(r).get("result", {}).get("result", {}).get("value", "")
         )
 
-    def navigate(self, url: str):
+    def navigate(self, url: str) -> None:
         command = {"id": self.cmd_id, "method": "Page.navigate", "params": {"url": url}}
         self.send_cmd(command)
 
-    def open_html_str(self, html: str):
+    def open_html_str(self, html: str) -> None:
         command: Dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Page.navigate",
@@ -198,24 +198,24 @@ class CRD:
         }
         self.send_cmd(command)
 
-    def runtime_enable(self):
+    def runtime_enable(self) -> None:
         command = {
             "method": "Runtime.enable",
         }
         self.send_cmd(command)
 
-    def runtime_disable(self):
+    def runtime_disable(self) -> None:
         command = {
             "method": "Runtime.disable",
         }
         self.send_cmd(command)
 
-    def reload(self):
+    def reload(self) -> None:
         command = {
             "method": "Page.reload",
         }
         self.send_cmd(command)
 
-    def close(self):
+    def close(self) -> None:
         self.ws.close()
         self.chrome_proc.kill()

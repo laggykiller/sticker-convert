@@ -13,7 +13,7 @@ from sticker_convert.utils.process import killall
 
 
 class GetDiscordAuth:
-    def __init__(self, cb_msg: Callable[..., None] = print):
+    def __init__(self, cb_msg: Callable[..., None] = print) -> None:
         chromedriver_download_dir = CONFIG_DIR / "bin"
         os.makedirs(chromedriver_download_dir, exist_ok=True)
 

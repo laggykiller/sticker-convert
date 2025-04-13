@@ -17,7 +17,7 @@ class GetSignalAuth:
         self,
         cb_msg: Callable[..., None] = print,
         cb_ask_str: Callable[..., str] = input,
-    ):
+    ) -> None:
         chromedriver_download_dir = CONFIG_DIR / "bin"
         os.makedirs(chromedriver_download_dir, exist_ok=True)
 
@@ -26,7 +26,7 @@ class GetSignalAuth:
         self.cb_ask_str = cb_ask_str
         self.cb_msg = cb_msg
 
-    def download_signal_desktop(self):
+    def download_signal_desktop(self) -> None:
         download_url = "https://signal.org/en/download/"
 
         webbrowser.open(download_url)
