@@ -457,7 +457,7 @@ class StickerConvert:
                 raise RuntimeError("[F] Chrome/Chromium required for importing svg")
             self.cb.put("[W] Importing SVG takes long time")
             singletons.objs["crd"] = CRD(chrome_path, args=args)
-            singletons.objs["crd"].connect(-1)
+            singletons.objs["crd"].connect(-1)  # type: ignore
 
         crd = cast(CRD, singletons.objs["crd"])
         if isinstance(self.in_f, bytes):
