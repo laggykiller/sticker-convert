@@ -5,6 +5,7 @@ import json
 import os
 import platform
 import shutil
+import signal
 import socket
 import subprocess
 import time
@@ -159,7 +160,7 @@ class CRD:
         command: Dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Page.captureScreenshot",
-            "params": {},
+            "params": {"captureBeyondViewport": True, "optimizeForSpeed": True},
         }
         if clip:
             command["params"]["clip"] = clip
@@ -217,5 +218,9 @@ class CRD:
         self.send_cmd(command)
 
     def close(self) -> None:
+        command = {
+            "method": "Browser.close",
+        }
+        self.send_cmd(command)
         self.ws.close()
-        self.chrome_proc.kill()
+        os.kill(self.chrome_proc.pid, signal.SIGTERM)

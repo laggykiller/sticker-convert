@@ -28,6 +28,7 @@ from sticker_convert.utils.callback import CallbackReturn, CbQueueType, ResultsL
 from sticker_convert.utils.files.json_resources_loader import OUTPUT_JSON
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
+from sticker_convert.utils.singletons import singletons
 
 
 class Executor:
@@ -136,6 +137,7 @@ class Executor:
 
         work_queue.put(None)
         cb_queue.put("__PROCESS_DONE__")
+        singletons.close()
 
     def start_workers(self, processes: int = 1) -> None:
         self.cb_thread_instance = Thread(

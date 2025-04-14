@@ -19,6 +19,7 @@ from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo, rounding
 from sticker_convert.utils.media.format_verify import FormatVerify
+from sticker_convert.utils.singletons import singletons
 
 if TYPE_CHECKING:
     from av.video.frame import VideoFrame
@@ -435,26 +436,30 @@ class StickerConvert:
         width = self.codec_info_orig.res[0]
         height = self.codec_info_orig.res[1]
 
-        chrome_path: Optional[str]
-        if self.opt_comp.chromium_path:
-            chrome_path = self.opt_comp.chromium_path
-        else:
-            chrome_path = CRD.get_chrome_path()
-        args = [
-            "--headless",
-            "--kiosk",
-            "--disable-extensions",
-            "--disable-infobars",
-            "--disable-gpu",
-            "--disable-gpu-rasterization",
-            "--hide-scrollbars",
-            f"--window-size={width + 200},{height + 200}",
-            "about:blank",
-        ]
-        if chrome_path is None:
-            raise RuntimeError("[F] Chrome/Chromium required for importing svg")
-        self.cb.put("[W] Importing SVG takes long time")
+        if singletons.objs.get("crd") is None:
+            chrome_path: Optional[str]
+            if self.opt_comp.chromium_path:
+                chrome_path = self.opt_comp.chromium_path
+            else:
+                chrome_path = CRD.get_chrome_path()
+            args = [
+                "--headless",
+                "--kiosk",
+                "--disable-extensions",
+                "--disable-infobars",
+                "--disable-gpu",
+                "--disable-gpu-rasterization",
+                "--hide-scrollbars",
+                "--force-device-scale-factor=1",
+                "about:blank",
+            ]
+            if chrome_path is None:
+                raise RuntimeError("[F] Chrome/Chromium required for importing svg")
+            self.cb.put("[W] Importing SVG takes long time")
+            singletons.objs["crd"] = CRD(chrome_path, args=args)
+            singletons.objs["crd"].connect(-1)
 
+        crd = cast(CRD, singletons.objs["crd"])
         if isinstance(self.in_f, bytes):
             svg = self.in_f.decode()
         else:
@@ -469,39 +474,35 @@ class StickerConvert:
             svg_tag["height"] = height
         svg = str(soup)
 
-        crd = None
-        try:
-            crd = CRD(chrome_path, args=args)
-            crd.connect(-1)
-            crd.open_html_str(svg)
-            crd.set_transparent_bg()
-            crd.exec_js('svg = document.getElementsByTagName("svg")[0]')
-            x = json.loads(crd.exec_js("svg.getBoundingClientRect().x"))["result"][
-                "result"
-            ]["value"]
-            y = json.loads(crd.exec_js("svg.getBoundingClientRect().y"))["result"][
-                "result"
-            ]["value"]
-            clip = {"x": x, "y": y, "width": width, "height": height, "scale": 1}
+        crd.open_html_str(svg)
+        crd.set_transparent_bg()
+        init_js = 'svg = document.getElementsByTagName("svg")[0];'
+        if self.codec_info_orig.fps > 0:
+            init_js += "svg.pauseAnimations();"
+        init_js += "JSON.stringify(svg.getBoundingClientRect());"
+        bound = json.loads(
+            json.loads(crd.exec_js(init_js))["result"]["result"]["value"]
+        )
+        clip = {
+            "x": bound["x"],
+            "y": bound["y"],
+            "width": width,
+            "height": height,
+            "scale": 1,
+        }
 
-            if self.codec_info_orig.fps > 0:
-                crd.exec_js("svg.pauseAnimations()")
-                for i in range(self.codec_info_orig.frames):
-                    curr_time = (
-                        i
-                        / self.codec_info_orig.frames
-                        * self.codec_info_orig.duration
-                        / 1000
-                    )
-                    crd.exec_js(f"svg.setCurrentTime({curr_time})")
-                    self.frames_raw.append(
-                        np.asarray(crd.screenshot(clip).convert("RGBA"))
-                    )
-            else:
-                self.frames_raw.append(np.asarray(crd.screenshot(clip).convert("RGBA")))
-        finally:
-            if crd is not None:
-                crd.close()
+        if self.codec_info_orig.fps > 0:
+            for i in range(self.codec_info_orig.frames):
+                curr_time = (
+                    i
+                    / self.codec_info_orig.frames
+                    * self.codec_info_orig.duration
+                    / 1000
+                )
+                crd.exec_js(f"svg.setCurrentTime({curr_time})")
+                self.frames_raw.append(np.asarray(crd.screenshot(clip)))
+        else:
+            self.frames_raw.append(np.asarray(crd.screenshot(clip)))
 
     def _frames_import_pillow(self) -> None:
         with Image.open(self.in_f) as im:
@@ -563,7 +564,7 @@ class StickerConvert:
             container = cast(InputContainer, container)
             context = container.streams.video[0].codec_context
             if context.name == "vp8":
-                context = cast(VideoCodecContext, CodecContext.create("libvpx", "r"))
+                context = CodecContext.create("libvpx", "r")
             elif context.name == "vp9":
                 context = cast(
                     VideoCodecContext, CodecContext.create("libvpx-vp9", "r")
@@ -596,7 +597,12 @@ class StickerConvert:
                     else:
                         frame_resized = frame
 
-                    if frame_resized.format.name == "yuv420p":
+                    # yuva420p may cause crash for pyav < 14
+                    # Not safe to directly call frame.to_ndarray(format="rgba")
+                    # https://github.com/PyAV-Org/PyAV/discussions/1510
+                    if int(av.__version__.split(".")[0]) >= 14:
+                        rgba_array = frame_resized.to_ndarray(format="rgba")
+                    elif frame_resized.format.name == "yuv420p":
                         rgb_array = frame_resized.to_ndarray(format="rgb24")
                         rgba_array = np.dstack(
                             (
@@ -608,9 +614,6 @@ class StickerConvert:
                             )
                         )
                     else:
-                        # yuva420p may cause crash
-                        # Not safe to directly call frame.to_ndarray(format="rgba")
-                        # https://github.com/laggykiller/sticker-convert/issues/114
                         frame_resized = frame_resized.reformat(
                             format="yuva420p",
                             dst_colorspace=1,
