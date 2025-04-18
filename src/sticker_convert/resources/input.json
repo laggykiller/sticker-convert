@@ -59,6 +59,16 @@
             "author": true
         }
     },
+    "band": {
+        "full_name": "Download from Naver Band",
+        "help": "Download Naver Band stickers from a URL / ID as input",
+        "example": "Example: https://www.band.us/sticker/xxxx OR 2535",
+        "address_lbls": "URL address / ID",
+        "metadata_provides": {
+            "title": true,
+            "author": false
+        }
+    },
     "viber": {
         "full_name": "Download from Viber",
         "help": "Download viber stickers from a URL as input",

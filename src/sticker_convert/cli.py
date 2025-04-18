@@ -232,6 +232,7 @@ class CLI:
             "telegram": args.download_telegram,
             "telegram_telethon": args.download_telegram_telethon,
             "kakao": args.download_kakao,
+            "band": args.download_band,
             "viber": args.download_viber,
             "discord": args.download_discord,
             "discord_emoji": args.download_discord_emoji,

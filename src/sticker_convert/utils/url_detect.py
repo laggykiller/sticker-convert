@@ -25,6 +25,9 @@ class UrlDetect:
         if domain in ("e.kakao.com", "emoticon.kakao.com"):
             return "kakao"
 
+        if domain == "www.band.us":
+            return "band"
+
         if domain == "stickers.viber.com":
             return "viber"
 

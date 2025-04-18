@@ -437,10 +437,40 @@ def test_download_kakao_mini_share_link(tmp_path: LocalPath) -> None:
         tmp_path=tmp_path,
         source="kakao",
         url="https://emoticon.kakao.com/items/EL7hYM1hlS0X-9LuBH_9fOc3xNg=?lang=ko&referer=share_link",
-        expected_file_count=35,
-        expected_file_formats=[".webp"],
+        expected_file_count=36,
+        expected_file_formats=[".png"],
         with_title=True,
         with_author=True,
+        with_emoji=False,
+    )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
+def test_download_band_static(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="band",
+        url="https://www.band.us/sticker/1854",
+        expected_file_count=81,
+        expected_file_formats=[".png"],
+        with_title=True,
+        with_author=False,
+        with_emoji=False,
+    )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
+def test_download_band_animated(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="band",
+        url="https://www.band.us/sticker/2535",
+        expected_file_count=24,
+        expected_file_formats=[".png"],
+        with_title=True,
+        with_author=False,
         with_emoji=False,
         file_count_start=1,
     )
