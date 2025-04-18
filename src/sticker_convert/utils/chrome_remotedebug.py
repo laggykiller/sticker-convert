@@ -84,8 +84,9 @@ class CRD:
 
     @staticmethod
     def get_chrome_path() -> Optional[str]:
-        import browsers  # type: ignore
         import logging
+
+        import browsers  # type: ignore
 
         # browsers module would turn on info logging
         logger = logging.getLogger()

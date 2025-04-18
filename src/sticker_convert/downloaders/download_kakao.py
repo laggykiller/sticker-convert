@@ -47,7 +47,9 @@ class MetadataKakao:
         return item_code
 
     @staticmethod
-    def get_item_code_from_title(pack_title: str, title_ko: str, auth_token: str) -> str:
+    def get_item_code_from_title(
+        pack_title: str, title_ko: str, auth_token: str
+    ) -> str:
         headers = {
             "Authorization": auth_token,
         }
