@@ -40,7 +40,7 @@ class MetadataKakao:
         return item_code
 
     @staticmethod
-    def get_item_code_from_title(title_ko: str, auth_token: str) -> Optional[str]:
+    def get_item_code_from_title(pack_title: str, title_ko: str, auth_token: str) -> str:
         headers = {
             "Authorization": auth_token,
         }
@@ -54,12 +54,21 @@ class MetadataKakao:
         )
 
         if response.status_code != 200:
-            return None
+            return "auth_error"
 
         response_json = json.loads(response.text)
-        item_code = response_json["emoticons"][0]["item_code"]
+        for emoticon in response_json["emoticons"]:
+            item_code = emoticon["item_code"]
+            pack_info = MetadataKakao.get_pack_info_authed(item_code, auth_token)
+            if pack_info is None:
+                continue
+            share_link = pack_info["itemMetaInfo"]["shareData"]["linkUrl"]
+            headers_desktop = {"User-Agent": "Chrome"}
+            r = requests.get(share_link, headers=headers_desktop, allow_redirects=True)
+            if pack_title == urlparse(r.url).path.split("/")[-1]:
+                return item_code
 
-        return item_code
+        return "code_not_found"
 
     @staticmethod
     def get_pack_info_unauthed(
@@ -185,13 +194,19 @@ class DownloadKakao(DownloadBase):
 
             if self.auth_token:
                 item_code = MetadataKakao.get_item_code_from_title(
-                    title_ko, self.auth_token
+                    self.pack_title, title_ko, self.auth_token
                 )
-                if item_code:
+                if item_code == "auth_error":
+                    msg = "Warning: Cannot get item code.\n"
+                    msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
+                    msg += "Continue to download static stickers instead?"
+                elif item_code == "code_not_found":
+                    msg = "Warning: Cannot get item code.\n"
+                    msg += "Please use share link instead.\n"
+                    msg += "Continue to download static stickers instead?"
+                else:
                     return self.download_animated(item_code)
-                msg = "Warning: Cannot get item code.\n"
-                msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
-                msg += "Continue to download static stickers instead?"
+
                 self.cb.put(("ask_bool", (msg,), None))
                 if self.cb_return:
                     response = self.cb_return.get_response()
