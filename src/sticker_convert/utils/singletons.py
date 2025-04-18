@@ -7,10 +7,10 @@ class SingletonProtocol(Protocol):
 
 
 class Singletons:
-    def __init__(self):
+    def __init__(self) -> None:
         self.objs: Dict[str, SingletonProtocol] = {}
 
-    def close(self):
+    def close(self) -> None:
         for obj in self.objs.values():
             obj.close()
 
