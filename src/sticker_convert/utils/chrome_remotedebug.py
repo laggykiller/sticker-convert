@@ -11,7 +11,6 @@ import subprocess
 import time
 from typing import Any, Dict, List, Optional, Tuple, Union, cast
 
-import browsers  # type: ignore
 import requests
 import websocket
 from PIL import Image
@@ -85,6 +84,13 @@ class CRD:
 
     @staticmethod
     def get_chrome_path() -> Optional[str]:
+        import browsers  # type: ignore
+        import logging
+
+        # browsers module would turn on info logging
+        logger = logging.getLogger()
+        logger.setLevel(logging.CRITICAL)
+
         bs: List[Tuple[int, str]] = []
         for b in browsers.browsers():
             browser_type = b["browser_type"]
