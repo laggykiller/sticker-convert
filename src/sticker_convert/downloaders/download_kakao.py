@@ -18,6 +18,13 @@ from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
 
 class MetadataKakao:
     @staticmethod
+    def share_link_to_public_link(share_link: str) -> str:
+        # Share link redirect to preview link if use desktop headers
+        headers_desktop = {"User-Agent": "Chrome"}
+        r = requests.get(share_link, headers=headers_desktop, allow_redirects=True)
+        return r.url
+
+    @staticmethod
     def get_item_code_from_hash(hash: str, auth_token: str) -> Optional[str]:
         headers = {
             "Authorization": auth_token,
@@ -63,9 +70,8 @@ class MetadataKakao:
             if pack_info is None:
                 continue
             share_link = pack_info["itemMetaInfo"]["shareData"]["linkUrl"]
-            headers_desktop = {"User-Agent": "Chrome"}
-            r = requests.get(share_link, headers=headers_desktop, allow_redirects=True)
-            if pack_title == urlparse(r.url).path.split("/")[-1]:
+            public_url = MetadataKakao.share_link_to_public_link(share_link)
+            if pack_title == urlparse(public_url).path.split("/")[-1]:
                 return item_code
 
         return "code_not_found"
@@ -128,13 +134,8 @@ class DownloadKakao(DownloadBase):
                 hash = urlparse(self.url).path.split("/")[-1]
                 item_code = MetadataKakao.get_item_code_from_hash(hash, self.auth_token)
 
-            # Share link redirect to preview link if use desktop headers
-            # This allows us to find pack author
-            headers_desktop = {"User-Agent": "Chrome"}
-
-            r = requests.get(self.url, headers=headers_desktop, allow_redirects=True)
-
-            self.pack_title = urlparse(r.url).path.split("/")[-1]
+            public_url = MetadataKakao.share_link_to_public_link(self.url)
+            self.pack_title = urlparse(public_url).path.split("/")[-1]
             pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(self.pack_title)
             if pack_info_unauthed is None:
                 self.cb.put(
@@ -264,9 +265,7 @@ class DownloadKakao(DownloadBase):
             if not self.pack_info_unauthed:
                 public_url = None
                 if urlparse(self.url).netloc == "emoticon.kakao.com":
-                    r = requests.get(self.url)
-                    # Share url would redirect to public url without headers
-                    public_url = r.url
+                    public_url = MetadataKakao.share_link_to_public_link(self.url)
                 elif urlparse(self.url).netloc == "e.kakao.com":
                     public_url = self.url
                 if public_url:
