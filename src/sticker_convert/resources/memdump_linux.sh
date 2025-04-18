@@ -7,7 +7,6 @@ PID=$1
 PID_MAPS=/proc/$PID/maps
 PID_MEM=/proc/$PID/mem
 
-rm -f /tmp/viber.dmp.$PID
 grep rw-p $PID_MAPS |
 while IFS='' read -r line || [[ -n "$line" ]]; do
     range=`echo $line | awk '{print $1;}'`
