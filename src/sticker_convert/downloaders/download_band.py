@@ -29,7 +29,11 @@ class DownloadBand(DownloadBase):
             if len(animated) > 0:
                 pack_files = animated
             else:
-                pack_files = [i for i in zf_files if i.endswith(".meta") is False and "_key" not in i]
+                pack_files = [
+                    i
+                    for i in zf_files
+                    if i.endswith(".meta") is False and "_key" not in i
+                ]
 
             self.cb.put(
                 (
@@ -49,11 +53,13 @@ class DownloadBand(DownloadBase):
                     f.write(data)
 
                 self.cb.put("update_bar")
-            
+
         return len(pack_files)
-    
+
     def get_metadata(self, pack_no: str) -> Optional[Dict[Any, Any]]:
-        r = requests.get(f"https://sapi.band.us/v1.0.0/get_sticker_info?pack_no={pack_no}")
+        r = requests.get(
+            f"https://sapi.band.us/v1.0.0/get_sticker_info?pack_no={pack_no}"
+        )
         if r.text:
             return json.loads(r.text)
         else:

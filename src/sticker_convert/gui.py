@@ -762,7 +762,8 @@ class GUI(Window):
                 download_option is None
                 or input_option.startswith(download_option) is False
                 and not (
-                    input_option in ("kakao", "band", "line", "discord", "discord_emoji")
+                    input_option
+                    in ("kakao", "band", "line", "discord", "discord_emoji")
                     and url.isnumeric()
                 )
             ):

@@ -12,9 +12,9 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
+from sticker_convert.downloaders.download_band import DownloadBand
 from sticker_convert.downloaders.download_discord import DownloadDiscord
 from sticker_convert.downloaders.download_kakao import DownloadKakao
-from sticker_convert.downloaders.download_band import DownloadBand
 from sticker_convert.downloaders.download_line import DownloadLine
 from sticker_convert.downloaders.download_signal import DownloadSignal
 from sticker_convert.downloaders.download_telegram import DownloadTelegram
@@ -566,7 +566,7 @@ class Job:
 
         if self.opt_input.option == "kakao":
             downloaders.append(DownloadKakao.start)
-        
+
         if self.opt_input.option == "band":
             downloaders.append(DownloadBand.start)
 
