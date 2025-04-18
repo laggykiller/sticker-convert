@@ -4,7 +4,7 @@ from __future__ import annotations
 import itertools
 import json
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import requests
@@ -47,14 +47,14 @@ class MetadataKakao:
         return item_code
 
     @staticmethod
-    def get_item_code_from_title(
-        pack_title: str, title_ko: str, auth_token: str
+    def get_item_code_from_search(
+        pack_title: str, search_term: str, by_author: bool, auth_token: str
     ) -> str:
         headers = {
             "Authorization": auth_token,
         }
 
-        data = {"query": title_ko}
+        data = {"query": search_term}
 
         response = requests.post(
             "https://talk-pilsner.kakao.com/emoticon/item_store/instant_search",
@@ -65,18 +65,51 @@ class MetadataKakao:
         if response.status_code != 200:
             return "auth_error"
 
+        def check_pack_match(pack_info: Dict[str, Any]) -> bool:
+            share_link = pack_info["itemMetaInfo"]["shareData"]["linkUrl"]
+            public_url = MetadataKakao.share_link_to_public_link(share_link)
+            if pack_title == urlparse(public_url).path.split("/")[-1]:
+                return True
+            return False
+
         response_json = json.loads(response.text)
         for emoticon in response_json["emoticons"]:
             item_code = emoticon["item_code"]
             pack_info = MetadataKakao.get_pack_info_authed(item_code, auth_token)
             if pack_info is None:
                 continue
-            share_link = pack_info["itemMetaInfo"]["shareData"]["linkUrl"]
-            public_url = MetadataKakao.share_link_to_public_link(share_link)
-            if pack_title == urlparse(public_url).path.split("/")[-1]:
+            if check_pack_match(pack_info):
                 return item_code
+            if by_author:
+                cid = pack_info["itemMetaInfo"]["itemMetaData"]["cid"]
+                for item_code in MetadataKakao.get_items_by_creator(cid, auth_token):
+                    pack_info = MetadataKakao.get_pack_info_authed(
+                        item_code, auth_token
+                    )
+                    if pack_info is None:
+                        continue
+                    if check_pack_match(pack_info):
+                        return item_code
 
         return "code_not_found"
+
+    @staticmethod
+    def get_items_by_creator(cid: str, auth_token: str) -> List[str]:
+        headers = {"Authorization": auth_token}
+
+        params = {
+            "itemSort": "NEW",
+            "offset": "0",
+            "size": "30",
+        }
+
+        response = requests.get(
+            f"https://talk-pilsner.kakao.com/emoticon/api/store/v3/creators/{cid}",
+            headers=headers,
+            params=params,
+        )
+
+        return [i["item_id"] for i in json.loads(response.text)["items"]]
 
     @staticmethod
     def get_pack_info_unauthed(
@@ -196,17 +229,30 @@ class DownloadKakao(DownloadBase):
             thumbnail_urls = self.pack_info_unauthed["result"]["thumbnailUrls"]
 
             if self.auth_token:
-                item_code = MetadataKakao.get_item_code_from_title(
-                    self.pack_title, title_ko, self.auth_token
+                item_code = MetadataKakao.get_item_code_from_search(
+                    self.pack_title, title_ko, False, self.auth_token
                 )
                 if item_code == "auth_error":
                     msg = "Warning: Cannot get item code.\n"
                     msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
                     msg += "Continue to download static stickers instead?"
                 elif item_code == "code_not_found":
-                    msg = "Warning: Cannot get item code.\n"
-                    msg += "Please use share link instead.\n"
-                    msg += "Continue to download static stickers instead?"
+                    self.cb.put(
+                        "Cannot get item code, trying to search by author name, this may take long time..."
+                    )
+                    self.cb.put(
+                        "Hint: Use share link instead to download more reliably"
+                    )
+                    if self.author is not None:
+                        item_code = MetadataKakao.get_item_code_from_search(
+                            self.pack_title, self.author, True, self.auth_token
+                        )
+                    if item_code == "code_not_found":
+                        msg = "Warning: Cannot get item code.\n"
+                        msg += "Please use share link instead.\n"
+                        msg += "Continue to download static stickers instead?"
+                    else:
+                        return self.download_animated(item_code)
                 else:
                     return self.download_animated(item_code)
 
