@@ -153,7 +153,7 @@ jobs:
 
   build-appimage:
     name: Build appimage
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build-binary-linux
     strategy:
       matrix:
@@ -170,19 +170,11 @@ jobs:
         fileName: sticker-convert-linux-${{matrix.arch}}.zip
     - name: Build appiamge for ${{matrix.arch}}
       run: |
+        sudo add-apt-repository universe
+        sudo apt install -y libfuse2
         unzip sticker-convert-linux-${{matrix.arch}}.zip
         mv sticker-convert-linux-${{matrix.arch}} ./sticker-convert.dist
-        docker build \
-          -t build_appimage \
-          -f ./scripts/build_appimage.dockerfile \
-          ./
-        docker run \
-          --rm \
-          -v $(pwd):/${GITHUB_WORKSPACE}  \
-          -w ${GITHUB_WORKSPACE}  \
-          -e SC_COMPILE_ARCH=${{matrix.arch}} \
-          build_appimage \
-          ./scripts/build_appimage.sh
+        SC_COMPILE_ARCH=${{matrix.arch}} ./scripts/build_appimage.sh
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
