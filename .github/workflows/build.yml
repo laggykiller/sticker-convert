@@ -74,7 +74,7 @@ jobs:
                 cp ./scripts/hold_control_and_click_open_me_first.command ./
                 zip -r9 sticker-convert-macos-arm64.zip sticker-convert.app hold_control_and_click_open_me_first.command
             OUT_FILE_NAME: ./sticker-convert-macos-arm64.zip
-          - os: ubuntu-20.04
+          - os: ubuntu-latest
             TARGET: linux-x86_64
             CMD_BUILD: |
                 docker build \
@@ -132,7 +132,7 @@ jobs:
 
   build-appimage:
     name: Build appimage
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     needs: build-binary
     strategy:
       matrix:
