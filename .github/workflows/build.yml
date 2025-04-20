@@ -83,8 +83,8 @@ jobs:
                   --platform linux/amd64 \
                   ./
                 docker build \
-                  -t build_appimage_x86_64 \
-                  -f ./scripts/build_appimage_x86_64.dockerfile \
+                  -t build_appimage \
+                  -f ./scripts/build_appimage.dockerfile \
                   --platform linux/amd64 \
                   ./
                 docker run \
@@ -98,8 +98,9 @@ jobs:
                   --rm \
                   -v $(pwd):/${GITHUB_WORKSPACE}  \
                   -w ${GITHUB_WORKSPACE}  \
+                  -e SC_COMPILE_ARCH=x86_64 \
                   --platform linux/amd64 \
-                  build_appimage_x86_64 \
+                  build_appimage \
                   ./scripts/build_appimage.sh
                 mv ./sticker-convert.dist ./sticker-convert-linux-x86_64
                 zip -r9 sticker-convert-linux-x86_64.zip ./sticker-convert-linux-x86_64
@@ -115,9 +116,9 @@ jobs:
                   --platform linux/arm64 \
                   ./
                 docker build \
-                  -t build_appimage_aarch64 \
-                  -f ./scripts/build_appimage_aarch64.dockerfile \
-                  --platform linux/arm64 \
+                  -t build_appimage \
+                  -f ./scripts/build_appimage.dockerfile \
+                  --platform linux/amd64 \
                   ./
                 docker run \
                   --rm \
@@ -130,8 +131,9 @@ jobs:
                   --rm \
                   -v $(pwd):/${GITHUB_WORKSPACE}  \
                   -w ${GITHUB_WORKSPACE}  \
-                  --platform linux/arm64 \
-                  build_appimage_aarch64 \
+                  -e SC_COMPILE_ARCH=aarch64 \
+                  --platform linux/amd64 \
+                  build_appimage \
                   ./scripts/build_appimage.sh
                 mv ./sticker-convert.dist ./sticker-convert-linux-aarch64
                 zip -r9 sticker-convert-linux-aarch64.zip ./sticker-convert-linux-aarch64
@@ -148,6 +150,9 @@ jobs:
       with:
         python-version: "3.12"
         allow-prereleases: true
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v3
+      if: runner.os == 'Linux'
     - name: Build for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
     - name: Upload Release Asset
