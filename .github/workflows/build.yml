@@ -147,6 +147,11 @@ jobs:
       with:
         latest: true
         fileName: sticker-convert-linux-${{matrix.arch}}.zip
+    - name: Install fuse2
+      run: |
+        sudo add-apt-repository universe
+        sudo apt update
+        sudo apt install -y libfuse2t64
     - name: Build appiamge for ${{matrix.arch}}
       run: |
         unzip sticker-convert-linux-${{matrix.arch}}.zip
