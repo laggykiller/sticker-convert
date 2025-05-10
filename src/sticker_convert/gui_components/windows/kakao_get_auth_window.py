@@ -277,6 +277,8 @@ class KakaoGetAuthWindow(BaseWindow):
 
     def cb_from_desktop_thread(self, *_: Any) -> None:
         self.gui.save_creds()
+        self.gui.cb_msg("Getting auth_token, this may take a minute...")
+        self.gui.cb_bar("indeterminate")
         m = GetKakaoDesktopAuth(
             cb_ask_str=self.cb_ask_str_kakao,
         )
@@ -298,3 +300,4 @@ class KakaoGetAuthWindow(BaseWindow):
             self.gui.highlight_fields()
 
         self.cb_msg_block_kakao(msg)
+        self.gui.cb_bar("clear")
