@@ -18,7 +18,7 @@ from sticker_convert.definitions import CONFIG_DIR, ROOT_DIR
 def killall(name: str) -> bool:
     result = False
 
-    for proc in psutil.process_iter():
+    for proc in psutil.process_iter():  # type: ignore
         if name in proc.name().lower():
             proc.kill()
             result = True
@@ -27,7 +27,7 @@ def killall(name: str) -> bool:
 
 
 def find_pid_by_name(name: str) -> Optional[int]:
-    for proc in psutil.process_iter():
+    for proc in psutil.process_iter():  # type: ignore
         if name in proc.name().lower():
             return proc.pid
 
