@@ -22,5 +22,5 @@ signalstickers-client-fork-laggykiller~=3.3.0.post2
 socksio~=1.0.0
 telethon~=1.40.0
 tqdm~=4.67.1
-ttkbootstrap-fork-laggykiller~=1.5.1
+ttkbootstrap~=1.13.7
 websocket_client~=1.8.0
