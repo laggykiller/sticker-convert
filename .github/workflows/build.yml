@@ -10,6 +10,8 @@ jobs:
   createrelease:
     name: Create Release
     runs-on: [ubuntu-latest]
+    permissions:
+      contents: write
     steps:
     - uses: actions/checkout@v4
       with:
@@ -24,6 +26,8 @@ jobs:
     name: Build wheel
     needs: createrelease
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -43,6 +47,8 @@ jobs:
     name: Build packages (Windows)
     needs: createrelease
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -81,6 +87,8 @@ jobs:
     name: Build packages (macOS)
     needs: createrelease
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -114,6 +122,8 @@ jobs:
     name: Build packages (Linux)
     needs: createrelease
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -155,6 +165,8 @@ jobs:
     name: Build appimage
     runs-on: ubuntu-22.04
     needs: build-binary-linux
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -267,6 +279,8 @@ jobs:
     name: Upload to pypi
     needs: [build-wheel, build-binary-windows, build-binary-macos, build-appimage]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/download-artifact@v4
         with:
