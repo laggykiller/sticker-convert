@@ -64,7 +64,7 @@
         "telethon_setup": "Setup Telethon",
         "kakao_auth_token": "Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx",
         "kakao_get_auth": "Generate Kakao auth_token by simulating login. Kakao username, password, country code and phone number are also required.",
-        "kakao_get_auth_desktop": "Get Kakao auth_token from Kakao Desktop application.\n(Only working on Windows.)",
+        "kakao_get_auth_desktop": "Get Kakao auth_token from Kakao Desktop application.",
         "kakao_bin_path": "Set Kakao Desktop application path for launching and getting auth_token.\nUseful for portable installation.",
         "kakao_username": "Set Kakao username, which is email or phone number used for signing up Kakao account\nExample: +447700900142\nRequired for generating Kakao auth_token.",
         "kakao_password": "Set Kakao password (Password of Kakao account).\nRequired for generating Kakao auth_token.",

@@ -293,7 +293,6 @@ Credentials options:
   --kakao-get-auth      Generate Kakao auth_token by simulating login. Kakao username, password, country code and phone number are also required.
   --kakao-get-auth-desktop
                         Get Kakao auth_token from Kakao Desktop application.
-                        (Only working on Windows.)
   --kakao-bin-path KAKAO_BIN_PATH
                         Set Kakao Desktop application path for launching and getting auth_token.
                         Useful for portable installation.

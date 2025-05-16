@@ -14,7 +14,7 @@
 ## How to get auth_token
 ### Method 1: Get auth_token from KakaoTalk Desktop application (Recommended)
 - `sticker-convert` will get auth_token from KakaoTalk Desktop application.
-- Note that this only work on Windows and macOS. Does not work on Linux, even if you run using Wine.
+- If you are using Linux, you can install Windows version using wine. Remember to set Windows Version to "Windows 10" in `winecfg`
 
 GUI:
 1. Download and Login to KakaoTalk Desktop

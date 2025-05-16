@@ -130,10 +130,10 @@ class GetViberAuth:
             pw_func = partial(
                 self.cb_ask_str, initialvalue="", cli_show_initialvalue=False
             )
-        s, msg = get_mem(viber_pid, pw_func)
+        s = get_mem(viber_pid, pw_func)
 
         if s is None:
-            return None, msg
+            return None, "Failed to dump memory"
 
         member_id_addr = s.find(b"X-Viber-Auth-Mid: ")
         m_token_addr = s.find(b"X-Viber-Auth-Token: ")
@@ -217,8 +217,6 @@ class GetViberAuth:
             methods.append(self.get_auth_by_dump)
             if pme_present:
                 methods.append(self.get_auth_by_pme)
-            if check_admin() is False:
-                methods.reverse()
         else:
             if not os.path.isfile("/.dockerenv"):
                 methods.append(self.get_auth_by_dump)
