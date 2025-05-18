@@ -153,7 +153,14 @@ class MetadataLine:
         files = pack_meta["stickers"]
 
         resource_type = pack_meta.get("stickerResourceType")
+        has_animation = pack_meta.get("hasAnimation")
         has_sound = pack_meta.get("hasSound")
+
+        if resource_type is None:
+            if has_animation and has_sound:
+                resource_type = "ANIMATION_SOUND"
+            elif has_animation:
+                resource_type = "ANIMATION"
 
         return title, author, files, resource_type, has_sound
 
