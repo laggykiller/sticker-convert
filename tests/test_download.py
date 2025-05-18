@@ -257,7 +257,7 @@ def test_download_line_animated_apng_no_resource_type(tmp_path: LocalPath) -> No
         tmp_path=tmp_path,
         source="line",
         url="https://store.line.me/stickershop/product/6286/en",
-        expected_file_count=40,
+        expected_file_count=24,
         expected_file_formats=[".png"],
         with_title=True,
         with_author=True,

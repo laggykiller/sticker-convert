@@ -61,7 +61,7 @@ class TelethonSetup:
     def get_api_info(self) -> bool:
         api_id_ask = "Enter api_id: "
         wrong_hint = ""
-        
+
         while True:
             telethon_api_id = self.cb_ask_str(wrong_hint + api_id_ask)
             if telethon_api_id == "":

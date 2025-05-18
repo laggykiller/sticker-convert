@@ -342,10 +342,12 @@ class TelethonAPI(TelegramAPI):
         self.cb = cb
         self.cb_return = cb_return
 
-        success, self.client, _, _ = await TelethonSetup(
+        success, client, _, _ = await TelethonSetup(
             self.opt_cred, self.cb_ask_str
         ).start_async()
 
+        if success is True and client is not None:
+            self.client = client
         return success
 
     async def exit(self) -> None:
