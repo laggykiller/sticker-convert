@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from typing import Callable, Tuple
+from typing import Callable, Optional, Tuple
 
 import anyio
 from telethon import TelegramClient  # type: ignore
@@ -58,28 +58,39 @@ class TelethonSetup:
     def guide(self) -> None:
         self.cb_ask_str(GUIDE_MSG)
 
-    def get_api_info(self) -> None:
+    def get_api_info(self) -> bool:
         api_id_ask = "Enter api_id: "
         wrong_hint = ""
+        
         while True:
             telethon_api_id = self.cb_ask_str(wrong_hint + api_id_ask)
-            if telethon_api_id.isnumeric():
+            if telethon_api_id == "":
+                return False
+            elif telethon_api_id.isnumeric():
                 self.opt_cred.telethon_api_id = int(telethon_api_id)
                 break
             else:
                 wrong_hint = "Error: api_id should be numeric\n"
+
         self.opt_cred.telethon_api_hash = self.cb_ask_str("Enter api_hash: ")
+        if self.opt_cred.telethon_api_hash == "":
+            return False
+        return True
 
     def signin(self) -> Tuple[bool, TelegramClient, int, str]:
         return anyio.run(self.signin_async)
 
-    def start(self) -> Tuple[bool, TelegramClient, int, str]:
+    def start(self) -> Tuple[bool, Optional[TelegramClient], int, str]:
+        cred_valid = False
         if self.opt_cred.telethon_api_id == 0 or self.opt_cred.telethon_api_hash == "":
             self.guide()
-            self.get_api_info()
-        return self.signin()
+            cred_valid = self.get_api_info()
+        if cred_valid:
+            return self.signin()
+        else:
+            return False, None, 0, ""
 
-    async def start_async(self) -> Tuple[bool, TelegramClient, int, str]:
+    async def start_async(self) -> Tuple[bool, Optional[TelegramClient], int, str]:
         if self.opt_cred.telethon_api_id == 0 or self.opt_cred.telethon_api_hash == "":
             self.guide()
             self.get_api_info()

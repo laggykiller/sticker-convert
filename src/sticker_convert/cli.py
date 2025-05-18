@@ -551,6 +551,8 @@ class CLI:
                 opt_cred.telethon_api_hash = telethon_api_hash
 
                 self.cb.msg("Telethon setup successful")
+            else:
+                self.cb.msg("Telethon setup failed")
 
         if args.line_get_auth:
             get_line_auth = GetLineAuth()
