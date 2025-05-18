@@ -69,6 +69,9 @@ RUN apt purge -y curl wget gpg git && \
 COPY ./src /app/
 
 FROM base-gui AS full
+RUN mkdir -p '/home/app' && \
+    chmod -R 777 '/home/app'
+
 # Install signal-desktop
 RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
     cat signal-desktop-keyring.gpg | tee -a /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null && \
@@ -87,12 +90,33 @@ RUN apt install --no-install-recommends -y chromium xvfb
 
 ENV QT_QUICK_BACKEND="software"
 
+# Install KakaoTalk Desktop
+ENV WINEPREFIX=/home/app/.wine
+RUN dpkg --add-architecture i386 && \
+    mkdir -pm755 /etc/apt/keyrings && \
+    wget -O- https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
+    wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources && \
+    apt update && \
+    apt install -y winehq-stable=10.0.0.0~bullseye-1 && \
+    # msi=$(strings -e l "/opt/wine-stable/lib64/wine/x86_64-windows/appwiz.cpl" | grep -o "wine-mono-.*msi") && \
+    # pkgver="${msi##wine-mono-}" && \
+    # pkgver="${pkgver%%-*}" && \
+    # curl -o /tmp/wine-mono-${pkgver}-x86.msi https://dl.winehq.org/wine/wine-mono/${pkgver}/wine-mono-${pkgver}-x86.msi && \
+    curl -o /tmp/wine-mono-10.0.0-x86.msi https://dl.winehq.org/wine/wine-mono/10.0.0/wine-mono-10.0.0-x86.msi && \
+    curl -o /tmp/KakaoTalk_Setup.exe -L https://app-pc.kakaocdn.net/talk/win32/KakaoTalk_Setup.exe && \
+    winecfg -v win10 && \
+    # wine msiexec /i /tmp/wine-mono-${pkgver}-x86.msi && \
+    wine msiexec /i /tmp/wine-mono-10.0.0-x86.msi && \
+    wine "/tmp/KakaoTalk_Setup.exe" "/S" && \
+    rm /tmp/KakaoTalk_Setup.exe && \
+    # rm /tmp/wine-mono-${pkgver}-x86.msi
+    rm /tmp/wine-mono-10.0.0-x86.msi
+
 RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \
     apt autoremove --yes && \
-    rm -rf /var/lib/{apt,dpkg,cache,log}/
+    rm -rf /var/lib/{apt,dpkg,cache,log}/ && \
+    chmod -R 777 '/home/app' && \
+    chown -R 1000 '/home/app'
 
 COPY ./src /app/
-
-RUN mkdir -p '/home/app' && \
-    chmod -R 777 '/home/app'

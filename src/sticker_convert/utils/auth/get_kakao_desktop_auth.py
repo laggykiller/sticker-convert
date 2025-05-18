@@ -218,9 +218,10 @@ class GetKakaoDesktopAuth:
         elif platform.system() == "Darwin":
             kakao_bin_path = "/Applications/KakaoTalk.app"
         else:
-            kakao_bin_path = os.path.expanduser(
-                "~/.wine/drive_c/Program Files (x86)/Kakao/KakaoTalk/KakaoTalk.exe"
-            )
+            wineprefix = os.environ.get("WINEPREFIX")
+            if not (wineprefix and Path(wineprefix).exists()):
+                wineprefix = os.path.expanduser("~/.wine")
+            kakao_bin_path = f"{wineprefix}/drive_c/Program Files (x86)/Kakao/KakaoTalk/KakaoTalk.exe"
 
         if Path(kakao_bin_path).exists():
             return kakao_bin_path
