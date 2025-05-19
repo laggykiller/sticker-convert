@@ -77,7 +77,7 @@ class MetadataLine:
     @staticmethod
     def get_metadata_sticon(
         pack_id: str, region: str
-    ) -> Optional[Tuple[str, str, List[Dict[str, Any]], str, bool]]:
+    ) -> Optional[Tuple[str, str, List[Dict[str, Any]], str, bool, bool]]:
         pack_meta_r = requests.get(
             f"https://stickershop.line-scdn.net/sticonshop/v1/{pack_id}/sticon/iphone/meta.json"
         )
@@ -114,14 +114,15 @@ class MetadataLine:
         files = pack_meta["orders"]
 
         resource_type = pack_meta.get("sticonResourceType")
+        has_animation = True if resource_type == "ANIMATION" else False
         has_sound = False
 
-        return title, author, files, resource_type, has_sound
+        return title, author, files, resource_type, has_animation, has_sound
 
     @staticmethod
     def get_metadata_stickers(
         pack_id: str, region: str
-    ) -> Optional[Tuple[str, str, List[Dict[str, Any]], str, bool]]:
+    ) -> Optional[Tuple[str, str, List[Dict[str, Any]], str, bool, bool]]:
         pack_meta_r = requests.get(
             f"https://stickershop.line-scdn.net/stickershop/v1/product/{pack_id}/android/productInfo.meta"
         )
@@ -156,13 +157,7 @@ class MetadataLine:
         has_animation = pack_meta.get("hasAnimation")
         has_sound = pack_meta.get("hasSound")
 
-        if resource_type is None:
-            if has_animation and has_sound:
-                resource_type = "ANIMATION_SOUND"
-            elif has_animation:
-                resource_type = "ANIMATION"
-
-        return title, author, files, resource_type, has_sound
+        return title, author, files, resource_type, has_animation, has_sound
 
 
 class DownloadLine(DownloadBase):
@@ -214,6 +209,7 @@ class DownloadLine(DownloadBase):
             if (
                 self.resource_type in ("ANIMATION", "ANIMATION_SOUND", "POPUP")
                 or self.has_sound is True
+                or self.has_animation is True
             ):
                 pack_url = f"https://stickershop.line-scdn.net/stickershop/v1/product/{self.pack_id}/iphone/stickerpack@2x.zip"
             elif self.resource_type == "PER_STICKER_TEXT":
@@ -426,6 +422,7 @@ class DownloadLine(DownloadBase):
                 self.author,
                 self.pack_files,
                 self.resource_type,
+                self.has_animation,
                 self.has_sound,
             ) = metadata
         else:
