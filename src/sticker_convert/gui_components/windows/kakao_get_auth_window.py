@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import platform
 from functools import partial
 from threading import Thread
 from typing import Any, Optional
@@ -51,6 +52,20 @@ class KakaoGetAuthWindow(BaseWindow):
             justify="left",
             anchor="w",
         )
+        if platform.system() != "Darwin":
+            self.explanation1_4_lbl = Label(
+                self.frame_from_desktop,
+                text="Note: This will download ProcDump and read memory of KakaoTalk Desktop",
+                justify="left",
+                anchor="w",
+            )
+        else:
+            self.explanation1_4_lbl = Label(
+                self.frame_from_desktop,
+                text="Note: This will read memory of KakaoTalk Desktop",
+                justify="left",
+                anchor="w",
+            )
         self.kakao_bin_path_lbl = Label(
             self.frame_from_desktop,
             text="Kakao app path (Optional):",
@@ -85,10 +100,13 @@ class KakaoGetAuthWindow(BaseWindow):
         self.explanation1_3_lbl.grid(
             column=0, row=2, columnspan=2, sticky="w", padx=3, pady=3
         )
-        self.kakao_bin_path_lbl.grid(column=0, row=3, sticky="w", padx=3, pady=3)
-        self.kakao_bin_path_entry.grid(column=1, row=3, sticky="w", padx=3, pady=3)
-        self.launch_desktop_btn.grid(column=0, row=4, columnspan=2, padx=3, pady=3)
-        self.get_auth_desktop_btn.grid(column=0, row=5, columnspan=2, padx=3, pady=3)
+        self.explanation1_4_lbl.grid(
+            column=0, row=3, columnspan=2, sticky="w", padx=3, pady=3
+        )
+        self.kakao_bin_path_lbl.grid(column=0, row=4, sticky="w", padx=3, pady=3)
+        self.kakao_bin_path_entry.grid(column=1, row=4, sticky="w", padx=3, pady=3)
+        self.launch_desktop_btn.grid(column=0, row=5, columnspan=2, padx=3, pady=3)
+        self.get_auth_desktop_btn.grid(column=0, row=6, columnspan=2, padx=3, pady=3)
 
         # Method 2 frame
         self.explanation2_1_lbl = Label(

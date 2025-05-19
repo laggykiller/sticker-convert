@@ -59,10 +59,25 @@ class ViberGetAuthWindow(BaseWindow):
                 justify="left",
                 anchor="w",
             )
+        if platform.system() != "Darwin":
+            self.explanation_lbl3 = Label(
+                self.frame_info,
+                text="Note: This will download ProcDump and read memory of Viber Desktop",
+                justify="left",
+                anchor="w",
+            )
+        else:
+            self.explanation_lbl3 = Label(
+                self.frame_info,
+                text="Note: This will read memory of Viber Desktop",
+                justify="left",
+                anchor="w",
+            )
 
         self.explanation_lbl0.grid(column=0, row=0, sticky="w", padx=3, pady=3)
         self.explanation_lbl1.grid(column=0, row=1, sticky="w", padx=3, pady=3)
         self.explanation_lbl2.grid(column=0, row=2, sticky="w", padx=3, pady=3)
+        self.explanation_lbl3.grid(column=0, row=3, sticky="w", padx=3, pady=3)
 
         # Start button frame
         self.launch_btn = Button(
