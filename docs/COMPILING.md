@@ -6,22 +6,37 @@ Install python3 from https://www.python.org/
 Install the required python modules with `pip3 install -r requirements.txt`
 
 ## 3. Running the script
-Change directory into `sticker_convert` directory and run `python3 ./sticker-convert.py`
+Change directory into `src` directory and run `python3 ./sticker-convert.py`
 
-# Compiling on Windows and MacOS
-This repository uses `nuitka` (factory branch) for compiling. Just run `python compile.py`, compilation result in `sticker-convert.dist` directory.
+# Compiling
+This repository uses `nuitka` for compiling. Just run `python3 compile.py`, compilation result in `sticker-convert.dist` directory.
+
+On Linux, you may also perform dockerized build
+```bash
+ARCH=amd64  # Choose one only
+ARCH=arm64  # Choose one only
+
+# Run this if you are crosscompiling
+# sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
+
+docker build \
+    -t nuitka_build_${ARCH} \
+    -f ./scripts/nuitka_build_${ARCH}.dockerfile \
+    --platform linux/${ARCH} \
+    ./
+docker run \
+    --rm \
+    -v $(pwd):/sticker-convert \
+    -w /sticker-convert \
+    --platform linux/${ARCH} \
+    nuitka_build_${ARCH} \
+    python ./compile.py
+```
 
 ## Creating AppImage on Linux
-1. Use Ubuntu 20.04 (May work on newer version if you change `sourceline` in `AppImageBuilder.yml`)
-2. Install [appimage-builder](https://appimage-builder.readthedocs.io/en/latest/intro/install.html)
-```
-wget -O appimage-builder-x86_64.AppImage https://github.com/AppImageCrafters/appimage-builder/releases/download/v1.1.0/appimage-builder-1.1.0-x86_64.AppImage
-chmod +x appimage-builder-x86_64.AppImage
-sudo mv appimage-builder-x86_64.AppImage /usr/local/bin/appimage-builder
-```
-3. Clone this repository
-4. Run `appimage-builder --recipe ./AppImageBuilder-x86_64.yml`
-5. If successful, `sticker-convert-x86_64.AppImage` should be created
+At the root of this repo, run `scripts/build_appimage.sh`
+
+Note: You must run this on x86_64 machine
 
 # Create msi installer
 1. Install [.NET SDK](https://dotnet.microsoft.com/en-us/download/dotnet)
