@@ -86,7 +86,7 @@ jobs:
       env:
         # select release-signing policy for main and release branches
         SIGNPATH_SIGNING_POLICY_SLUG: | 
-          ${{ (github.ref == 'refs/heads/master' || startsWith(github.ref, 'ref/head/v*'))) 
+          ${{ (github.ref == 'refs/heads/master' || startsWith(github.ref, 'ref/head/v*'))
             && 'release-signing' 
             || 'test-signing' }}
       with:
