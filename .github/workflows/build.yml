@@ -8,15 +8,16 @@ jobs:
   createrelease:
     name: Create Release
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'ref/head/v*')
     permissions:
       contents: write
     steps:
     - uses: actions/checkout@v4
+      if: startsWith(github.ref, 'ref/head/v*')
       with:
         submodules: recursive
     - name: Create Release
       uses: ncipollo/release-action@v1
+      if: startsWith(github.ref, 'ref/head/v*')
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
         name: Release ${{ github.ref_name }}
