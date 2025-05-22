@@ -90,7 +90,7 @@ jobs:
         SIGNPATH_SIGNING_POLICY_SLUG: ${{ startsWith(github.ref, 'ref/head/v*') && 'release-signing' || 'test-signing' }}
       with:
         api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
-        organization-id: 'sticker-convert'
+        organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
         project-slug: 'sticker-convert'
         signing-policy-slug:  '${{ env.SIGNPATH_SIGNING_POLICY_SLUG }}'
         github-artifact-id:  "${{steps.upload-unsigned-artifact.outputs.artifact-id}}"
