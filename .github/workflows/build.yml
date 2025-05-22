@@ -2,14 +2,13 @@ name: Build
 
 on:
   push:
-    tags:
-      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
 
 jobs:
 
   createrelease:
     name: Create Release
-    runs-on: [ubuntu-latest]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'ref/head/v*')
     permissions:
       contents: write
     steps:
@@ -73,15 +72,41 @@ jobs:
         wix extension add WixToolset.UI.wixext/4.0.4
         python .\msicreator\createmsi.py msicreator.json
         move *.msi sticker-convert-${{matrix.TARGET}}.msi
+    - name: Upload unsigned artifact
+      id: upload-unsigned-artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{matrix.TARGET}}-unsigned
+        if-no-files-found: error
+        path: |
+          ./sticker-convert-${{matrix.TARGET}}.zip
+          ./sticker-convert-${{matrix.TARGET}}.msi
+    - name: Sign
+      uses: signpath/github-action-submit-signing-request@v1.1
+      env:
+        # select release-signing policy for main and release branches
+        SIGNPATH_SIGNING_POLICY_SLUG: | 
+          ${{ (github.ref == 'refs/heads/master' || startsWith(github.ref, 'ref/head/v*'))) 
+            && 'release-signing' 
+            || 'test-signing' }}
+      with:
+        api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+        organization-id: 'sticker-convert'
+        project-slug: 'sticker-convert'
+        signing-policy-slug:  '${{ env.SIGNPATH_SIGNING_POLICY_SLUG }}'
+        github-artifact-id:  "${{steps.upload-unsigned-artifact.outputs.artifact-id}}"
+        wait-for-completion: true
+        output-artifact-directory: ${{matrix.TARGET}}-signed
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'ref/head/v*')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
-          ./sticker-convert-${{matrix.TARGET}}.zip
-          ./sticker-convert-${{matrix.TARGET}}.msi
+          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.zip
+          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.msi
 
   build-binary-macos:
     name: Build packages (macOS)
@@ -110,9 +135,17 @@ jobs:
         python ./compile.py
         cp ./scripts/hold_control_and_click_open_me_first.command ./
         zip -r9 sticker-convert-${{matrix.TARGET}}.zip sticker-convert.app hold_control_and_click_open_me_first.command
+    - name: Upload artifact
+      id: upload-artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{matrix.TARGET}}
+        if-no-files-found: error
+        path: sticker-convert-${{matrix.TARGET}}.zip
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'ref/head/v*')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -153,9 +186,17 @@ jobs:
           python ./compile.py
         mv ./sticker-convert.dist ./sticker-convert-${{matrix.TARGET}}
         zip -r9 sticker-convert-${{matrix.TARGET}}.zip ./sticker-convert-${{matrix.TARGET}}
+    - name: Upload artifact
+      id: upload-artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{matrix.TARGET}}
+        if-no-files-found: error
+        path: sticker-convert-${{matrix.TARGET}}.zip
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'ref/head/v*')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -176,10 +217,9 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
-    - uses: robinraju/release-downloader@v1
+    - uses: actions/download-artifact@v4
       with:
-        latest: true
-        fileName: sticker-convert-linux-${{matrix.arch}}.zip
+        name: sticker-convert-linux-${{matrix.arch}}.zip
     - name: Build appiamge for ${{matrix.arch}}
       run: |
         sudo add-apt-repository universe
@@ -252,7 +292,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: ${{ startsWith(github.ref, 'ref/head/v*') }}
           tags: ${{ steps.meta_min_cli.outputs.tags }}
           labels: ${{ steps.meta_min_cli.outputs.labels }}
           target: min-cli
@@ -261,7 +301,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: ${{ startsWith(github.ref, 'ref/head/v*') }}
           tags: ${{ steps.meta_min_gui.outputs.tags }}
           labels: ${{ steps.meta_min_gui.outputs.labels }}
           target: min-gui
@@ -270,7 +310,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: true
+          push: ${{ startsWith(github.ref, 'ref/head/v*') }}
           tags: ${{ steps.meta_full.outputs.tags }}
           labels: ${{ steps.meta_full.outputs.labels }}
           target: full
@@ -279,6 +319,7 @@ jobs:
     name: Upload to pypi
     needs: [build-wheel, build-binary-windows, build-binary-macos, build-appimage]
     runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'ref/head/v*')
     permissions:
       contents: read
     steps:
