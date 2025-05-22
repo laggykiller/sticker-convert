@@ -2,7 +2,6 @@
 import configparser
 import os
 import re
-import subprocess
 from typing import Optional
 
 # Adopted from https://github.com/roniemartinez/browsers/blob/master/browsers/linux.py
@@ -47,12 +46,6 @@ def get_chromium_path() -> Optional[str]:
 
                 if executable_path.lower().endswith(" %u"):
                     executable_path = executable_path[:-3].strip()
-
-                version = subprocess.getoutput(
-                    f"{executable_path} --version 2>&1"
-                ).strip()
-                if match := VERSION_PATTERN.search(version):
-                    version = match[0]
 
                 return executable_path
 
