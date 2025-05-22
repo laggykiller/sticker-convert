@@ -9,7 +9,7 @@ import signal
 import socket
 import subprocess
 import time
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Dict, List, Optional, Union, cast
 
 import requests
 import websocket
@@ -83,28 +83,14 @@ class CRD:
         self.chrome_proc = subprocess.Popen(launch_cmd)
 
     @staticmethod
-    def get_chrome_path() -> Optional[str]:
-        import logging
-
-        import browsers  # type: ignore
-
-        # browsers module would turn on info logging
-        logger = logging.getLogger()
-        logger.setLevel(logging.CRITICAL)
-
-        bs: List[Tuple[int, str]] = []
-        for b in browsers.browsers():
-            browser_type = b["browser_type"]
-            path = b["path"]
-            try:
-                rank = BROWSER_PREF.index(browser_type)
-            except ValueError:
-                continue
-            bs.append((rank, path))
-        if len(bs) == 0:
-            return None
-        bs = sorted(bs, key=lambda x: x[0])
-        return bs[0][1]
+    def get_chromium_path() -> Optional[str]:
+        if platform.system() == "Windows":
+            from sticker_convert.utils.chromiums.windows import get_chromium_path
+        elif platform.system() == "Darwin":
+            from sticker_convert.utils.chromiums.osx import get_chromium_path
+        else:
+            from sticker_convert.utils.chromiums.linux import get_chromium_path
+        return get_chromium_path()
 
     def connect(self, target_id: int = 0) -> None:
         self.cmd_id = 1

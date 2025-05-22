@@ -72,7 +72,7 @@ class GetDiscordAuth:
         if chrome_path is not None:
             using_discord_app = True
         else:
-            chrome_path = CRD.get_chrome_path()
+            chrome_path = CRD.get_chromium_path()
         if chrome_path is None:
             return (
                 None,

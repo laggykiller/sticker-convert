@@ -441,7 +441,7 @@ class StickerConvert:
             if self.opt_comp.chromium_path:
                 chrome_path = self.opt_comp.chromium_path
             else:
-                chrome_path = CRD.get_chrome_path()
+                chrome_path = CRD.get_chromium_path()
             args = [
                 "--headless",
                 "--kiosk",

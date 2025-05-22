@@ -11,7 +11,6 @@ memory-tempfile~=2.2.3
 mergedeep~=1.3.4
 numpy>=1.22.4
 Pillow~=11.2.1
-pybrowsers~=1.1.0
 pyoxipng~=9.1.0
 python-telegram-bot~=22.1
 psutil~=7.0.0

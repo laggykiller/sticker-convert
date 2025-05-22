@@ -495,6 +495,7 @@ See [docs/TODO.md](docs/TODO.md)
 - Information about Line stickers: https://github.com/doubleplusc/Line-sticker-downloader
 - Information about Kakao animated stickers: https://gist.github.com/chitacan/9802668
 - Downloading and decrypting Kakao animated stickers: https://github.com/blluv/KakaoTalkEmoticonDownloader
+- Finding browser executable paths: https://github.com/roniemartinez/browsers
 - Application icon taken from [Icons8](https://icons8.com/)
 - Banner generated from [GitHub Socialify](https://socialify.git.ci/)
 - Free code signing provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/)
