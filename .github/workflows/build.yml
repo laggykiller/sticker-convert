@@ -230,9 +230,9 @@ jobs:
       id: upload-artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{matrix.TARGET}}-appimage
+        name: linux-${{matrix.arch}}-appimage
         if-no-files-found: error
-        path: sticker-convert-${{matrix.TARGET}}.AppImage
+        path: sticker-convert-${{matrix.arch}}.AppImage
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
