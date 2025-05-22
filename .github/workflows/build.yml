@@ -41,6 +41,7 @@ jobs:
 
       - uses: actions/upload-artifact@v4
         with:
+          name: wheel
           path: dist/*
 
   build-binary-windows:
@@ -86,10 +87,7 @@ jobs:
       uses: signpath/github-action-submit-signing-request@v1.1
       env:
         # select release-signing policy for main and release branches
-        SIGNPATH_SIGNING_POLICY_SLUG: | 
-          ${{ (github.ref == 'refs/heads/master' || startsWith(github.ref, 'ref/head/v*'))
-            && 'release-signing' 
-            || 'test-signing' }}
+        SIGNPATH_SIGNING_POLICY_SLUG: ${{ startsWith(github.ref, 'ref/head/v*') && 'release-signing' || 'test-signing' }}
       with:
         api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
         organization-id: 'sticker-convert'
@@ -220,7 +218,7 @@ jobs:
         submodules: recursive
     - uses: actions/download-artifact@v4
       with:
-        name: sticker-convert-linux-${{matrix.arch}}.zip
+        name: linux-${{matrix.arch}}
     - name: Build appiamge for ${{matrix.arch}}
       run: |
         sudo add-apt-repository universe
@@ -228,9 +226,17 @@ jobs:
         unzip sticker-convert-linux-${{matrix.arch}}.zip
         mv sticker-convert-linux-${{matrix.arch}} ./sticker-convert.dist
         SC_COMPILE_ARCH=${{matrix.arch}} ./scripts/build_appimage.sh
+    - name: Upload artifact
+      id: upload-artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{matrix.TARGET}}-appimage
+        if-no-files-found: error
+        path: sticker-convert-${{matrix.TARGET}}.AppImage
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
+      if: startsWith(github.ref, 'ref/head/v*')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -326,9 +332,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          # unpacks default artifact into dist/
-          # if `name: artifact` is omitted, the action will create extra parent dir
-          name: artifact
+          name: wheel
           path: dist
 
       - uses: pypa/gh-action-pypi-publish@v1.5.0

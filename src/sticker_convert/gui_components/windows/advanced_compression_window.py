@@ -609,7 +609,7 @@ class AdvancedCompressionWindow(BaseWindow):
         )[1]
         if color:
             self.gui.bg_color_var.set(color.replace("#", "") + "00")
-        self.lift()
+        self.lift()  # type: ignore
         self.attributes("-topmost", True)  # type: ignore
         self.attributes("-topmost", False)  # type: ignore
 
