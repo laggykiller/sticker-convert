@@ -99,6 +99,14 @@ jobs:
         output-artifact-directory: ${{matrix.TARGET}}-signed
         parameters: |
           version: "${{ env.STICKER_CONVERT_VERSION }}"
+    - name: Upload signed artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{matrix.TARGET}}-signed
+        if-no-files-found: error
+        path:  |
+          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.zip
+          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.msi
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
