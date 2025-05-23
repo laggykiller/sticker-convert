@@ -139,7 +139,7 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         "--company-name=laggykiller",
         f"--product-version={__version__}",
         f"--file-version={__version__}",
-        '--copyright="GPL-2.0 license"',
+        "--copyright=GPL-2.0",
     ]
 
     if platform.system() == "Windows":
