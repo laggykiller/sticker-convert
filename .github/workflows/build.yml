@@ -97,7 +97,7 @@ jobs:
         wait-for-completion: true
         output-artifact-directory: ${{matrix.TARGET}}-signed
         parameters: |
-          version: "${{ github.ref_name }}"
+          version: "${{ github.ref_name }}.0"
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2

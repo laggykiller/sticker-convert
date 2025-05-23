@@ -135,6 +135,11 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         "--include-package-data=signalstickers_client",
         "--noinclude-data-file=tcl/opt0.4",
         "--noinclude-data-file=tcl/http1.0",
+        "--product-name=sticker-convert",
+        "--company-name=laggykiller",
+        f"--product-version={__version__}.0",
+        f"--file-version={__version__}.0",
+        "--copyright=GPL-2.0 license",
     ]
 
     if platform.system() == "Windows":
