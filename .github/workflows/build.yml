@@ -66,6 +66,7 @@ jobs:
         allow-prereleases: true
     - name: Build for ${{matrix.TARGET}}
       run: |
+        echo "STICKER_CONVERT_VERSION=$(python -c "from sticker_convert.version import __version__; print(__version__)")" >> $GITHUB_ENV
         python compile.py
         move sticker-convert.dist sticker-convert
         Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-${{matrix.TARGET}}.zip
@@ -97,7 +98,7 @@ jobs:
         wait-for-completion: true
         output-artifact-directory: ${{matrix.TARGET}}-signed
         parameters: |
-          version: "${{ github.ref_name }}.0"
+          version: "${{ env.STICKER_CONVERT_VERSION }}"
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
