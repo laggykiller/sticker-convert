@@ -66,7 +66,7 @@ jobs:
         allow-prereleases: true
     - name: Build for ${{matrix.TARGET}}
       run: |
-        echo "STICKER_CONVERT_VERSION=$(python -c "from sticker_convert.version import __version__; print(__version__)")" >> $GITHUB_ENV
+        echo "STICKER_CONVERT_VERSION=$(cd src; python -c "from sticker_convert.version import __version__; print(__version__)")" >> $GITHUB_ENV
         python compile.py
         move sticker-convert.dist sticker-convert
         Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-${{matrix.TARGET}}.zip
