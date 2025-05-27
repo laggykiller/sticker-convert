@@ -14,12 +14,12 @@ jobs:
       contents: write
     steps:
     - uses: actions/checkout@v4
-      if: startsWith(github.ref, 'refs/tags/v*')
+      if: startsWith(github.ref, 'refs/tags/v')
       with:
         submodules: recursive
     - name: Create Release
       uses: ncipollo/release-action@v1
-      if: startsWith(github.ref, 'refs/tags/v*')
+      if: startsWith(github.ref, 'refs/tags/v')
       with:
         token: "${{ secrets.GITHUB_TOKEN }}"
         name: Release ${{ github.ref_name }}
@@ -90,7 +90,7 @@ jobs:
       uses: signpath/github-action-submit-signing-request@v1.1
       env:
         # select release-signing policy for main and release branches
-        SIGNPATH_SIGNING_POLICY_SLUG: ${{ startsWith(github.ref, 'refs/tags/v*') && 'release-signing' || 'test-signing' }}
+        SIGNPATH_SIGNING_POLICY_SLUG: ${{ startsWith(github.ref, 'refs/tags/v') && 'release-signing' || 'test-signing' }}
       with:
         api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
         organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
@@ -112,7 +112,7 @@ jobs:
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/v*')
+      if: startsWith(github.ref, 'refs/tags/v')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -157,7 +157,7 @@ jobs:
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/v*')
+      if: startsWith(github.ref, 'refs/tags/v')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -208,7 +208,7 @@ jobs:
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/v*')
+      if: startsWith(github.ref, 'refs/tags/v')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -249,7 +249,7 @@ jobs:
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
-      if: startsWith(github.ref, 'refs/tags/v*')
+      if: startsWith(github.ref, 'refs/tags/v')
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -312,7 +312,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: ${{ startsWith(github.ref, 'refs/tags/v*') }}
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
           tags: ${{ steps.meta_min_cli.outputs.tags }}
           labels: ${{ steps.meta_min_cli.outputs.labels }}
           target: min-cli
@@ -321,7 +321,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: ${{ startsWith(github.ref, 'refs/tags/v*') }}
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
           tags: ${{ steps.meta_min_gui.outputs.tags }}
           labels: ${{ steps.meta_min_gui.outputs.labels }}
           target: min-gui
@@ -330,7 +330,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          push: ${{ startsWith(github.ref, 'refs/tags/v*') }}
+          push: ${{ startsWith(github.ref, 'refs/tags/v') }}
           tags: ${{ steps.meta_full.outputs.tags }}
           labels: ${{ steps.meta_full.outputs.labels }}
           target: full
@@ -339,7 +339,7 @@ jobs:
     name: Upload to pypi
     needs: [build-wheel, build-binary-windows, build-binary-macos, build-appimage]
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v*')
+    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       contents: read
     steps:
