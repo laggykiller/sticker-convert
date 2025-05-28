@@ -98,6 +98,7 @@ jobs:
         signing-policy-slug:  '${{ env.SIGNPATH_SIGNING_POLICY_SLUG }}'
         github-artifact-id:  "${{steps.upload-unsigned-artifact.outputs.artifact-id}}"
         wait-for-completion: true
+        wait-for-completion-timeout-in-seconds: 18000
         output-artifact-directory: ${{matrix.TARGET}}-signed
         parameters: |
           version: "${{ env.STICKER_CONVERT_VERSION }}"
