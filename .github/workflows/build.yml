@@ -51,7 +51,7 @@ jobs:
     needs: createrelease
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: read
+      contents: write
     strategy:
       matrix:
         include:
@@ -125,7 +125,7 @@ jobs:
     needs: createrelease
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: read
+      contents: write
     strategy:
       matrix:
         include:
@@ -168,7 +168,7 @@ jobs:
     needs: createrelease
     runs-on: ${{ matrix.os }}
     permissions:
-      contents: read
+      contents: write
     strategy:
       matrix:
         include:
@@ -219,7 +219,7 @@ jobs:
     runs-on: ubuntu-22.04
     needs: build-binary-linux
     permissions:
-      contents: read
+      contents: write
     strategy:
       matrix:
         include:
