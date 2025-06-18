@@ -4,7 +4,7 @@
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
 - With GUI and CLI that runs on Windows, MacOS and Linux
-- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), Naver Band (Download only), Viber, Discord (Download only), iMessage (Create Xcode sticker pack project)
+- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), Naver Band (Download only), OGQ (Download only), Viber, Discord (Download only), iMessage (Create Xcode sticker pack project)
 - Supports static and animated stickers, with transparency support
 
 ## Downloads
@@ -46,6 +46,7 @@
 | [Line](docs/guide_line.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
 | [Kakao](docs/guide_kakao.md)          | ✅ (Need 'auth_token' for animated) | 🚫 (Need to submit for manual approval)                  |
 | [Band](docs/guide_band.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
+| [OGQ](docs/guide_ogq.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
 | [Viber](docs/guide_viber.md)          | ✅                                  | ✅ (Require `viber_auth`)                                |
 | [Discord](docs/guide_discord.md)      | ✅ (Require `token`)                | 🚫                                                       |
 | [iMessage](docs/guide_imessage.md)    | 🚫                                  | ⭕ (Create Xcode stickerpack project for sideload)       |
@@ -75,6 +76,9 @@
 - Band
     - Download: Supported (e.g. `https://www.band.us/sticker/xxxx` OR 2535). Learn how to get share link from [docs/guide_band.md](docs/guide_band.md)
     - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
+- OGQ
+    - Download: Supported (e.g. `https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx`)
+    - Upload: Not supported. You need to manually submit sticker pack for approval before you can use in app.
 - Viber
     - Download: Supported (e.g. `https://stickers.viber.com/pages/example` OR `https://stickers.viber.com/pages/custom-sticker-packs/example`)
     - Upload: Supported. Viber authentication data required for uploading Viber stickers, which could be fetched from Viber Desktop application automatically.
@@ -102,11 +106,11 @@ To run in CLI mode, pass on any arguments
 
 ```
 usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--input-dir INPUT_DIR]
-                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
+                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage]
                           [--no-compress]
-                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
+                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
                           [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER]
                           [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
                           [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
@@ -163,6 +167,9 @@ Input options:
   --download-band DOWNLOAD_BAND
                         Download Naver Band stickers from a URL / ID as input
                         (Example: https://www.band.us/sticker/xxxx OR 2535)
+  --download-ogq DOWNLOAD_OGQ
+                        Download OGQ stickers from a URL / ID as input
+                        (Example: https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx)
   --download-viber DOWNLOAD_VIBER
                         Download viber stickers from a URL as input
                         (Example: https://stickers.viber.com/pages/example
@@ -195,7 +202,7 @@ Output options:
 
 Compression options:
   --no-compress         Do not compress files. Useful for only downloading stickers.
-  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}
                         Apply preset for compression.
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
@@ -501,5 +508,5 @@ See [docs/TODO.md](docs/TODO.md)
 - Free code signing on Windows provided by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/)
 
 ## DISCLAIMER
-- The author of this repo is NOT affiliated with Signal, Telegram, WhatsApp, Line, Kakao, Naver Band, Viber, Discord, iMessage or Sticker Maker.
+- The author of this repo is NOT affiliated with Signal, Telegram, WhatsApp, Line, Kakao, Naver Band, OGQ, Viber, Discord, iMessage or Sticker Maker.
 - The author of this repo is NOT repsonsible for any legal consequences and loss incurred from using this repo.

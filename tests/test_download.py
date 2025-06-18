@@ -476,6 +476,34 @@ def test_download_band_static(tmp_path: LocalPath) -> None:
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 @pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
+def test_download_ogq_animated(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="band",
+        url="https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=5ef373905a559",
+        expected_file_count=25,
+        expected_file_formats=[".png", ".gif"],
+        with_title=True,
+        with_author=True,
+        with_emoji=False,
+    )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
+def test_download_ogq_static(tmp_path: LocalPath) -> None:
+    _run_sticker_convert(
+        tmp_path=tmp_path,
+        source="band",
+        url="https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=636bf3c2a6bc3",
+        expected_file_count=25,
+        expected_file_formats=[".png"],
+        with_title=True,
+        with_author=True,
+        with_emoji=False,
+    )
+
+
+@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
 def test_download_band_animated(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,

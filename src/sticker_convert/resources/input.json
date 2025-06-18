@@ -69,6 +69,16 @@
             "author": false
         }
     },
+    "ogq": {
+        "full_name": "Download from OGQ",
+        "help": "Download OGQ stickers from a URL / ID as input",
+        "example": "Example: https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx",
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": true,
+            "author": false
+        }
+    },
     "viber": {
         "full_name": "Download from Viber",
         "help": "Download viber stickers from a URL as input",
