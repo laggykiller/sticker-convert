@@ -597,12 +597,12 @@ class StickerConvert:
                     else:
                         frame_resized = frame
 
-                    # yuva420p may cause crash for pyav < 14
+                    # yuva420p may cause crash
                     # Not safe to directly call frame.to_ndarray(format="rgba")
                     # https://github.com/PyAV-Org/PyAV/discussions/1510
-                    if int(av.__version__.split(".")[0]) >= 14:
-                        rgba_array = frame_resized.to_ndarray(format="rgba")
-                    elif frame_resized.format.name == "yuv420p":
+                    # if int(av.__version__.split(".")[0]) >= 14:
+                    #     rgba_array = frame_resized.to_ndarray(format="rgba")
+                    if frame_resized.format.name == "yuv420p":
                         rgb_array = frame_resized.to_ndarray(format="rgb24")
                         rgba_array = np.dstack(
                             (
