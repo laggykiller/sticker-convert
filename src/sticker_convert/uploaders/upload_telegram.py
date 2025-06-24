@@ -308,7 +308,6 @@ class UploadTelegram(UploadBase):
         stickers_total = 0
         stickers_ok = 0
         for pack_title, stickers in packs.items():
-            stickers_total += len(stickers)
             self.cb.put(f"Uploading pack {pack_title}")
             result, stickers_total_pack, stickers_ok_pack = anyio.run(
                 self.upload_pack, pack_title, stickers, emoji_dict
