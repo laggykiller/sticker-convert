@@ -165,22 +165,32 @@ class UploadTelegram(UploadBase):
                     src, fmt=spec_choice.get_format(), file_info=file_info
                 )
             )
-            if sticker_format == "video":
-                # For video stickers (Only)
-                # Allow file with one of the dimension = 512 but another <512
-                # https://core.telegram.org/stickers#video-requirements
-                check_file_result = check_file_result and (
-                    file_info.res[0] == 512 or file_info.res[1] == 512
-                )
-                check_file_result = check_file_result and (
-                    file_info.res[0] <= 512 and file_info.res[1] <= 512
-                )
+            if self.opt_output.option == "telegram":
+                if sticker_format == "animated":
+                    check_file_result = (
+                        check_file_result
+                        and file_info.res[0] == 512
+                        and file_info.res[1] == 512
+                    )
+                else:
+                    # For video and static stickers (Not animated)
+                    # Allow file with one of the dimension = 512 but another <512
+                    # https://core.telegram.org/stickers#video-requirements
+                    check_file_result = check_file_result and (
+                        file_info.res[0] == 512 or file_info.res[1] == 512
+                    )
+                    check_file_result = check_file_result and (
+                        file_info.res[0] <= 512 and file_info.res[1] <= 512
+                    )
             else:
+                # telegram_emoji
                 check_file_result = (
                     check_file_result
-                    and file_info.res[0] == 512
-                    and file_info.res[1] == 512
+                    and file_info.res[0] == 100
+                    and file_info.res[1] == 100
                 )
+
+            if sticker_format == "static":
                 # It is important to check if webp and png are static only
                 check_file_result = check_file_result and FormatVerify.check_animated(
                     src, animated=spec_choice.animated, file_info=file_info
