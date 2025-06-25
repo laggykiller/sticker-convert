@@ -252,7 +252,7 @@ class DownloadLine(DownloadBase):
             )
 
             for num, sticker in enumerate(self.pack_files):
-                if self.resource_type == "ANIMATION":
+                if self.has_animation == True:
                     f_path = str(sticker) + "_animation.png"
                 else:
                     f_path = str(sticker) + ".png"
@@ -273,13 +273,13 @@ class DownloadLine(DownloadBase):
             )
 
             for num, sticker in enumerate(self.pack_files):
-                if self.resource_type in ("ANIMATION", "ANIMATION_SOUND"):
-                    f_path = "animation@2x/" + str(sticker["id"]) + "@2x.png"
-                elif self.resource_type == "POPUP":
+                if self.resource_type == "POPUP":
                     if sticker.get("popup", {}).get("layer") == "BACKGROUND":
                         f_path = str(sticker["id"]) + "@2x.png"
                         self.decompress(zf, f_path, num, "preview-")
                     f_path = "popup/" + str(sticker["id"]) + ".png"
+                elif self.has_animation is True:
+                    f_path = "animation@2x/" + str(sticker["id"]) + "@2x.png"
                 else:
                     f_path = str(sticker["id"]) + "@2x.png"
                 self.decompress(zf, f_path, num)
