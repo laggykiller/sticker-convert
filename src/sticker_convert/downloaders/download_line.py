@@ -252,7 +252,7 @@ class DownloadLine(DownloadBase):
             )
 
             for num, sticker in enumerate(self.pack_files):
-                if self.has_animation == True:
+                if self.has_animation is True:
                     f_path = str(sticker) + "_animation.png"
                 else:
                     f_path = str(sticker) + ".png"
