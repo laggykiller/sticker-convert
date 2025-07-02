@@ -11,6 +11,12 @@
 ## How to get share link
 ![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
 
+If you want to download sticker pack that you found from web link (`https://e.kakao.com/t/xxxxx`), you can:
+1. Login to Kakao in e.kakao.com
+2. Like the pack you want to download (Press the heart button)
+3. In Kakao mobile app, open emoticon shop -> press hamburger menu on left upper corner -> Like to find the pack you liked
+4. Get the share link in mobile app and use it to download pack using sticker-convert
+
 ## How to get auth_token
 ### Method 1: Get auth_token from KakaoTalk Desktop application (Recommended)
 - `sticker-convert` will get auth_token from KakaoTalk Desktop application.
