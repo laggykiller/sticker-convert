@@ -49,7 +49,7 @@ Note: You must run this on x86_64 machine
 6. `python msicreator\createmsi.py msicreator.json`
 
 # Build wheel
-1. To build wheel `pip -m build .`
+1. To build wheel `python -m build .`
 2. To install wheel `pip install dist/sticker_convert-xxx.whl`
 
 # Development
