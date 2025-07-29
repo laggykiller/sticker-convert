@@ -215,6 +215,10 @@ class GetKakaoDesktopAuth:
             kakao_bin_path = os.path.expandvars(
                 "%programfiles(x86)%\\Kakao\\KakaoTalk\\KakaoTalk.exe"
             )
+            if Path(kakao_bin_path).exists() is False:
+                kakao_bin_path = os.path.expandvars(
+                    "%programfiles%\\Kakao\\KakaoTalk\\KakaoTalk.exe"
+                )
         elif platform.system() == "Darwin":
             kakao_bin_path = "/Applications/KakaoTalk.app"
         else:
