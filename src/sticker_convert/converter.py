@@ -932,13 +932,19 @@ class StickerConvert:
             self.tmp_f.write(frame_optimized)
 
     def _frames_export_apng(self) -> None:
-        from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgba  # type: ignore
+        from apngasm_python._apngasm_python import APNGAsm, create_frame_from_rgb, create_frame_from_rgba  # type: ignore
 
         assert self.fps
         assert self.res_h
 
         frames_concat = np.concatenate(self.frames_processed)
         with Image.fromarray(frames_concat, "RGBA") as image_concat:  # type: ignore
+            if image_concat.getextrema()[3][0] < 255:  # type: ignore
+                mode = "RGBA"
+                create_frame_method = create_frame_from_rgba
+            else:
+                mode = "RGB"
+                create_frame_method = create_frame_from_rgb
             image_quant = self.quantize(image_concat)
 
         if self.apngasm is None:
@@ -949,8 +955,8 @@ class StickerConvert:
         for i in range(0, image_quant.height, self.res_h):
             crop_dimension = (0, i, image_quant.width, i + self.res_h)
             image_cropped = image_quant.crop(crop_dimension)
-            image_final = image_cropped.convert("RGBA")
-            frame_final = create_frame_from_rgba(
+            image_final = image_cropped.convert(mode)
+            frame_final = create_frame_method(
                 np.array(image_final),
                 width=image_final.width,
                 height=image_final.height,
