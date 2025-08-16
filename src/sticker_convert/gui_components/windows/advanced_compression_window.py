@@ -101,6 +101,20 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
+        self.res_snap_pow2_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["res_snap_pow2"]
+        )
+        self.res_snap_pow2_lbl = Label(
+            self.frame_advcomp, text="Snap resolution to power of 2"
+        )
+        self.res_snap_pow2_cbox = Checkbutton(
+            self.frame_advcomp,
+            variable=self.gui.res_snap_pow2_var,
+            onvalue=True,
+            offvalue=False,
+            bootstyle="success-round-toggle",  # type: ignore
+        )
+
         self.quality_help_btn = self.add_help_btn(self.gui.help["comp"]["quality"])
         self.quality_lbl = Label(self.frame_advcomp, text="Output quality (0-100)")
         self.quality_min_lbl = Label(self.frame_advcomp, text="Min:")
@@ -326,7 +340,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.fps_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.fps_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.fps_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
-        self.fps_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.fps_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.res_w_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.res_w_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
@@ -334,7 +348,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.res_w_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.res_w_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.res_w_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
-        self.res_w_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.res_w_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.res_h_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.res_h_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
@@ -342,7 +356,11 @@ class AdvancedCompressionWindow(BaseWindow):
         self.res_h_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.res_h_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.res_h_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
-        self.res_h_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.res_h_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
+        r += 1
+        self.res_snap_pow2_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.res_snap_pow2_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.res_snap_pow2_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.quality_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.quality_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
@@ -350,7 +368,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.quality_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.quality_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.quality_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
-        self.quality_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.quality_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.color_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.color_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
@@ -358,7 +376,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.color_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.color_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.color_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
-        self.color_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.color_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.duration_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.duration_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
@@ -366,7 +384,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.duration_min_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.duration_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.duration_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
-        self.duration_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.duration_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.size_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.size_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
@@ -374,14 +392,14 @@ class AdvancedCompressionWindow(BaseWindow):
         self.img_size_max_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.vid_size_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.vid_size_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
-        self.size_disable_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.size_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.format_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.format_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
         self.img_format_lbl.grid(column=2, row=r, sticky="w", padx=3, pady=3)
         self.img_format_entry.grid(column=3, row=r, sticky="nes", padx=3, pady=3)
         self.vid_format_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
-        self.vid_format_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
+        self.vid_format_entry.grid(column=5, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.power_help_btn1.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.power_lbl1.grid(column=1, row=r, sticky="w", padx=3, pady=3)
@@ -404,12 +422,12 @@ class AdvancedCompressionWindow(BaseWindow):
         r += 1
         self.fake_vid_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.fake_vid_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
-        self.fake_vid_cbox.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.fake_vid_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.bg_color_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.bg_color_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
         self.bg_color_entry.grid(column=5, row=r, sticky="w", padx=3, pady=3)
-        self.bg_color_btn.grid(column=6, row=r, sticky="nes", padx=3, pady=3)
+        self.bg_color_btn.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.scale_filter_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.scale_filter_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)

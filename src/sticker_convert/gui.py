@@ -116,6 +116,7 @@ class GUI(Window):
         self.res_h_max_var = IntVar(self)
         self.res_h_disable_var = BooleanVar()
         self.res_power_var = DoubleVar()
+        self.res_snap_pow2_var = BooleanVar()
         self.quality_min_var = IntVar(self)
         self.quality_max_var = IntVar(self)
         self.quality_disable_var = BooleanVar()
@@ -547,6 +548,7 @@ class GUI(Window):
             if not self.res_h_disable_var.get()
             else None,
             res_power=self.res_power_var.get(),
+            res_snap_pow2=self.res_snap_pow2_var.get(),
             quality_min=self.quality_min_var.get()
             if not self.quality_disable_var.get()
             else None,

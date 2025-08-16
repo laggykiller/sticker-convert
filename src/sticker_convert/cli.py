@@ -141,7 +141,7 @@ class CLI:
             "quantize_method",
             "chromium_path",
         )
-        flags_comp_bool = ("fake_vid",)
+        flags_comp_bool = ("fake_vid", "res_snap_pow2")
         keyword_args: Dict[str, Any]
         for k, v in self.help["comp"].items():
             if k in flags_comp_int:
@@ -394,6 +394,9 @@ class CLI:
             res_power=self.compression_presets[preset]["res"]["power"]
             if args.res_power is None
             else args.res_power,
+            res_snap_pow2=self.compression_presets[preset]["res"]["snap_pow2"]
+            if args.res_snap_pow2 is None
+            else args.res_snap_pow2,
             quality_min=self.compression_presets[preset]["quality"]["min"]
             if args.quality_min is None
             else args.quality_min,

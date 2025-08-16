@@ -55,6 +55,7 @@ class CompOption(BaseOption):
     res_h_min: Optional[int] = None
     res_h_max: Optional[int] = None
     res_power: float = 3.0
+    res_snap_pow2: bool = False
 
     quality_min: Optional[int] = None
     quality_max: Optional[int] = None
@@ -92,6 +93,7 @@ class CompOption(BaseOption):
                 "w": {"min": self.res_w_min, "max": self.res_w_max},
                 "h": {"min": self.res_h_min, "max": self.res_h_max},
                 "power": self.res_power,
+                "snap_pow2": self.res_snap_pow2,
             },
             "quality": {
                 "min": self.quality_min,

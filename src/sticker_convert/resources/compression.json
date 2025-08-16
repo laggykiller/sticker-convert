@@ -22,7 +22,8 @@
                 "min": 512,
                 "max": 512
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -69,7 +70,8 @@
                 "min": 64,
                 "max": 512
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": true
         },
         "quality": {
             "min": 10,
@@ -116,7 +118,8 @@
                 "min": 512,
                 "max": 512
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -163,7 +166,8 @@
                 "min": 100,
                 "max": 100
             },
-            "power": 1
+            "power": 1,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -210,7 +214,8 @@
                 "min": 512,
                 "max": 512
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 0,
@@ -257,7 +262,8 @@
                 "min": 100,
                 "max": 320
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -304,7 +310,8 @@
                 "min": 360,
                 "max": 360
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -351,7 +358,8 @@
                 "min": 100,
                 "max": 320
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -398,7 +406,8 @@
                 "min": 480,
                 "max": 480
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -445,7 +454,8 @@
                 "min": 490,
                 "max": 490
             },
-            "power": 1
+            "power": 1,
+            "snap_pow2": false
         },
         "quality": {
             "min": 95,
@@ -492,7 +502,8 @@
                 "min": 320,
                 "max": 320
             },
-            "power": 1
+            "power": 1,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -539,7 +550,8 @@
                 "min": 32,
                 "max": 128
             },
-            "power": 1
+            "power": 1,
+            "snap_pow2": true
         },
         "quality": {
             "min": 10,
@@ -586,7 +598,8 @@
                 "min": 300,
                 "max": 300
             },
-            "power": 1
+            "power": 1,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -633,7 +646,8 @@
                 "min": 408,
                 "max": 408
             },
-            "power": 1
+            "power": 1,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -680,7 +694,8 @@
                 "min": 618,
                 "max": 618
             },
-            "power": 1
+            "power": 1,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -727,7 +742,8 @@
                 "min": 256,
                 "max": 512
             },
-            "power": 3
+            "power": 3,
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,

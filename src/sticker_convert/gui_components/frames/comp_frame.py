@@ -119,6 +119,7 @@ class CompFrame(LabelFrame):
         self.gui.res_h_min_var.set(preset.get("res", {}).get("h", {}).get("min"))
         self.gui.res_h_max_var.set(preset.get("res", {}).get("h", {}).get("max"))
         self.gui.res_power_var.set(preset.get("res", {}).get("power"))
+        self.gui.res_snap_pow2_var.set(preset.get("res", {}).get("snap_pow2"))
         self.gui.quality_min_var.set(preset.get("quality", {}).get("min"))
         self.gui.quality_max_var.set(preset.get("quality", {}).get("max"))
         self.gui.quality_power_var.set(preset.get("quality", {}).get("power"))

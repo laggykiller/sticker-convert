@@ -3,7 +3,7 @@ import json
 import os
 from fractions import Fraction
 from io import BytesIO
-from math import ceil, floor
+from math import ceil, floor, log2
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
 
@@ -57,6 +57,7 @@ def get_step_value(
     steps: int,
     power: float = 1.0,
     even: bool = False,
+    snap_pow2: bool = False,
 ) -> Optional[int]:
     # Power should be between -1 and positive infinity
     # Smaller power = More 'importance' of the parameter
@@ -70,6 +71,15 @@ def get_step_value(
 
     if max_step is not None and min_step is not None:
         v = round((max_step - min_step) * step / steps * factor + min_step)
+        if snap_pow2 is True and floor(log2(max_step)) >= ceil(log2(min_step)):
+            lower_exp = max(floor(log2(v)), ceil(log2(min_step)))
+            lower_pow2 = 2**lower_exp
+            upper_exp = min(ceil(log2(v)), floor(log2(max_step)))
+            upper_pow2 = 2**upper_exp
+            if abs(v - lower_pow2) <= abs(v - upper_pow2):
+                return lower_pow2
+            else:
+                return upper_pow2
         if even is True and v % 2 == 1:
             return v + 1
         return v
@@ -342,6 +352,7 @@ class StickerConvert:
                         self.opt_comp.steps,
                         self.opt_comp.res_power,
                         need_even,
+                        self.opt_comp.res_snap_pow2,
                     ),
                     get_step_value(
                         self.opt_comp.res_h_max,
@@ -350,6 +361,7 @@ class StickerConvert:
                         self.opt_comp.steps,
                         self.opt_comp.res_power,
                         need_even,
+                        self.opt_comp.res_snap_pow2,
                     ),
                     get_step_value(
                         self.opt_comp.quality_max,

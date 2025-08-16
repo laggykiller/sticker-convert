@@ -29,6 +29,7 @@
         "res_h_min": "Set minimum height.",
         "res_h_max": "Set maximum height.",
         "res_power": "Between -1 and positive infinity.\nPower lower = More importance of the parameter,\ntry harder to keep higher and not sacrifice.",
+        "res_snap_pow2": "Snap resolution to nearest power of 2 (1,2,4,8,16,...).\nIgnored if no power of 2 present between minimum and maximum resolutions",
         "quality": "Quality higher = Clearer but larger size.",
         "quality_min": "Set minimum quality.",
         "quality_max": "Set maximum quality.",
