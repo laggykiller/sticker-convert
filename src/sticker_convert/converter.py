@@ -947,14 +947,9 @@ class StickerConvert:
 
         delay_num = int(1000 / self.fps)
         for i in range(0, image_quant.height, self.res_h):
-            with BytesIO() as f:
-                crop_dimension = (0, i, image_quant.width, i + self.res_h)
-                image_cropped = image_quant.crop(crop_dimension)
-                image_cropped.save(f, format="png")
-                f.seek(0)
-                frame_optimized = self.optimize_png(f.read())
-            with Image.open(BytesIO(frame_optimized)) as im:
-                image_final = im.convert("RGBA")
+            crop_dimension = (0, i, image_quant.width, i + self.res_h)
+            image_cropped = image_quant.crop(crop_dimension)
+            image_final = image_cropped.convert("RGBA")
             frame_final = create_frame_from_rgba(
                 np.array(image_final),
                 width=image_final.width,
@@ -969,7 +964,8 @@ class StickerConvert:
             self.apngasm.assemble(tmp_apng.as_posix())
 
             with open(tmp_apng, "rb") as f:
-                self.tmp_f.write(f.read())
+                apng_optimized = self.optimize_png(f.read())
+                self.tmp_f.write(apng_optimized)
 
         self.apngasm.reset()
 
@@ -978,7 +974,7 @@ class StickerConvert:
 
         return oxipng.optimize_from_memory(
             image_bytes,
-            level=4,
+            level=6,
             fix_errors=True,
             filter=[oxipng.RowFilter.Brute],
             optimize_alpha=True,
