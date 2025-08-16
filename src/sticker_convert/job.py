@@ -422,7 +422,7 @@ class Job:
         ):
             error_msg += "\n"
             error_msg += (
-                f"[X] scale_filter {self.opt_comp.scale_filter} is not valid option"
+                f"[X] scale_filter {self.opt_comp.scale_filter} is not valid option\n"
             )
             error_msg += (
                 "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
@@ -430,7 +430,7 @@ class Job:
 
         if self.opt_comp.quantize_method not in ("imagequant", "fastoctree", "none"):
             error_msg += "\n"
-            error_msg += f"[X] quantize_method {self.opt_comp.quantize_method} is not valid option"
+            error_msg += f"[X] quantize_method {self.opt_comp.quantize_method} is not valid option\n"
             error_msg += "    Valid options: imagequant, fastoctree, none"
 
         if self.opt_comp.bg_color:
