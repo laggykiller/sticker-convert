@@ -29,8 +29,10 @@ jobs:
         pip install -r requirements-dev.txt
         pip install -r requirements-type.txt
         pip install .
-    - name: Update emoji.json
-      run: curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/rhysd/gemoji/refs/heads/unicode-16.0/db/emoji.json
+    - name: Update emoji data
+      run: |
+        curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/rhysd/gemoji/refs/heads/unicode-16.0/db/emoji.json
+        curl -o src/sticker_convert/resources/NotoColorEmoji.ttf -L https://github.com/googlefonts/noto-emoji/raw/refs/heads/main/fonts/NotoColorEmoji.ttf
     - name: mypy
       run: mypy
     - name: pyright
