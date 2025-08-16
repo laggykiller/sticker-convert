@@ -15,7 +15,6 @@ from sticker_convert.gui_components.windows.base_window import BaseWindow
 
 
 class AdvancedCompressionWindow(BaseWindow):
-    emoji_column_per_row = 8
     emoji_visible_rows = 5
     emoji_btns: List[Tuple[Button, ImageTk.PhotoImage]] = []
 
@@ -680,6 +679,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         column = 0
         row = 0
+        emoji_column_per_row = 0
 
         self.emoji_btns = []
         for entry in self.gui.emoji_list:
@@ -720,7 +720,12 @@ class AdvancedCompressionWindow(BaseWindow):
 
             column += 1
 
-            if column == self.emoji_column_per_row:
+            if emoji_column_per_row == 0:
+                self.emoji_canvas.update_idletasks()
+                emoji_column_per_row = int(
+                    self.emoji_canvas.winfo_width() / button.winfo_width()
+                )
+            if column == emoji_column_per_row:
                 column = 0
                 row += 1
 
@@ -732,7 +737,7 @@ class AdvancedCompressionWindow(BaseWindow):
         # Resize the canvas frame to show specified number of buttons and the scrollbar
         if len(self.emoji_btns) > 0:
             in_view_columns_width = (
-                self.emoji_btns[0][0].winfo_width() * self.emoji_column_per_row
+                self.emoji_btns[0][0].winfo_width() * emoji_column_per_row
             )
             in_view_rows_height = (
                 self.emoji_btns[0][0].winfo_height() * self.emoji_visible_rows
