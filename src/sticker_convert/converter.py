@@ -1004,8 +1004,8 @@ class StickerConvert:
             return image.copy()
         if self.opt_comp.quantize_method == "imagequant":
             return self._quantize_by_imagequant(image)
-        if self.opt_comp.quantize_method == "fastoctree":
-            return self._quantize_by_fastoctree(image)
+        if self.opt_comp.quantize_method in ("mediancut", "maxcoverage", "fastoctree"):
+            return self._quantize_by_pillow(image)
 
         return image
 
@@ -1036,10 +1036,24 @@ class StickerConvert:
 
         return image
 
-    def _quantize_by_fastoctree(self, image: Image.Image) -> Image.Image:
+    def _quantize_by_pillow(self, image: Image.Image) -> Image.Image:
         assert self.color
 
-        return image.quantize(colors=self.color, method=2)
+        if image.mode == "RGBA" and self.opt_comp.quantize_method in (
+            "mediancut",
+            "maxcoverage",
+        ):
+            self.cb.put(
+                f"[W] {self.opt_comp.quantize_method} does not support RGBA, defaulted to fastoctree quantization"
+            )
+            method = Image.Quantize.FASTOCTREE
+        elif self.opt_comp.quantize_method == "mediancut":
+            method = Image.Quantize.MEDIANCUT
+        elif self.opt_comp.quantize_method == "maxcoverage":
+            method = Image.Quantize.MAXCOVERAGE
+        else:
+            method = Image.Quantize.FASTOCTREE
+        return image.quantize(colors=self.color, method=method)
 
     def fix_fps(self, fps: float) -> Fraction:
         # After rounding fps/duration during export,

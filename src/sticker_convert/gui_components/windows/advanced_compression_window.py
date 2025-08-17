@@ -302,6 +302,8 @@ class AdvancedCompressionWindow(BaseWindow):
             self.gui.quantize_method_var.get(),
             "imagequant",
             "fastoctree",
+            "maxcoverage",
+            "mediancut",
             "none",
             bootstyle="secondary",  # type: ignore
         )

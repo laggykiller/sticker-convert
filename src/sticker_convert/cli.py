@@ -142,7 +142,10 @@ class CLI:
             "chromium_path",
         )
         flags_comp_bool = (
-            "fake_vid", "no_fake_vid", "res_snap_pow2", "no_res_snap_pow2"
+            "fake_vid",
+            "no_fake_vid",
+            "res_snap_pow2",
+            "no_res_snap_pow2",
         )
         keyword_args: Dict[str, Any]
         for k, v in self.help["comp"].items():

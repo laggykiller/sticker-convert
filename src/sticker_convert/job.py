@@ -428,10 +428,16 @@ class Job:
                 "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
             )
 
-        if self.opt_comp.quantize_method not in ("imagequant", "fastoctree", "none"):
+        if self.opt_comp.quantize_method not in (
+            "imagequant",
+            "fastoctree",
+            "maxcoverage",
+            "mediancut",
+            "none",
+        ):
             error_msg += "\n"
             error_msg += f"[X] quantize_method {self.opt_comp.quantize_method} is not valid option\n"
-            error_msg += "    Valid options: imagequant, fastoctree, none"
+            error_msg += "    Valid options: imagequant, fastoctree, maxcoverage, mediancut, none"
 
         if self.opt_comp.bg_color:
             try:
