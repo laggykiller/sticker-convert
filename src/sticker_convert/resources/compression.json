@@ -71,7 +71,7 @@
                 "max": 512
             },
             "power": 3,
-            "snap_pow2": true
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
@@ -551,7 +551,7 @@
                 "max": 128
             },
             "power": 1,
-            "snap_pow2": true
+            "snap_pow2": false
         },
         "quality": {
             "min": 10,
