@@ -176,7 +176,7 @@ jobs:
           - os: ubuntu-latest
             TARGET: linux-x86_64
             ARCH: amd64
-          - os: ubuntu-22.04-arm
+          - os: ubuntu-24.04-arm
             TARGET: linux-aarch64
             ARCH: arm64
     steps:
@@ -217,7 +217,7 @@ jobs:
 
   build-appimage:
     name: Build appimage
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     needs: build-binary-linux
     permissions:
       contents: write
