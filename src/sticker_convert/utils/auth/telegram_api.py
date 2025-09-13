@@ -67,11 +67,12 @@ class BotAPI(TelegramAPI):
             self.cb.put("Token required for downloading from telegram")
             return False
 
-        if opt_cred.telegram_userid.isnumeric():
-            self.telegram_userid = int(opt_cred.telegram_userid)
-        else:
-            self.cb.put("Invalid userid, should contain numbers only")
-            return False
+        if opt_cred.telegram_userid:
+            if opt_cred.telegram_userid.isnumeric():
+                self.telegram_userid = int(opt_cred.telegram_userid)
+            else:
+                self.cb.put("Invalid userid, should contain numbers only")
+                return False
 
         self.application = (  # type: ignore
             ApplicationBuilder()
