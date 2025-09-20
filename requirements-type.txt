@@ -1,4 +1,5 @@
 types-beautifulsoup4
+types-cryptography
 types-psutil
 types-Pillow
 types-requests

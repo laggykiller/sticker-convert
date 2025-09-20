@@ -111,10 +111,10 @@ def yuva_to_rgba(frame: "VideoFrame") -> "np.ndarray[Any, Any]":
     u = u.repeat(2, axis=0).repeat(2, axis=1)
     v = v.repeat(2, axis=0).repeat(2, axis=1)
 
-    y = y.reshape((y.shape[0], y.shape[1], 1))
-    u = u.reshape((u.shape[0], u.shape[1], 1))
-    v = v.reshape((v.shape[0], v.shape[1], 1))
-    a = a.reshape((a.shape[0], a.shape[1], 1))
+    y = y.reshape((y.shape[0], y.shape[1], 1))  # type: ignore
+    u = u.reshape((u.shape[0], u.shape[1], 1))  # type: ignore
+    v = v.reshape((v.shape[0], v.shape[1], 1))  # type: ignore
+    a = a.reshape((a.shape[0], a.shape[1], 1))  # type: ignore
 
     yuv_array = np.concatenate((y, u, v), axis=2)
 
