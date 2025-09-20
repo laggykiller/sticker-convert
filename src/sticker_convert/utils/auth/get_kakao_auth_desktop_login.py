@@ -11,8 +11,8 @@ import time
 import uuid
 from typing import Any, Callable, Optional, Tuple
 
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import requests
-from Crypto.Cipher import AES
 
 from sticker_convert.job_option import CredOption
 
@@ -171,9 +171,10 @@ class GetKakaoAuthDesktopLogin:
             aes_key = bytes.fromhex("9FBAE3118FDE5DEAEB8279D08F1D4C79")
             aes_iv = bytes.fromhex("00000000000000000000000000000000")
 
-            cipher = AES.new(aes_key, AES.MODE_CBC, aes_iv)  # type: ignore
+            cipher = Cipher(algorithms.AES(aes_key), modes.CBC(aes_iv))
+            encryptor = cipher.encryptor()
             padded = self.pkcs7_pad(pragma).encode()
-            encrypted_pragma = cipher.encrypt(padded)
+            encrypted_pragma = encryptor.update(padded) + encryptor.finalize()
             pragma_hash = hashlib.sha512(encrypted_pragma).digest()
 
             return base64.b64encode(pragma_hash).decode()
