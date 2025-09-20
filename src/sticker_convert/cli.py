@@ -15,8 +15,9 @@ from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR
 from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
 from sticker_convert.utils.auth.get_discord_auth import GetDiscordAuth
-from sticker_convert.utils.auth.get_kakao_auth import GetKakaoAuth
-from sticker_convert.utils.auth.get_kakao_desktop_auth import GetKakaoDesktopAuth
+from sticker_convert.utils.auth.get_kakao_auth_android_login import GetKakaoAuthAndroidLogin
+from sticker_convert.utils.auth.get_kakao_auth_desktop_login import GetKakaoAuthDesktopLogin
+from sticker_convert.utils.auth.get_kakao_auth_desktop_memdump import GetKakaoAuthDesktopMemdump
 from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
 from sticker_convert.utils.auth.get_viber_auth import GetViberAuth
@@ -176,8 +177,9 @@ class CLI:
         flags_cred_bool = (
             "signal_get_auth",
             "telethon_setup",
-            "kakao_get_auth",
-            "kakao_get_auth_desktop",
+            "kakao_get_auth_desktop_memdump",
+            "kakao_get_auth_desktop_login",
+            "kakao_get_auth_android_login",
             "line_get_auth",
             "discord_get_auth",
             "save_cred",
@@ -511,28 +513,42 @@ class CLI:
             else creds.get("discord", {}).get("token"),
         )
 
-        if args.kakao_get_auth:
-            get_kakao_auth = GetKakaoAuth(
+        if args.kakao_get_auth_android_login:
+            get_kakao_auth_android_login = GetKakaoAuthAndroidLogin(
                 opt_cred=opt_cred,
                 cb_msg=self.cb.msg,
                 cb_msg_block=self.cb.msg_block,
                 cb_ask_str=self.cb.ask_str,
             )
-            auth_token = get_kakao_auth.get_cred()
+            auth_token = get_kakao_auth_android_login.get_cred()
 
             if auth_token:
                 opt_cred.kakao_auth_token = auth_token
 
                 self.cb.msg(f"Got auth_token successfully: {auth_token}")
 
-        if args.kakao_get_auth_desktop:
-            get_kakao_desktop_auth = GetKakaoDesktopAuth(
+        if args.kakao_get_auth_desktop_memdump:
+            get_kakao_auth_desktop_memdump = GetKakaoAuthDesktopMemdump(
                 cb_ask_str=self.cb.ask_str,
             )
             kakao_bin_path = None
             if args.kakao_bin_path:
                 kakao_bin_path = args.kakao_bin_path
-            auth_token, msg = get_kakao_desktop_auth.get_cred(kakao_bin_path)
+            auth_token, msg = get_kakao_auth_desktop_memdump.get_cred(kakao_bin_path)
+
+            if auth_token:
+                opt_cred.kakao_auth_token = auth_token
+
+            self.cb.msg(msg)
+
+        if args.kakao_get_auth_desktop_login:
+            get_kakao_auth_desktop_login = GetKakaoAuthDesktopLogin(
+                opt_cred=opt_cred,
+                cb_msg=self.cb.msg,
+                cb_msg_block=self.cb.msg_block,
+                cb_ask_str=self.cb.ask_str,
+            )
+            auth_token, msg = get_kakao_auth_desktop_login.get_cred()
 
             if auth_token:
                 opt_cred.kakao_auth_token = auth_token

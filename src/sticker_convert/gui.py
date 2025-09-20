@@ -163,6 +163,7 @@ class GUI(Window):
         self.kakao_password_var = StringVar(self)
         self.kakao_country_code_var = StringVar(self)
         self.kakao_phone_number_var = StringVar(self)
+        self.kakao_device_uuid_var = StringVar(self)
         self.kakao_bin_path_var = StringVar(self)
         self.line_cookies_var = StringVar(self)
         self.viber_auth_var = StringVar(self)
@@ -427,6 +428,9 @@ class GUI(Window):
         self.kakao_phone_number_var.set(
             self.creds.get("kakao", {}).get("phone_number", "")
         )
+        self.kakao_device_uuid_var.set(
+            self.creds.get("kakao", {}).get("device_uuid", "")
+        )
         self.line_cookies_var.set(self.creds.get("line", {}).get("cookies", ""))
         self.viber_auth_var.set(self.creds.get("viber", {}).get("auth", ""))
         self.discord_token_var.set(self.creds.get("discord", {}).get("token", ""))
@@ -599,6 +603,7 @@ class GUI(Window):
             kakao_password=self.kakao_password_var.get(),
             kakao_country_code=self.kakao_country_code_var.get(),
             kakao_phone_number=self.kakao_phone_number_var.get(),
+            kakao_device_uuid=self.kakao_device_uuid_var.get(),
             line_cookies=self.line_cookies_var.get(),
             viber_auth=self.viber_auth_var.get(),
             discord_token=self.discord_token_var.get(),

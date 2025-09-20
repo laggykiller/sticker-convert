@@ -26,9 +26,13 @@ MSG_LAUNCH_FAIL = "Failed to launch Kakao"
 MSG_PERMISSION_ERROR = "Failed to read Kakao process memory"
 
 
-class GetKakaoDesktopAuth:
+class GetKakaoAuthDesktopMemdump:
     def __init__(self, cb_ask_str: Callable[..., str] = input) -> None:
         self.cb_ask_str = cb_ask_str
+        if platform.system() == "Windows":
+            self.auth_token_length = 64
+        else:
+            self.auth_token_length = 52
 
     def launch_kakao(self, kakao_bin_path: str) -> None:
         if platform.system() == "Windows":
@@ -69,12 +73,11 @@ class GetKakaoDesktopAuth:
                 ):
                     auth_token_addr = cast(int, address) + 15
                     auth_token_bytes = process.read_process_memory(
-                        auth_token_addr, bytes, 200
+                        auth_token_addr, bytes, self.auth_token_length + 1
                     )
-                    auth_token_term = auth_token_bytes.find(b"\x00")
-                    if auth_token_term == -1:
+                    if auth_token_bytes[-1:] != b"\x00":
                         continue
-                    auth_token_candidate = auth_token_bytes[:auth_token_term].decode(
+                    auth_token_candidate = auth_token_bytes[:-1].decode(
                         encoding="ascii"
                     )
                     if len(auth_token_candidate) > 150:
@@ -126,13 +129,12 @@ class GetKakaoDesktopAuth:
         for i in re.finditer(b"authorization: ", s):
             auth_token_addr = i.start() + 15
 
-            auth_token_bytes = s[auth_token_addr : auth_token_addr + 200]
-            auth_token_term = auth_token_bytes.find(b"\x00")
-            if auth_token_term == -1:
+            auth_token_bytes = s[
+                auth_token_addr : auth_token_addr + self.auth_token_length + 1
+            ]
+            if auth_token_bytes[-1:] != b"\x00":
                 return None, MSG_NO_AUTH
-            auth_token_candidate = auth_token_bytes[:auth_token_term].decode(
-                encoding="ascii"
-            )
+            auth_token_candidate = auth_token_bytes[:-1].decode(encoding="ascii")
             if len(auth_token_candidate) > 150:
                 auth_token = auth_token_candidate
                 break

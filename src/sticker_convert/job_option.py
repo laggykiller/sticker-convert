@@ -223,6 +223,7 @@ class CredOption(BaseOption):
     kakao_auth_token: str = ""
     kakao_username: str = ""
     kakao_password: str = ""
+    kakao_device_uuid: str = ""
     kakao_country_code: str = ""
     kakao_phone_number: str = ""
     line_cookies: str = ""

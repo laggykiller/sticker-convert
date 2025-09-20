@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 from sticker_convert.job_option import CredOption
 
 
-class GetKakaoAuth:
+class GetKakaoAuthAndroidLogin:
     def __init__(
         self,
         opt_cred: CredOption,

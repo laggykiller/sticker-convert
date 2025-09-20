@@ -105,37 +105,29 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress]
-                          [--custom-presets CUSTOM_PRESETS] [--input-dir INPUT_DIR]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--input-dir INPUT_DIR]
                           [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage]
                           [--no-compress]
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX]
-                          [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
-                          [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--res-snap-pow2]
-                          [--no-res-snap-pow2] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
-                          [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                          [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--padding-percent PADDING_PERCENT]
-                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX]
-                          [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                          [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
-                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD]
-                          [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH]
-                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
-                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                          [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID]
-                          [--telethon-setup] [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth]
-                          [--kakao-get-auth-desktop] [--kakao-bin-path KAKAO_BIN_PATH]
-                          [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                          [--kakao-country-code KAKAO_COUNTRY_CODE]
-                          [--kakao-phone-number KAKAO_PHONE_NUMBER] [--line-get-auth]
-                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH]
-                          [--viber-get-auth VIBER_GET_AUTH] [--viber-bin-path VIBER_BIN_PATH]
-                          [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--save-cred]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER]
+                          [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX]
+                          [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--res-snap-pow2]
+                          [--no-res-snap-pow2] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER]
+                          [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR]
+                          [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
+                          [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid] [--scale-filter SCALE_FILTER]
+                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH]
+                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                          [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--telethon-setup]
+                          [--kakao-auth-token KAKAO_AUTH_TOKEN] [--kakao-get-auth-android-login] [--kakao-get-auth-desktop-memdump]
+                          [--kakao-get-auth-desktop-login] [--kakao-bin-path KAKAO_BIN_PATH] [--kakao-username KAKAO_USERNAME]
+                          [--kakao-password KAKAO_PASSWORD] [--kakao-country-code KAKAO_COUNTRY_CODE]
+                          [--kakao-phone-number KAKAO_PHONE_NUMBER] [--kakao-device-uuid KAKAO_DEVICE_UUID] [--line-get-auth]
+                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--save-cred]
 
 CLI for stickers-convert
 
@@ -314,29 +306,35 @@ Credentials options:
   --telethon-setup      Setup Telethon
   --kakao-auth-token KAKAO_AUTH_TOKEN
                         Set Kakao auth_token. Required for downloading animated stickers from https://e.kakao.com/t/xxxxx
-  --kakao-get-auth      Generate Kakao auth_token by simulating login. Kakao username, password, country code and phone number are also required.
-  --kakao-get-auth-desktop
-                        Get Kakao auth_token from Kakao Desktop application.
+  --kakao-get-auth-android-login
+                        Get Kakao auth_token by simulating login from Android. Kakao username, password, country code and phone number required.
+  --kakao-get-auth-desktop-memdump
+                        Get Kakao auth_token from installed Kakao Desktop application with memdump.
+  --kakao-get-auth-desktop-login
+                        Get Kakao auth_token by simulating login from Desktop application. Kakao username and password required.
   --kakao-bin-path KAKAO_BIN_PATH
                         Set Kakao Desktop application path for launching and getting auth_token.
                         Useful for portable installation.
   --kakao-username KAKAO_USERNAME
                         Set Kakao username, which is email or phone number used for signing up Kakao account
                         Example: +447700900142
-                        Required for generating Kakao auth_token.
+                        Required for getting Kakao auth_token by simulating android/desktop login.
   --kakao-password KAKAO_PASSWORD
                         Set Kakao password (Password of Kakao account).
-                        Required for generating Kakao auth_token.
+                        Required for getting Kakao auth_token by simulating android/desktop login.
   --kakao-country-code KAKAO_COUNTRY_CODE
                         Set Kakao country code of phone.
                         Example: 82 (For korea), 44 (For UK), 1 (For USA).
-                        Required for generating Kakao auth_token.
+                        Required for getting Kakao auth_token by simulating android login.
   --kakao-phone-number KAKAO_PHONE_NUMBER
                         Set Kakao phone number (Phone number associated with your Kakao account)
                         Do NOT enter country code
                         Example: 7700900142
                         Used for send / receive verification code via SMS.
-                        Required for generating Kakao auth_token.
+                        Required for getting Kakao auth_token by simulating android login.
+  --kakao-device-uuid KAKAO_DEVICE_UUID
+                        Set Kakao device uuid for desktop login. Defaults to real device uuid.
+                        Optional for getting Kakao auth_token by simulating desktop login
   --line-get-auth       Get Line cookies from browser, which is required to create custom message stickers.
   --line-cookies LINE_COOKIES
                         Set Line cookies, which is required to create custom message stickers.
