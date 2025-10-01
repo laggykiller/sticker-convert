@@ -5,7 +5,6 @@ import platform
 import shutil
 import subprocess
 import time
-from functools import partial
 from pathlib import Path
 from typing import Any, Callable, List, Optional, Tuple, cast
 
@@ -124,14 +123,14 @@ class AuthViber(AuthBase):
         if viber_pid is None:
             return None, MSG_LAUNCH_FAIL
 
-        pw_func = partial(
-            self.cb.put,
-            (
-                "ask_str",
-                None,
-                {"initialvalue": "", "cli_show_initialvalue": False, "password": True},
-            ),
-        )
+        pw_func: Callable[[str], str] = lambda msg: self.cb.put((
+            "ask_str",
+            None,
+            {
+                "message": msg,
+                "password": True,
+            },
+        ))
         s = get_mem(viber_pid, pw_func)
 
         if s is None:
