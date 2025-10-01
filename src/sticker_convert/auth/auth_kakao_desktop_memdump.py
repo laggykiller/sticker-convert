@@ -134,7 +134,7 @@ class AuthKakaoDesktopMemdump(AuthBase):
             auth_token_bytes = s[auth_token_addr : auth_token_addr + 200]
             auth_token_term = auth_token_bytes.find(b"\x00")
             if auth_token_term == -1:
-                return None, MSG_NO_AUTH
+                continue
             auth_token_candidate = auth_token_bytes[:auth_token_term].decode(
                 encoding="ascii"
             )
