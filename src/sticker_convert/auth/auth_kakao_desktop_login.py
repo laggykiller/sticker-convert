@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import socket
 import subprocess
@@ -11,6 +12,7 @@ import time
 import uuid
 from typing import Any, Optional, Tuple
 
+from bs4 import BeautifulSoup
 import requests
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
@@ -27,7 +29,9 @@ class AuthKakaoDesktopLogin(AuthBase):
             self.plat = "mac"
             user_agent_os = "Mc"
             self.os_version = platform.mac_ver()[0]
-            version = "25.2.0"
+            version = self.macos_get_ver()
+            if version is None:
+                version = "25.2.0"
         else:
             self.plat = "win32"
             user_agent_os = "Wd"
@@ -35,7 +39,9 @@ class AuthKakaoDesktopLogin(AuthBase):
                 self.os_version = platform.uname().version
             else:
                 self.os_version = "10.0"
-            version = "25.7.7"
+            version = self.windows_get_ver()
+            if version is None:
+                version = "25.8.2"
 
         user_agent = f"KT/{version} {user_agent_os}/{self.os_version} en"
         self.headers = {
@@ -63,6 +69,29 @@ class AuthKakaoDesktopLogin(AuthBase):
 
     def pkcs7_pad(self, m: str) -> str:
         return m + chr(16 - len(m) % 16) * (16 - len(m) % 16)
+
+    def windows_get_ver(self) -> Optional[str]:
+        r = requests.get("https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/k/Kakao/KakaoTalk")
+        rjson = json.loads(r.text)
+        if len(rjson) == 0:
+            return None
+        ver = rjson[-1]["name"]
+        return ".".join(ver.split(".")[:3])
+
+    def macos_get_ver(self) -> Optional[str]:
+        country = "us"
+        app_name = "kakaotalk-messenger"
+        app_id = "362057947"
+
+        url = f"https://apps.apple.com/{country}/app/{app_name}/id{app_id}"
+
+        r = requests.get(url)
+        soup = BeautifulSoup(r.text, "html.parser")
+        version_tag = soup.find("p", {"class": re.compile(".*latest__version")})
+        version_str = None
+        if version_tag is not None:
+            version_str = version_tag.text.replace("Version ", "")
+        return version_str
 
     def windows_get_pragma(self, use_wine: bool = False) -> Optional[str]:
         sys_uuid = None
