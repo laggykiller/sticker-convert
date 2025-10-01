@@ -147,8 +147,8 @@ class ViberGetAuthWindow(BaseWindow):
         m = AuthViber(self.gui.get_opt_cred(), self.gui.cb)
         viber_bin_path = m.get_viber_desktop()
 
-        if self.gui.viber_auth_var.get():
-            viber_bin_path = self.gui.viber_auth_var.get()
+        if self.gui.viber_bin_path_var.get():
+            viber_bin_path = self.gui.viber_bin_path_var.get()
 
         if viber_bin_path:
             Popen([viber_bin_path])
