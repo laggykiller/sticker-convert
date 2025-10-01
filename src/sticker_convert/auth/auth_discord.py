@@ -4,13 +4,14 @@ import os
 import platform
 import shutil
 import time
+from pathlib import Path
 from typing import Any, Optional, Tuple
 from urllib.parse import urlparse
 
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.chrome_remotedebug import CRD
-from sticker_convert.utils.process import killall
+from sticker_convert.utils.process import killall, find_pid_by_name
 
 
 class AuthDiscord(AuthBase):
@@ -80,8 +81,13 @@ class AuthDiscord(AuthBase):
             )
 
         token = None
-        if using_discord_app:
-            killall("discord")
+
+        if find_pid_by_name(Path(chrome_path).name):
+            response = self.cb.put(("ask_bool", (f"All {Path(chrome_path).name} will be closed. Continue?",), None))
+            if response is True:
+                killall(Path(chrome_path).name.lower())
+            else:
+                return None, FAIL_MSG
 
         crd = CRD(chrome_path)
         while True:
