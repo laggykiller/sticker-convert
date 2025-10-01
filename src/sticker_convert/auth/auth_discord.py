@@ -98,9 +98,14 @@ class AuthDiscord(AuthBase):
 
         while True:
             try:
-                r = crd.exec_js(
-                    "(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken();"
-                )
+                if using_discord_app:
+                    r = crd.exec_js(
+                        "(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken();"
+                    )
+                else:
+                    r = crd.exec_js(
+                        "const iframe=document.createElement('iframe');JSON.parse(document.body.appendChild(iframe).contentWindow.localStorage.token);"
+                    )
             except RuntimeError:
                 break
             if (
