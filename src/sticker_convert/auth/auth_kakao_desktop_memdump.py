@@ -5,7 +5,7 @@ import re
 import subprocess
 import time
 from pathlib import Path
-from typing import Any, Callable, Optional, Tuple, Union, cast
+from typing import Any, Optional, Tuple, Union, cast
 
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import find_pid_by_name, get_mem, killall
@@ -110,14 +110,18 @@ class AuthKakaoDesktopMemdump(AuthBase):
             if relaunch and self.relaunch_kakao(kakao_bin_path) is None:
                 return None, MSG_LAUNCH_FAIL
 
-        pw_func: Callable[[str], str] = lambda msg: self.cb.put((
-            "ask_str",
-            None,
-            {
-                "message": msg,
-                "password": True,
-            },
-        ))
+        def pw_func(msg: str) -> str:
+            return self.cb.put(
+                (
+                    "ask_str",
+                    None,
+                    {
+                        "message": msg,
+                        "password": True,
+                    },
+                )
+            )
+
         s = get_mem(kakao_pid, pw_func, is_wine)
 
         if s is None:

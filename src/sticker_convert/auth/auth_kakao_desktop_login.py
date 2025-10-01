@@ -12,8 +12,8 @@ import time
 import uuid
 from typing import Any, Optional, Tuple
 
-from bs4 import BeautifulSoup
 import requests
+from bs4 import BeautifulSoup
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from sticker_convert.auth.auth_base import AuthBase
@@ -71,7 +71,9 @@ class AuthKakaoDesktopLogin(AuthBase):
         return m + chr(16 - len(m) % 16) * (16 - len(m) % 16)
 
     def windows_get_ver(self) -> Optional[str]:
-        r = requests.get("https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/k/Kakao/KakaoTalk")
+        r = requests.get(
+            "https://api.github.com/repos/microsoft/winget-pkgs/contents/manifests/k/Kakao/KakaoTalk"
+        )
         rjson = json.loads(r.text)
         if len(rjson) == 0:
             return None

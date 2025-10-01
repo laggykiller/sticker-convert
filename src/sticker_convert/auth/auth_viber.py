@@ -123,14 +123,18 @@ class AuthViber(AuthBase):
         if viber_pid is None:
             return None, MSG_LAUNCH_FAIL
 
-        pw_func: Callable[[str], str] = lambda msg: self.cb.put((
-            "ask_str",
-            None,
-            {
-                "message": msg,
-                "password": True,
-            },
-        ))
+        def pw_func(msg: str) -> str:
+            return self.cb.put(
+                (
+                    "ask_str",
+                    None,
+                    {
+                        "message": msg,
+                        "password": True,
+                    },
+                )
+            )
+
         s = get_mem(viber_pid, pw_func)
 
         if s is None:
