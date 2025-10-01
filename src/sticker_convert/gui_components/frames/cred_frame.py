@@ -4,13 +4,13 @@ from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Entry, Label, LabelFrame  # type: ignore
 
+from sticker_convert.auth.auth_telethon import AuthTelethon
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.windows.discord_get_auth_window import DiscordGetAuthWindow
 from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGetAuthWindow
 from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
 from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
 from sticker_convert.gui_components.windows.viber_get_auth_window import ViberGetAuthWindow
-from sticker_convert.utils.auth.telethon_setup import TelethonSetup
 
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
@@ -188,19 +188,19 @@ class CredFrame(LabelFrame):
         faq_site = "https://github.com/laggykiller/sticker-convert#faq"
         success = webbrowser.open(faq_site)
         if not success:
-            self.gui.cb_ask_str("You can get help from:", initialvalue=faq_site)
+            self.gui.cb.ask_str("You can get help from:", initialvalue=faq_site)
 
     def cb_telethon_get_auth(self, *_: Any) -> None:
-        success, _client, api_id, api_hash = TelethonSetup(
-            self.gui.get_opt_cred(), self.gui.cb_ask_str
+        success, _client, api_id, api_hash = AuthTelethon(
+            self.gui.get_opt_cred(), self.gui.cb
         ).start()
         if success:
             self.gui.telethon_api_id_var.set(api_id)
             self.gui.telethon_api_hash_var.set(api_hash)
             self.gui.save_creds()
-            self.gui.cb_msg_block("Telethon setup successful")
+            self.gui.cb.put(("msg_block", ("Telethon setup successful",), None))
         else:
-            self.gui.cb_msg_block("Telethon setup failed")
+            self.gui.cb.put(("msg_block", ("Telethon setup failed",), None))
 
     def cb_kakao_get_auth(self, *_: Any) -> None:
         KakaoGetAuthWindow(self.gui)

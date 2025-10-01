@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-from typing import Callable, Optional, Tuple
+from typing import Any, Optional, Tuple
 
 import anyio
 from telethon import TelegramClient  # type: ignore
 from telethon.errors import SessionPasswordNeededError  # type: ignore
 
+from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
-from sticker_convert.job_option import CredOption
 
 GUIDE_MSG = """1. Visit https://my.telegram.org
 2. Login using your phone number
@@ -21,12 +21,9 @@ GUIDE_MSG = """1. Visit https://my.telegram.org
 Continue when done"""
 
 
-class TelethonSetup:
-    def __init__(
-        self, opt_cred: CredOption, cb_ask_str: Callable[..., str] = input
-    ) -> None:
-        self.cb_ask_str = cb_ask_str
-        self.opt_cred = opt_cred
+class AuthTelethon(AuthBase):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
 
     async def signin_async(self) -> Tuple[bool, TelegramClient, int, str]:
         client = TelegramClient(
@@ -38,13 +35,21 @@ class TelethonSetup:
         await client.connect()
         authed = await client.is_user_authorized()
         if authed is False:
-            phone_number = self.cb_ask_str("Enter phone number: ")
+            msg = "Enter phone number: "
+            phone_number = self.cb.put(("ask_str", (msg,), None))
             await client.send_code_request(phone_number)
-            code = self.cb_ask_str("Enter code: ")
+            msg = "Enter code: "
+            code = self.cb.put(("ask_str", (msg,), None))
             try:
                 await client.sign_in(phone_number, code)
             except SessionPasswordNeededError:
-                password = self.cb_ask_str("Enter password: ")
+                password = self.cb.put(
+                    (
+                        "ask_str",
+                        None,
+                        {"question": "Enter password: ", "password": True},
+                    )
+                )
                 await client.sign_in(password=password)
             authed = await client.is_user_authorized()
 
@@ -56,14 +61,14 @@ class TelethonSetup:
         )
 
     def guide(self) -> None:
-        self.cb_ask_str(GUIDE_MSG)
+        self.cb.put(("ask_str", (GUIDE_MSG,), None))
 
     def get_api_info(self) -> bool:
         api_id_ask = "Enter api_id: "
         wrong_hint = ""
 
         while True:
-            telethon_api_id = self.cb_ask_str(wrong_hint + api_id_ask)
+            telethon_api_id = self.cb.put(("ask_str", (wrong_hint + api_id_ask,), None))
             if telethon_api_id == "":
                 return False
             elif telethon_api_id.isnumeric():
@@ -72,7 +77,9 @@ class TelethonSetup:
             else:
                 wrong_hint = "Error: api_id should be numeric\n"
 
-        self.opt_cred.telethon_api_hash = self.cb_ask_str("Enter api_hash: ")
+        msg = "Enter api_hash: "
+        self.opt_cred.telethon_api_hash = self.cb.put(("ask_str", (msg,), None))
+
         if self.opt_cred.telethon_api_hash == "":
             return False
         return True

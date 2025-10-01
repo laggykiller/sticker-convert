@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 import webbrowser
-from functools import partial
 from threading import Thread
 from typing import Any
 
 from ttkbootstrap import Button, Frame, Label  # type: ignore
 
+from sticker_convert.auth.auth_line import AuthLine
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
-from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 
 
 class LineGetAuthWindow(BaseWindow):
@@ -16,8 +15,6 @@ class LineGetAuthWindow(BaseWindow):
         super().__init__(*args, **kwargs)
 
         self.title("Get Line cookie")
-
-        self.cb_msg_block_line = partial(self.gui.cb_msg_block, parent=self)
 
         self.frame_info = Frame(self.scrollable_frame)
         self.frame_btn = Frame(self.scrollable_frame)
@@ -72,7 +69,7 @@ class LineGetAuthWindow(BaseWindow):
         line_login_site = "https://store.line.me/login"
         success = webbrowser.open(line_login_site)
         if not success:
-            self.gui.cb_ask_str(
+            self.gui.cb.ask_str(
                 "Cannot open web browser for you. Install web browser and open:",
                 initialvalue=line_login_site,
             )
@@ -81,7 +78,7 @@ class LineGetAuthWindow(BaseWindow):
         Thread(target=self.cb_get_cookies_thread, daemon=True).start()
 
     def cb_get_cookies_thread(self, *_: Any) -> None:
-        m = GetLineAuth()
+        m = AuthLine(self.gui.get_opt_cred(), self.gui.cb)
 
         line_cookies = None
         line_cookies = m.get_cred()
@@ -92,11 +89,11 @@ class LineGetAuthWindow(BaseWindow):
             self.gui.creds["line"]["cookies"] = line_cookies
             self.gui.line_cookies_var.set(line_cookies)
 
-            self.cb_msg_block_line("Got Line cookies successfully")
+            msg = "Got Line cookies successfully"
+            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
             self.gui.save_creds()
             self.gui.highlight_fields()
             return
 
-        self.cb_msg_block_line(
-            "Failed to get Line cookies. Have you logged in the web browser?"
-        )
+        msg = "Failed to get Line cookies. Have you logged in the web browser?"
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 import platform
-from functools import partial
 from pathlib import Path
 from subprocess import Popen
 from threading import Thread
@@ -9,9 +8,9 @@ from typing import Any
 
 from ttkbootstrap import Button, Entry, Frame, Label  # type: ignore
 
+from sticker_convert.auth.auth_viber import AuthViber
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
-from sticker_convert.utils.auth.get_viber_auth import GetViberAuth
 
 
 class ViberGetAuthWindow(BaseWindow):
@@ -19,9 +18,6 @@ class ViberGetAuthWindow(BaseWindow):
         super().__init__(*args, **kwargs)
 
         self.title("Get Viber auth data")
-
-        self.cb_msg_block_viber = partial(self.gui.cb_msg_block, parent=self)
-        self.cb_ask_str_viber = partial(self.gui.cb_ask_str, parent=self)
 
         self.frame_info = Frame(self.scrollable_frame)
         self.frame_btns = Frame(self.scrollable_frame)
@@ -128,7 +124,7 @@ class ViberGetAuthWindow(BaseWindow):
         Thread(target=self.cb_get_cred_thread, daemon=True).start()
 
     def cb_get_cred_thread(self) -> None:
-        m = GetViberAuth(self.cb_ask_str_viber)
+        m = AuthViber(self.gui.get_opt_cred(), self.gui.cb)
 
         viber_bin_path = None
         if self.gui.viber_bin_path_var.get():
@@ -145,10 +141,10 @@ class ViberGetAuthWindow(BaseWindow):
             self.gui.save_creds()
             self.gui.highlight_fields()
 
-        self.cb_msg_block_viber(msg)
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
 
     def cb_launch_viber(self) -> None:
-        m = GetViberAuth(self.cb_ask_str_viber)
+        m = AuthViber(self.gui.get_opt_cred(), self.gui.cb)
         viber_bin_path = m.get_viber_desktop()
 
         if self.gui.viber_auth_var.get():
@@ -157,7 +153,8 @@ class ViberGetAuthWindow(BaseWindow):
         if viber_bin_path:
             Popen([viber_bin_path])
         else:
-            self.cb_msg_block_viber("Error: Viber Desktop not installed.")
+            msg = "Error: Viber Desktop not installed."
+            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
 
     def cb_setdir(self) -> None:
         orig_input_dir = self.gui.viber_bin_path_var.get()

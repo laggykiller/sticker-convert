@@ -4,19 +4,18 @@ import os
 import platform
 import signal
 import sys
-from functools import partial
 from json.decoder import JSONDecodeError
 from math import ceil
 from multiprocessing import Event, cpu_count
 from pathlib import Path
 from threading import Thread
-from typing import Any, Callable, Dict, Optional, Union, cast
+from typing import Any, Callable, Dict, Optional, cast
 from urllib.parse import urlparse
 
 from mergedeep import merge  # type: ignore
 from PIL import ImageFont
-from ttkbootstrap import BooleanVar, DoubleVar, IntVar, StringVar, Toplevel, Window  # type: ignore
-from ttkbootstrap.dialogs import Messagebox, Querybox  # type: ignore
+from ttkbootstrap import BooleanVar, DoubleVar, IntVar, StringVar, Window  # type: ignore
+from ttkbootstrap.dialogs import Messagebox  # type: ignore
 
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
 from sticker_convert.gui_components.frames.comp_frame import CompFrame
@@ -29,6 +28,7 @@ from sticker_convert.gui_components.frames.progress_frame import ProgressFrame
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
+from sticker_convert.utils.callback import CallbackGui
 from sticker_convert.utils.files.json_manager import JsonManager
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.url_detect import UrlDetect
@@ -38,6 +38,7 @@ from sticker_convert.version import __version__
 class GUI(Window):
     def __init__(self) -> None:
         super().__init__(themename="darkly", alpha=0)  # type: ignore
+        self.cb = CallbackGui(self)
         self.init_done = False
         self.load_jsons()
 
@@ -79,11 +80,13 @@ class GUI(Window):
 
     def quit(self) -> None:
         if self.job:
-            response = self.cb_ask_bool("Job is running, really quit?")
+            response = self.cb.put(
+                ("ask_bool", ("Job is running, really quit?",), None)
+            )
             if response is False:
                 return
 
-        self.cb_msg(msg="Quitting, please wait...")
+        self.cb.put("Quitting, please wait...")
 
         self.save_config()
         if self.settings_save_cred_var.get() is True:
@@ -241,7 +244,7 @@ class GUI(Window):
             msg += "Please use the stickers with your friends only.\n"
             msg += "It is illegal and immoral to sell stickers downloaded from this program.\n"
 
-        self.cb_msg(msg)
+        self.cb.put(msg)
 
     def warn_tkinter_bug(self) -> None:
         if (
@@ -255,13 +258,13 @@ class GUI(Window):
             msg += "on title bar or move mouse cursor away from window for a while.\n"
             msg += "(This is a bug in tkinter specific to macOS 14 python <=3.11.6)\n"
             msg += "(https://github.com/python/cpython/issues/110218)\n"
-            self.cb_msg(msg)
+            self.cb.put(msg)
 
     def load_jsons(self) -> None:
         try:
             from sticker_convert.utils.files.json_resources_loader import COMPRESSION_JSON, EMOJI_JSON, HELP_JSON, INPUT_JSON, OUTPUT_JSON
         except RuntimeError as e:
-            self.cb_msg(str(e))
+            self.cb.put(str(e))
             return
 
         self.help = HELP_JSON
@@ -286,7 +289,7 @@ class GUI(Window):
                     self.settings_path
                 )
             except JSONDecodeError:
-                self.cb_msg("Warning: config.json content is corrupted")
+                self.cb.put("Warning: config.json content is corrupted")
                 self.settings = {}
         else:
             self.settings = {}
@@ -296,7 +299,7 @@ class GUI(Window):
             try:
                 self.creds = JsonManager.load_json(self.creds_path)
             except JSONDecodeError:
-                self.cb_msg("Warning: creds.json content is corrupted")
+                self.cb.put("Warning: creds.json content is corrupted")
                 self.creds = {}
         else:
             self.creds = {}
@@ -494,17 +497,7 @@ class GUI(Window):
         opt_comp = self.get_opt_comp()
         opt_cred = self.get_opt_cred()
 
-        self.job = Job(
-            opt_input,
-            opt_comp,
-            opt_output,
-            opt_cred,
-            self.cb_msg,
-            self.cb_msg_block,
-            self.cb_bar,
-            self.cb_ask_bool,
-            self.cb_ask_str,
-        )
+        self.job = Job(opt_input, opt_comp, opt_output, opt_cred, self.cb)
 
         signal.signal(signal.SIGINT, self.job.cancel)
 
@@ -642,84 +635,6 @@ class GUI(Window):
         if self.action:
             self.response = self.action()
         self.response_event.set()
-
-    def cb_ask_str(
-        self,
-        question: str,
-        initialvalue: Optional[str] = None,
-        cli_show_initialvalue: bool = True,
-        parent: Optional[object] = None,
-    ) -> str:
-        self.action = partial(
-            Querybox.get_string,  # type: ignore
-            question,
-            title="sticker-convert",
-            initialvalue=initialvalue,
-            parent=parent,
-        )
-        self.event_generate("<<exec_in_main>>")
-        self.response_event.wait()
-        self.response_event.clear()
-
-        if self.response is None:
-            return ""
-        elif isinstance(self.response, str):
-            return self.response
-        else:
-            raise RuntimeError(f"Invalid response in cb_ask_str: {self.response}")
-
-    def cb_ask_bool(
-        self, question: str, parent: Union[Window, Toplevel, None] = None
-    ) -> bool:
-        self.action = partial(
-            Messagebox.yesno,  # type: ignore
-            question,
-            title="sticker-convert",
-            parent=parent,
-        )
-        self.event_generate("<<exec_in_main>>")
-        self.response_event.wait()
-        self.response_event.clear()
-
-        if self.response == "Yes":
-            return True
-        return False
-
-    def cb_msg(self, *args: Any, **kwargs: Any) -> None:
-        self.progress_frame.update_message_box(*args, **kwargs)
-
-    def cb_msg_block(
-        self,
-        *args: Any,
-        message: Optional[str] = None,
-        parent: Optional[object] = None,
-        **_kwargs: Any,
-    ) -> Any:
-        if message is None and len(args) > 0:
-            message = " ".join(str(i) for i in args)
-        self.action = partial(
-            Messagebox.show_info,  # type: ignore
-            message,
-            title="sticker-convert",
-            parent=parent,
-        )
-        self.event_generate("<<exec_in_main>>")
-        self.response_event.wait()
-        self.response_event.clear()
-
-        return self.response
-
-    def cb_bar(
-        self,
-        set_progress_mode: Optional[str] = None,
-        steps: int = 0,
-        update_bar: int = 0,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
-        self.progress_frame.update_progress_bar(
-            set_progress_mode, steps, update_bar, *args, **kwargs
-        )
 
     def highlight_fields(self) -> bool:
         if not self.init_done:

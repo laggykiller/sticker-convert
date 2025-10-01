@@ -21,7 +21,9 @@ class CompFrame(LabelFrame):
             self,
             text="?",
             width=1,
-            command=lambda: self.gui.cb_msg_block(self.gui.help["comp"]["no_compress"]),
+            command=lambda: self.gui.cb.put(
+                ("msg_block", (self.gui.help["comp"]["no_compress"],), None)
+            ),
             bootstyle="secondary",  # type: ignore
         )
         self.no_compress_lbl = Label(self, text="No compression")
@@ -38,7 +40,9 @@ class CompFrame(LabelFrame):
             self,
             text="?",
             width=1,
-            command=lambda: self.gui.cb_msg_block(self.gui.help["comp"]["preset"]),
+            command=lambda: self.gui.cb.put(
+                ("msg_block", (self.gui.help["comp"]["preset"],), None)
+            ),
             bootstyle="secondary",  # type: ignore
         )
         self.comp_preset_lbl = Label(self, text="Preset")
@@ -56,7 +60,9 @@ class CompFrame(LabelFrame):
             self,
             text="?",
             width=1,
-            command=lambda: self.gui.cb_msg_block(self.gui.help["comp"]["steps"]),
+            command=lambda: self.gui.cb.put(
+                ("msg_block", (self.gui.help["comp"]["steps"],), None)
+            ),
             bootstyle="secondary",  # type: ignore
         )
         self.steps_lbl = Label(self, text="Number of steps")
@@ -67,7 +73,9 @@ class CompFrame(LabelFrame):
             self,
             text="?",
             width=1,
-            command=lambda: self.gui.cb_msg_block(self.gui.help["comp"]["processes"]),
+            command=lambda: self.gui.cb.put(
+                ("msg_block", (self.gui.help["comp"]["processes"],), None)
+            ),
             bootstyle="secondary",  # type: ignore
         )
         self.processes_lbl = Label(self, text="Number of processes")

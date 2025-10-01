@@ -8,7 +8,7 @@ from datetime import datetime
 from multiprocessing import Manager, Process, Value
 from pathlib import Path
 from threading import Thread
-from typing import Any, Callable, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
@@ -32,21 +32,18 @@ from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.singletons import singletons
 
+if TYPE_CHECKING:
+    from sticker_convert.utils.callback import CallbackCli, CallbackGui
+
 
 class Executor:
-    def __init__(
-        self,
-        cb_msg: Callable[..., None],
-        cb_msg_block: Callable[..., None],
-        cb_bar: Callable[..., None],
-        cb_ask_bool: Callable[..., bool],
-        cb_ask_str: Callable[..., str],
-    ) -> None:
-        self.cb_msg = cb_msg
-        self.cb_msg_block = cb_msg_block
-        self.cb_bar = cb_bar
-        self.cb_ask_bool = cb_ask_bool
-        self.cb_ask_str = cb_ask_str
+    def __init__(self, cb: Union[CallbackGui, CallbackCli]) -> None:
+        self.cb_msg = cb.cb_msg
+        self.cb_msg_block = cb.cb_msg_block
+        self.cb_msg_dynamic = cb.cb_msg_dynamic
+        self.cb_bar = cb.cb_bar
+        self.cb_ask_bool = cb.cb_ask_bool
+        self.cb_ask_str = cb.cb_ask_str
 
         self.manager = Manager()
         self.work_queue: WorkQueueType = self.manager.Queue()
@@ -90,7 +87,7 @@ class Executor:
     def cb(
         self,
         action: Optional[str],
-        args: Optional[Tuple[str, ...]] = None,
+        args: Optional[Tuple[Any, ...]] = None,
         kwargs: Optional[Dict[str, Any]] = None,
     ) -> None:
         if args is None:
@@ -105,6 +102,8 @@ class Executor:
             self.cb_bar(update_bar=1)
         elif action == "msg_block":
             self.cb_return.set_response(self.cb_msg_block(*args, **kwargs))
+        elif action == "msg_dynamic":
+            self.cb_msg_dynamic(*args, **kwargs)
         elif action == "ask_bool":
             self.cb_return.set_response(self.cb_ask_bool(*args, **kwargs))
         elif action == "ask_str":
@@ -208,31 +207,16 @@ class Job:
         opt_comp: CompOption,
         opt_output: OutputOption,
         opt_cred: CredOption,
-        cb_msg: Callable[..., None],
-        cb_msg_block: Callable[..., None],
-        cb_bar: Callable[..., None],
-        cb_ask_bool: Callable[..., bool],
-        cb_ask_str: Callable[..., str],
+        cb: Union[CallbackCli, CallbackGui],
     ) -> None:
         self.opt_input = opt_input
         self.opt_comp = opt_comp
         self.opt_output = opt_output
         self.opt_cred = opt_cred
-        self.cb_msg = cb_msg
-        self.cb_msg_block = cb_msg_block
-        self.cb_bar = cb_bar
-        self.cb_ask_bool = cb_ask_bool
-        self.cb_ask_str = cb_ask_str
 
         self.out_urls: List[str] = []
 
-        self.executor = Executor(
-            self.cb_msg,
-            self.cb_msg_block,
-            self.cb_bar,
-            self.cb_ask_bool,
-            self.cb_ask_str,
-        )
+        self.executor = Executor(cb)
 
     def start(self) -> int:
         if Path(self.opt_input.dir).is_dir() is False:

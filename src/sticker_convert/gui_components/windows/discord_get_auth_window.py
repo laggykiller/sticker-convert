@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-from functools import partial
 from threading import Thread
 from typing import Any
 
 from ttkbootstrap import Button, Frame, Label  # type: ignore
 
+from sticker_convert.auth.auth_discord import AuthDiscord
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
-from sticker_convert.utils.auth.get_discord_auth import GetDiscordAuth
 
 
 class DiscordGetAuthWindow(BaseWindow):
@@ -15,9 +14,6 @@ class DiscordGetAuthWindow(BaseWindow):
         super(DiscordGetAuthWindow, self).__init__(*args, **kwargs)
 
         self.title("Get Discord token")
-
-        self.cb_msg_block_discord = partial(self.gui.cb_msg_block, parent=self)
-        self.cb_ask_str_discord = partial(self.gui.cb_ask_str, parent=self)
 
         self.frame_info = Frame(self.scrollable_frame)
         self.frame_start_btn = Frame(self.scrollable_frame)
@@ -68,7 +64,7 @@ class DiscordGetAuthWindow(BaseWindow):
         Thread(target=self.cb_login_thread, daemon=True).start()
 
     def cb_login_thread(self, *args: Any) -> None:
-        m = GetDiscordAuth(cb_msg=self.gui.cb_msg)
+        m = AuthDiscord(self.gui.get_opt_cred(), self.gui.cb)
         discord_token, msg = m.get_cred()
         if discord_token:
             if not self.gui.creds.get("discord"):
@@ -79,4 +75,4 @@ class DiscordGetAuthWindow(BaseWindow):
             self.gui.save_creds()
             self.gui.highlight_fields()
 
-        self.cb_msg_block_discord(msg)
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))

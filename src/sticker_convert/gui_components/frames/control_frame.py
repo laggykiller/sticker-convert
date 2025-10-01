@@ -23,7 +23,7 @@ class ControlFrame(Frame):
 
     def cb_start_btn(self, *args: Any, **kwargs: Any) -> None:
         if self.gui.job:
-            response = self.gui.cb_ask_bool("Cancel job?")
+            response = self.gui.cb.ask_bool("Cancel job?")
             if response is True:
                 self.gui.cancel_job()
         else:

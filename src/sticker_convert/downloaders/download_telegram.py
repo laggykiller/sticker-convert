@@ -5,9 +5,9 @@ from urllib.parse import urlparse
 
 import anyio
 
+from sticker_convert.auth.telegram_api import BotAPI, TelegramAPI, TelethonAPI
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption, InputOption
-from sticker_convert.utils.auth.telegram_api import BotAPI, TelegramAPI, TelethonAPI
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 

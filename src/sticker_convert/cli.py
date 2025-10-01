@@ -11,18 +11,18 @@ from typing import Any, Dict
 
 from mergedeep import merge  # type: ignore
 
+from sticker_convert.auth.auth_discord import AuthDiscord
+from sticker_convert.auth.auth_kakao_android_login import AuthKakaoAndroidLogin
+from sticker_convert.auth.auth_kakao_desktop_login import AuthKakaoDesktopLogin
+from sticker_convert.auth.auth_kakao_desktop_memdump import AuthKakaoDesktopMemdump
+from sticker_convert.auth.auth_line import AuthLine
+from sticker_convert.auth.auth_signal import AuthSignal
+from sticker_convert.auth.auth_telethon import AuthTelethon
+from sticker_convert.auth.auth_viber import AuthViber
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR
 from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
-from sticker_convert.utils.auth.get_discord_auth import GetDiscordAuth
-from sticker_convert.utils.auth.get_kakao_auth_android_login import GetKakaoAuthAndroidLogin
-from sticker_convert.utils.auth.get_kakao_auth_desktop_login import GetKakaoAuthDesktopLogin
-from sticker_convert.utils.auth.get_kakao_auth_desktop_memdump import GetKakaoAuthDesktopMemdump
-from sticker_convert.utils.auth.get_line_auth import GetLineAuth
-from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
-from sticker_convert.utils.auth.get_viber_auth import GetViberAuth
-from sticker_convert.utils.auth.telethon_setup import TelethonSetup
-from sticker_convert.utils.callback import Callback
+from sticker_convert.utils.callback import CallbackCli
 from sticker_convert.utils.files.json_manager import JsonManager
 from sticker_convert.utils.url_detect import UrlDetect
 from sticker_convert.version import __version__
@@ -30,13 +30,13 @@ from sticker_convert.version import __version__
 
 class CLI:
     def __init__(self) -> None:
-        self.cb = Callback()
+        self.cb = CallbackCli()
 
     def cli(self) -> None:
         try:
             from sticker_convert.utils.files.json_resources_loader import COMPRESSION_JSON, EMOJI_JSON, HELP_JSON, INPUT_JSON, OUTPUT_JSON
         except RuntimeError as e:
-            self.cb.msg(str(e))
+            self.cb.put(str(e))
             return
 
         self.help = HELP_JSON
@@ -216,15 +216,7 @@ class CLI:
         self.opt_cred = self.get_opt_cred(args)
 
         job = Job(
-            self.opt_input,
-            self.opt_comp,
-            self.opt_output,
-            self.opt_cred,
-            self.cb.msg,
-            self.cb.msg_block,
-            self.cb.bar,
-            self.cb.ask_bool,
-            self.cb.ask_str,
+            self.opt_input, self.opt_comp, self.opt_output, self.opt_cred, self.cb
         )
 
         signal.signal(signal.SIGINT, job.cancel)
@@ -258,9 +250,9 @@ class CLI:
             detected_download_option = UrlDetect.detect(url)
             if detected_download_option:
                 download_option = detected_download_option
-                self.cb.msg(f"Detected URL input source: {download_option}")
+                self.cb.put(f"Detected URL input source: {download_option}")
             else:
-                self.cb.msg(f"Error: Unrecognied URL input source for url: {url}")
+                self.cb.put(f"Error: Unrecognied URL input source for url: {url}")
                 sys.exit()
 
         opt_input = InputOption(
@@ -343,21 +335,21 @@ class CLI:
             if output_option == "local":
                 preset = "custom"
                 args.no_compress = True
-                self.cb.msg(
+                self.cb.put(
                     "Auto compression option set to no_compress (Reason: Export to local directory only)"
                 )
             elif "telegram_emoji" in output_option:
                 preset = "telegram_emoji"
-                self.cb.msg(f"Auto compression option set to {preset}")
+                self.cb.put(f"Auto compression option set to {preset}")
             elif "telegram" in output_option:
                 preset = "telegram"
-                self.cb.msg(f"Auto compression option set to {preset}")
+                self.cb.put(f"Auto compression option set to {preset}")
             elif output_option == "imessage":
                 preset = "imessage_small"
-                self.cb.msg(f"Auto compression option set to {preset}")
+                self.cb.put(f"Auto compression option set to {preset}")
             else:
                 preset = output_option
-                self.cb.msg(f"Auto compression option set to {preset}")
+                self.cb.put(f"Auto compression option set to {preset}")
 
         opt_comp = CompOption(
             preset=preset,
@@ -464,13 +456,13 @@ class CLI:
             try:
                 creds = JsonManager.load_json(creds_path)
             except JSONDecodeError:
-                self.cb.msg("Warning: creds.json content is corrupted")
+                self.cb.put("Warning: creds.json content is corrupted")
                 creds = {}
         else:
             creds = {}
 
         if creds:
-            self.cb.msg("Loaded credentials from creds.json")
+            self.cb.put("Loaded credentials from creds.json")
 
         opt_cred = CredOption(
             signal_uuid=args.signal_uuid
@@ -514,23 +506,16 @@ class CLI:
         )
 
         if args.kakao_get_auth_android_login:
-            get_kakao_auth_android_login = GetKakaoAuthAndroidLogin(
-                opt_cred=opt_cred,
-                cb_msg=self.cb.msg,
-                cb_msg_block=self.cb.msg_block,
-                cb_ask_str=self.cb.ask_str,
-            )
+            get_kakao_auth_android_login = AuthKakaoAndroidLogin(opt_cred, self.cb)
             auth_token = get_kakao_auth_android_login.get_cred()
 
             if auth_token:
                 opt_cred.kakao_auth_token = auth_token
 
-                self.cb.msg(f"Got auth_token successfully: {auth_token}")
+                self.cb.put(f"Got auth_token successfully: {auth_token}")
 
         if args.kakao_get_auth_desktop_memdump:
-            get_kakao_auth_desktop_memdump = GetKakaoAuthDesktopMemdump(
-                cb_ask_str=self.cb.ask_str,
-            )
+            get_kakao_auth_desktop_memdump = AuthKakaoDesktopMemdump(opt_cred, self.cb)
             kakao_bin_path = None
             if args.kakao_bin_path:
                 kakao_bin_path = args.kakao_bin_path
@@ -539,62 +524,57 @@ class CLI:
             if auth_token:
                 opt_cred.kakao_auth_token = auth_token
 
-            self.cb.msg(msg)
+            self.cb.put(msg)
 
         if args.kakao_get_auth_desktop_login:
-            get_kakao_auth_desktop_login = GetKakaoAuthDesktopLogin(
-                opt_cred=opt_cred,
-                cb_msg=self.cb.msg,
-                cb_msg_block=self.cb.msg_block,
-                cb_ask_str=self.cb.ask_str,
-            )
+            get_kakao_auth_desktop_login = AuthKakaoDesktopLogin(opt_cred, self.cb)
             auth_token, msg = get_kakao_auth_desktop_login.get_cred()
 
             if auth_token:
                 opt_cred.kakao_auth_token = auth_token
 
-            self.cb.msg(msg)
+            self.cb.put(msg)
 
         if args.signal_get_auth:
-            m = GetSignalAuth(cb_msg=self.cb.msg, cb_ask_str=self.cb.ask_str)
+            m = AuthSignal(opt_cred, self.cb)
 
             uuid, password = m.get_cred()
             if uuid and password:
                 opt_cred.signal_uuid = uuid
                 opt_cred.signal_password = password
 
-                self.cb.msg(f"Got uuid and password successfully: {uuid}, {password}")
+                self.cb.put(f"Got uuid and password successfully: {uuid}, {password}")
 
-            self.cb.msg("Failed to get uuid and password")
+            self.cb.put("Failed to get uuid and password")
 
         if args.telethon_setup:
-            telethon_setup = TelethonSetup(opt_cred, self.cb.ask_str)
+            telethon_setup = AuthTelethon(opt_cred, self.cb)
             success, _, telethon_api_id, telethon_api_hash = telethon_setup.start()
 
             if success:
                 opt_cred.telethon_api_id = telethon_api_id
                 opt_cred.telethon_api_hash = telethon_api_hash
 
-                self.cb.msg("Telethon setup successful")
+                self.cb.put("Telethon setup successful")
             else:
-                self.cb.msg("Telethon setup failed")
+                self.cb.put("Telethon setup failed")
 
         if args.line_get_auth:
-            get_line_auth = GetLineAuth()
+            get_line_auth = AuthLine(opt_cred, self.cb)
 
             line_cookies = get_line_auth.get_cred()
 
             if line_cookies:
                 opt_cred.line_cookies = line_cookies
 
-                self.cb.msg("Got Line cookies successfully")
+                self.cb.put("Got Line cookies successfully")
             else:
-                self.cb.msg(
+                self.cb.put(
                     "Failed to get Line cookies. Have you logged in the web browser?"
                 )
 
         if args.viber_get_auth:
-            get_viber_auth = GetViberAuth(self.cb.ask_str)
+            get_viber_auth = AuthViber(opt_cred, self.cb)
 
             viber_bin_path = None
             if args.viber_bin_path:
@@ -605,20 +585,20 @@ class CLI:
             if viber_auth:
                 opt_cred.viber_auth = viber_auth
 
-            self.cb.msg(msg)
+            self.cb.put(msg)
 
         if args.discord_get_auth:
-            get_discord_auth = GetDiscordAuth(self.cb.msg)
+            get_discord_auth = AuthDiscord(opt_cred, self.cb)
             discord_token, msg = get_discord_auth.get_cred()
 
             if discord_token:
                 opt_cred.discord_token = discord_token
 
-            self.cb.msg(msg)
+            self.cb.put(msg)
 
         if args.save_cred:
             creds_path = CONFIG_DIR / "creds.json"
             JsonManager.save_json(creds_path, opt_cred.to_dict())
-            self.cb.msg("Saved credentials to creds.json")
+            self.cb.put("Saved credentials to creds.json")
 
         return opt_cred

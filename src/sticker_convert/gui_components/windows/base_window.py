@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import platform
-from typing import TYPE_CHECKING, Tuple
+from typing import TYPE_CHECKING, Optional, Tuple
 
 from ttkbootstrap import Toplevel  # type: ignore
 
@@ -11,9 +11,14 @@ if TYPE_CHECKING:
 
 
 class BaseWindow(Toplevel):
-    def __init__(self, gui: "GUI") -> None:
+    def __init__(self, gui: "GUI", parent: Optional[Toplevel] = None) -> None:
         super().__init__(alpha=0)  # type: ignore
         self.gui = gui
+
+        if parent is None:
+            self.parent = gui
+        else:
+            self.parent = parent
 
         GUIUtils.set_icon(self)
 

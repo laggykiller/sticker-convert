@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 import platform
-from functools import partial
 from threading import Thread
 from typing import Any, Optional
 
 from ttkbootstrap import Button, Entry, Frame, Label, LabelFrame  # type: ignore
 
+from sticker_convert.auth.auth_kakao_android_login import AuthKakaoAndroidLogin
+from sticker_convert.auth.auth_kakao_desktop_login import AuthKakaoDesktopLogin
+from sticker_convert.auth.auth_kakao_desktop_memdump import AuthKakaoDesktopMemdump
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
-from sticker_convert.utils.auth.get_kakao_auth_android_login import GetKakaoAuthAndroidLogin
-from sticker_convert.utils.auth.get_kakao_auth_desktop_login import GetKakaoAuthDesktopLogin
-from sticker_convert.utils.auth.get_kakao_auth_desktop_memdump import GetKakaoAuthDesktopMemdump
 
 
 class KakaoGetAuthWindow(BaseWindow):
@@ -19,9 +18,6 @@ class KakaoGetAuthWindow(BaseWindow):
         super().__init__(*args, **kwargs)
 
         self.title("Get Kakao auth_token")
-
-        self.cb_msg_block_kakao = partial(self.gui.cb_msg_block, parent=self)
-        self.cb_ask_str_kakao = partial(self.gui.cb_ask_str, parent=self)
 
         self.frame_desktop_memdump = LabelFrame(
             self.scrollable_frame, text="Method 1: KakaoTalk Desktop memdump"
@@ -137,8 +133,15 @@ class KakaoGetAuthWindow(BaseWindow):
             self.frame_desktop_login,
             text="?",
             width=1,
-            command=lambda: self.cb_msg_block_kakao(
-                self.gui.help["cred"]["kakao_username"]
+            command=lambda: self.gui.cb.put(
+                (
+                    "msg_block",
+                    None,
+                    {
+                        "message": self.gui.help["cred"]["kakao_username"],
+                        "parent": self,
+                    },
+                )
             ),
             bootstyle="secondary",  # type: ignore
         )
@@ -160,8 +163,15 @@ class KakaoGetAuthWindow(BaseWindow):
             self.frame_desktop_login,
             text="?",
             width=1,
-            command=lambda: self.cb_msg_block_kakao(
-                self.gui.help["cred"]["kakao_password"]
+            command=lambda: self.gui.cb.put(
+                (
+                    "msg_block",
+                    None,
+                    {
+                        "message": self.gui.help["cred"]["kakao_password"],
+                        "parent": self,
+                    },
+                )
             ),
             bootstyle="secondary",  # type: ignore
         )
@@ -179,8 +189,15 @@ class KakaoGetAuthWindow(BaseWindow):
             self.frame_desktop_login,
             text="?",
             width=1,
-            command=lambda: self.cb_msg_block_kakao(
-                self.gui.help["cred"]["kakao_device_uuid"]
+            command=lambda: self.gui.cb.put(
+                (
+                    "msg_block",
+                    None,
+                    {
+                        "message": self.gui.help["cred"]["kakao_device_uuid"],
+                        "parent": self,
+                    },
+                )
             ),
             bootstyle="secondary",  # type: ignore
         )
@@ -254,8 +271,15 @@ class KakaoGetAuthWindow(BaseWindow):
             self.frame_android_login,
             text="?",
             width=1,
-            command=lambda: self.cb_msg_block_kakao(
-                self.gui.help["cred"]["kakao_username"]
+            command=lambda: self.gui.cb.put(
+                (
+                    "msg_block",
+                    None,
+                    {
+                        "message": self.gui.help["cred"]["kakao_username"],
+                        "parent": self,
+                    },
+                )
             ),
             bootstyle="secondary",  # type: ignore
         )
@@ -277,8 +301,15 @@ class KakaoGetAuthWindow(BaseWindow):
             self.frame_android_login,
             text="?",
             width=1,
-            command=lambda: self.cb_msg_block_kakao(
-                self.gui.help["cred"]["kakao_password"]
+            command=lambda: self.gui.cb.put(
+                (
+                    "msg_block",
+                    None,
+                    {
+                        "message": self.gui.help["cred"]["kakao_password"],
+                        "parent": self,
+                    },
+                )
             ),
             bootstyle="secondary",  # type: ignore
         )
@@ -296,8 +327,15 @@ class KakaoGetAuthWindow(BaseWindow):
             self.frame_android_login,
             text="?",
             width=1,
-            command=lambda: self.cb_msg_block_kakao(
-                self.gui.help["cred"]["kakao_country_code"]
+            command=lambda: self.gui.cb.put(
+                (
+                    "msg_block",
+                    None,
+                    {
+                        "message": self.gui.help["cred"]["kakao_country_code"],
+                        "parent": self,
+                    },
+                )
             ),
             bootstyle="secondary",  # type: ignore
         )
@@ -315,8 +353,15 @@ class KakaoGetAuthWindow(BaseWindow):
             self.frame_android_login,
             text="?",
             width=1,
-            command=lambda: self.cb_msg_block_kakao(
-                self.gui.help["cred"]["kakao_phone_number"]
+            command=lambda: self.gui.cb.put(
+                (
+                    "msg_block",
+                    None,
+                    {
+                        "message": self.gui.help["cred"]["kakao_phone_number"],
+                        "parent": self,
+                    },
+                )
             ),
             bootstyle="secondary",  # type: ignore
         )
@@ -375,12 +420,7 @@ class KakaoGetAuthWindow(BaseWindow):
 
     def cb_get_auth_desktop_login_thread(self, *_: Any) -> None:
         self.gui.save_creds()
-        m = GetKakaoAuthDesktopLogin(
-            opt_cred=self.gui.get_opt_cred(),
-            cb_msg=self.gui.cb_msg,
-            cb_msg_block=self.cb_msg_block_kakao,
-            cb_ask_str=self.cb_ask_str_kakao,
-        )
+        m = AuthKakaoDesktopLogin(self.gui.get_opt_cred(), self.gui.cb)
 
         auth_token, msg = m.get_cred()
 
@@ -393,19 +433,14 @@ class KakaoGetAuthWindow(BaseWindow):
             self.gui.save_creds()
             self.gui.highlight_fields()
 
-        self.cb_msg_block_kakao(msg)
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
 
     def cb_get_auth_desktop_login(self) -> None:
         Thread(target=self.cb_get_auth_desktop_login_thread, daemon=True).start()
 
     def cb_get_auth_android_login_thread(self, *_: Any) -> None:
         self.gui.save_creds()
-        m = GetKakaoAuthAndroidLogin(
-            opt_cred=self.gui.get_opt_cred(),
-            cb_msg=self.gui.cb_msg,
-            cb_msg_block=self.cb_msg_block_kakao,
-            cb_ask_str=self.cb_ask_str_kakao,
-        )
+        m = AuthKakaoAndroidLogin(self.gui.get_opt_cred(), self.gui.cb)
 
         auth_token = m.get_cred()
 
@@ -415,16 +450,16 @@ class KakaoGetAuthWindow(BaseWindow):
             self.gui.creds["kakao"]["auth_token"] = auth_token
             self.gui.kakao_auth_token_var.set(auth_token)
 
-            self.cb_msg_block_kakao(f"Got auth_token successfully: {auth_token}")
+            msg = f"Got auth_token successfully: {auth_token}"
+            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
             self.gui.save_creds()
             self.gui.highlight_fields()
         else:
-            self.cb_msg_block_kakao("Failed to get auth_token")
+            msg = "Failed to get auth_token"
+            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
 
     def cb_launch_desktop(self) -> None:
-        m = GetKakaoAuthDesktopMemdump(
-            cb_ask_str=self.cb_ask_str_kakao,
-        )
+        m = AuthKakaoDesktopMemdump(self.gui.get_opt_cred(), self.gui.cb)
         if self.gui.kakao_bin_path_var.get() != "":
             bin_path = self.gui.kakao_bin_path_var.get()
         else:
@@ -433,20 +468,17 @@ class KakaoGetAuthWindow(BaseWindow):
         if bin_path is not None:
             m.launch_kakao(bin_path)
         else:
-            self.cb_msg_block_kakao(
-                "Error: Cannot launch Kakao Desktop. Is it installed?"
-            )
+            msg = "Error: Cannot launch Kakao Desktop. Is it installed?"
+            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
 
     def cb_get_auth_desktop_memdump(self) -> None:
         Thread(target=self.cb_get_auth_desktop_memdump_thread, daemon=True).start()
 
     def cb_get_auth_desktop_memdump_thread(self, *_: Any) -> None:
         self.gui.save_creds()
-        self.gui.cb_msg("Getting auth_token, this may take a minute...")
-        self.gui.cb_bar("indeterminate")
-        m = GetKakaoAuthDesktopMemdump(
-            cb_ask_str=self.cb_ask_str_kakao,
-        )
+        self.gui.cb.put("Getting auth_token, this may take a minute...")
+        self.gui.cb.bar("indeterminate")
+        m = AuthKakaoDesktopMemdump(self.gui.get_opt_cred(), self.gui.cb)
 
         bin_path: Optional[str]
         if self.gui.kakao_bin_path_var.get() != "":
@@ -464,5 +496,5 @@ class KakaoGetAuthWindow(BaseWindow):
             self.gui.save_creds()
             self.gui.highlight_fields()
 
-        self.cb_msg_block_kakao(msg)
-        self.gui.cb_bar("clear")
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
+        self.gui.cb.bar("clear")

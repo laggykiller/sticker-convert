@@ -6,10 +6,10 @@ import shutil
 import subprocess
 import time
 from functools import partial
-from getpass import getpass
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple, cast
+from typing import Any, Callable, List, Optional, Tuple, cast
 
+from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import check_admin, find_pid_by_name, get_mem, killall
 
 MSG_NO_BIN = """Viber Desktop not detected.
@@ -27,9 +27,9 @@ MSG_LAUNCH_FAIL = "Failed to launch Viber"
 MSG_PERMISSION_ERROR = "Failed to read Viber process memory"
 
 
-class GetViberAuth:
-    def __init__(self, cb_ask_str: Callable[..., str] = input) -> None:
-        self.cb_ask_str = cb_ask_str
+class AuthViber(AuthBase):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
 
     def relaunch_viber(self, viber_bin_path: str) -> Optional[int]:
         killed = killall("viber")
@@ -124,12 +124,14 @@ class GetViberAuth:
         if viber_pid is None:
             return None, MSG_LAUNCH_FAIL
 
-        if self.cb_ask_str == input:
-            pw_func = getpass
-        else:
-            pw_func = partial(
-                self.cb_ask_str, initialvalue="", cli_show_initialvalue=False
-            )
+        pw_func = partial(
+            self.cb.put,
+            (
+                "ask_str",
+                None,
+                {"initialvalue": "", "cli_show_initialvalue": False, "password": True},
+            ),
+        )
         s = get_mem(viber_pid, pw_func)
 
         if s is None:

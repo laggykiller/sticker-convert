@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from functools import partial
+from getpass import getpass
 from multiprocessing import Event, Manager
 from multiprocessing.managers import ListProxy, SyncManager
 from queue import Queue
@@ -19,6 +21,9 @@ if TYPE_CHECKING:
     ResponseListType = ListProxy[ResponseItemType]  # type: ignore
     CbQueueType = Queue[CbQueueItemType]  # type: ignore
     WorkQueueType = Queue[WorkQueueItemType]  # type: ignore
+    from ttkbootstrap import Toplevel  # type: ignore
+
+    from sticker_convert.gui import GUI  # type: ignore
 else:
     ResultsListType = List[Any]
     ResponseListType = List[ResponseItemType]
@@ -51,12 +56,13 @@ class CallbackProtocol(Protocol):
     def put(self, i: Union[CbQueueItemType, str]) -> Any: ...
 
 
-class Callback(CallbackProtocol):
+class CallbackCli(CallbackProtocol):
     def __init__(
         self,
         msg: Optional[Callable[..., None]] = None,
         bar: Optional[Callable[..., None]] = None,
         msg_block: Optional[Callable[..., None]] = None,
+        msg_dynamic: Optional[Callable[..., bool]] = None,
         ask_bool: Optional[Callable[..., bool]] = None,
         ask_str: Optional[Callable[..., str]] = None,
         silent: bool = False,
@@ -79,6 +85,11 @@ class Callback(CallbackProtocol):
             self.msg_block = msg_block
         else:
             self.msg_block = self.cb_msg_block
+
+        if msg_dynamic:
+            self.msg_dynamic = msg_dynamic
+        else:
+            self.msg_dynamic = self.cb_msg_dynamic
 
         if ask_bool:
             self.ask_bool = ask_bool
@@ -136,6 +147,16 @@ class Callback(CallbackProtocol):
         if not self.no_confirm:
             input("Press Enter to continue...")
 
+    def cb_msg_dynamic(self, *args: Any) -> bool:
+        message = args[0]
+
+        if message is None:
+            print()
+        else:
+            print(message, end="\r", flush=True)
+
+        return True
+
     def cb_ask_bool(self, *args: Any, **kwargs: Any) -> bool:
         question = args[0]
 
@@ -161,6 +182,7 @@ class Callback(CallbackProtocol):
         msg: Optional[str] = None,
         initialvalue: Optional[str] = None,
         cli_show_initialvalue: bool = True,
+        password: bool = False,
     ) -> str:
         self.msg(msg)
 
@@ -168,7 +190,12 @@ class Callback(CallbackProtocol):
         if cli_show_initialvalue and initialvalue:
             hint = f" [Default: {initialvalue}]"
 
-        response = input(f"Enter your response and press enter{hint} > ")
+        if password is True:
+            if msg is None:
+                msg = "Password: "
+            response = getpass(msg)
+        else:
+            response = input(f"Enter your response and press enter{hint} > ")
 
         if initialvalue and not response:
             response = initialvalue
@@ -202,6 +229,191 @@ class Callback(CallbackProtocol):
             self.bar(update_bar=1)
         elif action == "msg_block":
             return self.msg_block(*args, **kwargs)
+        elif action == "msg_dynamic":
+            return self.msg_dynamic(*args, **kwargs)
+        elif action == "ask_bool":
+            return self.ask_bool(*args, **kwargs)
+        elif action == "ask_str":
+            return self.ask_str(**kwargs)
+        else:
+            self.msg(action)
+        return None
+
+
+class CallbackGui(CallbackProtocol):
+    def __init__(self, gui: "GUI"):
+        from ttkbootstrap import Label, StringVar  # type: ignore
+
+        from sticker_convert.gui_components.windows.base_window import BaseWindow
+        from sticker_convert.job import Job
+
+        self.gui = gui
+        self.job: Optional[Job] = None
+        self.msg_dynamic_window: Optional[BaseWindow] = None
+        self.message_var = StringVar(self.gui)
+        self.msg_dynamic_label: Optional[Label] = None
+
+        self.ask_str = self.cb_ask_str
+        self.ask_bool = self.cb_ask_bool
+        self.msg = self.cb_msg
+        self.msg_block = self.cb_msg_block
+        self.msg_dynamic = self.cb_msg_dynamic
+        self.bar = self.cb_bar
+
+    def cb_ask_str(
+        self,
+        question: str,
+        initialvalue: Optional[str] = None,
+        cli_show_initialvalue: bool = True,
+        password: bool = False,
+        parent: Optional[object] = None,
+    ) -> str:
+        from ttkbootstrap import Querybox  # type: ignore
+
+        self.gui.action = partial(
+            Querybox.get_string,  # type: ignore
+            question,
+            title="sticker-convert",
+            initialvalue=initialvalue,
+            parent=parent,
+        )
+        self.gui.event_generate("<<exec_in_main>>")
+        self.gui.response_event.wait()
+        self.gui.response_event.clear()
+
+        if self.gui.response is None:
+            return ""
+        elif isinstance(self.gui.response, str):
+            return self.gui.response
+        else:
+            raise RuntimeError(f"Invalid response in cb_ask_str: {self.gui.response}")
+
+    def cb_ask_bool(self, question: str, parent: Optional["Toplevel"] = None) -> bool:
+        from ttkbootstrap.dialogs import Messagebox  # type: ignore
+
+        self.gui.action = partial(
+            Messagebox.yesno,  # type: ignore
+            question,
+            title="sticker-convert",
+            parent=parent,
+        )
+        self.gui.event_generate("<<exec_in_main>>")
+        self.gui.response_event.wait()
+        self.gui.response_event.clear()
+
+        if self.gui.response == "Yes":
+            return True
+        return False
+
+    def cb_msg(self, *args: Any, **kwargs: Any) -> None:
+        self.gui.progress_frame.update_message_box(*args, **kwargs)
+
+    def cb_msg_block(
+        self,
+        message: Optional[str] = None,
+        parent: Optional[object] = None,
+        **_kwargs: Any,
+    ) -> Any:
+        from ttkbootstrap.dialogs import Messagebox  # type: ignore
+
+        self.gui.action = partial(
+            Messagebox.show_info,  # type: ignore
+            message,
+            title="sticker-convert",
+            parent=parent,
+        )
+        self.gui.event_generate("<<exec_in_main>>")
+        self.gui.response_event.wait()
+        self.gui.response_event.clear()
+
+        return self.gui.response
+
+    def cb_msg_dynamic(
+        self,
+        message: Optional[str] = None,
+        parent: Optional["Toplevel"] = None,
+        **_kwargs: Any,
+    ) -> bool:
+        from ttkbootstrap import Label  # type: ignore
+
+        from sticker_convert.gui_components.gui_utils import GUIUtils
+        from sticker_convert.gui_components.windows.base_window import BaseWindow
+
+        self.gui.action = None
+        if self.msg_dynamic_window is None:
+            if message is not None:
+                self.msg_dynamic_window = BaseWindow(self.gui, parent)
+                self.message_var.set(message)
+                self.msg_dynamic_label = Label(
+                    self.msg_dynamic_window.scrollable_frame,
+                    textvariable=self.message_var,
+                )
+                self.msg_dynamic_label.pack()
+                self.gui.action = partial(
+                    GUIUtils.finalize_window, self.msg_dynamic_window
+                )
+                ret = True
+            else:
+                ret = False
+        elif self.msg_dynamic_window.winfo_exists() == 0:
+            self.msg_dynamic_window = None
+            ret = False
+        else:
+            if message is None:
+                self.gui.action = self.msg_dynamic_window.destroy
+                ret = False
+            else:
+                self.gui.action = partial(self.message_var.set, message)
+                ret = True
+
+        if self.gui.action is not None:
+            self.gui.event_generate("<<exec_in_main>>")
+            self.gui.response_event.wait()
+            self.gui.response_event.clear()
+
+        return ret
+
+    def cb_bar(
+        self,
+        set_progress_mode: Optional[str] = None,
+        steps: int = 0,
+        update_bar: int = 0,
+        *args: Any,
+        **kwargs: Any,
+    ) -> None:
+        self.gui.progress_frame.update_progress_bar(
+            set_progress_mode, steps, update_bar, *args, **kwargs
+        )
+
+    def put(self, i: Union[CbQueueItemType, str]) -> Union[str, bool, None]:
+        if isinstance(i, tuple):
+            action = i[0]
+            if len(i) >= 2:
+                args: Tuple[Any, ...] = i[1] if i[1] else tuple()
+            else:
+                args = tuple()
+            if len(i) >= 3:
+                kwargs: Dict[str, Any] = i[2] if i[2] else {}
+            else:
+                kwargs = {}
+        else:
+            action = i
+            args = tuple()
+            kwargs = {}
+
+        # Fake implementation for Queue.put()
+        if action is None:
+            return None
+        if action == "msg":
+            self.msg(*args, **kwargs)
+        elif action == "bar":
+            self.bar(**kwargs)
+        elif action == "update_bar":
+            self.bar(update_bar=1)
+        elif action == "msg_block":
+            return self.msg_block(*args, **kwargs)
+        elif action == "msg_dynamic":
+            return self.msg_dynamic(*args, **kwargs)
         elif action == "ask_bool":
             return self.ask_bool(*args, **kwargs)
         elif action == "ask_str":

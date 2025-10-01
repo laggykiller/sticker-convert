@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
-from functools import partial
 from threading import Thread
 from typing import Any
 
 from ttkbootstrap import Button, Frame, Label  # type: ignore
 
+from sticker_convert.auth.auth_signal import AuthSignal
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
-from sticker_convert.utils.auth.get_signal_auth import GetSignalAuth
 
 
 class SignalGetAuthWindow(BaseWindow):
@@ -15,9 +14,6 @@ class SignalGetAuthWindow(BaseWindow):
         super(SignalGetAuthWindow, self).__init__(*args, **kwargs)
 
         self.title("Get Signal uuid and password")
-
-        self.cb_msg_block_signal = partial(self.gui.cb_msg_block, parent=self)
-        self.cb_ask_str_signal = partial(self.gui.cb_ask_str, parent=self)
 
         self.frame_info = Frame(self.scrollable_frame)
         self.frame_start_btn = Frame(self.scrollable_frame)
@@ -68,7 +64,7 @@ class SignalGetAuthWindow(BaseWindow):
         Thread(target=self.cb_login_thread, daemon=True).start()
 
     def cb_login_thread(self, *args: Any) -> None:
-        m = GetSignalAuth(cb_msg=self.gui.cb_msg, cb_ask_str=self.cb_ask_str_signal)
+        m = AuthSignal(self.gui.get_opt_cred(), self.gui.cb)
 
         uuid, password = m.get_cred()
         if uuid and password:
@@ -79,11 +75,13 @@ class SignalGetAuthWindow(BaseWindow):
             self.gui.signal_uuid_var.set(uuid)
             self.gui.signal_password_var.set(password)
 
-            self.cb_msg_block_signal(
+            msg = (
                 f"Got uuid and password successfully:\nuuid={uuid}\npassword={password}"
             )
+            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
             self.gui.save_creds()
             self.gui.highlight_fields()
             return
 
-        self.cb_msg_block_signal("Failed to get uuid and password")
+        msg = "Failed to get uuid and password"
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))

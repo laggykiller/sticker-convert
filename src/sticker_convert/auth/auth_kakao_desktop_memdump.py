@@ -5,10 +5,10 @@ import re
 import subprocess
 import time
 from functools import partial
-from getpass import getpass
 from pathlib import Path
-from typing import Callable, Optional, Tuple, Union, cast
+from typing import Any, Optional, Tuple, Union, cast
 
+from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import find_pid_by_name, get_mem, killall
 
 MSG_NO_BIN = """Kakao Desktop not detected.
@@ -26,9 +26,9 @@ MSG_LAUNCH_FAIL = "Failed to launch Kakao"
 MSG_PERMISSION_ERROR = "Failed to read Kakao process memory"
 
 
-class GetKakaoAuthDesktopMemdump:
-    def __init__(self, cb_ask_str: Callable[..., str] = input) -> None:
-        self.cb_ask_str = cb_ask_str
+class AuthKakaoDesktopMemdump(AuthBase):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
 
     def launch_kakao(self, kakao_bin_path: str) -> None:
         if platform.system() == "Windows":
@@ -111,12 +111,18 @@ class GetKakaoAuthDesktopMemdump:
             if relaunch and self.relaunch_kakao(kakao_bin_path) is None:
                 return None, MSG_LAUNCH_FAIL
 
-        if self.cb_ask_str == input:
-            pw_func = getpass
-        else:
-            pw_func = partial(
-                self.cb_ask_str, initialvalue="", cli_show_initialvalue=False
-            )
+        pw_func = partial(
+            self.cb.put,
+            (
+                "ask_str",
+                None,
+                {
+                    "initialvalue": "",
+                    "cli_show_initialvalue": False,
+                    "password": True,
+                },
+            ),
+        )
         s = get_mem(kakao_pid, pw_func, is_wine)
 
         if s is None:

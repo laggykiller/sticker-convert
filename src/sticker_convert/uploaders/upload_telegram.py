@@ -6,10 +6,10 @@ from typing import Any, Dict, List, Optional, Tuple, Union, cast
 import anyio
 from telegram import Sticker
 
+from sticker_convert.auth.telegram_api import BotAPI, TelegramAPI, TelegramSticker, TelethonAPI
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
-from sticker_convert.utils.auth.telegram_api import BotAPI, TelegramAPI, TelegramSticker, TelethonAPI
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler

@@ -78,27 +78,35 @@ class ConfigFrame(LabelFrame):
         )
 
     def cb_clear_cred(self, *_: Any, **kwargs: Any) -> None:
-        response = self.gui.cb_ask_bool("Are you sure you want to clear credentials?")
+        response = self.gui.cb.put(
+            ("ask_bool", ("Are you sure you want to clear credentials?",), None)
+        )
         if response is True:
             self.gui.delete_creds()
             self.gui.load_jsons()
             self.gui.apply_creds()
             self.gui.highlight_fields()
-            self.gui.cb_msg_block("Credentials cleared.")
+            self.gui.cb.put(("msg_block", ("Credentials cleared.",), None))
 
     def cb_restore_default(self, *_: Any, **kwargs: Any) -> None:
-        response = self.gui.cb_ask_bool(
-            "Are you sure you want to restore default config? (This will not clear credentials.)"
+        response = self.gui.cb.put(
+            (
+                "ask_bool",
+                (
+                    "Are you sure you want to restore default config? (This will not clear credentials.)",
+                ),
+                None,
+            )
         )
         if response is True:
             self.gui.delete_config()
             self.gui.load_jsons()
             self.gui.apply_config()
             self.gui.highlight_fields()
-            self.gui.cb_msg_block("Restored to default config.")
+            self.gui.cb.put(("msg_block", ("Restored to default config.",), None))
 
     def cb_open_config_directory(self, *_: Any, **kwargs: Any) -> None:
-        self.gui.cb_msg(msg=f"Config is located at {CONFIG_DIR}")
+        self.gui.cb.put(f"Config is located at {CONFIG_DIR}")
         if platform.system() == "Windows":
             os.startfile(CONFIG_DIR)  # type: ignore
         elif platform.system() == "Darwin":

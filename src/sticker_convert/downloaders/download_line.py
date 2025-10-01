@@ -14,9 +14,9 @@ import requests
 from bs4 import BeautifulSoup
 from PIL import Image
 
+from sticker_convert.auth.auth_line import AuthLine
 from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption, InputOption
-from sticker_convert.utils.auth.get_line_auth import GetLineAuth
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.apple_png_normalize import ApplePngNormalize
@@ -190,7 +190,7 @@ class DownloadLine(DownloadBase):
                         'Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"'
                     )
 
-            if not GetLineAuth.validate_cookies(cookies):
+            if not AuthLine.validate_cookies(cookies):
                 self.cb.put(
                     'Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"'
                 )

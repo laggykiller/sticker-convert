@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import re
-from functools import partial
 from tkinter import colorchooser
 from typing import Any, List, Tuple
 
@@ -650,13 +649,13 @@ class AdvancedCompressionWindow(BaseWindow):
         self.set_emoji_btn()
 
     def add_help_btn(self, msg: str) -> Button:
-        cb_msg_block_adv_comp_win = partial(self.gui.cb_msg_block, parent=self)
-
         return Button(
             self.frame_advcomp,
             text="?",
             width=1,
-            command=lambda: cb_msg_block_adv_comp_win(msg),
+            command=lambda: self.gui.cb.put(
+                ("msg_block", None, {"message": msg, "parent": self})
+            ),
             bootstyle="secondary",  # type: ignore
         )
 

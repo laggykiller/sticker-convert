@@ -3,7 +3,7 @@ import re
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Protocol, Tuple, Union, cast
+from typing import Any, Dict, List, Protocol, Tuple, Union, cast
 
 import anyio
 from telegram import InputSticker, PhotoSize, Sticker
@@ -15,8 +15,8 @@ from telethon.functions import messages  # type: ignore
 from telethon.tl.types.messages import StickerSet as TLStickerSet  # type: ignore
 from telethon.types import DocumentAttributeFilename, InputStickerSetShortName, InputStickerSetThumb, Message, TypeDocument  # type: ignore
 
+from sticker_convert.auth.auth_telethon import AuthTelethon
 from sticker_convert.job_option import CredOption
-from sticker_convert.utils.auth.telethon_setup import TelethonSetup
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 
 # sticker_path: Path, sticker_bytes: bytes, emoji_list: List[str], sticker_format: str
@@ -343,9 +343,7 @@ class TelethonAPI(TelegramAPI):
         self.cb = cb
         self.cb_return = cb_return
 
-        success, client, _, _ = await TelethonSetup(
-            self.opt_cred, self.cb_ask_str
-        ).start_async()
+        success, client, _, _ = await AuthTelethon(self.opt_cred, self.cb).start_async()
 
         if success is True and client is not None:
             self.client = client
@@ -353,15 +351,6 @@ class TelethonAPI(TelegramAPI):
 
     async def exit(self) -> None:
         self.client.disconnect()
-
-    def cb_ask_str(
-        self, msg: Optional[str] = None, initialvalue: Optional[str] = None
-    ) -> str:
-        self.cb.put(("ask_str", (msg,), None))
-        response = self.cb_return.get_response()
-
-        assert isinstance(response, str)
-        return response
 
     async def set_upload_pack_short_name(self, pack_title: str) -> str:
         self.pack_title = pack_title

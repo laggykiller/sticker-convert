@@ -4,22 +4,22 @@ import os
 import platform
 import shutil
 import time
-from typing import Callable, Optional, Tuple
+from typing import Any, Optional, Tuple
 from urllib.parse import urlparse
 
+from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.process import killall
 
 
-class GetDiscordAuth:
-    def __init__(self, cb_msg: Callable[..., None] = print) -> None:
+class AuthDiscord(AuthBase):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
         chromedriver_download_dir = CONFIG_DIR / "bin"
         os.makedirs(chromedriver_download_dir, exist_ok=True)
 
         self.chromedriver_download_dir = chromedriver_download_dir
-
-        self.cb_msg = cb_msg
 
     def get_discord_bin_path(self) -> Optional[str]:
         discord_bin: Optional[str]

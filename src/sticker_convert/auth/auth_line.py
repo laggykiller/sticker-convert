@@ -7,8 +7,13 @@ from typing import Any, Callable, Dict, List, Optional, Union
 import requests
 import rookiepy
 
+from sticker_convert.auth.auth_base import AuthBase
 
-class GetLineAuth:
+
+class AuthLine(AuthBase):
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+
     def get_cred(self) -> Optional[str]:
         browsers: List[Callable[..., Any]] = [
             rookiepy.load,  # Supposed to load from any browser, but may fail
@@ -44,7 +49,7 @@ class GetLineAuth:
                 cookies_dict = browser(["store.line.me"])
                 cookies_jar = rookiepy.to_cookiejar(cookies_dict)
 
-                if GetLineAuth.validate_cookies(cookies_jar):
+                if AuthLine.validate_cookies(cookies_jar):
                     break
 
             except Exception:
