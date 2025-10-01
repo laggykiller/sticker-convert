@@ -442,7 +442,7 @@ class KakaoGetAuthWindow(BaseWindow):
         self.gui.save_creds()
         m = AuthKakaoAndroidLogin(self.gui.get_opt_cred(), self.gui.cb)
 
-        auth_token = m.get_cred()
+        auth_token, msg = m.get_cred()
 
         if auth_token:
             if not self.gui.creds.get("kakao"):
@@ -450,13 +450,10 @@ class KakaoGetAuthWindow(BaseWindow):
             self.gui.creds["kakao"]["auth_token"] = auth_token
             self.gui.kakao_auth_token_var.set(auth_token)
 
-            msg = f"Got auth_token successfully: {auth_token}"
-            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
             self.gui.save_creds()
             self.gui.highlight_fields()
-        else:
-            msg = "Failed to get auth_token"
-            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
+
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
 
     def cb_launch_desktop(self) -> None:
         m = AuthKakaoDesktopMemdump(self.gui.get_opt_cred(), self.gui.cb)
@@ -476,7 +473,6 @@ class KakaoGetAuthWindow(BaseWindow):
 
     def cb_get_auth_desktop_memdump_thread(self, *_: Any) -> None:
         self.gui.save_creds()
-        self.gui.cb.put("Getting auth_token, this may take a minute...")
         self.gui.cb.bar("indeterminate")
         m = AuthKakaoDesktopMemdump(self.gui.get_opt_cred(), self.gui.cb)
 

@@ -507,12 +507,12 @@ class CLI:
 
         if args.kakao_get_auth_android_login:
             get_kakao_auth_android_login = AuthKakaoAndroidLogin(opt_cred, self.cb)
-            auth_token = get_kakao_auth_android_login.get_cred()
+            auth_token, msg = get_kakao_auth_android_login.get_cred()
 
             if auth_token:
                 opt_cred.kakao_auth_token = auth_token
 
-                self.cb.put(f"Got auth_token successfully: {auth_token}")
+            self.cb.put(msg)
 
         if args.kakao_get_auth_desktop_memdump:
             get_kakao_auth_desktop_memdump = AuthKakaoDesktopMemdump(opt_cred, self.cb)
@@ -538,40 +538,34 @@ class CLI:
         if args.signal_get_auth:
             m = AuthSignal(opt_cred, self.cb)
 
-            uuid, password = m.get_cred()
+            uuid, password, msg = m.get_cred()
             if uuid and password:
                 opt_cred.signal_uuid = uuid
                 opt_cred.signal_password = password
 
-                self.cb.put(f"Got uuid and password successfully: {uuid}, {password}")
-
-            self.cb.put("Failed to get uuid and password")
+            self.cb.put(msg)
 
         if args.telethon_setup:
             telethon_setup = AuthTelethon(opt_cred, self.cb)
-            success, _, telethon_api_id, telethon_api_hash = telethon_setup.start()
+            success, _, telethon_api_id, telethon_api_hash, msg = telethon_setup.start(
+                check_auth_only=True
+            )
 
             if success:
                 opt_cred.telethon_api_id = telethon_api_id
                 opt_cred.telethon_api_hash = telethon_api_hash
 
-                self.cb.put("Telethon setup successful")
-            else:
-                self.cb.put("Telethon setup failed")
+            self.cb.put(msg)
 
         if args.line_get_auth:
             get_line_auth = AuthLine(opt_cred, self.cb)
 
-            line_cookies = get_line_auth.get_cred()
+            line_cookies, msg = get_line_auth.get_cred()
 
             if line_cookies:
                 opt_cred.line_cookies = line_cookies
 
-                self.cb.put("Got Line cookies successfully")
-            else:
-                self.cb.put(
-                    "Failed to get Line cookies. Have you logged in the web browser?"
-                )
+            self.cb.put(msg)
 
         if args.viber_get_auth:
             get_viber_auth = AuthViber(opt_cred, self.cb)

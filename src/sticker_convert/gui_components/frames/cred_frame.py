@@ -191,16 +191,14 @@ class CredFrame(LabelFrame):
             self.gui.cb.ask_str("You can get help from:", initialvalue=faq_site)
 
     def cb_telethon_get_auth(self, *_: Any) -> None:
-        success, _client, api_id, api_hash = AuthTelethon(
+        success, _client, api_id, api_hash, msg = AuthTelethon(
             self.gui.get_opt_cred(), self.gui.cb
-        ).start()
+        ).start(check_auth_only=True)
         if success:
             self.gui.telethon_api_id_var.set(api_id)
             self.gui.telethon_api_hash_var.set(api_hash)
             self.gui.save_creds()
-            self.gui.cb.put(("msg_block", ("Telethon setup successful",), None))
-        else:
-            self.gui.cb.put(("msg_block", ("Telethon setup failed",), None))
+        self.gui.cb.put(("msg_block", (msg,), None))
 
     def cb_kakao_get_auth(self, *_: Any) -> None:
         KakaoGetAuthWindow(self.gui)

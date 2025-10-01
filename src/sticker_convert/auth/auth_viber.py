@@ -194,6 +194,8 @@ class AuthViber(AuthBase):
         self,
         viber_bin_path: Optional[str] = None,
     ) -> Tuple[Optional[str], str]:
+        msg = "Getting Viber credentials...\n(This may take a minute)"
+        self.cb.put(("msg_dynamic", (msg,), None))
         if not viber_bin_path:
             viber_bin_path = self.get_viber_desktop()
 
@@ -237,4 +239,5 @@ class AuthViber(AuthBase):
                 break
 
         killall("viber")
+        self.cb.put(("msg_dynamic", (None,), None))
         return viber_auth, msg

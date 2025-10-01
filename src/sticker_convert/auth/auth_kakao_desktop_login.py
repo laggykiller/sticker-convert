@@ -18,6 +18,8 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from sticker_convert.auth.auth_base import AuthBase
 
+OK_MSG = "Login successful, auth_token: {auth_token}"
+
 
 class AuthKakaoDesktopLogin(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -55,6 +57,8 @@ class AuthKakaoDesktopLogin(AuthBase):
         }
 
         self.device_name = socket.gethostname()
+        if platform.system() != "Darwin":
+            self.device_name = self.device_name.upper()
         self.device_uuid = self.get_device_uuid()
 
         hash = hashlib.sha512(
@@ -269,34 +273,44 @@ class AuthKakaoDesktopLogin(AuthBase):
         return json.loads(response.text)
 
     def get_cred(self) -> Tuple[Optional[str], str]:
-        self.cb.put("Get authorization token")
+        msg = "Getting Kakao authorization token by desktop login..."
+        self.cb.put(("msg_dynamic", (msg,), None))
         rjson = self.login()
         access_token = rjson.get("access_token")
         if access_token is not None:
             auth_token = access_token + "-" + self.device_uuid
-            return auth_token, f"Login successful, auth_token: {auth_token}"
+            return auth_token, OK_MSG.format(auth_token=auth_token)
 
         rjson = self.generate_passcode()
         if rjson.get("status") != 0:
             return None, f"Failed to generate passcode: {rjson}"
         passcode = rjson["passcode"]
-        time_out = rjson["remainingSeconds"] + time.time()
 
-        register_success = False
-        while time.time() < time_out:
+        fail_reason = None
+        self.cb.put(("msg_dynamic", (None,), None))
+        while True:
             rjson = self.register_device()
             if rjson["status"] == 0:
-                register_success = True
                 break
-            time_remaining = int(time_out - time.time())
+            elif rjson["status"] == -110:
+                fail_reason = "Timeout"
+                break
+            elif rjson["status"] != -100:
+                fail_reason = str(rjson)
+                break
+            time_remaining = rjson.get("remainingSeconds")
+            next_req_time = rjson.get("nextRequestIntervalInSeconds")
+            if time_remaining is None or next_req_time is None:
+                fail_reason = str(rjson)
             msg = f"Please enter passcode in Kakao app on mobile device within {time_remaining} seconds: {passcode}"
             msg_dynamic_window_exist = self.cb.put(("msg_dynamic", (msg,), None))
             if msg_dynamic_window_exist is False:
+                fail_reason = "Cancelled"
                 break
-            time.sleep(1)
+            time.sleep(next_req_time)
         self.cb.put(("msg_dynamic", (None,), None))
-        if register_success is False:
-            return None, f"Failed to register device: {rjson}"
+        if fail_reason is not None:
+            return None, f"Failed to register device: {fail_reason}"
 
         rjson = self.login()
         if rjson.get("status") == -101:
@@ -306,4 +320,4 @@ class AuthKakaoDesktopLogin(AuthBase):
             return None, f"Failed to login after registering device: {rjson}"
 
         auth_token = access_token + "-" + self.device_uuid
-        return auth_token, f"Login successful, auth_token: {auth_token}"
+        return auth_token, OK_MSG.format(auth_token=auth_token)

@@ -179,21 +179,21 @@ class CallbackCli(CallbackProtocol):
 
     def cb_ask_str(
         self,
-        msg: Optional[str] = None,
+        question: Optional[str] = None,
         initialvalue: Optional[str] = None,
         cli_show_initialvalue: bool = True,
         password: bool = False,
     ) -> str:
-        self.msg(msg)
+        self.msg(question)
 
         hint = ""
         if cli_show_initialvalue and initialvalue:
             hint = f" [Default: {initialvalue}]"
 
         if password is True:
-            if msg is None:
-                msg = "Password: "
-            response = getpass(msg)
+            if question is None:
+                question = "Password: "
+            response = getpass(question)
         else:
             response = input(f"Enter your response and press enter{hint} > ")
 
@@ -206,7 +206,7 @@ class CallbackCli(CallbackProtocol):
         if isinstance(i, tuple):
             action = i[0]
             if len(i) >= 2:
-                args: Tuple[str, ...] = i[1] if i[1] else tuple()
+                args: Tuple[Any, ...] = i[1] if i[1] else tuple()
             else:
                 args = tuple()
             if len(i) >= 3:
@@ -234,7 +234,7 @@ class CallbackCli(CallbackProtocol):
         elif action == "ask_bool":
             return self.ask_bool(*args, **kwargs)
         elif action == "ask_str":
-            return self.ask_str(**kwargs)
+            return self.ask_str(*args, **kwargs)
         else:
             self.msg(action)
         return None
@@ -242,7 +242,7 @@ class CallbackCli(CallbackProtocol):
 
 class CallbackGui(CallbackProtocol):
     def __init__(self, gui: "GUI"):
-        from ttkbootstrap import Label, StringVar  # type: ignore
+        from ttkbootstrap import Label, Progressbar, StringVar  # type: ignore
 
         from sticker_convert.gui_components.windows.base_window import BaseWindow
         from sticker_convert.job import Job
@@ -252,6 +252,7 @@ class CallbackGui(CallbackProtocol):
         self.msg_dynamic_window: Optional[BaseWindow] = None
         self.message_var = StringVar(self.gui)
         self.msg_dynamic_label: Optional[Label] = None
+        self.msg_dynamic_bar: Optional[Progressbar] = None
 
         self.ask_str = self.cb_ask_str
         self.ask_bool = self.cb_ask_bool
@@ -334,7 +335,7 @@ class CallbackGui(CallbackProtocol):
         parent: Optional["Toplevel"] = None,
         **_kwargs: Any,
     ) -> bool:
-        from ttkbootstrap import Label  # type: ignore
+        from ttkbootstrap import Label, Progressbar  # type: ignore
 
         from sticker_convert.gui_components.gui_utils import GUIUtils
         from sticker_convert.gui_components.windows.base_window import BaseWindow
@@ -343,27 +344,46 @@ class CallbackGui(CallbackProtocol):
         if self.msg_dynamic_window is None:
             if message is not None:
                 self.msg_dynamic_window = BaseWindow(self.gui, parent)
+                self.msg_dynamic_window.wm_title("sticker-convert")
                 self.message_var.set(message)
                 self.msg_dynamic_label = Label(
                     self.msg_dynamic_window.scrollable_frame,
                     textvariable=self.message_var,
                 )
+                self.msg_dynamic_bar = Progressbar(
+                    self.msg_dynamic_window.scrollable_frame,
+                    orient="horizontal",
+                    mode="indeterminate",
+                )
+                self.msg_dynamic_bar.start(50)
                 self.msg_dynamic_label.pack()
+                self.msg_dynamic_bar.pack(fill="x")
                 self.gui.action = partial(
                     GUIUtils.finalize_window, self.msg_dynamic_window
                 )
+                print(message, end="\r", flush=True)
                 ret = True
             else:
+                print()
                 ret = False
         elif self.msg_dynamic_window.winfo_exists() == 0:
             self.msg_dynamic_window = None
+            print()
             ret = False
         else:
             if message is None:
-                self.gui.action = self.msg_dynamic_window.destroy
+
+                def _action():
+                    assert self.msg_dynamic_window is not None
+                    self.msg_dynamic_window.destroy()
+                    self.msg_dynamic_window = None
+
+                self.gui.action = _action
+                print()
                 ret = False
             else:
                 self.gui.action = partial(self.message_var.set, message)
+                print(message, end="\r", flush=True)
                 ret = True
 
         if self.gui.action is not None:
@@ -417,7 +437,7 @@ class CallbackGui(CallbackProtocol):
         elif action == "ask_bool":
             return self.ask_bool(*args, **kwargs)
         elif action == "ask_str":
-            return self.ask_str(**kwargs)
+            return self.ask_str(*args, **kwargs)
         else:
             self.msg(action)
         return None

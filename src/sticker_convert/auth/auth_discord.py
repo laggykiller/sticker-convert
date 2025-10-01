@@ -11,7 +11,10 @@ from urllib.parse import urlparse
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.chrome_remotedebug import CRD
-from sticker_convert.utils.process import killall, find_pid_by_name
+from sticker_convert.utils.process import find_pid_by_name, killall
+
+OK_MSG = "Got token successfully:\ntoken={token}"
+FAIL_MSG = "Failed to get token"
 
 
 class AuthDiscord(AuthBase):
@@ -43,6 +46,8 @@ class AuthDiscord(AuthBase):
             for discord_dir, discord_bin in discord_win_dirs:
                 app_dir: Optional[str] = None
                 chrome_path: Optional[str] = None
+                if os.path.isdir(discord_dir) is False:
+                    continue
                 for i in [j for j in os.listdir(discord_dir) if j.startswith("app-")]:
                     app_dir = os.path.join(discord_dir, i)
                     chrome_path = os.path.join(app_dir, discord_bin)
@@ -68,6 +73,9 @@ class AuthDiscord(AuthBase):
         return None
 
     def get_cred(self) -> Tuple[Optional[str], str]:
+        msg = "Getting Discord authorization token..."
+        self.cb.put(("msg_dynamic", (msg,), None))
+
         using_discord_app = False
         chrome_path = self.get_discord_bin_path()
         if chrome_path is not None:
@@ -75,6 +83,7 @@ class AuthDiscord(AuthBase):
         else:
             chrome_path = CRD.get_chromium_path()
         if chrome_path is None:
+            self.cb.put(("msg_dynamic", (None,), None))
             return (
                 None,
                 "Please install Discord Desktop or Chrome/Chromium and try again",
@@ -83,7 +92,13 @@ class AuthDiscord(AuthBase):
         token = None
 
         if find_pid_by_name(Path(chrome_path).name):
-            response = self.cb.put(("ask_bool", (f"All {Path(chrome_path).name} will be closed. Continue?",), None))
+            response = self.cb.put(
+                (
+                    "ask_bool",
+                    (f"All {Path(chrome_path).name} will be closed. Continue?",),
+                    None,
+                )
+            )
             if response is True:
                 killall(Path(chrome_path).name.lower())
             else:
@@ -123,7 +138,8 @@ class AuthDiscord(AuthBase):
             time.sleep(1)
         crd.close()
 
+        self.cb.put(("msg_dynamic", (None,), None))
         if token is None:
-            return None, "Failed to get token"
+            return None, FAIL_MSG
 
-        return token, f"Got token successfully:\ntoken={token}"
+        return token, OK_MSG.format(token=token)

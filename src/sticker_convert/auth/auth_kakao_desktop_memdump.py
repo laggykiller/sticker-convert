@@ -250,6 +250,8 @@ class AuthKakaoDesktopMemdump(AuthBase):
         # - Slow
         # - Cannot run on macOS
 
+        msg = "Getting Kakao authorization token by Desktop memdump...\n(This may take a minute)"
+        self.cb.put(("msg_dynamic", (msg,), None))
         if not kakao_bin_path:
             kakao_bin_path = self.get_kakao_desktop()
 
@@ -264,5 +266,7 @@ class AuthKakaoDesktopMemdump(AuthBase):
             kakao_auth, msg = self.get_auth_darwin(kakao_bin_path)
         else:
             kakao_auth, msg = self.get_auth_by_dump(kakao_bin_path)
+
+        self.cb.put(("msg_dynamic", (None,), None))
 
         return kakao_auth, msg

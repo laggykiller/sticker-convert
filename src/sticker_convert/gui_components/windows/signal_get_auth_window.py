@@ -66,7 +66,8 @@ class SignalGetAuthWindow(BaseWindow):
     def cb_login_thread(self, *args: Any) -> None:
         m = AuthSignal(self.gui.get_opt_cred(), self.gui.cb)
 
-        uuid, password = m.get_cred()
+        uuid, password, msg = m.get_cred()
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
         if uuid and password:
             if not self.gui.creds.get("signal"):
                 self.gui.creds["signal"] = {}
@@ -75,13 +76,6 @@ class SignalGetAuthWindow(BaseWindow):
             self.gui.signal_uuid_var.set(uuid)
             self.gui.signal_password_var.set(password)
 
-            msg = (
-                f"Got uuid and password successfully:\nuuid={uuid}\npassword={password}"
-            )
-            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
             self.gui.save_creds()
             self.gui.highlight_fields()
             return
-
-        msg = "Failed to get uuid and password"
-        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))

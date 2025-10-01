@@ -63,11 +63,14 @@ class AuthSignal(AuthBase):
                 return signal_path
         return None
 
-    def get_cred(self) -> Tuple[Optional[str], Optional[str]]:
+    def get_cred(self) -> Tuple[Optional[str], Optional[str], str]:
+        msg = "Getting Signal credentials..."
+        self.cb.put(("msg_dynamic", (msg,), None))
         signal_bin_path = self.get_signal_bin_path()
         if signal_bin_path is None:
+            self.cb.put(("msg_dynamic", (None,), None))
             self.download_signal_desktop()
-            return None, None
+            return None, None, "Failed to get uuid and password"
 
         if platform.system() == "Windows":
             killall("signal")
@@ -122,4 +125,9 @@ class AuthSignal(AuthBase):
             time.sleep(1)
 
         crd.close()
-        return uuid, password
+        self.cb.put(("msg_dynamic", (None,), None))
+        return (
+            uuid,
+            password,
+            f"Got uuid and password successfully:\nuuid={uuid}\npassword={password}",
+        )

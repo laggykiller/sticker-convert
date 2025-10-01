@@ -81,19 +81,13 @@ class LineGetAuthWindow(BaseWindow):
         m = AuthLine(self.gui.get_opt_cred(), self.gui.cb)
 
         line_cookies = None
-        line_cookies = m.get_cred()
-
+        line_cookies, msg = m.get_cred()
+        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
         if line_cookies:
             if not self.gui.creds.get("line"):
                 self.gui.creds["line"] = {}
             self.gui.creds["line"]["cookies"] = line_cookies
             self.gui.line_cookies_var.set(line_cookies)
-
-            msg = "Got Line cookies successfully"
-            self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
             self.gui.save_creds()
             self.gui.highlight_fields()
             return
-
-        msg = "Failed to get Line cookies. Have you logged in the web browser?"
-        self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
