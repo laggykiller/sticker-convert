@@ -279,6 +279,7 @@ class AuthKakaoDesktopLogin(AuthBase):
         access_token = rjson.get("access_token")
         if access_token is not None:
             auth_token = access_token + "-" + self.device_uuid
+            self.cb.put(("msg_dynamic", (None,), None))
             return auth_token, OK_MSG.format(auth_token=auth_token)
 
         rjson = self.generate_passcode()
