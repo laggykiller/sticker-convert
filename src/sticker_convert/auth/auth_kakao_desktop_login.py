@@ -157,10 +157,10 @@ class AuthKakaoDesktopLogin(AuthBase):
 
             return base64.b64encode(hwid_sha1 + hwid_sha256).decode()
         else:
-            use_wine = True if platform.system != "Windows" else False
+            use_wine = True if platform.system() != "Windows" else False
             pragma = self.windows_get_pragma(use_wine=use_wine)
             if pragma is None:
-                if platform.system == "Windows":
+                if platform.system() == "Windows":
                     if self.opt_cred.kakao_device_uuid:
                         sys_uuid = self.opt_cred.kakao_device_uuid
                     else:
