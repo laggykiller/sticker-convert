@@ -23,4 +23,4 @@ socksio~=1.0.0
 telethon~=1.41.2
 tqdm~=4.67.1
 ttkbootstrap-fork-laggykiller~=1.5.1
-websocket_client~=1.8.0
+websocket_client~=1.9.0
