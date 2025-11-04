@@ -27,6 +27,9 @@ class UrlDetect:
 
         if domain == "www.band.us":
             return "band"
+        
+        if domain == "ogqmarket.naver.com":
+            return "ogq"
 
         if domain == "stickers.viber.com":
             return "viber"

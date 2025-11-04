@@ -2,7 +2,7 @@
     "auto": {
         "full_name": "Download (Auto detect)",
         "help": "Auto detect URL type and download",
-        "example": "Supported input sources: Signal, Telegram, Line, Kakao, Viber, Discord",
+        "example": "Supported input sources: Signal, Telegram, Line, Kakao, Naver Band, OGQ, Viber, Discord",
         "address_lbls": "URL address",
         "metadata_provides": {
             "title": false,
