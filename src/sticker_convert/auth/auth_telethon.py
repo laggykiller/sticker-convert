@@ -9,12 +9,13 @@ from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.translate import I
 
+
 class AuthTelethon(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.GUIDE_MSG = I(
             "1. Visit {telegram_api_url}\n"
             "2. Login using your phone number\n"
-            "3. Go to \"API development tools\"\n"
+            '3. Go to "API development tools"\n'
             "4. Fill form\n"
             "- App title: sticker-convert\n"
             "- Short name: sticker-convert\n"
@@ -90,7 +91,11 @@ class AuthTelethon(AuthBase):
 
     def guide(self) -> None:
         self.cb.put(
-            ("msg_block", (self.GUIDE_MSG.format(telegram_api_url=self.TELEGRAM_API_URL),), None)
+            (
+                "msg_block",
+                (self.GUIDE_MSG.format(telegram_api_url=self.TELEGRAM_API_URL),),
+                None,
+            )
         )
 
     def get_api_info(self) -> bool:

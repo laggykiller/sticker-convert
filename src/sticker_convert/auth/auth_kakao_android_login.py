@@ -11,6 +11,7 @@ from bs4 import BeautifulSoup
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.translate import I
 
+
 class AuthKakaoAndroidLogin(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.OK_MSG = I("Got auth_token successfully:\nauth_token={}\n")

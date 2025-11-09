@@ -3,6 +3,7 @@ from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.translate import I
 
+
 def get_msg_emoji_txt_required():
     return I(
         "emoji.txt is required for uploading signal stickers\n"
@@ -10,6 +11,7 @@ def get_msg_emoji_txt_required():
         "Default emoji is set to {}.\n"
         "Please edit emoji.txt now, then continue"
     )
+
 
 class UploadBase:
     def __init__(

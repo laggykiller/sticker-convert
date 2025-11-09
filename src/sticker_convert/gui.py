@@ -268,7 +268,9 @@ class GUI(Window):
             and sys.version_info[1] == 11
             and sys.version_info[2] <= 6
         ):
-            self.cb.put(self.MSG_MAC14_TK_BUG.format(mac14_tk_bug_url=self.MAC14_TK_BUG_URL))
+            self.cb.put(
+                self.MSG_MAC14_TK_BUG.format(mac14_tk_bug_url=self.MAC14_TK_BUG_URL)
+            )
 
     def load_jsons(self) -> None:
         self.help = load_resource_json("help")

@@ -10,7 +10,7 @@ from signalstickers_client.stickersclient import StickersClient
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
-from sticker_convert.uploaders.upload_base import get_msg_emoji_txt_required, UploadBase
+from sticker_convert.uploaders.upload_base import UploadBase, get_msg_emoji_txt_required
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler

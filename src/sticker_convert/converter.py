@@ -132,11 +132,15 @@ class StickerConvert:
         #  cb_return: CallbackReturn
     ) -> None:
         self.MSG_START_COMP = I("[I] Start compressing {} -> {}")
-        self.MSG_SKIP_COMP = I("[S] Compatible file found, skip compress and just copy {} -> {}")
+        self.MSG_SKIP_COMP = I(
+            "[S] Compatible file found, skip compress and just copy {} -> {}"
+        )
         self.MSG_COMP = I(
             "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-{})"
         )
-        self.MSG_REDO_COMP = I("[{}] Compressed {} -> {} but size {} {} limit {}, recompressing")
+        self.MSG_REDO_COMP = I(
+            "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
+        )
         self.MSG_DONE_COMP = I("[S] Successful compression {} -> {} size {} (step {})")
         self.MSG_FAIL_COMP = I(
             "[F] Failed Compression {} -> {}, "

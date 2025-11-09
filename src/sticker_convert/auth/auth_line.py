@@ -14,7 +14,9 @@ from sticker_convert.utils.translate import I
 class AuthLine(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.OK_MSG = I("Got Line cookies successfully")
-        self.FAIL_MSG = I("Failed to get Line cookies. Have you logged in the web browser?")
+        self.FAIL_MSG = I(
+            "Failed to get Line cookies. Have you logged in the web browser?"
+        )
 
         super().__init__(*args, **kwargs)
 

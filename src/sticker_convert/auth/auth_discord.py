@@ -14,6 +14,7 @@ from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.process import find_pid_by_name, killall
 from sticker_convert.utils.translate import I
 
+
 class AuthDiscord(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.OK_MSG = I("Got token successfully:\ntoken={}")

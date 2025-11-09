@@ -29,7 +29,9 @@ class TelegramAPI:
         self.MSG_FAIL_ALL = I("Cannot upload any sticker. Reason: {}")
         self.MSG_FAIL_PACK = I("Cannot upload pack {}. Reason: {}")
         self.MSG_FAIL_DEL = I("Cannot delete pack of {}. Reason: {}")
-        self.MSG_FAIL_STICKER = I("Cannot upload sticker {sticker} of {pack}. Reason: {reason}")
+        self.MSG_FAIL_STICKER = I(
+            "Cannot upload sticker {sticker} of {pack}. Reason: {reason}"
+        )
         self.MSG_FAIL_PACK_ICON = I("Cannot set pack icon for {}. Reason: {}")
 
     async def setup(
@@ -40,28 +42,38 @@ class TelegramAPI:
         cb_return: CallbackReturn,
     ) -> bool:
         raise NotImplementedError
+
     async def exit(self) -> None:
         raise NotImplementedError
+
     async def set_upload_pack_type(self, is_emoji: bool) -> None:
         raise NotImplementedError
+
     async def set_upload_pack_short_name(self, pack_title: str) -> str:
         raise NotImplementedError
+
     async def check_pack_exist(self) -> bool:
         raise NotImplementedError
+
     async def pack_del(self) -> bool:
         raise NotImplementedError
+
     async def pack_new(
         self, stickers_list: List[TelegramSticker], sticker_type: str
     ) -> Tuple[int, int]:
         raise NotImplementedError
+
     async def pack_add(
         self, stickers_list: List[TelegramSticker], sticker_type: str
     ) -> Tuple[int, int]:
         raise NotImplementedError
+
     async def pack_thumbnail(self, thumbnail: TelegramSticker) -> bool:
         raise NotImplementedError
+
     async def get_pack_url(self) -> str:
         raise NotImplementedError
+
     async def pack_dl(
         self, pack_short_name: str, out_dir: Path
     ) -> Tuple[Dict[str, bool], Dict[str, str]]:

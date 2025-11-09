@@ -12,6 +12,7 @@ from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import check_admin, find_pid_by_name, get_mem, killall
 from sticker_convert.utils.translate import I
 
+
 class AuthViber(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         self.MSG_NO_BIN = I(

@@ -9,13 +9,14 @@ from telegram import Sticker
 from sticker_convert.auth.telegram_api import BotAPI, TelegramAPI, TelegramSticker, TelethonAPI
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
-from sticker_convert.uploaders.upload_base import get_msg_emoji_txt_required, UploadBase
+from sticker_convert.uploaders.upload_base import UploadBase, get_msg_emoji_txt_required
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
 from sticker_convert.utils.translate import I
+
 
 class UploadTelegram(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -24,7 +25,7 @@ class UploadTelegram(UploadBase):
             "Delete all stickers in pack?\n"
             "Note: After recreating set, please wait for about 3 minutes for the set to reappear."
         )
-        
+
         super().__init__(*args, **kwargs)
 
         self.base_spec.size_max_img = 512000
