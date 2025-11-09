@@ -10,10 +10,10 @@ RUN cat requirements.txt | grep -v 'ttkbootstrap' > requirements-cli.txt &&\
     rm requirements.txt &&\
     pip3 install --no-cache-dir -r requirements-cli.txt
 
-COPY ./scripts/update-locales.sh /update-locales.sh
-RUN /update-locales.sh
-
 COPY ./src /app/
+
+COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
+RUN /app/scripts/update-locales.sh
 
 RUN apt purge -y python3-pip && \
     apt clean autoclean && \
@@ -38,9 +38,7 @@ RUN apt update -y && \
     libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig gettext
 
 # Set locales
-COPY ./scripts/update-locales.sh /update-locales.sh
-RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen &&\
-    /update-locales.sh
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
 
 # Set application name displayed in Webpage
 RUN set-cont-env APP_NAME "sticker-convert"
@@ -72,6 +70,9 @@ RUN apt purge -y curl wget gpg git && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 COPY ./src /app/
+
+COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
+RUN /app/scripts/update-locales.sh
 
 FROM base-gui AS full
 RUN mkdir -p '/home/app' && \
@@ -116,6 +117,14 @@ RUN dpkg --add-architecture i386 && \
     rm /tmp/KakaoTalk_Setup.exe && \
     # rm /tmp/wine-mono-${pkgver}-x86.msi
     rm /tmp/wine-mono-10.0.0-x86.msi
+
+# Additional language support
+RUN sed -i -e 's/# ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/' /etc/locale.gen &&\
+    sed -i -e 's/# zh_TW.UTF-8 UTF-8/zh_TW.UTF-8 UTF-8/' /etc/locale.gen &&\
+    sed -i -e 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen &&\
+    locale-gen
+
+RUN apt install --no-install-recommends -y fonts-noto-cjk
 
 RUN apt purge -y curl wget gpg git && \
     apt clean autoclean && \
