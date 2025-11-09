@@ -386,6 +386,9 @@ class TelethonAPI(TelegramAPI):
 
         if success is True and client is not None:
             self.client = client
+            repl = await self._send_and_recv("/start")
+            if "Sticker Bot" not in repl:
+                return False
         return success
 
     async def exit(self) -> None:
