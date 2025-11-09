@@ -459,9 +459,9 @@ class TelethonAPI(TelegramAPI):
     ) -> Tuple[int, int]:
         stickers_ok = 0
         if self.is_emoji:
-            repl = await self._send_and_recv("/newpack")
+            repl = await self._send_and_recv("/newemojipack")
         elif stickers_list[0][3] == "static":
-            repl = await self._send_and_recv("/newsticker")
+            repl = await self._send_and_recv("/newpack")
         elif stickers_list[0][3] == "video":
             repl = await self._send_and_recv("/newvideo")
         elif stickers_list[0][3] == "animated":
