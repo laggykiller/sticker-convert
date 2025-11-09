@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-09 18:43+0800\n"
-"PO-Revision-Date: 2025-11-09 18:43+0800\n"
+"POT-Creation-Date: 2025-11-09 22:57+0800\n"
+"PO-Revision-Date: 2025-11-09 22:57+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_US\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/sticker_convert/converter.py:31
+#: src/sticker_convert/converter.py:134
 #, python-brace-format
 msgid "[I] Start compressing {} -> {}"
 msgstr "[I] Start compressing {} -> {}"
 
-#: src/sticker_convert/converter.py:32
+#: src/sticker_convert/converter.py:136
 #, python-brace-format
 msgid "[S] Compatible file found, skip compress and just copy {} -> {}"
 msgstr "[S] Compatible file found, skip compress and just copy {} -> {}"
 
-#: src/sticker_convert/converter.py:34
+#: src/sticker_convert/converter.py:139
 #, python-brace-format
 msgid ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
@@ -36,17 +36,17 @@ msgstr ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
 "{})"
 
-#: src/sticker_convert/converter.py:36
+#: src/sticker_convert/converter.py:142
 #, python-brace-format
 msgid "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 msgstr "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 
-#: src/sticker_convert/converter.py:37
+#: src/sticker_convert/converter.py:144
 #, python-brace-format
 msgid "[S] Successful compression {} -> {} size {} (step {})"
 msgstr "[S] Successful compression {} -> {} size {} (step {})"
 
-#: src/sticker_convert/converter.py:39
+#: src/sticker_convert/converter.py:146
 #, python-brace-format
 msgid ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
@@ -55,16 +55,16 @@ msgstr ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
 "quality under current settings (Best size: {})"
 
-#: src/sticker_convert/converter.py:43
+#: src/sticker_convert/converter.py:150
 #, python-brace-format
 msgid "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 msgstr "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 
-#: src/sticker_convert/converter.py:45
+#: src/sticker_convert/converter.py:152
 msgid "[W] Importing SVG takes long time"
 msgstr "[W] Importing SVG takes long time"
 
-#: src/sticker_convert/cli.py:31 src/sticker_convert/gui.py:37
+#: src/sticker_convert/cli.py:35 src/sticker_convert/gui.py:41
 #, python-brace-format
 msgid ""
 "sticker-convert is Free and Opensource software by laggykiller\n"
@@ -77,64 +77,64 @@ msgstr ""
 "Please use the stickers with your friends only.\n"
 "It is illegal and immoral to sell stickers downloaded from this program."
 
-#: src/sticker_convert/cli.py:57
+#: src/sticker_convert/cli.py:59
 msgid "CLI for sticker-convert"
 msgstr "CLI for sticker-convert"
 
-#: src/sticker_convert/cli.py:88
+#: src/sticker_convert/cli.py:90
 msgid "Input options"
 msgstr "Input options"
 
-#: src/sticker_convert/cli.py:101
+#: src/sticker_convert/cli.py:103
 #: src/sticker_convert/gui_components/frames/output_frame.py:22
 msgid "Output options"
 msgstr "Output options"
 
-#: src/sticker_convert/cli.py:115 src/sticker_convert/gui.py:227
+#: src/sticker_convert/cli.py:117 src/sticker_convert/gui.py:231
 msgid "Compression options"
 msgstr "Compression options"
 
-#: src/sticker_convert/cli.py:191
+#: src/sticker_convert/cli.py:193
 msgid "Credentials options"
 msgstr "Credentials options"
 
-#: src/sticker_convert/cli.py:224
+#: src/sticker_convert/cli.py:226
 #, python-brace-format
 msgid "Error: Cannot load custom presets from {}"
 msgstr "Error: Cannot load custom presets from {}"
 
-#: src/sticker_convert/cli.py:272
+#: src/sticker_convert/cli.py:274
 #, python-brace-format
 msgid "Detected URL input source: {}"
 msgstr "Detected URL input source: {}"
 
-#: src/sticker_convert/cli.py:275
+#: src/sticker_convert/cli.py:277
 #, python-brace-format
 msgid "Error: Unrecognied URL input source for url: {}"
 msgstr "Error: Unrecognied URL input source for url: {}"
 
-#: src/sticker_convert/cli.py:353
+#: src/sticker_convert/cli.py:355
 #, python-brace-format
 msgid "Auto compression option set to {}"
 msgstr "Auto compression option set to {}"
 
-#: src/sticker_convert/cli.py:362
+#: src/sticker_convert/cli.py:364
 msgid " Reason: Export to local directory only"
 msgstr " Reason: Export to local directory only"
 
-#: src/sticker_convert/cli.py:482 src/sticker_convert/gui.py:293
+#: src/sticker_convert/cli.py:484 src/sticker_convert/gui.py:299
 msgid "Warning: creds.json content is corrupted"
 msgstr "Warning: creds.json content is corrupted"
 
-#: src/sticker_convert/cli.py:488
+#: src/sticker_convert/cli.py:490
 msgid "Loaded credentials from creds.json"
 msgstr "Loaded credentials from creds.json"
 
-#: src/sticker_convert/cli.py:619
+#: src/sticker_convert/cli.py:621
 msgid "Saved credentials to creds.json"
 msgstr "Saved credentials to creds.json"
 
-#: src/sticker_convert/gui.py:43
+#: src/sticker_convert/gui.py:49
 #, python-brace-format
 msgid ""
 "NOTICE: If buttons are not responsive, try to press\n"
@@ -147,52 +147,52 @@ msgstr ""
 "(This is a bug in tkinter specific to macOS 14 python <=3.11.6)\n"
 "({mac14_tk_bug_url})"
 
-#: src/sticker_convert/gui.py:96
+#: src/sticker_convert/gui.py:100
 msgid "Job is running, really quit?"
 msgstr "Job is running, really quit?"
 
-#: src/sticker_convert/gui.py:101
+#: src/sticker_convert/gui.py:105
 msgid "Quitting, please wait..."
 msgstr "Quitting, please wait..."
 
-#: src/sticker_convert/gui.py:224
+#: src/sticker_convert/gui.py:228
 msgid "Input"
 msgstr "Input"
 
-#: src/sticker_convert/gui.py:230
+#: src/sticker_convert/gui.py:234
 msgid "Output"
 msgstr "Output"
 
-#: src/sticker_convert/gui.py:233
+#: src/sticker_convert/gui.py:237
 msgid "Credentials"
 msgstr "Credentials"
 
-#: src/sticker_convert/gui.py:236
+#: src/sticker_convert/gui.py:240
 msgid "Config"
 msgstr "Config"
 
-#: src/sticker_convert/gui.py:239
+#: src/sticker_convert/gui.py:243
 msgid "Progress"
 msgstr "Progress"
 
-#: src/sticker_convert/gui.py:283
+#: src/sticker_convert/gui.py:289
 msgid "Warning: config.json content is corrupted"
 msgstr "Warning: config.json content is corrupted"
 
-#: src/sticker_convert/gui.py:490
+#: src/sticker_convert/gui.py:496
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/sticker_convert/gui.py:612
+#: src/sticker_convert/gui.py:618
 #: src/sticker_convert/gui_components/frames/control_frame.py:19
 msgid "Start"
 msgstr "Start"
 
-#: src/sticker_convert/gui.py:692
+#: src/sticker_convert/gui.py:698
 msgid "Invalid URL: "
 msgstr "Invalid URL: "
 
-#: src/sticker_convert/gui.py:697
+#: src/sticker_convert/gui.py:704
 msgid "Detected URL: "
 msgstr "Detected URL: "
 
@@ -731,7 +731,7 @@ msgid "Failed to create Xcode project: ios-message-stickers-template not found"
 msgstr ""
 "Failed to create Xcode project: ios-message-stickers-template not found"
 
-#: src/sticker_convert/uploaders/upload_base.py:6
+#: src/sticker_convert/uploaders/upload_base.py:9
 #, python-brace-format
 msgid ""
 "emoji.txt is required for uploading signal stickers\n"
@@ -780,7 +780,7 @@ msgid "Verifying {} for uploading to signal"
 msgstr "Verifying {} for uploading to signal"
 
 #: src/sticker_convert/uploaders/upload_signal.py:61
-#: src/sticker_convert/uploaders/upload_telegram.py:132
+#: src/sticker_convert/uploaders/upload_telegram.py:134
 #, python-brace-format
 msgid "Warning: Cannot find emoji for file {}, using default emoji..."
 msgstr "Warning: Cannot find emoji for file {}, using default emoji..."
@@ -800,7 +800,7 @@ msgstr "password required for uploading to Signal"
 
 #: src/sticker_convert/uploaders/upload_signal.py:141
 #: src/sticker_convert/uploaders/upload_viber.py:66
-#: src/sticker_convert/uploaders/upload_telegram.py:279
+#: src/sticker_convert/uploaders/upload_telegram.py:281
 #, python-brace-format
 msgid "title cannot be {}"
 msgstr "title cannot be {}"
@@ -811,7 +811,7 @@ msgid "author cannot be {}"
 msgstr "author cannot be {}"
 
 #: src/sticker_convert/uploaders/upload_signal.py:187
-#: src/sticker_convert/uploaders/upload_telegram.py:324
+#: src/sticker_convert/uploaders/upload_telegram.py:326
 #, python-brace-format
 msgid "Uploading pack {}"
 msgstr "Uploading pack {}"
@@ -853,7 +853,7 @@ msgstr "Uploaded {}"
 msgid "Failed to upload {}: {} {}"
 msgstr "Failed to upload {}: {} {}"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:20
+#: src/sticker_convert/uploaders/upload_telegram.py:24
 #, python-brace-format
 msgid ""
 "Warning: Pack {} already exists.\n"
@@ -866,27 +866,27 @@ msgstr ""
 "Note: After recreating set, please wait for about 3 minutes for the set to "
 "reappear."
 
-#: src/sticker_convert/uploaders/upload_telegram.py:90
+#: src/sticker_convert/uploaders/upload_telegram.py:92
 #: src/sticker_convert/downloaders/download_telegram.py:40
 msgid "Download failed: Invalid credentials"
 msgstr "Download failed: Invalid credentials"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:111
+#: src/sticker_convert/uploaders/upload_telegram.py:113
 #, python-brace-format
 msgid "Deleting all stickers from pack {}"
 msgstr "Deleting all stickers from pack {}"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:116
+#: src/sticker_convert/uploaders/upload_telegram.py:118
 #, python-brace-format
 msgid "Not deleting existing pack {}"
 msgstr "Not deleting existing pack {}"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:126
+#: src/sticker_convert/uploaders/upload_telegram.py:128
 #, python-brace-format
 msgid "Verifying {} for uploading to telegram"
 msgstr "Verifying {} for uploading to telegram"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:140
+#: src/sticker_convert/uploaders/upload_telegram.py:142
 #, python-brace-format
 msgid ""
 "Warning: {emoji} emoji for file {file}, exceeding limit of 20, keep first 20 "
@@ -895,7 +895,7 @@ msgstr ""
 "Warning: {emoji} emoji for file {file}, exceeding limit of 20, keep first 20 "
 "only..."
 
-#: src/sticker_convert/uploaders/upload_telegram.py:266
+#: src/sticker_convert/uploaders/upload_telegram.py:268
 #, python-brace-format
 msgid "Finish uploading {}"
 msgstr "Finish uploading {}"
@@ -916,10 +916,10 @@ msgstr "Downloading {}"
 
 #: src/sticker_convert/downloaders/download_base.py:105
 #: src/sticker_convert/downloaders/download_base.py:169
-#: src/sticker_convert/downloaders/download_line.py:445
+#: src/sticker_convert/downloaders/download_line.py:447
 #: src/sticker_convert/downloaders/download_band.py:91
-#: src/sticker_convert/auth/telegram_api.py:312
-#: src/sticker_convert/auth/telegram_api.py:642
+#: src/sticker_convert/auth/telegram_api.py:339
+#: src/sticker_convert/auth/telegram_api.py:675
 #, python-brace-format
 msgid "Downloaded {}"
 msgstr "Downloaded {}"
@@ -934,7 +934,7 @@ msgstr "Error {}: {} (tried {}/{} times)"
 msgid "Cannot download {} (tried {}/{} times): {}"
 msgstr "Cannot download {} (tried {}/{} times): {}"
 
-#: src/sticker_convert/downloaders/download_line.py:27
+#: src/sticker_convert/downloaders/download_line.py:167
 msgid ""
 "The Line sticker pack you are downloading can have customized text.\n"
 "line-sticker-text.txt has been created in input directory.\n"
@@ -944,8 +944,8 @@ msgstr ""
 "line-sticker-text.txt has been created in input directory.\n"
 "Please edit line-sticker-text.txt, then continue."
 
-#: src/sticker_convert/downloaders/download_line.py:196
-#: src/sticker_convert/downloaders/download_line.py:203
+#: src/sticker_convert/downloaders/download_line.py:198
+#: src/sticker_convert/downloaders/download_line.py:205
 msgid ""
 "Warning: Line cookies invalid, you will not be able to add text to \"Custom "
 "stickers\""
@@ -953,46 +953,46 @@ msgstr ""
 "Warning: Line cookies invalid, you will not be able to add text to \"Custom "
 "stickers\""
 
-#: src/sticker_convert/downloaders/download_line.py:245
+#: src/sticker_convert/downloaders/download_line.py:247
 #: src/sticker_convert/downloaders/download_viber.py:82
 #, python-brace-format
 msgid "Read {}"
 msgstr "Read {}"
 
-#: src/sticker_convert/downloaders/download_line.py:253
-#: src/sticker_convert/downloaders/download_line.py:274
+#: src/sticker_convert/downloaders/download_line.py:255
+#: src/sticker_convert/downloaders/download_line.py:276
 #: src/sticker_convert/downloaders/download_viber.py:62
 #: src/sticker_convert/downloaders/download_band.py:26
 msgid "Unzipping..."
 msgstr "Unzipping..."
 
-#: src/sticker_convert/downloaders/download_line.py:378
+#: src/sticker_convert/downloaders/download_line.py:380
 #, python-brace-format
 msgid "Failed to generate customized text {} due to: {}"
 msgstr "Failed to generate customized text {} due to: {}"
 
-#: src/sticker_convert/downloaders/download_line.py:410
+#: src/sticker_convert/downloaders/download_line.py:412
 #, python-brace-format
 msgid "Combined {}"
 msgstr "Combined {}"
 
-#: src/sticker_convert/downloaders/download_line.py:418
+#: src/sticker_convert/downloaders/download_line.py:420
 #: src/sticker_convert/downloaders/download_band.py:71
 msgid "Download failed: Unsupported URL format"
 msgstr "Download failed: Unsupported URL format"
 
-#: src/sticker_convert/downloaders/download_line.py:436
+#: src/sticker_convert/downloaders/download_line.py:438
 #: src/sticker_convert/downloaders/download_band.py:82
 msgid "Download failed: Failed to get metadata"
 msgstr "Download failed: Failed to get metadata"
 
-#: src/sticker_convert/downloaders/download_line.py:447
+#: src/sticker_convert/downloaders/download_line.py:449
 #: src/sticker_convert/downloaders/download_band.py:93
 #, python-brace-format
 msgid "Cannot download {}"
 msgstr "Cannot download {}"
 
-#: src/sticker_convert/downloaders/download_kakao.py:19
+#: src/sticker_convert/downloaders/download_kakao.py:155
 msgid ""
 "Warning: Cannot get item code.\n"
 "Is auth_token invalid / expired? Try to regenerate it.\n"
@@ -1002,7 +1002,7 @@ msgstr ""
 "Is auth_token invalid / expired? Try to regenerate it.\n"
 "Continue to download static stickers instead?"
 
-#: src/sticker_convert/downloaders/download_kakao.py:23
+#: src/sticker_convert/downloaders/download_kakao.py:161
 msgid ""
 "Warning: Cannot get item code.\n"
 "Please use share link instead.\n"
@@ -1012,36 +1012,36 @@ msgstr ""
 "Please use share link instead.\n"
 "Continue to download static stickers instead?"
 
-#: src/sticker_convert/downloaders/download_kakao.py:186
-#: src/sticker_convert/downloaders/download_kakao.py:234
+#: src/sticker_convert/downloaders/download_kakao.py:190
+#: src/sticker_convert/downloaders/download_kakao.py:238
 msgid "Download failed: Cannot download metadata for sticker pack"
 msgstr "Download failed: Cannot download metadata for sticker pack"
 
-#: src/sticker_convert/downloaders/download_kakao.py:196
+#: src/sticker_convert/downloaders/download_kakao.py:200
 msgid "Warning: Downloading animated sticker requires auth_token"
 msgstr "Warning: Downloading animated sticker requires auth_token"
 
-#: src/sticker_convert/downloaders/download_kakao.py:201
+#: src/sticker_convert/downloaders/download_kakao.py:205
 msgid "Warning: auth_token invalid, cannot download animated sticker"
 msgstr "Warning: auth_token invalid, cannot download animated sticker"
 
-#: src/sticker_convert/downloaders/download_kakao.py:204
+#: src/sticker_convert/downloaders/download_kakao.py:208
 msgid "Downloading static stickers..."
 msgstr "Downloading static stickers..."
 
-#: src/sticker_convert/downloaders/download_kakao.py:218
+#: src/sticker_convert/downloaders/download_kakao.py:222
 msgid "Warning: Cannot get pack_title with auth_token."
 msgstr "Warning: Cannot get pack_title with auth_token."
 
-#: src/sticker_convert/downloaders/download_kakao.py:220
+#: src/sticker_convert/downloaders/download_kakao.py:224
 msgid "Is auth_token invalid / expired? Try to regenerate it."
 msgstr "Is auth_token invalid / expired? Try to regenerate it."
 
-#: src/sticker_convert/downloaders/download_kakao.py:222
+#: src/sticker_convert/downloaders/download_kakao.py:226
 msgid "Continuing without getting pack_title"
 msgstr "Continuing without getting pack_title"
 
-#: src/sticker_convert/downloaders/download_kakao.py:251
+#: src/sticker_convert/downloaders/download_kakao.py:255
 msgid ""
 "Cannot get item code, trying to search by author name, this may take long "
 "time..."
@@ -1049,25 +1049,25 @@ msgstr ""
 "Cannot get item code, trying to search by author name, this may take long "
 "time..."
 
-#: src/sticker_convert/downloaders/download_kakao.py:255
+#: src/sticker_convert/downloaders/download_kakao.py:259
 msgid "Hint: Use share link instead to download more reliably"
 msgstr "Hint: Use share link instead to download more reliably"
 
-#: src/sticker_convert/downloaders/download_kakao.py:279
+#: src/sticker_convert/downloaders/download_kakao.py:283
 msgid "Download failed: Unrecognized URL"
 msgstr "Download failed: Unrecognized URL"
 
-#: src/sticker_convert/downloaders/download_kakao.py:348
+#: src/sticker_convert/downloaders/download_kakao.py:352
 #, python-brace-format
 msgid "Failed to determine extension of {}"
 msgstr "Failed to determine extension of {}"
 
-#: src/sticker_convert/downloaders/download_kakao.py:397
+#: src/sticker_convert/downloaders/download_kakao.py:401
 #, python-brace-format
 msgid "Decrypted {}"
 msgstr "Decrypted {}"
 
-#: src/sticker_convert/downloaders/download_kakao.py:401
+#: src/sticker_convert/downloaders/download_kakao.py:405
 #, python-brace-format
 msgid "Finished getting {}"
 msgstr "Finished getting {}"
@@ -1428,50 +1428,50 @@ msgstr "An error occured while exporting stickers"
 msgid "Export: {stickers_ok}/{stickers_total} stickers success"
 msgstr "Export: {stickers_ok}/{stickers_total} stickers success"
 
-#: src/sticker_convert/auth/telegram_api.py:26
+#: src/sticker_convert/auth/telegram_api.py:29
 #, python-brace-format
 msgid "Cannot upload any sticker. Reason: {}"
 msgstr "Cannot upload any sticker. Reason: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:27
+#: src/sticker_convert/auth/telegram_api.py:30
 #, python-brace-format
 msgid "Cannot upload pack {}. Reason: {}"
 msgstr "Cannot upload pack {}. Reason: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:28
+#: src/sticker_convert/auth/telegram_api.py:31
 #, python-brace-format
 msgid "Cannot delete pack of {}. Reason: {}"
 msgstr "Cannot delete pack of {}. Reason: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:29
+#: src/sticker_convert/auth/telegram_api.py:33
 #, python-brace-format
 msgid "Cannot upload sticker {sticker} of {pack}. Reason: {reason}"
 msgstr "Cannot upload sticker {sticker} of {pack}. Reason: {reason}"
 
-#: src/sticker_convert/auth/telegram_api.py:30
+#: src/sticker_convert/auth/telegram_api.py:35
 #, python-brace-format
 msgid "Cannot set pack icon for {}. Reason: {}"
 msgstr "Cannot set pack icon for {}. Reason: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:71
+#: src/sticker_convert/auth/telegram_api.py:98
 msgid "Token and userid required for uploading to telegram"
 msgstr "Token and userid required for uploading to telegram"
 
-#: src/sticker_convert/auth/telegram_api.py:74
+#: src/sticker_convert/auth/telegram_api.py:101
 msgid "Token required for downloading from telegram"
 msgstr "Token required for downloading from telegram"
 
-#: src/sticker_convert/auth/telegram_api.py:81
+#: src/sticker_convert/auth/telegram_api.py:108
 msgid "Invalid userid, should contain numbers only"
 msgstr "Invalid userid, should contain numbers only"
 
-#: src/sticker_convert/auth/telegram_api.py:136
-#: src/sticker_convert/auth/telegram_api.py:147
+#: src/sticker_convert/auth/telegram_api.py:163
+#: src/sticker_convert/auth/telegram_api.py:174
 #, python-brace-format
 msgid "Cannot delete sticker set {}. Reason: {}"
 msgstr "Cannot delete sticker set {}. Reason: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:141
+#: src/sticker_convert/auth/telegram_api.py:168
 msgid ""
 "\n"
 "Hint: You might had deleted and recreated pack too quickly. Wait about 3 "
@@ -1481,27 +1481,27 @@ msgstr ""
 "Hint: You might had deleted and recreated pack too quickly. Wait about 3 "
 "minutes and try again."
 
-#: src/sticker_convert/auth/telegram_api.py:169
+#: src/sticker_convert/auth/telegram_api.py:196
 #, python-brace-format
 msgid "Creating pack and bulk uploading {} stickers of {}"
 msgstr "Creating pack and bulk uploading {} stickers of {}"
 
-#: src/sticker_convert/auth/telegram_api.py:181
+#: src/sticker_convert/auth/telegram_api.py:208
 #, python-brace-format
 msgid "Created pack and bulk uploaded {} stickers of {}"
 msgstr "Created pack and bulk uploaded {} stickers of {}"
 
-#: src/sticker_convert/auth/telegram_api.py:190
+#: src/sticker_convert/auth/telegram_api.py:217
 #, python-brace-format
 msgid "Cannot create pack and bulk upload {} stickers of {}. Reason: {}"
 msgstr "Cannot create pack and bulk upload {} stickers of {}. Reason: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:224
+#: src/sticker_convert/auth/telegram_api.py:251
 #, python-brace-format
 msgid "Uploaded sticker {} of {}"
 msgstr "Uploaded sticker {} of {}"
 
-#: src/sticker_convert/auth/telegram_api.py:236
+#: src/sticker_convert/auth/telegram_api.py:263
 msgid ""
 "Hint: You might had deleted and recreated pack too quickly. Wait about 3 "
 "minutes and try again."
@@ -1509,43 +1509,43 @@ msgstr ""
 "Hint: You might had deleted and recreated pack too quickly. Wait about 3 "
 "minutes and try again."
 
-#: src/sticker_convert/auth/telegram_api.py:253
+#: src/sticker_convert/auth/telegram_api.py:280
 #, python-brace-format
 msgid "Uploading cover (thumbnail) of pack {}"
 msgstr "Uploading cover (thumbnail) of pack {}"
 
-#: src/sticker_convert/auth/telegram_api.py:262
+#: src/sticker_convert/auth/telegram_api.py:289
 #, python-brace-format
 msgid "Uploaded cover (thumbnail) of pack {}"
 msgstr "Uploaded cover (thumbnail) of pack {}"
 
-#: src/sticker_convert/auth/telegram_api.py:267
+#: src/sticker_convert/auth/telegram_api.py:294
 #, python-brace-format
 msgid "Cannot upload cover (thumbnail) of pack {}. Reason: {}"
 msgstr "Cannot upload cover (thumbnail) of pack {}. Reason: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:295
-#: src/sticker_convert/auth/telegram_api.py:637
+#: src/sticker_convert/auth/telegram_api.py:322
+#: src/sticker_convert/auth/telegram_api.py:670
 #, python-brace-format
 msgid "Failed to download {}: {}"
 msgstr "Failed to download {}: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:333
+#: src/sticker_convert/auth/telegram_api.py:360
 #, python-brace-format
 msgid "Failed to download telegram sticker set {} due to: {}"
 msgstr "Failed to download telegram sticker set {} due to: {}"
 
-#: src/sticker_convert/auth/telegram_api.py:472
+#: src/sticker_convert/auth/telegram_api.py:505
 #, python-brace-format
 msgid "Cannot upload any sticker to {} due to invalid sticker format {}"
 msgstr "Cannot upload any sticker to {} due to invalid sticker format {}"
 
-#: src/sticker_convert/auth/telegram_api.py:701
+#: src/sticker_convert/auth/telegram_api.py:734
 #, python-brace-format
 msgid "Failed to download cover{}: {}"
 msgstr "Failed to download cover{}: {}"
 
-#: src/sticker_convert/auth/auth_kakao_android_login.py:14
+#: src/sticker_convert/auth/auth_kakao_android_login.py:17
 #, python-brace-format
 msgid ""
 "Got auth_token successfully:\n"
@@ -1591,7 +1591,7 @@ msgstr "Getting Kakao authorization token by Android login: Skip restoration"
 msgid "Getting Kakao authorization token by Android login: Get profile"
 msgstr "Getting Kakao authorization token by Android login: Get profile"
 
-#: src/sticker_convert/auth/auth_signal.py:16
+#: src/sticker_convert/auth/auth_signal.py:20
 msgid ""
 "Signal Desktop not detected.\n"
 "Download and install Signal Desktop version\n"
@@ -1601,15 +1601,15 @@ msgstr ""
 "Download and install Signal Desktop version\n"
 "After installation, quit Signal Desktop before continuing"
 
-#: src/sticker_convert/auth/auth_signal.py:69
+#: src/sticker_convert/auth/auth_signal.py:71
 msgid "Getting Signal credentials..."
 msgstr "Getting Signal credentials..."
 
-#: src/sticker_convert/auth/auth_signal.py:75
+#: src/sticker_convert/auth/auth_signal.py:77
 msgid "Failed to get uuid and password"
 msgstr "Failed to get uuid and password"
 
-#: src/sticker_convert/auth/auth_signal.py:134
+#: src/sticker_convert/auth/auth_signal.py:136
 #, python-brace-format
 msgid ""
 "Got uuid and password successfully:\n"
@@ -1620,20 +1620,19 @@ msgstr ""
 "uuid={}\n"
 "password={}"
 
-#: src/sticker_convert/auth/auth_line.py:13
+#: src/sticker_convert/auth/auth_line.py:16
 msgid "Got Line cookies successfully"
 msgstr "Got Line cookies successfully"
 
-#: src/sticker_convert/auth/auth_line.py:14
-#: src/sticker_convert/auth/auth_line.py:69
+#: src/sticker_convert/auth/auth_line.py:18
 msgid "Failed to get Line cookies. Have you logged in the web browser?"
 msgstr "Failed to get Line cookies. Have you logged in the web browser?"
 
-#: src/sticker_convert/auth/auth_line.py:22
+#: src/sticker_convert/auth/auth_line.py:24
 msgid "Getting Line cookies"
 msgstr "Getting Line cookies"
 
-#: src/sticker_convert/auth/auth_viber.py:15
+#: src/sticker_convert/auth/auth_viber.py:19
 msgid ""
 "Viber Desktop not detected.\n"
 "Download and install Viber Desktop,\n"
@@ -1643,7 +1642,7 @@ msgstr ""
 "Download and install Viber Desktop,\n"
 "then login to Viber Desktop and try again."
 
-#: src/sticker_convert/auth/auth_viber.py:18
+#: src/sticker_convert/auth/auth_viber.py:24
 msgid ""
 "Viber Desktop installed,\n"
 "but viber_auth not found.\n"
@@ -1653,8 +1652,8 @@ msgstr ""
 "but viber_auth not found.\n"
 "Please login to Viber Desktop and try again."
 
-#: src/sticker_convert/auth/auth_viber.py:21
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:20
+#: src/sticker_convert/auth/auth_viber.py:29
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:28
 msgid ""
 "You need to disable SIP:\n"
 "1. Restart computer in Recovery mode\n"
@@ -1668,24 +1667,24 @@ msgstr ""
 "3. Run the command `csrutil disable`\n"
 "4. Restart your computer"
 
-#: src/sticker_convert/auth/auth_viber.py:26
+#: src/sticker_convert/auth/auth_viber.py:35
 msgid "Failed to launch Viber"
 msgstr "Failed to launch Viber"
 
-#: src/sticker_convert/auth/auth_viber.py:27
+#: src/sticker_convert/auth/auth_viber.py:36
 msgid "Failed to read Viber process memory"
 msgstr "Failed to read Viber process memory"
 
-#: src/sticker_convert/auth/auth_viber.py:100
-#: src/sticker_convert/auth/auth_viber.py:165
+#: src/sticker_convert/auth/auth_viber.py:106
+#: src/sticker_convert/auth/auth_viber.py:171
 msgid "Got viber_auth successfully:\n"
 msgstr "Got viber_auth successfully:\n"
 
-#: src/sticker_convert/auth/auth_viber.py:142
+#: src/sticker_convert/auth/auth_viber.py:148
 msgid "Failed to dump memory"
 msgstr "Failed to dump memory"
 
-#: src/sticker_convert/auth/auth_viber.py:198
+#: src/sticker_convert/auth/auth_viber.py:204
 msgid ""
 "Getting Viber credentials...\n"
 "(This may take a minute)"
@@ -1693,7 +1692,7 @@ msgstr ""
 "Getting Viber credentials...\n"
 "(This may take a minute)"
 
-#: src/sticker_convert/auth/auth_discord.py:17
+#: src/sticker_convert/auth/auth_discord.py:20
 #, python-brace-format
 msgid ""
 "Got token successfully:\n"
@@ -1702,24 +1701,24 @@ msgstr ""
 "Got token successfully:\n"
 "token={}"
 
-#: src/sticker_convert/auth/auth_discord.py:18
+#: src/sticker_convert/auth/auth_discord.py:21
 msgid "Failed to get token"
 msgstr "Failed to get token"
 
-#: src/sticker_convert/auth/auth_discord.py:77
+#: src/sticker_convert/auth/auth_discord.py:76
 msgid "Getting Discord authorization token..."
 msgstr "Getting Discord authorization token..."
 
-#: src/sticker_convert/auth/auth_discord.py:90
+#: src/sticker_convert/auth/auth_discord.py:89
 msgid "Please install Discord Desktop or Chrome/Chromium and try again"
 msgstr "Please install Discord Desktop or Chrome/Chromium and try again"
 
-#: src/sticker_convert/auth/auth_discord.py:100
+#: src/sticker_convert/auth/auth_discord.py:99
 #, python-brace-format
 msgid "All {} will be closed. Continue?"
 msgstr "All {} will be closed. Continue?"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:14
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:18
 msgid ""
 "Kakao Desktop not detected.\n"
 "Download and install Kakao Desktop,\n"
@@ -1729,7 +1728,7 @@ msgstr ""
 "Download and install Kakao Desktop,\n"
 "then login to Kakao Desktop and try again."
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:17
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:23
 msgid ""
 "Kakao Desktop installed,\n"
 "but kakao_auth not found.\n"
@@ -1739,15 +1738,15 @@ msgstr ""
 "but kakao_auth not found.\n"
 "Please login to Kakao Desktop and try again."
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:25
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:34
 msgid "Failed to launch Kakao"
 msgstr "Failed to launch Kakao"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:26
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:35
 msgid "Failed to read Kakao process memory"
 msgstr "Failed to read Kakao process memory"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:255
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:261
 msgid ""
 "Getting Kakao authorization token by Desktop memdump...\n"
 "(This may take a minute)"
@@ -1755,7 +1754,7 @@ msgstr ""
 "Getting Kakao authorization token by Desktop memdump...\n"
 "(This may take a minute)"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_login.py:22
+#: src/sticker_convert/auth/auth_kakao_desktop_login.py:25
 #, python-brace-format
 msgid "Login successful, auth_token={}"
 msgstr "Login successful, auth_token={}"
@@ -1786,7 +1785,7 @@ msgstr "Failed to register device: {}"
 msgid "Failed to login after registering device: {}"
 msgstr "Failed to login after registering device: {}"
 
-#: src/sticker_convert/auth/auth_telethon.py:12
+#: src/sticker_convert/auth/auth_telethon.py:16
 #, python-brace-format
 msgid ""
 "1. Visit {telegram_api_url}\n"
@@ -1813,34 +1812,34 @@ msgstr ""
 "5. Note down api_id and api_hash\n"
 "Continue when done"
 
-#: src/sticker_convert/auth/auth_telethon.py:24
+#: src/sticker_convert/auth/auth_telethon.py:29
 msgid "Telethon setup successful"
 msgstr "Telethon setup successful"
 
-#: src/sticker_convert/auth/auth_telethon.py:25
+#: src/sticker_convert/auth/auth_telethon.py:30
 msgid "Telethon setup failed"
 msgstr "Telethon setup failed"
 
-#: src/sticker_convert/auth/auth_telethon.py:46
+#: src/sticker_convert/auth/auth_telethon.py:48
 msgid "Enter phone number: "
 msgstr "Enter phone number: "
 
-#: src/sticker_convert/auth/auth_telethon.py:58
+#: src/sticker_convert/auth/auth_telethon.py:60
 msgid "Enter code: "
 msgstr "Enter code: "
 
-#: src/sticker_convert/auth/auth_telethon.py:96
+#: src/sticker_convert/auth/auth_telethon.py:102
 msgid "Enter api_id: "
 msgstr "Enter api_id: "
 
-#: src/sticker_convert/auth/auth_telethon.py:116
+#: src/sticker_convert/auth/auth_telethon.py:122
 msgid "Error: api_id should be numeric\n"
 msgstr "Error: api_id should be numeric\n"
 
-#: src/sticker_convert/auth/auth_telethon.py:118
+#: src/sticker_convert/auth/auth_telethon.py:124
 msgid "Enter api_hash: "
 msgstr "Enter api_hash: "
 
-#: src/sticker_convert/utils/translate.py:107
+#: src/sticker_convert/utils/translate.py:110
 msgid "Auto"
 msgstr "Auto"

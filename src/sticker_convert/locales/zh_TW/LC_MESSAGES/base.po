@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-09 18:43+0800\n"
+"POT-Creation-Date: 2025-11-09 22:57+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,17 +15,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: src/sticker_convert/converter.py:31
+#: src/sticker_convert/converter.py:134
 #, python-brace-format
 msgid "[I] Start compressing {} -> {}"
 msgstr "[I] 開始壓縮 {} -> {}"
 
-#: src/sticker_convert/converter.py:32
+#: src/sticker_convert/converter.py:136
 #, python-brace-format
 msgid "[S] Compatible file found, skip compress and just copy {} -> {}"
 msgstr "[S] 找到兼容檔案，跳過壓縮並僅複製 {} -> {}"
 
-#: src/sticker_convert/converter.py:34
+#: src/sticker_convert/converter.py:139
 #, python-brace-format
 msgid ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
@@ -33,17 +33,17 @@ msgid ""
 msgstr ""
 "[C] 壓縮 {} -> {} 解像度={}x{}，質量={}，幀率={}，顏色={}（步驟 {}-{}-{}）"
 
-#: src/sticker_convert/converter.py:36
+#: src/sticker_convert/converter.py:142
 #, python-brace-format
 msgid "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 msgstr "[{}] 已壓縮 {} -> {} 但大小 {} {} 限制 {}，正在重新壓縮"
 
-#: src/sticker_convert/converter.py:37
+#: src/sticker_convert/converter.py:144
 #, python-brace-format
 msgid "[S] Successful compression {} -> {} size {} (step {})"
 msgstr "[S] 成功壓縮 {} -> {} 大小 {}（步驟 {}）"
 
-#: src/sticker_convert/converter.py:39
+#: src/sticker_convert/converter.py:146
 #, python-brace-format
 msgid ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
@@ -51,16 +51,16 @@ msgid ""
 msgstr ""
 "[F] 壓縮失敗 {} -> {}，在當前設置下無法達到最低大小的限制 {}（最佳大小：{}）"
 
-#: src/sticker_convert/converter.py:43
+#: src/sticker_convert/converter.py:150
 #, python-brace-format
 msgid "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 msgstr "[W] {}不支持RGBA，默認為fastoctree量化"
 
-#: src/sticker_convert/converter.py:45
+#: src/sticker_convert/converter.py:152
 msgid "[W] Importing SVG takes long time"
 msgstr "[W] 導入 SVG 需要很長時間"
 
-#: src/sticker_convert/cli.py:31 src/sticker_convert/gui.py:37
+#: src/sticker_convert/cli.py:35 src/sticker_convert/gui.py:41
 #, python-brace-format
 msgid ""
 "sticker-convert is Free and Opensource software by laggykiller\n"
@@ -72,64 +72,64 @@ msgstr ""
 "{project_url}\n"
 "尊重智慧財產權，做個文明人，請不要轉售貼圖！"
 
-#: src/sticker_convert/cli.py:57
+#: src/sticker_convert/cli.py:59
 msgid "CLI for sticker-convert"
 msgstr "sticker-convert的CLI"
 
-#: src/sticker_convert/cli.py:88
+#: src/sticker_convert/cli.py:90
 msgid "Input options"
 msgstr "輸入選項"
 
-#: src/sticker_convert/cli.py:101
+#: src/sticker_convert/cli.py:103
 #: src/sticker_convert/gui_components/frames/output_frame.py:22
 msgid "Output options"
 msgstr "輸出選項"
 
-#: src/sticker_convert/cli.py:115 src/sticker_convert/gui.py:227
+#: src/sticker_convert/cli.py:117 src/sticker_convert/gui.py:231
 msgid "Compression options"
 msgstr "壓縮選項"
 
-#: src/sticker_convert/cli.py:191
+#: src/sticker_convert/cli.py:193
 msgid "Credentials options"
 msgstr "認證選項"
 
-#: src/sticker_convert/cli.py:224
+#: src/sticker_convert/cli.py:226
 #, python-brace-format
 msgid "Error: Cannot load custom presets from {}"
 msgstr "錯誤：無法從 {} 載入自訂預設"
 
-#: src/sticker_convert/cli.py:272
+#: src/sticker_convert/cli.py:274
 #, python-brace-format
 msgid "Detected URL input source: {}"
 msgstr "檢測到的 URL 輸入來源：{}"
 
-#: src/sticker_convert/cli.py:275
+#: src/sticker_convert/cli.py:277
 #, python-brace-format
 msgid "Error: Unrecognied URL input source for url: {}"
 msgstr "錯誤：無法識別連結的輸入來源：{}"
 
-#: src/sticker_convert/cli.py:353
+#: src/sticker_convert/cli.py:355
 #, python-brace-format
 msgid "Auto compression option set to {}"
 msgstr "自動壓縮選項設置為 {}"
 
-#: src/sticker_convert/cli.py:362
+#: src/sticker_convert/cli.py:364
 msgid " Reason: Export to local directory only"
 msgstr "原因：僅導出到本地目錄"
 
-#: src/sticker_convert/cli.py:482 src/sticker_convert/gui.py:293
+#: src/sticker_convert/cli.py:484 src/sticker_convert/gui.py:299
 msgid "Warning: creds.json content is corrupted"
 msgstr "警告：creds.json 內容已損壞"
 
-#: src/sticker_convert/cli.py:488
+#: src/sticker_convert/cli.py:490
 msgid "Loaded credentials from creds.json"
 msgstr "從creds.json加載憑證"
 
-#: src/sticker_convert/cli.py:619
+#: src/sticker_convert/cli.py:621
 msgid "Saved credentials to creds.json"
 msgstr "將憑證保存到creds.json"
 
-#: src/sticker_convert/gui.py:43
+#: src/sticker_convert/gui.py:49
 #, fuzzy, python-brace-format
 msgid ""
 "NOTICE: If buttons are not responsive, try to press\n"
@@ -142,52 +142,52 @@ msgstr ""
 "（這是 tkinter 在 macOS 14 python <=3.11.6 的BUG）\n"
 "（https://github.com/python/cpython/issues/110218）"
 
-#: src/sticker_convert/gui.py:96
+#: src/sticker_convert/gui.py:100
 msgid "Job is running, really quit?"
 msgstr "作業正在運行，真的要退出嗎？"
 
-#: src/sticker_convert/gui.py:101
+#: src/sticker_convert/gui.py:105
 msgid "Quitting, please wait..."
 msgstr "正在退出，請稍候..."
 
-#: src/sticker_convert/gui.py:224
+#: src/sticker_convert/gui.py:228
 msgid "Input"
 msgstr "輸入"
 
-#: src/sticker_convert/gui.py:230
+#: src/sticker_convert/gui.py:234
 msgid "Output"
 msgstr "輸出"
 
-#: src/sticker_convert/gui.py:233
+#: src/sticker_convert/gui.py:237
 msgid "Credentials"
 msgstr "身份驗證數據"
 
-#: src/sticker_convert/gui.py:236
+#: src/sticker_convert/gui.py:240
 msgid "Config"
 msgstr "設定"
 
-#: src/sticker_convert/gui.py:239
+#: src/sticker_convert/gui.py:243
 msgid "Progress"
 msgstr "進展"
 
-#: src/sticker_convert/gui.py:283
+#: src/sticker_convert/gui.py:289
 msgid "Warning: config.json content is corrupted"
 msgstr "警告：config.json 內容已損壞"
 
-#: src/sticker_convert/gui.py:490
+#: src/sticker_convert/gui.py:496
 msgid "Cancel"
 msgstr "取消"
 
-#: src/sticker_convert/gui.py:612
+#: src/sticker_convert/gui.py:618
 #: src/sticker_convert/gui_components/frames/control_frame.py:19
 msgid "Start"
 msgstr "開始"
 
-#: src/sticker_convert/gui.py:692
+#: src/sticker_convert/gui.py:698
 msgid "Invalid URL: "
 msgstr "URL無效："
 
-#: src/sticker_convert/gui.py:697
+#: src/sticker_convert/gui.py:704
 msgid "Detected URL: "
 msgstr "偵查到URL："
 
@@ -725,7 +725,7 @@ msgstr "驗證 {} 以創建 Xcode iMessage 貼圖包"
 msgid "Failed to create Xcode project: ios-message-stickers-template not found"
 msgstr "未能創建Xcode專案：ios-message-stickers-template不存在"
 
-#: src/sticker_convert/uploaders/upload_base.py:6
+#: src/sticker_convert/uploaders/upload_base.py:9
 #, python-brace-format
 msgid ""
 "emoji.txt is required for uploading signal stickers\n"
@@ -774,7 +774,7 @@ msgid "Verifying {} for uploading to signal"
 msgstr "正在驗證 {} 是否上傳到Signal"
 
 #: src/sticker_convert/uploaders/upload_signal.py:61
-#: src/sticker_convert/uploaders/upload_telegram.py:132
+#: src/sticker_convert/uploaders/upload_telegram.py:134
 #, python-brace-format
 msgid "Warning: Cannot find emoji for file {}, using default emoji..."
 msgstr "警告：無法找到檔案{}的表情符號，使用默認表情符號..."
@@ -794,7 +794,7 @@ msgstr "上傳到Signal需要密碼"
 
 #: src/sticker_convert/uploaders/upload_signal.py:141
 #: src/sticker_convert/uploaders/upload_viber.py:66
-#: src/sticker_convert/uploaders/upload_telegram.py:279
+#: src/sticker_convert/uploaders/upload_telegram.py:281
 #, python-brace-format
 msgid "title cannot be {}"
 msgstr "標題不能是 {}"
@@ -805,7 +805,7 @@ msgid "author cannot be {}"
 msgstr "作者不能是 {}"
 
 #: src/sticker_convert/uploaders/upload_signal.py:187
-#: src/sticker_convert/uploaders/upload_telegram.py:324
+#: src/sticker_convert/uploaders/upload_telegram.py:326
 #, python-brace-format
 msgid "Uploading pack {}"
 msgstr "正在上傳包{}"
@@ -847,7 +847,7 @@ msgstr "已上傳{}"
 msgid "Failed to upload {}: {} {}"
 msgstr "無法上傳 {}：{} {}"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:20
+#: src/sticker_convert/uploaders/upload_telegram.py:24
 #, python-brace-format
 msgid ""
 "Warning: Pack {} already exists.\n"
@@ -859,27 +859,27 @@ msgstr ""
 "刪除表情包中的所有貼圖？\n"
 "注意：重新創建表情包後，請等待大約 3 分鐘，表情包將重新出現。"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:90
+#: src/sticker_convert/uploaders/upload_telegram.py:92
 #: src/sticker_convert/downloaders/download_telegram.py:40
 msgid "Download failed: Invalid credentials"
 msgstr "下載失敗：憑證無效"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:111
+#: src/sticker_convert/uploaders/upload_telegram.py:113
 #, python-brace-format
 msgid "Deleting all stickers from pack {}"
 msgstr "刪除表情包{}中的所有貼圖"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:116
+#: src/sticker_convert/uploaders/upload_telegram.py:118
 #, python-brace-format
 msgid "Not deleting existing pack {}"
 msgstr "不刪除現有的表情包{}"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:126
+#: src/sticker_convert/uploaders/upload_telegram.py:128
 #, python-brace-format
 msgid "Verifying {} for uploading to telegram"
 msgstr "正在驗證{}是否可被上傳到 telegram"
 
-#: src/sticker_convert/uploaders/upload_telegram.py:140
+#: src/sticker_convert/uploaders/upload_telegram.py:142
 #, python-brace-format
 msgid ""
 "Warning: {emoji} emoji for file {file}, exceeding limit of 20, keep first 20 "
@@ -887,7 +887,7 @@ msgid ""
 msgstr ""
 "警告：檔案 {file} 的 {emoji} 表情符號，超過 20 個限制，僅保留前 20 個..."
 
-#: src/sticker_convert/uploaders/upload_telegram.py:266
+#: src/sticker_convert/uploaders/upload_telegram.py:268
 #, python-brace-format
 msgid "Finish uploading {}"
 msgstr "完成上傳{}"
@@ -908,10 +908,10 @@ msgstr "正在下載{}"
 
 #: src/sticker_convert/downloaders/download_base.py:105
 #: src/sticker_convert/downloaders/download_base.py:169
-#: src/sticker_convert/downloaders/download_line.py:445
+#: src/sticker_convert/downloaders/download_line.py:447
 #: src/sticker_convert/downloaders/download_band.py:91
-#: src/sticker_convert/auth/telegram_api.py:312
-#: src/sticker_convert/auth/telegram_api.py:642
+#: src/sticker_convert/auth/telegram_api.py:339
+#: src/sticker_convert/auth/telegram_api.py:675
 #, python-brace-format
 msgid "Downloaded {}"
 msgstr "已下載{}"
@@ -926,7 +926,7 @@ msgstr "錯誤 {}：{}（已嘗試 {}/{} 次）"
 msgid "Cannot download {} (tried {}/{} times): {}"
 msgstr "無法下載 {}（已嘗試 {}/{} 次）：{}"
 
-#: src/sticker_convert/downloaders/download_line.py:27
+#: src/sticker_convert/downloaders/download_line.py:167
 msgid ""
 "The Line sticker pack you are downloading can have customized text.\n"
 "line-sticker-text.txt has been created in input directory.\n"
@@ -936,53 +936,53 @@ msgstr ""
 "已在輸入目錄中創建line-sticker-text.txt。\n"
 "請編輯line-sticker-text.txt，然後繼續。"
 
-#: src/sticker_convert/downloaders/download_line.py:196
-#: src/sticker_convert/downloaders/download_line.py:203
+#: src/sticker_convert/downloaders/download_line.py:198
+#: src/sticker_convert/downloaders/download_line.py:205
 msgid ""
 "Warning: Line cookies invalid, you will not be able to add text to \"Custom "
 "stickers\""
 msgstr "警告：Line cookie 無效，您將無法在\"隨你填貼圖\"添加文字"
 
-#: src/sticker_convert/downloaders/download_line.py:245
+#: src/sticker_convert/downloaders/download_line.py:247
 #: src/sticker_convert/downloaders/download_viber.py:82
 #, python-brace-format
 msgid "Read {}"
 msgstr "已讀取 {}"
 
-#: src/sticker_convert/downloaders/download_line.py:253
-#: src/sticker_convert/downloaders/download_line.py:274
+#: src/sticker_convert/downloaders/download_line.py:255
+#: src/sticker_convert/downloaders/download_line.py:276
 #: src/sticker_convert/downloaders/download_viber.py:62
 #: src/sticker_convert/downloaders/download_band.py:26
 msgid "Unzipping..."
 msgstr "正在解壓縮..."
 
-#: src/sticker_convert/downloaders/download_line.py:378
+#: src/sticker_convert/downloaders/download_line.py:380
 #, python-brace-format
 msgid "Failed to generate customized text {} due to: {}"
 msgstr "無法生成自定義文字{}。原因：{}"
 
-#: src/sticker_convert/downloaders/download_line.py:410
+#: src/sticker_convert/downloaders/download_line.py:412
 #, python-brace-format
 msgid "Combined {}"
 msgstr "已合併{}"
 
-#: src/sticker_convert/downloaders/download_line.py:418
+#: src/sticker_convert/downloaders/download_line.py:420
 #: src/sticker_convert/downloaders/download_band.py:71
 msgid "Download failed: Unsupported URL format"
 msgstr "下載失敗：連結格式不受支持"
 
-#: src/sticker_convert/downloaders/download_line.py:436
+#: src/sticker_convert/downloaders/download_line.py:438
 #: src/sticker_convert/downloaders/download_band.py:82
 msgid "Download failed: Failed to get metadata"
 msgstr "下載失敗：無法獲取元數據"
 
-#: src/sticker_convert/downloaders/download_line.py:447
+#: src/sticker_convert/downloaders/download_line.py:449
 #: src/sticker_convert/downloaders/download_band.py:93
 #, python-brace-format
 msgid "Cannot download {}"
 msgstr "無法下載{}"
 
-#: src/sticker_convert/downloaders/download_kakao.py:19
+#: src/sticker_convert/downloaders/download_kakao.py:155
 msgid ""
 "Warning: Cannot get item code.\n"
 "Is auth_token invalid / expired? Try to regenerate it.\n"
@@ -992,7 +992,7 @@ msgstr ""
 "auth_token 是否無效/過期？請嘗試重新生成。\n"
 "繼續下載靜態貼圖嗎？"
 
-#: src/sticker_convert/downloaders/download_kakao.py:23
+#: src/sticker_convert/downloaders/download_kakao.py:161
 msgid ""
 "Warning: Cannot get item code.\n"
 "Please use share link instead.\n"
@@ -1002,60 +1002,60 @@ msgstr ""
 "請改用分享鏈接。\n"
 "要繼續下載靜態貼圖嗎？"
 
-#: src/sticker_convert/downloaders/download_kakao.py:186
-#: src/sticker_convert/downloaders/download_kakao.py:234
+#: src/sticker_convert/downloaders/download_kakao.py:190
+#: src/sticker_convert/downloaders/download_kakao.py:238
 msgid "Download failed: Cannot download metadata for sticker pack"
 msgstr "下載失敗：無法下載貼圖包的元數據"
 
-#: src/sticker_convert/downloaders/download_kakao.py:196
+#: src/sticker_convert/downloaders/download_kakao.py:200
 msgid "Warning: Downloading animated sticker requires auth_token"
 msgstr "警告：下載動態貼圖需要auth_token"
 
-#: src/sticker_convert/downloaders/download_kakao.py:201
+#: src/sticker_convert/downloaders/download_kakao.py:205
 msgid "Warning: auth_token invalid, cannot download animated sticker"
 msgstr "警告：auth_token無效，無法下載動態貼圖"
 
-#: src/sticker_convert/downloaders/download_kakao.py:204
+#: src/sticker_convert/downloaders/download_kakao.py:208
 msgid "Downloading static stickers..."
 msgstr "正在下載靜態貼圖..."
 
-#: src/sticker_convert/downloaders/download_kakao.py:218
+#: src/sticker_convert/downloaders/download_kakao.py:222
 msgid "Warning: Cannot get pack_title with auth_token."
 msgstr "警告：無法使用auth_token獲取pack_title。"
 
-#: src/sticker_convert/downloaders/download_kakao.py:220
+#: src/sticker_convert/downloaders/download_kakao.py:224
 msgid "Is auth_token invalid / expired? Try to regenerate it."
 msgstr "auth_token是否無效/過期？嘗試重新生成它。"
 
-#: src/sticker_convert/downloaders/download_kakao.py:222
+#: src/sticker_convert/downloaders/download_kakao.py:226
 msgid "Continuing without getting pack_title"
 msgstr "繼續而不獲取pack_title"
 
-#: src/sticker_convert/downloaders/download_kakao.py:251
+#: src/sticker_convert/downloaders/download_kakao.py:255
 msgid ""
 "Cannot get item code, trying to search by author name, this may take long "
 "time..."
 msgstr "無法獲取項目代號，正在嘗試按作者姓名搜索，這可能需要很長時間..."
 
-#: src/sticker_convert/downloaders/download_kakao.py:255
+#: src/sticker_convert/downloaders/download_kakao.py:259
 msgid "Hint: Use share link instead to download more reliably"
 msgstr "提示：使用共享鏈接可以更可靠地下載"
 
-#: src/sticker_convert/downloaders/download_kakao.py:279
+#: src/sticker_convert/downloaders/download_kakao.py:283
 msgid "Download failed: Unrecognized URL"
 msgstr "下載失敗：無法識別連結"
 
-#: src/sticker_convert/downloaders/download_kakao.py:348
+#: src/sticker_convert/downloaders/download_kakao.py:352
 #, python-brace-format
 msgid "Failed to determine extension of {}"
 msgstr "無法確定{}的擴展名"
 
-#: src/sticker_convert/downloaders/download_kakao.py:397
+#: src/sticker_convert/downloaders/download_kakao.py:401
 #, python-brace-format
 msgid "Decrypted {}"
 msgstr "已解密{}"
 
-#: src/sticker_convert/downloaders/download_kakao.py:401
+#: src/sticker_convert/downloaders/download_kakao.py:405
 #, python-brace-format
 msgid "Finished getting {}"
 msgstr "已完成獲取{}"
@@ -1407,50 +1407,50 @@ msgstr "輸出貼紙時發生錯誤"
 msgid "Export: {stickers_ok}/{stickers_total} stickers success"
 msgstr "輸出：{stickers_ok}/{stickers_total} 個貼紙成功"
 
-#: src/sticker_convert/auth/telegram_api.py:26
+#: src/sticker_convert/auth/telegram_api.py:29
 #, python-brace-format
 msgid "Cannot upload any sticker. Reason: {}"
 msgstr "無法上傳任何貼圖。原因：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:27
+#: src/sticker_convert/auth/telegram_api.py:30
 #, python-brace-format
 msgid "Cannot upload pack {}. Reason: {}"
 msgstr "無法上傳貼圖包{}。原因：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:28
+#: src/sticker_convert/auth/telegram_api.py:31
 #, python-brace-format
 msgid "Cannot delete pack of {}. Reason: {}"
 msgstr "無法刪除貼圖包{}。原因：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:29
+#: src/sticker_convert/auth/telegram_api.py:33
 #, python-brace-format
 msgid "Cannot upload sticker {sticker} of {pack}. Reason: {reason}"
 msgstr "無法上傳{pack}貼圖包中的{sticker}貼圖。原因：{reason}"
 
-#: src/sticker_convert/auth/telegram_api.py:30
+#: src/sticker_convert/auth/telegram_api.py:35
 #, python-brace-format
 msgid "Cannot set pack icon for {}. Reason: {}"
 msgstr "無法為 {} 設置貼圖包圖標。原因：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:71
+#: src/sticker_convert/auth/telegram_api.py:98
 msgid "Token and userid required for uploading to telegram"
 msgstr "上傳到 telegram 所需的token和用戶ID"
 
-#: src/sticker_convert/auth/telegram_api.py:74
+#: src/sticker_convert/auth/telegram_api.py:101
 msgid "Token required for downloading from telegram"
 msgstr "從telegram下載需要token"
 
-#: src/sticker_convert/auth/telegram_api.py:81
+#: src/sticker_convert/auth/telegram_api.py:108
 msgid "Invalid userid, should contain numbers only"
 msgstr "userid無效，只能包含數字"
 
-#: src/sticker_convert/auth/telegram_api.py:136
-#: src/sticker_convert/auth/telegram_api.py:147
+#: src/sticker_convert/auth/telegram_api.py:163
+#: src/sticker_convert/auth/telegram_api.py:174
 #, python-brace-format
 msgid "Cannot delete sticker set {}. Reason: {}"
 msgstr "無法刪除貼圖包{}。原因：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:141
+#: src/sticker_convert/auth/telegram_api.py:168
 msgid ""
 "\n"
 "Hint: You might had deleted and recreated pack too quickly. Wait about 3 "
@@ -1459,69 +1459,69 @@ msgstr ""
 "\n"
 "提示：您可能太快刪除並重新創建貼圖包。請等待大約 3 分鐘，然後重試。"
 
-#: src/sticker_convert/auth/telegram_api.py:169
+#: src/sticker_convert/auth/telegram_api.py:196
 #, python-brace-format
 msgid "Creating pack and bulk uploading {} stickers of {}"
 msgstr "創建貼圖包並批量上傳{}個{}的貼圖"
 
-#: src/sticker_convert/auth/telegram_api.py:181
+#: src/sticker_convert/auth/telegram_api.py:208
 #, python-brace-format
 msgid "Created pack and bulk uploaded {} stickers of {}"
 msgstr "已創建貼圖包並批量上傳{}個{}的貼圖"
 
-#: src/sticker_convert/auth/telegram_api.py:190
+#: src/sticker_convert/auth/telegram_api.py:217
 #, python-brace-format
 msgid "Cannot create pack and bulk upload {} stickers of {}. Reason: {}"
 msgstr "無法創建貼圖包和批量上傳{}個{}的貼圖。原因：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:224
+#: src/sticker_convert/auth/telegram_api.py:251
 #, python-brace-format
 msgid "Uploaded sticker {} of {}"
 msgstr "已上傳貼圖{} （貼圖包{}）"
 
-#: src/sticker_convert/auth/telegram_api.py:236
+#: src/sticker_convert/auth/telegram_api.py:263
 msgid ""
 "Hint: You might had deleted and recreated pack too quickly. Wait about 3 "
 "minutes and try again."
 msgstr "提示：您可能太快刪除並重新創建貼圖包。等待大約 3 分鐘，然後重試。"
 
-#: src/sticker_convert/auth/telegram_api.py:253
+#: src/sticker_convert/auth/telegram_api.py:280
 #, python-brace-format
 msgid "Uploading cover (thumbnail) of pack {}"
 msgstr "正在上傳貼圖包 {} 的封面（縮略圖）"
 
-#: src/sticker_convert/auth/telegram_api.py:262
+#: src/sticker_convert/auth/telegram_api.py:289
 #, python-brace-format
 msgid "Uploaded cover (thumbnail) of pack {}"
 msgstr "已上傳貼圖包 {} 的封面（縮略圖）"
 
-#: src/sticker_convert/auth/telegram_api.py:267
+#: src/sticker_convert/auth/telegram_api.py:294
 #, python-brace-format
 msgid "Cannot upload cover (thumbnail) of pack {}. Reason: {}"
 msgstr "無法上傳包 {} 的封面（縮略圖）。原因：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:295
-#: src/sticker_convert/auth/telegram_api.py:637
+#: src/sticker_convert/auth/telegram_api.py:322
+#: src/sticker_convert/auth/telegram_api.py:670
 #, python-brace-format
 msgid "Failed to download {}: {}"
 msgstr "無法下載 {}：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:333
+#: src/sticker_convert/auth/telegram_api.py:360
 #, python-brace-format
 msgid "Failed to download telegram sticker set {} due to: {}"
 msgstr "無法下載telegram貼圖包 {}，原因是：{}"
 
-#: src/sticker_convert/auth/telegram_api.py:472
+#: src/sticker_convert/auth/telegram_api.py:505
 #, python-brace-format
 msgid "Cannot upload any sticker to {} due to invalid sticker format {}"
 msgstr "無法將任何貼圖上傳到{}，因為貼圖格式{}無效"
 
-#: src/sticker_convert/auth/telegram_api.py:701
+#: src/sticker_convert/auth/telegram_api.py:734
 #, python-brace-format
 msgid "Failed to download cover{}: {}"
 msgstr "未能下載cover{}：{}"
 
-#: src/sticker_convert/auth/auth_kakao_android_login.py:14
+#: src/sticker_convert/auth/auth_kakao_android_login.py:17
 #, python-brace-format
 msgid ""
 "Got auth_token successfully:\n"
@@ -1565,7 +1565,7 @@ msgstr "通過Android登錄獲取Kakao授權token：正在跳過資料恢復"
 msgid "Getting Kakao authorization token by Android login: Get profile"
 msgstr "通過Android登錄獲取Kakao授權token：正在獲取個人資料"
 
-#: src/sticker_convert/auth/auth_signal.py:16
+#: src/sticker_convert/auth/auth_signal.py:20
 msgid ""
 "Signal Desktop not detected.\n"
 "Download and install Signal Desktop version\n"
@@ -1575,15 +1575,15 @@ msgstr ""
 "下載並安裝桌面版Signal\n"
 "安裝後，退出桌面版Signal，然後再繼續"
 
-#: src/sticker_convert/auth/auth_signal.py:69
+#: src/sticker_convert/auth/auth_signal.py:71
 msgid "Getting Signal credentials..."
 msgstr "正在獲取Signal憑證..."
 
-#: src/sticker_convert/auth/auth_signal.py:75
+#: src/sticker_convert/auth/auth_signal.py:77
 msgid "Failed to get uuid and password"
 msgstr "未能獲取uuid和密碼"
 
-#: src/sticker_convert/auth/auth_signal.py:134
+#: src/sticker_convert/auth/auth_signal.py:136
 #, python-brace-format
 msgid ""
 "Got uuid and password successfully:\n"
@@ -1594,20 +1594,19 @@ msgstr ""
 "uuid={}\n"
 "密碼={}"
 
-#: src/sticker_convert/auth/auth_line.py:13
+#: src/sticker_convert/auth/auth_line.py:16
 msgid "Got Line cookies successfully"
 msgstr "成功獲取 Line cookies"
 
-#: src/sticker_convert/auth/auth_line.py:14
-#: src/sticker_convert/auth/auth_line.py:69
+#: src/sticker_convert/auth/auth_line.py:18
 msgid "Failed to get Line cookies. Have you logged in the web browser?"
 msgstr "獲取 Line cookies 失敗。請檢查是否已登錄網絡瀏覽器？"
 
-#: src/sticker_convert/auth/auth_line.py:22
+#: src/sticker_convert/auth/auth_line.py:24
 msgid "Getting Line cookies"
 msgstr "正在獲取 Line cookie"
 
-#: src/sticker_convert/auth/auth_viber.py:15
+#: src/sticker_convert/auth/auth_viber.py:19
 msgid ""
 "Viber Desktop not detected.\n"
 "Download and install Viber Desktop,\n"
@@ -1617,7 +1616,7 @@ msgstr ""
 "下載並安裝桌面版Viber，\n"
 "然後登錄桌面版Viber 並重試。"
 
-#: src/sticker_convert/auth/auth_viber.py:18
+#: src/sticker_convert/auth/auth_viber.py:24
 msgid ""
 "Viber Desktop installed,\n"
 "but viber_auth not found.\n"
@@ -1627,8 +1626,8 @@ msgstr ""
 "但未找到viber_auth。\n"
 "請登錄桌面版Viber並重試。"
 
-#: src/sticker_convert/auth/auth_viber.py:21
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:20
+#: src/sticker_convert/auth/auth_viber.py:29
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:28
 msgid ""
 "You need to disable SIP:\n"
 "1. Restart computer in Recovery mode\n"
@@ -1642,24 +1641,24 @@ msgstr ""
 "3.運行命令`csrutil disable`\n"
 "4. 重新啟動電腦"
 
-#: src/sticker_convert/auth/auth_viber.py:26
+#: src/sticker_convert/auth/auth_viber.py:35
 msgid "Failed to launch Viber"
 msgstr "無法啟動Viber"
 
-#: src/sticker_convert/auth/auth_viber.py:27
+#: src/sticker_convert/auth/auth_viber.py:36
 msgid "Failed to read Viber process memory"
 msgstr "無法讀取Viber進程內存"
 
-#: src/sticker_convert/auth/auth_viber.py:100
-#: src/sticker_convert/auth/auth_viber.py:165
+#: src/sticker_convert/auth/auth_viber.py:106
+#: src/sticker_convert/auth/auth_viber.py:171
 msgid "Got viber_auth successfully:\n"
 msgstr "成功獲取viber_auth：\n"
 
-#: src/sticker_convert/auth/auth_viber.py:142
+#: src/sticker_convert/auth/auth_viber.py:148
 msgid "Failed to dump memory"
 msgstr "轉儲內存失敗"
 
-#: src/sticker_convert/auth/auth_viber.py:198
+#: src/sticker_convert/auth/auth_viber.py:204
 msgid ""
 "Getting Viber credentials...\n"
 "(This may take a minute)"
@@ -1667,7 +1666,7 @@ msgstr ""
 "正在獲取 Viber 憑證...\n"
 "（這可能需要一分鐘）"
 
-#: src/sticker_convert/auth/auth_discord.py:17
+#: src/sticker_convert/auth/auth_discord.py:20
 #, python-brace-format
 msgid ""
 "Got token successfully:\n"
@@ -1676,24 +1675,24 @@ msgstr ""
 "成功獲取token：\n"
 "token={}"
 
-#: src/sticker_convert/auth/auth_discord.py:18
+#: src/sticker_convert/auth/auth_discord.py:21
 msgid "Failed to get token"
 msgstr "獲取token失敗"
 
-#: src/sticker_convert/auth/auth_discord.py:77
+#: src/sticker_convert/auth/auth_discord.py:76
 msgid "Getting Discord authorization token..."
 msgstr "正在獲取 Discord 授權token..."
 
-#: src/sticker_convert/auth/auth_discord.py:90
+#: src/sticker_convert/auth/auth_discord.py:89
 msgid "Please install Discord Desktop or Chrome/Chromium and try again"
 msgstr "請安裝 Discord Desktop 或 Chrome/Chromium，然後重試"
 
-#: src/sticker_convert/auth/auth_discord.py:100
+#: src/sticker_convert/auth/auth_discord.py:99
 #, python-brace-format
 msgid "All {} will be closed. Continue?"
 msgstr "所有 {} 將關閉。繼續？"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:14
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:18
 msgid ""
 "Kakao Desktop not detected.\n"
 "Download and install Kakao Desktop,\n"
@@ -1703,7 +1702,7 @@ msgstr ""
 "請下載並安裝桌面版 Kakao，\n"
 "然後登錄桌面版 Kakao 後重試。"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:17
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:23
 msgid ""
 "Kakao Desktop installed,\n"
 "but kakao_auth not found.\n"
@@ -1713,15 +1712,15 @@ msgstr ""
 "但沒有找到 kakao_auth。\n"
 "請登錄桌面版 Kakao 並重試。"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:25
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:34
 msgid "Failed to launch Kakao"
 msgstr "啟動 Kakao 失敗"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:26
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:35
 msgid "Failed to read Kakao process memory"
 msgstr "無法讀取Kakao進程內存"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:255
+#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:261
 msgid ""
 "Getting Kakao authorization token by Desktop memdump...\n"
 "(This may take a minute)"
@@ -1729,7 +1728,7 @@ msgstr ""
 "正在通過讀取桌面版應用程式內存以獲取 Kakao 授權token...\n"
 "（這可能需要一分鐘）"
 
-#: src/sticker_convert/auth/auth_kakao_desktop_login.py:22
+#: src/sticker_convert/auth/auth_kakao_desktop_login.py:25
 #, python-brace-format
 msgid "Login successful, auth_token={}"
 msgstr "登錄成功，auth_token={}"
@@ -1759,7 +1758,7 @@ msgstr "無法註冊設備：{}"
 msgid "Failed to login after registering device: {}"
 msgstr "註冊設備後登錄失敗：{}"
 
-#: src/sticker_convert/auth/auth_telethon.py:12
+#: src/sticker_convert/auth/auth_telethon.py:16
 #, fuzzy, python-brace-format
 msgid ""
 "1. Visit {telegram_api_url}\n"
@@ -1786,34 +1785,34 @@ msgstr ""
 "5.記下api_id和api_hash\n"
 "完成後繼續"
 
-#: src/sticker_convert/auth/auth_telethon.py:24
+#: src/sticker_convert/auth/auth_telethon.py:29
 msgid "Telethon setup successful"
 msgstr "Telethon設置成功"
 
-#: src/sticker_convert/auth/auth_telethon.py:25
+#: src/sticker_convert/auth/auth_telethon.py:30
 msgid "Telethon setup failed"
 msgstr "Telethon設置失敗"
 
-#: src/sticker_convert/auth/auth_telethon.py:46
+#: src/sticker_convert/auth/auth_telethon.py:48
 msgid "Enter phone number: "
 msgstr "請輸入電話號碼："
 
-#: src/sticker_convert/auth/auth_telethon.py:58
+#: src/sticker_convert/auth/auth_telethon.py:60
 msgid "Enter code: "
 msgstr "請輸入代碼："
 
-#: src/sticker_convert/auth/auth_telethon.py:96
+#: src/sticker_convert/auth/auth_telethon.py:102
 msgid "Enter api_id: "
 msgstr "請輸入 api_id:"
 
-#: src/sticker_convert/auth/auth_telethon.py:116
+#: src/sticker_convert/auth/auth_telethon.py:122
 msgid "Error: api_id should be numeric\n"
 msgstr "錯誤：api_id 只包括數字\n"
 
-#: src/sticker_convert/auth/auth_telethon.py:118
+#: src/sticker_convert/auth/auth_telethon.py:124
 msgid "Enter api_hash: "
 msgstr "輸入 api_hash："
 
-#: src/sticker_convert/utils/translate.py:107
+#: src/sticker_convert/utils/translate.py:110
 msgid "Auto"
 msgstr "自動選擇"
