@@ -13,7 +13,7 @@ RUN cat requirements.txt | grep -v 'ttkbootstrap' > requirements-cli.txt &&\
 COPY ./src /app/
 
 COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
-RUN /app/scripts/update-locales.sh
+RUN /app/scripts/update-locales.sh /app
 
 RUN apt purge -y python3-pip && \
     apt clean autoclean && \
@@ -72,7 +72,7 @@ RUN apt purge -y curl wget gpg git && \
 COPY ./src /app/
 
 COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
-RUN /app/scripts/update-locales.sh
+RUN /app/scripts/update-locales.sh /app
 
 FROM base-gui AS full
 RUN mkdir -p '/home/app' && \
@@ -134,3 +134,6 @@ RUN apt purge -y curl wget gpg git && \
     chown -R 1000 '/home/app'
 
 COPY ./src /app/
+
+COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
+RUN /app/scripts/update-locales.sh /app
