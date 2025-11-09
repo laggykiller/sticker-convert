@@ -32,9 +32,12 @@ jobs:
       contents: read
     steps:
       - uses: actions/checkout@v4
+      - name: Install gettext
+        run: sudo apt install -y gettext
+
       - name: Generate .mo files
         run: ./scripts/update-locales.sh
-      
+
       - name: Upload .mo files
         uses: actions/upload-artifact@v4
         with:
