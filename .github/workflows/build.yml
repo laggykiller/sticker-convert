@@ -31,6 +31,7 @@ jobs:
     permissions:
       contents: read
     steps:
+      - uses: actions/checkout@v4
       - name: Generate .mo files
         run: ./scripts/update-locales.sh
       
@@ -198,7 +199,7 @@ jobs:
 
   build-binary-linux:
     name: Build packages (Linux)
-    needs: createrelease
+    needs: generate-mo
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
