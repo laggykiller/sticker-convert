@@ -20,8 +20,13 @@ from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.apple_png_normalize import ApplePngNormalize
+from sticker_convert.utils.translate import I
 
 # Reference: https://github.com/doubleplusc/Line-sticker-downloader/blob/master/sticker_dl.py
+
+MSG_CUSTOM_TEXT = I("""The Line sticker pack you are downloading can have customized text.
+line-sticker-text.txt has been created in input directory.
+Please edit line-sticker-text.txt, then continue.""")
 
 
 class MetadataLine:
@@ -187,12 +192,16 @@ class DownloadLine(DownloadBase):
                         cookies[c_key] = c_value
                 except ValueError:
                     self.cb.put(
-                        'Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"'
+                        I(
+                            'Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"'
+                        )
                     )
 
             if not AuthLine.validate_cookies(cookies):
                 self.cb.put(
-                    'Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"'
+                    I(
+                        'Warning: Line cookies invalid, you will not be able to add text to "Custom stickers"'
+                    )
                 )
                 cookies = {}
 
@@ -233,7 +242,7 @@ class DownloadLine(DownloadBase):
         ext = Path(f_path).suffix
         if ext == ".png" and not self.is_emoji and int() < 775:
             data = ApplePngNormalize.normalize(data)
-        self.cb.put(f"Read {f_path}")
+        self.cb.put(I("Read {}").format(f_path))
 
         out_path = Path(self.out_dir, prefix + str(num).zfill(3) + suffix + ext)
         with open(out_path, "wb") as f:
@@ -241,7 +250,7 @@ class DownloadLine(DownloadBase):
 
     def decompress_emoticon(self, zip_file: bytes) -> None:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
-            self.cb.put("Unzipping...")
+            self.cb.put(I("Unzipping..."))
 
             self.cb.put(
                 (
@@ -262,7 +271,7 @@ class DownloadLine(DownloadBase):
 
     def decompress_stickers(self, zip_file: bytes) -> None:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
-            self.cb.put("Unzipping...")
+            self.cb.put(I("Unzipping..."))
 
             self.cb.put(
                 (
@@ -308,13 +317,7 @@ class DownloadLine(DownloadBase):
         if not line_sticker_text_path.is_file():
             with open(line_sticker_text_path, "w+", encoding="utf-8") as f:
                 json.dump(self.sticker_text_dict, f, indent=4, ensure_ascii=False)
-
-            msg_block = (
-                "The Line sticker pack you are downloading can have customized text.\n"
-            )
-            msg_block += "line-sticker-text.txt has been created in input directory.\n"
-            msg_block += "Please edit line-sticker-text.txt, then continue."
-            self.cb.put(("msg_block", (msg_block,), None))
+            self.cb.put(("msg_block", (MSG_CUSTOM_TEXT,), None))
             if self.cb_return:
                 self.cb_return.get_response()
 
@@ -372,7 +375,9 @@ class DownloadLine(DownloadBase):
 
         if response_dict["errorMessage"]:
             self.cb.put(
-                f"Failed to generate customized text {sticker_text} due to: {response_dict['errorMessage']}"
+                I("Failed to generate customized text {} due to: {}").format(
+                    sticker_text, response_dict["errorMessage"]
+                )
             )
             return None
 
@@ -401,14 +406,16 @@ class DownloadLine(DownloadBase):
 
                 os.remove(text_path)
 
-                self.cb.put(f"Combined {i.name.replace('-text.png', '.png')}")
+                self.cb.put(
+                    I("Combined {}").format(i.name.replace("-text.png", ".png"))
+                )
 
     def download_stickers_line(self) -> Tuple[int, int]:
         url_data = MetadataLine.analyze_url(self.url)
         if url_data:
             self.pack_id, self.region, self.is_emoji = url_data
         else:
-            self.cb.put("Download failed: Unsupported URL format")
+            self.cb.put(I("Download failed: Unsupported URL format"))
             return 0, 0
 
         if self.is_emoji:
@@ -426,7 +433,7 @@ class DownloadLine(DownloadBase):
                 self.has_sound,
             ) = metadata
         else:
-            self.cb.put("Download failed: Failed to get metadata")
+            self.cb.put(I("Download failed: Failed to get metadata"))
             return 0, 0
 
         MetadataHandler.set_metadata(self.out_dir, title=self.title, author=self.author)
@@ -435,9 +442,9 @@ class DownloadLine(DownloadBase):
         zip_file = self.download_file(pack_url)
 
         if zip_file:
-            self.cb.put(f"Downloaded {pack_url}")
+            self.cb.put(I("Downloaded {}").format(pack_url))
         else:
-            self.cb.put(f"Cannot download {pack_url}")
+            self.cb.put(I("Cannot download {}").format(pack_url))
             return 0, 0
 
         if self.is_emoji:

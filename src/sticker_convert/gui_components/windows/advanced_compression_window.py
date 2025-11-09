@@ -11,6 +11,7 @@ from ttkbootstrap import Button, Canvas, Checkbutton, Entry, Frame, Label, Label
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
+from sticker_convert.utils.translate import I
 
 
 class AdvancedCompressionWindow(BaseWindow):
@@ -21,26 +22,26 @@ class AdvancedCompressionWindow(BaseWindow):
         super().__init__(*args, **kwargs)
         self.categories = list({entry["category"] for entry in self.gui.emoji_list})
 
-        self.title("Advanced compression options")
+        self.title(I("Advanced compression options"))
 
         self.frame_advcomp = LabelFrame(
-            self.scrollable_frame, text="Advanced compression option"
+            self.scrollable_frame, text=I("Advanced compression option")
         )
         self.frame_emoji_search = LabelFrame(
-            self.scrollable_frame, text="Setting default emoji"
+            self.scrollable_frame, text=I("Setting default emoji")
         )
         self.frame_emoji_canvas = Frame(self.scrollable_frame)
 
         self.frame_advcomp.grid_columnconfigure(6, weight=1)
 
         self.fps_help_btn = self.add_help_btn(self.gui.help["comp"]["fps"])
-        self.fps_lbl = Label(self.frame_advcomp, text="Output FPS")
-        self.fps_min_lbl = Label(self.frame_advcomp, text="Min:")
+        self.fps_lbl = Label(self.frame_advcomp, text=I("Output FPS"))
+        self.fps_min_lbl = Label(self.frame_advcomp, text=I("Min:"))
         self.fps_min_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.fps_min_var, width=8
         )
         self.fps_min_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.fps_max_lbl = Label(self.frame_advcomp, text="Max:")
+        self.fps_max_lbl = Label(self.frame_advcomp, text=I("Max:"))
         self.fps_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.fps_max_var, width=8
         )
@@ -56,13 +57,13 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.res_w_help_btn = self.add_help_btn(self.gui.help["comp"]["res"])
-        self.res_w_lbl = Label(self.frame_advcomp, text="Output resolution (Width)")
-        self.res_w_min_lbl = Label(self.frame_advcomp, text="Min:")
+        self.res_w_lbl = Label(self.frame_advcomp, text=I("Output resolution (Width)"))
+        self.res_w_min_lbl = Label(self.frame_advcomp, text=I("Min:"))
         self.res_w_min_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.res_w_min_var, width=8
         )
         self.res_w_min_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.res_w_max_lbl = Label(self.frame_advcomp, text="Max:")
+        self.res_w_max_lbl = Label(self.frame_advcomp, text=I("Max:"))
         self.res_w_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.res_w_max_var, width=8
         )
@@ -78,13 +79,13 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.res_h_help_btn = self.add_help_btn(self.gui.help["comp"]["res"])
-        self.res_h_lbl = Label(self.frame_advcomp, text="Output resolution (Height)")
-        self.res_h_min_lbl = Label(self.frame_advcomp, text="Min:")
+        self.res_h_lbl = Label(self.frame_advcomp, text=I("Output resolution (Height)"))
+        self.res_h_min_lbl = Label(self.frame_advcomp, text=I("Min:"))
         self.res_h_min_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.res_h_min_var, width=8
         )
         self.res_h_min_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.res_h_max_lbl = Label(self.frame_advcomp, text="Max:")
+        self.res_h_max_lbl = Label(self.frame_advcomp, text=I("Max:"))
         self.res_h_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.res_h_max_var, width=8
         )
@@ -103,7 +104,7 @@ class AdvancedCompressionWindow(BaseWindow):
             self.gui.help["comp"]["res_snap_pow2"]
         )
         self.res_snap_pow2_lbl = Label(
-            self.frame_advcomp, text="Snap resolution to power of 2"
+            self.frame_advcomp, text=I("Snap resolution to power of 2")
         )
         self.res_snap_pow2_cbox = Checkbutton(
             self.frame_advcomp,
@@ -114,13 +115,13 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.quality_help_btn = self.add_help_btn(self.gui.help["comp"]["quality"])
-        self.quality_lbl = Label(self.frame_advcomp, text="Output quality (0-100)")
-        self.quality_min_lbl = Label(self.frame_advcomp, text="Min:")
+        self.quality_lbl = Label(self.frame_advcomp, text=I("Output quality (0-100)"))
+        self.quality_min_lbl = Label(self.frame_advcomp, text=I("Min:"))
         self.quality_min_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.quality_min_var, width=8
         )
         self.quality_min_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.quality_max_lbl = Label(self.frame_advcomp, text="Max:")
+        self.quality_max_lbl = Label(self.frame_advcomp, text=I("Max:"))
         self.quality_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.quality_max_var, width=8
         )
@@ -136,13 +137,13 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.color_help_btn = self.add_help_btn(self.gui.help["comp"]["color"])
-        self.color_lbl = Label(self.frame_advcomp, text="Colors (0-256)")
-        self.color_min_lbl = Label(self.frame_advcomp, text="Min:")
+        self.color_lbl = Label(self.frame_advcomp, text=I("Colors (0-256)"))
+        self.color_min_lbl = Label(self.frame_advcomp, text=I("Min:"))
         self.color_min_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.color_min_var, width=8
         )
         self.color_min_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.color_max_lbl = Label(self.frame_advcomp, text="Max:")
+        self.color_max_lbl = Label(self.frame_advcomp, text=I("Max:"))
         self.color_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.color_max_var, width=8
         )
@@ -158,13 +159,13 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.duration_help_btn = self.add_help_btn(self.gui.help["comp"]["duration"])
-        self.duration_lbl = Label(self.frame_advcomp, text="Duration (Miliseconds)")
-        self.duration_min_lbl = Label(self.frame_advcomp, text="Min:")
+        self.duration_lbl = Label(self.frame_advcomp, text=I("Duration (Miliseconds)"))
+        self.duration_min_lbl = Label(self.frame_advcomp, text=I("Min:"))
         self.duration_min_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.duration_min_var, width=8
         )
         self.duration_min_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.duration_max_lbl = Label(self.frame_advcomp, text="Max:")
+        self.duration_max_lbl = Label(self.frame_advcomp, text=I("Max:"))
         self.duration_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.duration_max_var, width=8
         )
@@ -180,13 +181,13 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.size_help_btn = self.add_help_btn(self.gui.help["comp"]["size"])
-        self.size_lbl = Label(self.frame_advcomp, text="Maximum file size (bytes)")
-        self.img_size_max_lbl = Label(self.frame_advcomp, text="Img:")
+        self.size_lbl = Label(self.frame_advcomp, text=I("Maximum file size (bytes)"))
+        self.img_size_max_lbl = Label(self.frame_advcomp, text=I("Img:"))
         self.img_size_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.img_size_max_var, width=8
         )
         self.img_size_max_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.vid_size_max_lbl = Label(self.frame_advcomp, text="Vid:")
+        self.vid_size_max_lbl = Label(self.frame_advcomp, text=I("Vid:"))
         self.vid_size_max_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.vid_size_max_var, width=8
         )
@@ -202,26 +203,26 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.format_help_btn = self.add_help_btn(self.gui.help["comp"]["format"])
-        self.format_lbl = Label(self.frame_advcomp, text="File format")
+        self.format_lbl = Label(self.frame_advcomp, text=I("File format"))
         self.img_format_lbl = Label(self.frame_advcomp, text="Img:")
         self.img_format_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.img_format_var, width=8
         )
         self.img_format_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.vid_format_lbl = Label(self.frame_advcomp, text="Vid:")
+        self.vid_format_lbl = Label(self.frame_advcomp, text=I("Vid:"))
         self.vid_format_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.vid_format_var, width=8
         )
         self.vid_format_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
         self.power_help_btn1 = self.add_help_btn(self.gui.help["comp"]["fps_power"])
-        self.power_lbl1 = Label(self.frame_advcomp, text="Power (Importance)")
-        self.fps_power_lbl = Label(self.frame_advcomp, text="FPS:")
+        self.power_lbl1 = Label(self.frame_advcomp, text=I("Power (Importance)"))
+        self.fps_power_lbl = Label(self.frame_advcomp, text=I("FPS:"))
         self.fps_power_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.fps_power_var, width=8
         )
         self.fps_power_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.res_power_lbl = Label(self.frame_advcomp, text="Res:")
+        self.res_power_lbl = Label(self.frame_advcomp, text=I("Res:"))
         self.res_power_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.res_power_var, width=8
         )
@@ -234,7 +235,7 @@ class AdvancedCompressionWindow(BaseWindow):
             self.frame_advcomp, textvariable=self.gui.quality_power_var, width=8
         )
         self.quality_power_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
-        self.color_power_lbl = Label(self.frame_advcomp, text="Color:")
+        self.color_power_lbl = Label(self.frame_advcomp, text=I("Color:"))
         self.color_power_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.color_power_var, width=8
         )
@@ -243,8 +244,8 @@ class AdvancedCompressionWindow(BaseWindow):
         self.padding_percent_help_btn = self.add_help_btn(
             self.gui.help["comp"]["padding_percent"]
         )
-        self.padding_percent_lbl1 = Label(self.frame_advcomp, text="Padding")
-        self.padding_percent_lbl2 = Label(self.frame_advcomp, text="0-100%")
+        self.padding_percent_lbl1 = Label(self.frame_advcomp, text=I("Padding"))
+        self.padding_percent_lbl2 = Label(self.frame_advcomp, text=I("0-100%"))
         self.padding_percent_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.padding_percent_var, width=8
         )
@@ -252,7 +253,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         self.fake_vid_help_btn = self.add_help_btn(self.gui.help["comp"]["fake_vid"])
         self.fake_vid_lbl = Label(
-            self.frame_advcomp, text="Convert (faking) image to video"
+            self.frame_advcomp, text=I("Convert (faking) image to video")
         )
         self.fake_vid_cbox = Checkbutton(
             self.frame_advcomp,
@@ -263,13 +264,13 @@ class AdvancedCompressionWindow(BaseWindow):
         )
 
         self.bg_color_help_btn = self.add_help_btn(self.gui.help["comp"]["bg_color"])
-        self.bg_color_lbl = Label(self.frame_advcomp, text="Background color")
+        self.bg_color_lbl = Label(self.frame_advcomp, text=I("Background color"))
         self.bg_color_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.bg_color_var, width=8
         )
         self.bg_color_btn = Button(
             self.frame_advcomp,
-            text="Set",
+            text=I("Set"),
             command=self.cb_bg_color,
             bootstyle="secondary",  # type: ignore
         )
@@ -277,7 +278,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.scale_filter_help_btn = self.add_help_btn(
             self.gui.help["comp"]["scale_filter"]
         )
-        self.scale_filter_lbl = Label(self.frame_advcomp, text="Scale filter")
+        self.scale_filter_lbl = Label(self.frame_advcomp, text=I("Scale filter"))
         self.scale_filter_opt = OptionMenu(
             self.frame_advcomp,
             self.gui.scale_filter_var,
@@ -294,7 +295,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.quantize_method_help_btn = self.add_help_btn(
             self.gui.help["comp"]["quantize_method"]
         )
-        self.quantize_method_lbl = Label(self.frame_advcomp, text="Quantize method")
+        self.quantize_method_lbl = Label(self.frame_advcomp, text=I("Quantize method"))
         self.quantize_method_opt = OptionMenu(
             self.frame_advcomp,
             self.gui.quantize_method_var,
@@ -311,7 +312,7 @@ class AdvancedCompressionWindow(BaseWindow):
             self.gui.help["comp"]["chromium_path"]
         )
         self.chromium_path_lbl = Label(
-            self.frame_advcomp, text="Chromium/Chrome directory"
+            self.frame_advcomp, text=I("Chromium/Chrome directory")
         )
         self.chromium_path_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.chromium_path_var, width=30
@@ -319,7 +320,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.chromium_path_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
         self.cache_dir_help_btn = self.add_help_btn(self.gui.help["comp"]["cache_dir"])
-        self.cache_dir_lbl = Label(self.frame_advcomp, text="Custom cache directory")
+        self.cache_dir_lbl = Label(self.frame_advcomp, text=I("Custom cache directory"))
         self.cache_dir_entry = Entry(
             self.frame_advcomp, textvariable=self.gui.cache_dir_var, width=30
         )
@@ -328,7 +329,7 @@ class AdvancedCompressionWindow(BaseWindow):
         self.default_emoji_help_btn = self.add_help_btn(
             self.gui.help["comp"]["default_emoji"]
         )
-        self.default_emoji_lbl = Label(self.frame_advcomp, text="Default emoji")
+        self.default_emoji_lbl = Label(self.frame_advcomp, text=I("Default emoji"))
         self.im: Image.Image = Image.new("RGBA", (32, 32), (255, 255, 255, 0))
         self.ph_im = ImageTk.PhotoImage(self.im)
         self.default_emoji_dsp = Label(self.frame_advcomp, image=self.ph_im)
@@ -470,7 +471,7 @@ class AdvancedCompressionWindow(BaseWindow):
 
         self.categories_lbl = Label(
             self.frame_emoji_search,
-            text="Category",
+            text=I("Category"),
             width=15,
             justify="left",
             anchor="w",
@@ -487,7 +488,7 @@ class AdvancedCompressionWindow(BaseWindow):
         )
         self.categories_opt.config(width=30)
 
-        self.search_lbl = Label(self.frame_emoji_search, text="Search")
+        self.search_lbl = Label(self.frame_emoji_search, text=I("Search"))
         self.search_var = StringVar(self.frame_emoji_search)
         self.search_var.trace_add("write", self.render_emoji_list)
         self.search_entry = Entry(self.frame_emoji_search, textvariable=self.search_var)

@@ -5,6 +5,7 @@ from ttkbootstrap import Button, Checkbutton, Entry, Label, LabelFrame, OptionMe
 
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.windows.advanced_compression_window import AdvancedCompressionWindow
+from sticker_convert.utils.translate import I
 
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
@@ -26,7 +27,7 @@ class CompFrame(LabelFrame):
             ),
             bootstyle="secondary",  # type: ignore
         )
-        self.no_compress_lbl = Label(self, text="No compression")
+        self.no_compress_lbl = Label(self, text=I("No compression"))
         self.no_compress_cbox = Checkbutton(
             self,
             variable=self.gui.no_compress_var,
@@ -45,7 +46,7 @@ class CompFrame(LabelFrame):
             ),
             bootstyle="secondary",  # type: ignore
         )
-        self.comp_preset_lbl = Label(self, text="Preset")
+        self.comp_preset_lbl = Label(self, text=I("Preset"))
         self.comp_preset_opt = OptionMenu(
             self,
             self.gui.comp_preset_var,
@@ -65,7 +66,7 @@ class CompFrame(LabelFrame):
             ),
             bootstyle="secondary",  # type: ignore
         )
-        self.steps_lbl = Label(self, text="Number of steps")
+        self.steps_lbl = Label(self, text=I("Number of steps"))
         self.steps_entry = Entry(self, textvariable=self.gui.steps_var, width=8)
         self.steps_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
@@ -78,13 +79,13 @@ class CompFrame(LabelFrame):
             ),
             bootstyle="secondary",  # type: ignore
         )
-        self.processes_lbl = Label(self, text="Number of processes")
+        self.processes_lbl = Label(self, text=I("Number of processes"))
         self.processes_entry = Entry(self, textvariable=self.gui.processes_var, width=8)
         self.processes_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
         self.comp_advanced_btn = Button(
             self,
-            text="Advanced...",
+            text=I("Advanced..."),
             command=self.cb_compress_advanced,
             bootstyle="secondary",  # type: ignore
         )

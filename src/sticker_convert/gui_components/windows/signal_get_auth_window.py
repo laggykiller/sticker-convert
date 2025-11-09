@@ -7,6 +7,7 @@ from ttkbootstrap import Button, Frame, Label  # type: ignore
 from sticker_convert.auth.auth_signal import AuthSignal
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
+from sticker_convert.utils.translate import I
 
 
 class SignalGetAuthWindow(BaseWindow):
@@ -24,19 +25,19 @@ class SignalGetAuthWindow(BaseWindow):
         # Info frame
         self.explanation1_lbl = Label(
             self.frame_info,
-            text="Please install Signal Desktop",
+            text=I("Please install Signal Desktop"),
             justify="left",
             anchor="w",
         )
         self.explanation2_lbl = Label(
             self.frame_info,
-            text="After installation, you need to login to Signal Desktop",
+            text=I("After installation, you need to login to Signal Desktop"),
             justify="left",
             anchor="w",
         )
         self.explanation3_lbl = Label(
             self.frame_info,
-            text="uuid and password will be automatically fetched",
+            text=I("uuid and password will be automatically fetched"),
             justify="left",
             anchor="w",
         )
@@ -53,7 +54,9 @@ class SignalGetAuthWindow(BaseWindow):
 
         # Start button frame
         self.login_btn = Button(
-            self.frame_start_btn, text="Get uuid and password", command=self.cb_login
+            self.frame_start_btn,
+            text=I("Get uuid and password"),
+            command=self.cb_login,
         )
 
         self.login_btn.pack()

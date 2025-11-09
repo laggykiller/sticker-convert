@@ -1,0 +1,38 @@
+{
+    "signal": {
+        "full_name": "Signalにアップロードする",
+        "help": "Signalにアップロードする"
+    },
+    "telegram": {
+        "full_name": "Telegramにアップロードする",
+        "help": "Telegramにアップロードする"
+    },
+    "telegram_emoji": {
+        "full_name": "Telegramにアップロードする (カスタム絵文字)",
+        "help": "Telegramにアップロードする (カスタム絵文字)"
+    },
+    "telegram_telethon": {
+        "full_name": "Telethonを使ってTelegramにアップロードする",
+        "help": "Telethonを使ってTelegramにアップロードする *推奨されませんが、_by_xxxbotで終わらないリンクを制作出来る*"
+    },
+    "telegram_emoji_telethon": {
+        "full_name": "Telethonを使ってTelegramにアップロードする (カスタム絵文字)",
+        "help": "Telethonを使ってTelegramにアップロードする (カスタム絵文字) *推奨されませんが、_by_xxxbotで終わらないリンクを制作出来る*"
+    },
+    "viber": {
+        "full_name": "Viberにアップロードする",
+        "help": "Viberにアップロードする"
+    },
+    "whatsapp": {
+        "full_name": ".wastickersファイルに圧縮する (WhatsApp)",
+        "help": ".wastickersファイルに圧縮する、そしてWhatsAppにアップロードする"
+    },
+    "imessage": {
+        "full_name": "Xcodeプロジェクトを作成する (iMessage)",
+        "help": "iMessageにインポートするためのXcodeプロジェクトを作成する"
+    },
+    "local": {
+        "full_name": "ローカルディレクトリのみに保存",
+        "help": "ローカルディレクトリのみに保存"
+    }
+}

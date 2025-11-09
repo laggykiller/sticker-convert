@@ -11,22 +11,23 @@ from sticker_convert.auth.auth_kakao_desktop_memdump import AuthKakaoDesktopMemd
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
+from sticker_convert.utils.translate import I
 
 
 class KakaoGetAuthWindow(BaseWindow):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        self.title("Get Kakao auth_token")
+        self.title(I("Get Kakao auth_token"))
 
         self.frame_desktop_memdump = LabelFrame(
-            self.scrollable_frame, text="Method 1: KakaoTalk Desktop memdump"
+            self.scrollable_frame, text=I("Method 1: KakaoTalk Desktop memdump")
         )
         self.frame_desktop_login = LabelFrame(
-            self.scrollable_frame, text="Method 2: Simulate Desktop login"
+            self.scrollable_frame, text=I("Method 2: Simulate Desktop login")
         )
         self.frame_android_login = LabelFrame(
-            self.scrollable_frame, text="Method 3: Simulate Android login"
+            self.scrollable_frame, text=I("Method 3: Simulate Android login")
         )
         self.frame_login_btn = Frame(self.scrollable_frame)
 
@@ -37,39 +38,41 @@ class KakaoGetAuthWindow(BaseWindow):
         # Method 1 frame
         self.explanation1_1_lbl = Label(
             self.frame_desktop_memdump,
-            text="This will get Kakao auth_token from Kakao Desktop",
+            text=I("This will get Kakao auth_token from Kakao Desktop"),
             justify="left",
             anchor="w",
         )
         self.explanation1_2_lbl = Label(
             self.frame_desktop_memdump,
-            text="Download Kakao Desktop, login and press 'Get auth_token'",
+            text=I("Download Kakao Desktop, login and press 'Get auth_token'"),
             justify="left",
             anchor="w",
         )
         self.explanation1_3_lbl = Label(
             self.frame_desktop_memdump,
-            text="This can take about a minute.",
+            text=I("This can take about a minute."),
             justify="left",
             anchor="w",
         )
         if platform.system() != "Darwin":
             self.explanation1_4_lbl = Label(
                 self.frame_desktop_memdump,
-                text="Note: This will download ProcDump and read memory of KakaoTalk Desktop",
+                text=I(
+                    "Note: This will download ProcDump and read memory of KakaoTalk Desktop"
+                ),
                 justify="left",
                 anchor="w",
             )
         else:
             self.explanation1_4_lbl = Label(
                 self.frame_desktop_memdump,
-                text="Note: This will read memory of KakaoTalk Desktop",
+                text=I("Note: This will read memory of KakaoTalk Desktop"),
                 justify="left",
                 anchor="w",
             )
         self.kakao_bin_path_lbl = Label(
             self.frame_desktop_memdump,
-            text="Kakao app path (Optional):",
+            text=I("Kakao app path (Optional):"),
             justify="left",
             anchor="w",
         )
@@ -80,14 +83,14 @@ class KakaoGetAuthWindow(BaseWindow):
         )
         self.launch_desktop_btn = Button(
             self.frame_desktop_memdump,
-            text="Launch Desktop app",
+            text=I("Launch Desktop app"),
             command=self.cb_launch_desktop,
             width=24,
             bootstyle="secondary",  # type: ignore
         )
         self.get_auth_desktop_btn = Button(
             self.frame_desktop_memdump,
-            text="Get auth_token",
+            text=I("Get auth_token"),
             command=self.cb_get_auth_desktop_memdump,
             width=24,
         )
@@ -112,19 +115,19 @@ class KakaoGetAuthWindow(BaseWindow):
         # Method 2 frame
         self.explanation2_1_lbl = Label(
             self.frame_desktop_login,
-            text="This will simulate login to Desktop Kakao app",
+            text=I("This will simulate login to Desktop Kakao app"),
             justify="left",
             anchor="w",
         )
         self.explanation2_2_lbl = Label(
             self.frame_desktop_login,
-            text="You may receive verification code from Kakao app on phone",
+            text=I("You may receive verification code from Kakao app on phone"),
             justify="left",
             anchor="w",
         )
         self.explanation2_3_lbl = Label(
             self.frame_desktop_login,
-            text="It is not necessary to download Desktop Kakao app",
+            text=I("It is not necessary to download Desktop Kakao app"),
             justify="left",
             anchor="w",
         )
@@ -147,7 +150,7 @@ class KakaoGetAuthWindow(BaseWindow):
         )
         self.kakao_username_lbl2 = Label(
             self.frame_desktop_login,
-            text="Username",
+            text=I("Username"),
             width=18,
             justify="left",
             anchor="w",
@@ -176,7 +179,10 @@ class KakaoGetAuthWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
         self.kakao_password_lbl2 = Label(
-            self.frame_desktop_login, text="Password", justify="left", anchor="w"
+            self.frame_desktop_login,
+            text=I("Password"),
+            justify="left",
+            anchor="w",
         )
         self.kakao_password_entry2 = Entry(
             self.frame_desktop_login,
@@ -203,7 +209,7 @@ class KakaoGetAuthWindow(BaseWindow):
         )
         self.kakao_device_uuid_lbl = Label(
             self.frame_desktop_login,
-            text="Device UUID (Optional)",
+            text=I("Device UUID (Optional)"),
             justify="left",
             anchor="w",
         )
@@ -216,7 +222,7 @@ class KakaoGetAuthWindow(BaseWindow):
 
         self.login_btn2 = Button(
             self.frame_desktop_login,
-            text="Login and get auth_token",
+            text=I("Login and get auth_token"),
             command=self.cb_get_auth_desktop_login,
             width=24,
         )
@@ -250,19 +256,19 @@ class KakaoGetAuthWindow(BaseWindow):
         # Method 3 frame
         self.explanation3_1_lbl = Label(
             self.frame_android_login,
-            text="This will simulate login to Android Kakao app",
+            text=I("This will simulate login to Android Kakao app"),
             justify="left",
             anchor="w",
         )
         self.explanation3_2_lbl = Label(
             self.frame_android_login,
-            text="You will send / receive verification code via SMS",
+            text=I("You will send / receive verification code via SMS"),
             justify="left",
             anchor="w",
         )
         self.explanation3_3_lbl = Label(
             self.frame_android_login,
-            text="You will be logged out of existing device",
+            text=I("You will be logged out of existing device"),
             justify="left",
             anchor="w",
         )
@@ -285,7 +291,7 @@ class KakaoGetAuthWindow(BaseWindow):
         )
         self.kakao_username_lbl3 = Label(
             self.frame_android_login,
-            text="Username",
+            text=I("Username"),
             width=18,
             justify="left",
             anchor="w",
@@ -314,7 +320,10 @@ class KakaoGetAuthWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
         self.kakao_password_lbl3 = Label(
-            self.frame_android_login, text="Password", justify="left", anchor="w"
+            self.frame_android_login,
+            text=I("Password"),
+            justify="left",
+            anchor="w",
         )
         self.kakao_password_entry3 = Entry(
             self.frame_android_login,
@@ -340,7 +349,10 @@ class KakaoGetAuthWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
         self.kakao_country_code_lbl = Label(
-            self.frame_android_login, text="Country code", justify="left", anchor="w"
+            self.frame_android_login,
+            text=I("Country code"),
+            justify="left",
+            anchor="w",
         )
         self.kakao_country_code_entry = Entry(
             self.frame_android_login,
@@ -366,7 +378,10 @@ class KakaoGetAuthWindow(BaseWindow):
             bootstyle="secondary",  # type: ignore
         )
         self.kakao_phone_number_lbl = Label(
-            self.frame_android_login, text="Phone number", justify="left", anchor="w"
+            self.frame_android_login,
+            text=I("Phone number"),
+            justify="left",
+            anchor="w",
         )
         self.kakao_phone_number_entry = Entry(
             self.frame_android_login,
@@ -377,7 +392,7 @@ class KakaoGetAuthWindow(BaseWindow):
 
         self.login_btn3 = Button(
             self.frame_android_login,
-            text="Login and get auth_token",
+            text=I("Login and get auth_token"),
             command=self.cb_get_auth_android_login,
             width=24,
         )
@@ -465,7 +480,7 @@ class KakaoGetAuthWindow(BaseWindow):
         if bin_path is not None:
             m.launch_kakao(bin_path)
         else:
-            msg = "Error: Cannot launch Kakao Desktop. Is it installed?"
+            msg = I("Error: Cannot launch Kakao Desktop. Is it installed?")
             self.gui.cb.put(("msg_block", None, {"message": msg, "parent": self}))
 
     def cb_get_auth_desktop_memdump(self) -> None:

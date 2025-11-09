@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import locale
 import os
 import platform
 import signal
@@ -9,15 +8,14 @@ from math import ceil
 from multiprocessing import Event, cpu_count
 from pathlib import Path
 from threading import Thread
-from typing import Any, Callable, Dict, Optional, cast
+from typing import Any, Callable, Dict, Optional
 from urllib.parse import urlparse
 
 from mergedeep import merge  # type: ignore
 from PIL import ImageFont
 from ttkbootstrap import BooleanVar, DoubleVar, IntVar, StringVar, Window  # type: ignore
-from ttkbootstrap.dialogs import Messagebox  # type: ignore
 
-from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR
+from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR, RUNTIME_STATE
 from sticker_convert.gui_components.frames.comp_frame import CompFrame
 from sticker_convert.gui_components.frames.config_frame import ConfigFrame
 from sticker_convert.gui_components.frames.control_frame import ControlFrame
@@ -30,9 +28,23 @@ from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
 from sticker_convert.utils.callback import CallbackGui
 from sticker_convert.utils.files.json_manager import JsonManager
+from sticker_convert.utils.files.json_resources_loader import load_resource_json
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.translate import SUPPORTED_LANG, I
 from sticker_convert.utils.url_detect import UrlDetect
 from sticker_convert.version import __version__
+
+MSG_MORAL = I("""sticker-convert is Free and Opensource software by laggykiller
+{project_url}
+Please use the stickers with your friends only.
+It is illegal and immoral to sell stickers downloaded from this program.""")
+PROJECT_URL = "https://github.com/laggykiller/sticker-convert"
+
+MSG_MAC14_TK_BUG = I("""NOTICE: If buttons are not responsive, try to press
+on title bar or move mouse cursor away from window for a while.
+(This is a bug in tkinter specific to macOS 14 python <=3.11.6)
+({mac14_tk_bug_url})""")
+MAC14_TK_BUG_URL = "https://github.com/python/cpython/issues/110218"
 
 
 class GUI(Window):
@@ -81,12 +93,12 @@ class GUI(Window):
     def quit(self) -> None:
         if self.job:
             response = self.cb.put(
-                ("ask_bool", ("Job is running, really quit?",), None)
+                ("ask_bool", (I("Job is running, really quit?"),), None)
             )
             if response is False:
                 return
 
-        self.cb.put("Quitting, please wait...")
+        self.cb.put(I("Quitting, please wait..."))
 
         self.save_config()
         if self.settings_save_cred_var.get() is True:
@@ -97,6 +109,29 @@ class GUI(Window):
         if self.job:
             self.cancel_job()
         self.destroy()
+
+    def reset(self) -> None:
+        self.init_done = False
+
+        # These json have translated version
+        RUNTIME_STATE["help_json_outdated"] = True
+        RUNTIME_STATE["input_json_outdated"] = True
+        RUNTIME_STATE["output_json_outdated"] = True
+        self.load_jsons()
+        self.apply_config()
+
+        self.input_frame.destroy()
+        self.comp_frame.destroy()
+        self.output_frame.destroy()
+        self.cred_frame.destroy()
+        self.settings_frame.destroy()
+        self.progress_frame.destroy()
+        self.control_frame.destroy()
+
+        self.init_frames()
+        self.pack_frames()
+        self.init_done = True
+        self.highlight_fields()
 
     def declare_variables(self) -> None:
         # Input
@@ -177,6 +212,8 @@ class GUI(Window):
         self.settings_save_cred_var = BooleanVar()
 
         # Other
+        self.lang_display_var = StringVar(self)
+        self.lang_true_var = StringVar(self)
         self.response_event = Event()
         self.response = None
         self.action: Optional[Callable[..., Any]] = None
@@ -184,22 +221,22 @@ class GUI(Window):
 
     def init_frames(self) -> None:
         self.input_frame = InputFrame(
-            self, self.scrollable_frame, borderwidth=1, text="Input"
+            self, self.scrollable_frame, borderwidth=1, text=I("Input")
         )
         self.comp_frame = CompFrame(
-            self, self.scrollable_frame, borderwidth=1, text="Compression options"
+            self, self.scrollable_frame, borderwidth=1, text=I("Compression options")
         )
         self.output_frame = OutputFrame(
-            self, self.scrollable_frame, borderwidth=1, text="Output"
+            self, self.scrollable_frame, borderwidth=1, text=I("Output")
         )
         self.cred_frame = CredFrame(
-            self, self.scrollable_frame, borderwidth=1, text="Credentials"
+            self, self.scrollable_frame, borderwidth=1, text=I("Credentials")
         )
         self.settings_frame = ConfigFrame(
-            self, self.scrollable_frame, borderwidth=1, text="Config"
+            self, self.scrollable_frame, borderwidth=1, text=I("Config")
         )
         self.progress_frame = ProgressFrame(
-            self, self.scrollable_frame, borderwidth=1, text="Progress"
+            self, self.scrollable_frame, borderwidth=1, text=I("Progress")
         )
         self.control_frame = ControlFrame(self, self.scrollable_frame, borderwidth=1)
 
@@ -216,35 +253,8 @@ class GUI(Window):
             column=0, row=4, columnspan=2, sticky="news", padx=5, pady=5
         )
 
-    def is_cn(self) -> bool:
-        cn_locs = ("zh_chs", "zh_cn", "chinese")
-        loc = locale.getlocale()[0]
-        winloc = ""
-        if platform.system() == "Windows":
-            import ctypes
-
-            windll = ctypes.windll.kernel32  # type: ignore
-            winloc_id = cast(int, windll.GetUserDefaultUILanguage())  # type: ignore
-            winloc = cast(str, locale.windows_locale[winloc_id])  # type: ignore
-
-        if loc is not None and (
-            loc.lower().startswith(cn_locs) or winloc.lower().startswith(cn_locs)
-        ):
-            return True
-        return False
-
     def author_info(self) -> None:
-        if self.is_cn():
-            msg = "sticker-convert是laggykiller创作的免费开源项目，严禁翻售\n"
-            msg += "https://github.com/laggykiller/sticker-convert\n"
-            msg += "尊重知识产权，做个文明人，请不要转售贴图！\n"
-        else:
-            msg = "sticker-convert is Free and Opensource software by laggykiller\n"
-            msg += "https://github.com/laggykiller/sticker-convert\n"
-            msg += "Please use the stickers with your friends only.\n"
-            msg += "It is illegal and immoral to sell stickers downloaded from this program.\n"
-
-        self.cb.put(msg)
+        self.cb.put(MSG_MORAL.format(project_url=PROJECT_URL))
 
     def warn_tkinter_bug(self) -> None:
         if (
@@ -254,33 +264,14 @@ class GUI(Window):
             and sys.version_info[1] == 11
             and sys.version_info[2] <= 6
         ):
-            msg = "NOTICE: If buttons are not responsive, try to press "
-            msg += "on title bar or move mouse cursor away from window for a while.\n"
-            msg += "(This is a bug in tkinter specific to macOS 14 python <=3.11.6)\n"
-            msg += "(https://github.com/python/cpython/issues/110218)\n"
-            self.cb.put(msg)
+            self.cb.put(MSG_MAC14_TK_BUG.format(mac14_tk_bug_url=MAC14_TK_BUG_URL))
 
     def load_jsons(self) -> None:
-        try:
-            from sticker_convert.utils.files.json_resources_loader import COMPRESSION_JSON, EMOJI_JSON, HELP_JSON, INPUT_JSON, OUTPUT_JSON
-        except RuntimeError as e:
-            self.cb.put(str(e))
-            return
-
-        self.help = HELP_JSON
-        self.input_presets = INPUT_JSON
-        self.compression_presets = COMPRESSION_JSON
-        self.output_presets = OUTPUT_JSON
-        self.emoji_list = EMOJI_JSON
-
-        if not (
-            self.compression_presets and self.input_presets and self.output_presets
-        ):
-            Messagebox.show_error(  # type: ignore
-                message='Warning: json(s) under "resources" directory cannot be found',
-                title="sticker-convert",
-            )
-            sys.exit()
+        self.help = load_resource_json("help")
+        self.input_presets = load_resource_json("input")
+        self.compression_presets = load_resource_json("compression")
+        self.output_presets = load_resource_json("output")
+        self.emoji_list = load_resource_json("emoji")
 
         self.settings_path = CONFIG_DIR / "config.json"
         if self.settings_path.is_file():
@@ -289,7 +280,7 @@ class GUI(Window):
                     self.settings_path
                 )
             except JSONDecodeError:
-                self.cb.put("Warning: config.json content is corrupted")
+                self.cb.put(I("Warning: config.json content is corrupted"))
                 self.settings = {}
         else:
             self.settings = {}
@@ -299,7 +290,7 @@ class GUI(Window):
             try:
                 self.creds = JsonManager.load_json(self.creds_path)
             except JSONDecodeError:
-                self.cb.put("Warning: creds.json content is corrupted")
+                self.cb.put(I("Warning: creds.json content is corrupted"))
                 self.creds = {}
         else:
             self.creds = {}
@@ -334,6 +325,7 @@ class GUI(Window):
             "comp_custom": comp_custom,
             "output": self.get_opt_output().to_dict(),
             "creds": {"save_cred": self.settings_save_cred_var.get()},
+            "lang": self.lang_true_var.get(),
         }
 
         JsonManager.save_json(self.settings_path, self.settings)
@@ -413,6 +405,12 @@ class GUI(Window):
             self.output_presets[self.default_output_mode]["full_name"]
         )
 
+        # Language
+        self.lang_true_var.set(self.settings.get("lang", "auto"))
+        self.lang_display_var.set(
+            [k for k, v in SUPPORTED_LANG.items() if v == self.lang_true_var.get()][0]
+        )
+
     def apply_creds(self) -> None:
         self.signal_uuid_var.set(self.creds.get("signal", {}).get("uuid", ""))
         self.signal_password_var.set(self.creds.get("signal", {}).get("password", ""))
@@ -489,7 +487,7 @@ class GUI(Window):
         else:
             self.delete_creds()
 
-        self.control_frame.start_btn.config(text="Cancel", bootstyle="danger")  # type: ignore
+        self.control_frame.start_btn.config(text=I("Cancel"), bootstyle="danger")  # type: ignore
         self.set_inputs("disabled")
 
         opt_input = self.get_opt_input()
@@ -611,7 +609,7 @@ class GUI(Window):
 
     def stop_job(self) -> None:
         self.set_inputs("normal")
-        self.control_frame.start_btn.config(text="Start", bootstyle="default")  # type: ignore
+        self.control_frame.start_btn.config(text=I("Start"), bootstyle="default")  # type: ignore
 
     def cancel_job(self) -> None:
         if self.job:
@@ -691,12 +689,13 @@ class GUI(Window):
             ):
                 self.input_frame.address_entry.config(bootstyle="danger")  # type: ignore
                 self.input_frame.address_tip.config(
-                    text=f"Invalid URL. {self.input_presets[input_option_display]['example']}"
+                    text=I("Invalid URL: ")
+                    + self.input_presets[input_option_display]["example"]
                 )
 
             elif input_option_display == "auto" and download_option:
                 self.input_frame.address_tip.config(
-                    text=f"Detected URL: {download_option}"
+                    text=I("Detected URL: ") + download_option
                 )
 
         # Output

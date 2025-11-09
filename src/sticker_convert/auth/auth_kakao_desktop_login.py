@@ -17,8 +17,9 @@ from bs4 import BeautifulSoup
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
 from sticker_convert.auth.auth_base import AuthBase
+from sticker_convert.utils.translate import I
 
-OK_MSG = "Login successful, auth_token: {auth_token}"
+OK_MSG = I("Login successful, auth_token={}")
 
 
 class AuthKakaoDesktopLogin(AuthBase):
@@ -273,18 +274,18 @@ class AuthKakaoDesktopLogin(AuthBase):
         return json.loads(response.text)
 
     def get_cred(self) -> Tuple[Optional[str], str]:
-        msg = "Getting Kakao authorization token by desktop login..."
+        msg = I("Getting Kakao authorization token by desktop login...")
         self.cb.put(("msg_dynamic", (msg,), None))
         rjson = self.login()
         access_token = rjson.get("access_token")
         if access_token is not None:
             auth_token = access_token + "-" + self.device_uuid
             self.cb.put(("msg_dynamic", (None,), None))
-            return auth_token, OK_MSG.format(auth_token=auth_token)
+            return auth_token, OK_MSG.format(auth_token)
 
         rjson = self.generate_passcode()
         if rjson.get("status") != 0:
-            return None, f"Failed to generate passcode: {rjson}"
+            return None, I("Failed to generate passcode: {}").format(rjson)
         passcode = rjson["passcode"]
 
         fail_reason = None
@@ -303,7 +304,9 @@ class AuthKakaoDesktopLogin(AuthBase):
             next_req_time = rjson.get("nextRequestIntervalInSeconds")
             if time_remaining is None or next_req_time is None:
                 fail_reason = str(rjson)
-            msg = f"Please enter passcode in Kakao app on mobile device within {time_remaining} seconds: {passcode}"
+            msg = I(
+                "Please enter passcode in Kakao app on mobile device within {} seconds: {}"
+            ).format(time_remaining, passcode)
             msg_dynamic_window_exist = self.cb.put(("msg_dynamic", (msg,), None))
             if msg_dynamic_window_exist is False:
                 fail_reason = "Cancelled"
@@ -311,14 +314,14 @@ class AuthKakaoDesktopLogin(AuthBase):
             time.sleep(next_req_time)
         self.cb.put(("msg_dynamic", (None,), None))
         if fail_reason is not None:
-            return None, f"Failed to register device: {fail_reason}"
+            return None, I("Failed to register device: {}").format(fail_reason)
 
         rjson = self.login()
         if rjson.get("status") == -101:
             rjson = self.login(forced=True)
         access_token = rjson.get("access_token")
         if access_token is None:
-            return None, f"Failed to login after registering device: {rjson}"
+            return None, I("Failed to login after registering device: {}").format(rjson)
 
         auth_token = access_token + "-" + self.device_uuid
-        return auth_token, OK_MSG.format(auth_token=auth_token)
+        return auth_token, OK_MSG.format(auth_token)

@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from sticker_convert.utils.files.json_resources_loader import INPUT_JSON, OUTPUT_JSON
+from sticker_convert.utils.files.json_resources_loader import load_resource_json
 from sticker_convert.utils.media.codec_info import CodecInfo
 
 RELATED_EXTENSIONS = (
@@ -166,7 +166,7 @@ class MetadataHandler:
         Does not check if metadata provided via user input in GUI or flag options
         metadata = 'title' or 'author'
         """
-        input_presets = INPUT_JSON
+        input_presets = load_resource_json("input")
         assert input_presets
 
         if input_option == "local":
@@ -185,7 +185,7 @@ class MetadataHandler:
     @staticmethod
     def check_metadata_required(output_option: str, metadata: str) -> bool:
         # metadata = 'title' or 'author'
-        output_presets = OUTPUT_JSON
+        output_presets = load_resource_json("output")
         assert output_presets
         return output_presets[output_option]["metadata_requirements"][metadata]
 

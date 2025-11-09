@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from typing import List
 
-from sticker_convert.utils.files.json_resources_loader import EMOJI_JSON
+from sticker_convert.utils.files.json_resources_loader import load_resource_json
 
 
 def get_emoji_list() -> List[str]:
-    return [i["emoji"] for i in EMOJI_JSON]
+    return [i["emoji"] for i in load_resource_json("emoji")]
 
 
 EMOJI_LIST = get_emoji_list()

@@ -11,6 +11,7 @@ import requests
 
 from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
+from sticker_convert.utils.translate import I
 
 
 class DownloadBase:
@@ -90,7 +91,7 @@ class DownloadBase:
         **kwargs: Any,
     ) -> None:
         async with semaphore:
-            self.cb.put(f"Downloading {url}")
+            self.cb.put(I("Downloading {}").format(url))
             success = False
             for retry in range(retries):
                 response = await client.get(
@@ -101,10 +102,12 @@ class DownloadBase:
                 if success:
                     async with await anyio.open_file(dest, "wb+") as f:
                         await f.write(response.content)
-                    self.cb.put(f"Downloaded {url}")
+                    self.cb.put(I("Downloaded {}").format(url))
                 else:
                     self.cb.put(
-                        f"Error {response.status_code}: {url} (tried {retry + 1}/{retries} times)"
+                        I("Error {}: {} (tried {}/{} times)").format(
+                            response.status_code, url, retry + 1, retries
+                        )
                     )
 
             if results is not None:
@@ -132,7 +135,7 @@ class DownloadBase:
                     return b""
                 total_length = int(response.headers.get("content-length"))  # type: ignore
 
-                self.cb.put(f"Downloading {url}")
+                self.cb.put(I("Downloading {}").format(url))
 
                 if show_progress:
                     steps = (total_length / chunk_size) + 1
@@ -153,7 +156,9 @@ class DownloadBase:
                 break
             except requests.exceptions.RequestException as e:
                 self.cb.put(
-                    f"Cannot download {url} (tried {retry + 1}/{retries} times): {e}"
+                    I("Cannot download {} (tried {}/{} times): {}").format(
+                        url, retry + 1, retries, e
+                    )
                 )
 
         if not result:
@@ -161,6 +166,6 @@ class DownloadBase:
         if dest:
             with open(dest, "wb+") as f:
                 f.write(result)
-            self.cb.put(f"Downloaded {url}")
+            self.cb.put(I("Downloaded {}").format(url))
             return b""
         return result

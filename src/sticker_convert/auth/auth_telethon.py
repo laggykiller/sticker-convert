@@ -7,8 +7,9 @@ from telethon.errors import RPCError, SessionPasswordNeededError  # type: ignore
 
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
+from sticker_convert.utils.translate import I
 
-GUIDE_MSG = """1. Visit https://my.telegram.org
+GUIDE_MSG = I("""1. Visit {telegram_api_url}
 2. Login using your phone number
 3. Go to "API development tools"
 4. Fill form
@@ -18,9 +19,10 @@ GUIDE_MSG = """1. Visit https://my.telegram.org
 - Platform: Desktop
 - Description: sticker-convert
 5. Note down api_id and api_hash
-Continue when done"""
-OK_MSG = "Telethon setup successful"
-FAIL_MSG = "Telethon setup failed"
+Continue when done""")
+TELEGRAM_API_URL = "https://my.telegram.org"
+OK_MSG = I("Telethon setup successful")
+FAIL_MSG = I("Telethon setup failed")
 
 
 class AuthTelethon(AuthBase):
@@ -41,7 +43,7 @@ class AuthTelethon(AuthBase):
         if authed is False and try_sign_in is True:
             error_msg = ""
             while True:
-                msg = f"{error_msg}Enter phone number: "
+                msg = error_msg + I("Enter phone number: ")
                 phone_number = self.cb.put(("ask_str", (msg,), None))
                 if phone_number == "":
                     return False, client, 0, "", FAIL_MSG
@@ -53,7 +55,7 @@ class AuthTelethon(AuthBase):
 
             error_msg = ""
             while True:
-                msg = f"{error_msg}Enter code: "
+                msg = error_msg + I("Enter code: ")
                 code = self.cb.put(("ask_str", (msg,), None))
                 if code == "":
                     return False, client, 0, "", FAIL_MSG
@@ -86,10 +88,12 @@ class AuthTelethon(AuthBase):
         )
 
     def guide(self) -> None:
-        self.cb.put(("msg_block", (GUIDE_MSG,), None))
+        self.cb.put(
+            ("msg_block", (GUIDE_MSG.format(telegram_api_url=TELEGRAM_API_URL),), None)
+        )
 
     def get_api_info(self) -> bool:
-        api_id_ask = "Enter api_id: "
+        api_id_ask = I("Enter api_id: ")
         wrong_hint = ""
 
         while True:
@@ -109,9 +113,9 @@ class AuthTelethon(AuthBase):
                 self.opt_cred.telethon_api_id = int(telethon_api_id)
                 break
             else:
-                wrong_hint = "Error: api_id should be numeric\n"
+                wrong_hint = I("Error: api_id should be numeric\n")
 
-        msg = "Enter api_hash: "
+        msg = I("Enter api_hash: ")
         self.opt_cred.telethon_api_hash = self.cb.put(
             (
                 "ask_str",

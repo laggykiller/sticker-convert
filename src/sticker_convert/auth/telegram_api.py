@@ -18,9 +18,16 @@ from telethon.types import DocumentAttributeFilename, InputStickerSetShortName, 
 from sticker_convert.auth.auth_telethon import AuthTelethon
 from sticker_convert.job_option import CredOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
+from sticker_convert.utils.translate import I
 
 # sticker_path: Path, sticker_bytes: bytes, emoji_list: List[str], sticker_format: str
 TelegramSticker = Tuple[Path, bytes, List[str], str]
+
+MSG_FAIL_ALL = I("Cannot upload any sticker. Reason: {}")
+MSG_FAIL_PACK = I("Cannot upload pack {}. Reason: {}")
+MSG_FAIL_DEL = I("Cannot delete pack of {}. Reason: {}")
+MSG_FAIL_STICKER = I("Cannot upload sticker {sticker} of {pack}. Reason: {reason}")
+MSG_FAIL_PACK_ICON = I("Cannot set pack icon for {}. Reason: {}")
 
 
 class TelegramAPI(Protocol):
@@ -61,17 +68,17 @@ class BotAPI(TelegramAPI):
         self.cb = cb
 
         if is_upload and not (opt_cred.telegram_token and opt_cred.telegram_userid):
-            self.cb.put("Token and userid required for uploading to telegram")
+            self.cb.put(I("Token and userid required for uploading to telegram"))
             return False
         elif is_upload is False and not opt_cred.telegram_token:
-            self.cb.put("Token required for downloading from telegram")
+            self.cb.put(I("Token required for downloading from telegram"))
             return False
 
         if opt_cred.telegram_userid:
             if opt_cred.telegram_userid.isnumeric():
                 self.telegram_userid = int(opt_cred.telegram_userid)
             else:
-                self.cb.put("Invalid userid, should contain numbers only")
+                self.cb.put(I("Invalid userid, should contain numbers only"))
                 return False
 
         self.application = (  # type: ignore
@@ -126,13 +133,21 @@ class BotAPI(TelegramAPI):
         try:
             await self.application.bot.delete_sticker_set(self.pack_short_name)
         except BadRequest as e:
-            msg = f"Cannot delete sticker set {self.pack_short_name} due to {e}"
+            msg = I("Cannot delete sticker set {}. Reason: {}").format(
+                self.pack_short_name, e
+            )
             if str(e) == "Stickerpack_not_found":
-                msg += "\nHint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
+                msg += I(
+                    "\nHint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
+                )
             self.cb.put(msg)
             return False
         except TelegramError as e:
-            self.cb.put(f"Cannot delete sticker set {self.pack_short_name} due to {e}")
+            self.cb.put(
+                I("Cannot delete sticker set {}. Reason: {}").format(
+                    self.pack_short_name, e
+                )
+            )
             return False
         return True
 
@@ -151,7 +166,9 @@ class BotAPI(TelegramAPI):
 
         try:
             self.cb.put(
-                f"Creating pack and bulk uploading {len(init_input_stickers)} stickers of {self.pack_short_name}"
+                I("Creating pack and bulk uploading {} stickers of {}").format(
+                    len(init_input_stickers), self.pack_short_name
+                )
             )
             await self.application.bot.create_new_sticker_set(
                 self.telegram_userid,
@@ -161,13 +178,17 @@ class BotAPI(TelegramAPI):
                 sticker_type,
             )
             self.cb.put(
-                f"Created pack and bulk uploaded {len(init_input_stickers)} stickers of {self.pack_short_name}"
+                I("Created pack and bulk uploaded {} stickers of {}").format(
+                    len(init_input_stickers), self.pack_short_name
+                )
             )
             _, success_add = await self.pack_add(stickers_list[50:], sticker_type)
             return len(stickers_list), len(init_input_stickers) + success_add
         except TelegramError as e:
             self.cb.put(
-                f"Cannot create pack and bulk upload {len(init_input_stickers)} stickers of {self.pack_short_name} due to {e}"
+                I(
+                    "Cannot create pack and bulk upload {} stickers of {}. Reason: {}"
+                ).format(len(init_input_stickers), self.pack_short_name, e)
             )
             return len(stickers_list), 0
 
@@ -199,19 +220,27 @@ class BotAPI(TelegramAPI):
                     self.pack_short_name,
                     input_sticker,
                 )
-                self.cb.put(f"Uploaded sticker {i[0]} of {self.pack_short_name}")
+                self.cb.put(
+                    I("Uploaded sticker {} of {}").format(i[0], self.pack_short_name)
+                )
                 stickers_ok += 1
             except BadRequest as e:
                 self.cb.put(
-                    f"Cannot upload sticker {i[0]} of {self.pack_short_name} due to {e}"
+                    MSG_FAIL_STICKER.format(
+                        sticker=i[0], pack=self.pack_short_name, reason=e
+                    )
                 )
                 if str(e) == "Stickerpack_not_found":
                     self.cb.put(
-                        "Hint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
+                        I(
+                            "Hint: You might had deleted and recreated pack too quickly. Wait about 3 minutes and try again."
+                        )
                     )
             except TelegramError as e:
                 self.cb.put(
-                    f"Cannot upload sticker {i[0]} of {self.pack_short_name} due to {e}"
+                    MSG_FAIL_STICKER.format(
+                        sticker=i[0], pack=self.pack_short_name, reason=e
+                    )
                 )
             self.cb.put("update_bar")
 
@@ -220,18 +249,24 @@ class BotAPI(TelegramAPI):
 
     async def pack_thumbnail(self, thumbnail: TelegramSticker) -> bool:
         try:
-            self.cb.put(f"Uploading cover (thumbnail) of pack {self.pack_short_name}")
+            self.cb.put(
+                I("Uploading cover (thumbnail) of pack {}").format(self.pack_short_name)
+            )
             await self.application.bot.set_sticker_set_thumbnail(
                 self.pack_short_name,
                 self.telegram_userid,
                 thumbnail[3],
                 thumbnail[1],
             )
-            self.cb.put(f"Uploaded cover (thumbnail) of pack {self.pack_short_name}")
+            self.cb.put(
+                I("Uploaded cover (thumbnail) of pack {}").format(self.pack_short_name)
+            )
             return True
         except TelegramError as e:
             self.cb.put(
-                f"Cannot upload cover (thumbnail) of pack {self.pack_short_name} due to {e}"
+                I("Cannot upload cover (thumbnail) of pack {}. Reason: {}").format(
+                    self.pack_short_name, e
+                )
             )
             return False
 
@@ -257,7 +292,7 @@ class BotAPI(TelegramAPI):
                 pool_timeout=self.timeout,
             )
         except TelegramError as e:
-            self.cb.put(f"Failed to download {f_id}: {str(e)}")
+            self.cb.put(I("Failed to download {}: {}").format(f_id, str(e)))
             results[f_id] = False
             return
         fpath = sticker_file.file_path
@@ -274,7 +309,7 @@ class BotAPI(TelegramAPI):
         )
         if isinstance(sticker, Sticker) and sticker.emoji is not None:
             emoji_dict[f_id] = sticker.emoji
-        self.cb.put(f"Downloaded {f_name}")
+        self.cb.put(I("Downloaded {}").format(f_name))
         results[f_id] = True
         if f_id != "cover":
             self.cb.put("update_bar")
@@ -295,7 +330,9 @@ class BotAPI(TelegramAPI):
             )
         except TelegramError as e:
             self.cb.put(
-                f"Failed to download telegram sticker set {pack_short_name} due to: {e}"
+                I("Failed to download telegram sticker set {} due to: {}").format(
+                    pack_short_name, e
+                )
             )
             return results, emoji_dict
 
@@ -399,21 +436,20 @@ class TelethonAPI(TelegramAPI):
         return "timeout"
 
     async def pack_del(self) -> bool:
-        msg_fail = "Cannot delete pack of {} due to {}"
         if self.is_emoji:
             repl = await self._send_and_recv("/delemoji")
         else:
             repl = await self._send_and_recv("/delpack")
         if repl != "Choose the sticker set you want to delete.":
-            self.cb.put(msg_fail.format(self.pack_short_name, repl))
+            self.cb.put(MSG_FAIL_DEL.format(self.pack_short_name, repl))
             return False
         repl = await self._send_and_recv(self.pack_short_name)
         if "Yes, I am totally sure." not in repl:
-            self.cb.put(msg_fail.format(self.pack_short_name, repl))
+            self.cb.put(MSG_FAIL_DEL.format(self.pack_short_name, repl))
             return False
         repl = await self._send_and_recv("Yes, I am totally sure.")
         if "Done!" not in repl:
-            self.cb.put(msg_fail.format(self.pack_short_name, repl))
+            self.cb.put(MSG_FAIL_DEL.format(self.pack_short_name, repl))
             return False
 
         return True
@@ -432,11 +468,13 @@ class TelethonAPI(TelegramAPI):
             repl = await self._send_and_recv("/newanimated")
         else:
             self.cb.put(
-                f"Cannot upload any sticker to {self.pack_short_name} due to invalid sticker format {stickers_list[0][3]}"
+                I(
+                    "Cannot upload any sticker to {} due to invalid sticker format {}"
+                ).format(self.pack_short_name, stickers_list[0][3])
             )
             return len(stickers_list), 0
         if "Yay!" not in repl:
-            self.cb.put(f"Cannot upload any sticker due to {repl}")
+            self.cb.put(MSG_FAIL_ALL.format(repl))
             return len(stickers_list), 0
 
         if self.is_emoji:
@@ -444,12 +482,12 @@ class TelethonAPI(TelegramAPI):
                 f"{stickers_list[0][3].capitalize()} emoji"
             )
             if "Yay!" not in repl:
-                self.cb.put(f"Cannot upload any sticker due to {repl}")
+                self.cb.put(MSG_FAIL_ALL.format(repl))
                 return len(stickers_list), 0
 
         repl = await self._send_and_recv(self.pack_title)
         if "Alright!" not in repl:
-            self.cb.put(f"Cannot upload any sticker due to {repl}")
+            self.cb.put(MSG_FAIL_ALL.format(repl))
             return len(stickers_list), 0
         self.cb.put(
             (
@@ -465,14 +503,18 @@ class TelethonAPI(TelegramAPI):
             repl = await self._send_and_recv(i[0])
             if "Thanks!" not in repl:
                 self.cb.put(
-                    f"Cannot upload sticker {i[0]} of {self.pack_short_name} due to {repl}"
+                    MSG_FAIL_STICKER.format(
+                        sticker=i[0], pack=self.pack_short_name, reason=repl
+                    )
                 )
                 self.cb.put("update_bar")
                 continue
             repl = await self._send_and_recv("".join(i[2]))
             if "Congratulations." not in repl:
                 self.cb.put(
-                    f"Cannot upload sticker {i[0]} of {self.pack_short_name} due to {repl}"
+                    MSG_FAIL_STICKER.format(
+                        sticker=i[0], pack=self.pack_short_name, reason=repl
+                    )
                 )
                 self.cb.put("update_bar")
                 continue
@@ -480,15 +522,15 @@ class TelethonAPI(TelegramAPI):
             self.cb.put("update_bar")
         repl = await self._send_and_recv("/publish")
         if "icon" not in repl:
-            self.cb.put(f"Cannot upload pack {self.pack_short_name} due to {repl}")
+            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
         repl = await self._send_and_recv("/skip")
         if "Please provide a short name" not in repl:
-            self.cb.put(f"Cannot upload pack {self.pack_short_name} due to {repl}")
+            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
         repl = await self._send_and_recv(self.pack_short_name)
         if "Kaboom!" not in repl:
-            self.cb.put(f"Cannot upload pack {self.pack_short_name} due to {repl}")
+            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
 
         self.cb.put(("bar", None, {"set_progress_mode": "indeterminate"}))
@@ -504,15 +546,11 @@ class TelethonAPI(TelegramAPI):
         else:
             repl = await self._send_and_recv("/addsticker")
         if "Choose" not in repl:
-            self.cb.put(
-                f"Cannot upload any sticker to {self.pack_short_name} due to {repl}"
-            )
+            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
         repl = await self._send_and_recv(self.pack_short_name)
         if "Alright!" not in repl:
-            self.cb.put(
-                f"Cannot upload any sticker to {self.pack_short_name} due to {repl}"
-            )
+            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
 
         self.cb.put(
@@ -529,14 +567,18 @@ class TelethonAPI(TelegramAPI):
             repl = await self._send_and_recv(i[0])
             if "Thanks!" not in repl:
                 self.cb.put(
-                    f"Cannot upload sticker {i[0]} of {self.pack_short_name} due to {repl}"
+                    MSG_FAIL_STICKER.format(
+                        sticker=i[0], pack=self.pack_short_name, reason=repl
+                    )
                 )
                 self.cb.put("update_bar")
                 continue
             repl = await self._send_and_recv("".join(i[2]))
             if "There we go." not in repl:
                 self.cb.put(
-                    f"Cannot upload sticker {i[0]} of {self.pack_short_name} due to {repl}"
+                    MSG_FAIL_STICKER.format(
+                        sticker=i[0], pack=self.pack_short_name, reason=repl
+                    )
                 )
                 self.cb.put("update_bar")
                 continue
@@ -547,9 +589,7 @@ class TelethonAPI(TelegramAPI):
 
         repl = await self._send_and_recv("/done")
         if "OK" not in repl:
-            self.cb.put(
-                f"Cannot upload any sticker to {self.pack_short_name} due to {repl}"
-            )
+            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
 
         return len(stickers_list), stickers_ok
@@ -557,15 +597,11 @@ class TelethonAPI(TelegramAPI):
     async def pack_thumbnail(self, thumbnail: TelegramSticker) -> bool:
         repl = await self._send_and_recv("/setpackicon")
         if "OK" not in repl:
-            self.cb.put(
-                f"Cannot set pack icon for {self.pack_short_name} due to {repl}"
-            )
+            self.cb.put(MSG_FAIL_PACK_ICON.format(self.pack_short_name, repl))
             return False
         repl = await self._send_and_recv(thumbnail[0])
         if "Enjoy!" not in repl:
-            self.cb.put(
-                f"Cannot set pack icon for {self.pack_short_name} due to {repl}"
-            )
+            self.cb.put(MSG_FAIL_PACK_ICON.format(self.pack_short_name, repl))
             return False
         return True
 
@@ -598,12 +634,12 @@ class TelethonAPI(TelegramAPI):
         try:
             await self.client.download_media(sticker, file=f_path)  # type: ignore
         except Exception as e:
-            self.cb.put(f"Failed to download {f_id}: {str(e)}")
+            self.cb.put(I("Failed to download {}: {}").format(f_id, str(e)))
             results[f_id] = False
             return
 
         emoji_dict[f_id] = id_to_emoji[sticker.id]
-        self.cb.put(f"Downloaded {f_name}")
+        self.cb.put(I("Downloaded {}").format(f_name))
         results[f_id] = True
         self.cb.put("update_bar")
 
@@ -662,6 +698,6 @@ class TelethonAPI(TelegramAPI):
                     f"cover{ext}",
                 )
             except Exception as e:
-                self.cb.put(f"Failed to download cover{ext}: {str(e)}")
+                self.cb.put(I("Failed to download cover{}: {}").format(ext, str(e)))
 
         return results, emoji_dict

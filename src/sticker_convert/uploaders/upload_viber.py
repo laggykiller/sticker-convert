@@ -14,6 +14,7 @@ from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.format_verify import FormatVerify
+from sticker_convert.utils.translate import I
 
 
 class UploadViber(UploadBase):
@@ -38,7 +39,7 @@ class UploadViber(UploadBase):
         urls: List[str] = []
 
         if not self.opt_cred.viber_auth:
-            self.cb.put("Viber auth required for uploading to viber")
+            self.cb.put(I("Viber auth required for uploading to viber"))
             return 0, 0, urls
 
         upload_data_base: Dict[str, str] = {}
@@ -47,13 +48,13 @@ class UploadViber(UploadBase):
             upload_data_base[j[0]] = j[1]
 
         if upload_data_base.get("member_id") is None:
-            self.cb.put("Invalid Viber auth: Missing member_id")
+            self.cb.put(I("Invalid Viber auth: Missing member_id"))
             return 0, 0, urls
         if upload_data_base.get("m_token") is None:
-            self.cb.put("Invalid Viber auth: Missing m_token")
+            self.cb.put(I("Invalid Viber auth: Missing m_token"))
             return 0, 0, urls
         if upload_data_base.get("m_ts") is None:
-            self.cb.put("Invalid Viber auth: Missing m_ts")
+            self.cb.put(I("Invalid Viber auth: Missing m_ts"))
             return 0, 0, urls
 
         title, author, _ = MetadataHandler.get_metadata(
@@ -62,7 +63,7 @@ class UploadViber(UploadBase):
             author=self.opt_output.author,
         )
         if title is None:
-            raise TypeError(f"title cannot be {title}")
+            raise TypeError(I("title cannot be {}").format(title))
         if author is None:
             author = ""
 
@@ -99,7 +100,7 @@ class UploadViber(UploadBase):
             ).as_posix()
             with zipfile.ZipFile(out_f, "w", zipfile.ZIP_DEFLATED) as zipf:
                 for num, src in enumerate(stickers):
-                    self.cb.put(f"Verifying {src} for uploading to Viber")
+                    self.cb.put(I("Verifying {} for uploading to Viber").format(src))
 
                     if not FormatVerify.check_file(src, spec=self.png_spec):
                         success, _, image_data, _ = StickerConvert.convert(
@@ -112,7 +113,9 @@ class UploadViber(UploadBase):
                         assert isinstance(image_data, bytes)
                         if not success:
                             self.cb.put(
-                                f"Warning: Cannot compress file {src.name}, skip this file..."
+                                I(
+                                    "Warning: Cannot compress file {}, skip this file..."
+                                ).format(src.name)
                             )
                             continue
                     else:
@@ -142,18 +145,24 @@ class UploadViber(UploadBase):
                     pack_id = rjson["custom_sticker_pack"]["id"]
                     url = f"https://stickers.viber.com/pages/custom-sticker-packs/{pack_id}"
                     urls.append(url)
-                    self.cb.put(f"Uploaded {pack_title}")
+                    self.cb.put(I("Uploaded {}").format(pack_title))
                     stickers_ok += len(stickers)
                 else:
                     self.cb.put(
-                        f"Failed to upload {pack_title}: {r.status_code} {r.text}"
+                        I("Failed to upload {}: {} {}").format(
+                            pack_title, r.status_code, r.text
+                        )
                     )
                 if rjson["status"] == 103:
                     self.cb.put(
                         "Viber auth data may have expired. Try to regenerate it?"
                     )
             else:
-                self.cb.put(f"Failed to upload {pack_title}: {r.status_code} {r.text}")
+                self.cb.put(
+                    I("Failed to upload {}: {} {}").format(
+                        pack_title, r.status_code, r.text
+                    )
+                )
 
         return stickers_ok, stickers_total, urls
 

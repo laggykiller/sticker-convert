@@ -12,6 +12,7 @@ from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
+from sticker_convert.utils.translate import I
 
 
 class DownloadSignal(DownloadBase):
@@ -48,12 +49,14 @@ class DownloadSignal(DownloadBase):
 
             codec = CodecInfo.get_file_codec(f_path)
             if codec == "":
-                msg = f"Warning: Downloaded {f_path} but cannot get file codec"
+                msg = I("Warning: Downloaded {} but cannot get file codec").format(
+                    f_path
+                )
                 self.cb.put(msg)
             else:
                 f_path_new = Path(f"{f_path}.{codec}")
                 f_path.rename(f_path_new)
-                msg = f"Downloaded {f_id}.{codec}"
+                msg = I("Downloaded {}.{}").format(f_id, codec)
                 self.cb.put(msg)
 
             self.cb.put("update_bar")
@@ -68,7 +71,7 @@ class DownloadSignal(DownloadBase):
                 cover_codec = "png"
             cover_path_new = Path(self.out_dir, f"cover.{cover_codec}")
             cover_path.rename(cover_path_new)
-            self.cb.put(f"Downloaded cover.{cover_codec}")
+            self.cb.put(I("Downloaded cover.{}").format(cover_codec))
 
         MetadataHandler.set_metadata(
             self.out_dir, title=pack.title, author=pack.author, emoji_dict=emoji_dict
@@ -78,7 +81,7 @@ class DownloadSignal(DownloadBase):
         if "signal.art" not in self.url and not self.url.startswith(
             "sgnl://addstickers/"
         ):
-            self.cb.put("Download failed: Unrecognized URL format")
+            self.cb.put(I("Download failed: Unrecognized URL format"))
             return 0, 0
 
         pack_id = self.url.split("pack_id=")[1].split("&pack_key=")[0]
@@ -87,7 +90,7 @@ class DownloadSignal(DownloadBase):
         try:
             pack = anyio.run(DownloadSignal.get_pack, pack_id, pack_key)
         except SignalException as e:
-            self.cb.put(f"Failed to download pack due to {repr(e)}")
+            self.cb.put(I("Failed to download pack. Reason: {}").format(repr(e)))
             return 0, 0
 
         self.save_stickers(pack)

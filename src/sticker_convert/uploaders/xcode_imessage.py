@@ -17,6 +17,7 @@ from sticker_convert.utils.files.metadata_handler import XCODE_IMESSAGE_ICONSET,
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
+from sticker_convert.utils.translate import I
 
 
 class XcodeImessage(UploadBase):
@@ -42,10 +43,12 @@ class XcodeImessage(UploadBase):
             author=self.opt_output.author,
         )
         if not author:
-            self.cb.put("author is required for creating Xcode iMessage sticker pack")
+            self.cb.put(
+                I("author is required for creating Xcode iMessage sticker pack")
+            )
             return 0, 0, urls
         if not title:
-            self.cb.put("title is required for creating Xcode iMessage sticker pack")
+            self.cb.put(I("title is required for creating Xcode iMessage sticker pack"))
             return 0, 0, urls
 
         author = author.replace(" ", "_")
@@ -66,7 +69,11 @@ class XcodeImessage(UploadBase):
             pack_title = sanitize_filename(pack_title)
 
             for src in stickers:
-                self.cb.put(f"Verifying {src} for creating Xcode iMessage sticker pack")
+                self.cb.put(
+                    I("Verifying {} for creating Xcode iMessage sticker pack").format(
+                        src
+                    )
+                )
 
                 fpath = Path(self.opt_output.dir, src)
 
@@ -145,7 +152,9 @@ class XcodeImessage(UploadBase):
             shutil.copytree(ROOT_DIR / "ios-message-stickers-template", pack_path)
         else:
             self.cb.put(
-                "Failed to create Xcode project: ios-message-stickers-template not found"
+                I(
+                    "Failed to create Xcode project: ios-message-stickers-template not found"
+                )
             )
 
         os.remove(pack_path / "README.md")

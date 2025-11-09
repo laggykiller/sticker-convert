@@ -10,6 +10,7 @@ from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.translate import I
 
 
 class DownloadTelegram(DownloadBase):
@@ -18,7 +19,7 @@ class DownloadTelegram(DownloadBase):
 
     def download_stickers_telegram(self) -> Tuple[int, int]:
         if not ("telegram.me" in self.url or "t.me" in self.url):
-            self.cb.put("Download failed: Unrecognized URL format")
+            self.cb.put(I("Download failed: Unrecognized URL format"))
             return 0, 0
 
         return anyio.run(self.save_stickers)
@@ -31,12 +32,12 @@ class DownloadTelegram(DownloadBase):
             tg_api = BotAPI()
 
         if self.opt_cred is None:
-            self.cb.put("Download failed: No credentials")
+            self.cb.put(I("Download failed: No credentials"))
             return 0, 0
 
         success = await tg_api.setup(self.opt_cred, False, self.cb, self.cb_return)
         if success is False:
-            self.cb.put("Download failed: Invalid credentials")
+            self.cb.put(I("Download failed: Invalid credentials"))
             return 0, 0
 
         title = Path(urlparse(self.url).path).name

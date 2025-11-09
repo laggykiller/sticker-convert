@@ -3,6 +3,7 @@ import os
 import platform
 import sys
 from pathlib import Path
+from typing import Any, Dict
 
 
 def get_root_dir() -> Path:
@@ -89,3 +90,6 @@ SVG_SAMPLE_FPS = 30
 # If width and height not set in SVG tag, import at this dimension
 SVG_DEFAULT_WIDTH = 1024
 SVG_DEFAULT_HEIGHT = 1024
+
+# A shared dictionary
+RUNTIME_STATE: Dict[str, Any] = {}

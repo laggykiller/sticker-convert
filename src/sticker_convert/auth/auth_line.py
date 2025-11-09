@@ -8,9 +8,10 @@ import requests
 import rookiepy
 
 from sticker_convert.auth.auth_base import AuthBase
+from sticker_convert.utils.translate import I
 
-OK_MSG = "Got Line cookies successfully"
-FAIL_MSG = "Failed to get Line cookies. Have you logged in the web browser?"
+OK_MSG = I("Got Line cookies successfully")
+FAIL_MSG = I("Failed to get Line cookies. Have you logged in the web browser?")
 
 
 class AuthLine(AuthBase):
@@ -18,7 +19,7 @@ class AuthLine(AuthBase):
         super().__init__(*args, **kwargs)
 
     def get_cred(self) -> Tuple[Optional[str], str]:
-        msg = "Getting Line cookies"
+        msg = I("Getting Line cookies")
         self.cb.put(("msg_dynamic", (msg,), None))
 
         browsers: List[Callable[..., Any]] = [
@@ -65,7 +66,7 @@ class AuthLine(AuthBase):
         if cookies_dict is None or cookies_jar is None:
             return (
                 None,
-                "Failed to get Line cookies. Have you logged in the web browser?",
+                I("Failed to get Line cookies. Have you logged in the web browser?"),
             )
 
         cookies_list = ["%s=%s" % (i["name"], i["value"]) for i in cookies_dict]

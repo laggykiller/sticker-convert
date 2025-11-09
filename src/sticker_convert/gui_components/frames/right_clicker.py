@@ -3,13 +3,15 @@ from typing import Any
 
 from ttkbootstrap import Menu  # type: ignore
 
+from sticker_convert.utils.translate import I
+
 
 # Reference: https://stackoverflow.com/a/57704013
 class RightClicker:
     def __init__(self, event: Any) -> None:
         right_click_menu = Menu(None, tearoff=0, takefocus=0)
 
-        for txt in ["Cut", "Copy", "Paste"]:
+        for txt in [I("Cut"), I("Copy"), I("Paste")]:
             right_click_menu.add_command(
                 label=txt,
                 command=lambda event=event, text=txt: self.right_click_command(

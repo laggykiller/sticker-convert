@@ -31,7 +31,7 @@ This method is much slower during upload, but can avoid problem of sticker link 
 ## Create api_id and api_hash
 Reference: https://core.telegram.org/api/obtaining_api_id#obtaining-api-id
 
-1. Visit https://my.telegram.org
+1. Visit "https://my.telegram.org"
 2. Login using your phone number
 3. Go to "API development tools"
 4. Fill form

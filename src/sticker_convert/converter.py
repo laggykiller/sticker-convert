@@ -13,29 +13,36 @@ from PIL import Image
 from PIL import __version__ as PillowVersion
 from PIL import features
 
+from sticker_convert.definitions import RUNTIME_STATE
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo, rounding
 from sticker_convert.utils.media.format_verify import FormatVerify
-from sticker_convert.utils.singletons import singletons
+from sticker_convert.utils.translate import get_translator
+
+I = get_translator()  # noqa: E741
 
 if TYPE_CHECKING:
     from av.video.frame import VideoFrame
     from av.video.plane import VideoPlane
 
-MSG_START_COMP = "[I] Start compressing {} -> {}"
-MSG_SKIP_COMP = "[S] Compatible file found, skip compress and just copy {} -> {}"
-MSG_COMP = (
+MSG_START_COMP = I("[I] Start compressing {} -> {}")
+MSG_SKIP_COMP = I("[S] Compatible file found, skip compress and just copy {} -> {}")
+MSG_COMP = I(
     "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-{})"
 )
-MSG_REDO_COMP = "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
-MSG_DONE_COMP = "[S] Successful compression {} -> {} size {} (step {})"
-MSG_FAIL_COMP = (
+MSG_REDO_COMP = I("[{}] Compressed {} -> {} but size {} {} limit {}, recompressing")
+MSG_DONE_COMP = I("[S] Successful compression {} -> {} size {} (step {})")
+MSG_FAIL_COMP = I(
     "[F] Failed Compression {} -> {}, "
     "cannot get below limit {} with lowest quality under current settings (Best size: {})"
 )
+MSG_QUANT_NO_ALPHA = I(
+    "[W] {} does not support RGBA, defaulted to fastoctree quantization"
+)
+MSG_SVG_LONG = I("[W] Importing SVG takes long time")
 
 YUV_RGB_MATRIX = np.array(
     [
@@ -448,7 +455,7 @@ class StickerConvert:
         width = self.codec_info_orig.res[0]
         height = self.codec_info_orig.res[1]
 
-        if singletons.objs.get("crd") is None:
+        if RUNTIME_STATE.get("crd") is None:
             chrome_path: Optional[str]
             if self.opt_comp.chromium_path:
                 chrome_path = self.opt_comp.chromium_path
@@ -467,11 +474,11 @@ class StickerConvert:
             ]
             if chrome_path is None:
                 raise RuntimeError("[F] Chrome/Chromium required for importing svg")
-            self.cb.put("[W] Importing SVG takes long time")
-            singletons.objs["crd"] = CRD(chrome_path, args=args)
-            singletons.objs["crd"].connect(-1)  # type: ignore
+            self.cb.put(MSG_SVG_LONG)
+            RUNTIME_STATE["crd"] = CRD(chrome_path, args=args)
+            RUNTIME_STATE["crd"].connect(-1)  # type: ignore
 
-        crd = cast(CRD, singletons.objs["crd"])
+        crd = cast(CRD, RUNTIME_STATE["crd"])
         if isinstance(self.in_f, bytes):
             svg = self.in_f.decode()
         else:
@@ -1043,9 +1050,7 @@ class StickerConvert:
             "mediancut",
             "maxcoverage",
         ):
-            self.cb.put(
-                f"[W] {self.opt_comp.quantize_method} does not support RGBA, defaulted to fastoctree quantization"
-            )
+            self.cb.put(MSG_QUANT_NO_ALPHA.format(self.opt_comp.quantize_method))
             method = Image.Quantize.FASTOCTREE
         elif self.opt_comp.quantize_method == "mediancut":
             method = Image.Quantize.MEDIANCUT

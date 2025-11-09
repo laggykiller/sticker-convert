@@ -12,6 +12,7 @@ from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.files.sanitize_filename import sanitize_filename
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
+from sticker_convert.utils.translate import I
 
 
 class CompressWastickers(UploadBase):
@@ -53,10 +54,10 @@ class CompressWastickers(UploadBase):
             author=self.opt_output.author,
         )
         if not title:
-            self.cb.put("Title is required for compressing .wastickers")
+            self.cb.put(I("Title is required for compressing .wastickers"))
             return 0, 0, urls
         if not author:
-            self.cb.put("Author is required for compressing .wastickers")
+            self.cb.put(I("Author is required for compressing .wastickers"))
             return 0, 0, urls
         packs = MetadataHandler.split_sticker_packs(
             self.opt_output.dir,
@@ -89,7 +90,7 @@ class CompressWastickers(UploadBase):
                         if Path(self.opt_output.dir, i.name).is_file()
                         and i.suffix not in (".txt", ".m4a", ".wastickers")
                     ][0]
-                    self.cb.put(f"Creating cover using {first_image.name}")
+                    self.cb.put(I("Creating cover using {}").format(first_image.name))
                     success, _, cover_data, _ = StickerConvert.convert(
                         Path(self.opt_output.dir, first_image),
                         cover_path_new,
@@ -99,7 +100,9 @@ class CompressWastickers(UploadBase):
                     )
                     if not success:
                         self.cb.put(
-                            f"Warning: Cannot compress cover {first_image.name}, unable to create .wastickers"
+                            I(
+                                "Warning: Cannot compress cover {}, unable to create .wastickers"
+                            ).format(first_image.name)
                         )
                         continue
                 else:
@@ -115,7 +118,9 @@ class CompressWastickers(UploadBase):
                         )
                         if not success:
                             self.cb.put(
-                                f"Warning: Cannot compress cover {cover_path_old.name}, unable to create .wastickers"
+                                I(
+                                    "Warning: Cannot compress cover {}, unable to create .wastickers"
+                                ).format(cover_path_old.name)
                             )
                             continue
                     else:
@@ -128,7 +133,9 @@ class CompressWastickers(UploadBase):
                 zipf.write(Path(self.opt_output.dir, "title.txt"), "title.txt")
 
                 for num, src in enumerate(stickers):
-                    self.cb.put(f"Verifying {src} for compressing into .wastickers")
+                    self.cb.put(
+                        I("Verifying {} for compressing into .wastickers").format(src)
+                    )
 
                     if self.opt_comp.fake_vid or CodecInfo.is_anim(src):
                         ext = ".webp"
@@ -150,7 +157,9 @@ class CompressWastickers(UploadBase):
                         assert isinstance(image_data, bytes)
                         if not success:
                             self.cb.put(
-                                f"Warning: Cannot compress file {Path(src).name}, skip this file..."
+                                I(
+                                    "Warning: Cannot compress file {}, skip this file..."
+                                ).format(Path(src).name)
                             )
                             continue
                     else:

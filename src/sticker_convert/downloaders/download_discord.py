@@ -11,6 +11,7 @@ from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.translate import I
 
 # References:
 # https://github.com/ThaTiemsz/Discord-Emoji-Downloader/blob/master/assets/app.js
@@ -23,7 +24,7 @@ class DownloadDiscord(DownloadBase):
 
     def download_stickers_discord(self) -> Tuple[int, int]:
         if self.opt_cred is None or self.opt_cred.discord_token == "":
-            self.cb.put("Error: Downloading from Discord requires token")
+            self.cb.put(I("Error: Downloading from Discord requires token"))
             return 0, 0
 
         gid: Optional[str] = None
@@ -35,7 +36,7 @@ class DownloadDiscord(DownloadBase):
                 gid = url_parsed.path.split("/")[2]
 
         if gid is None or gid.isnumeric() is False:
-            self.cb.put("Error: Invalid url")
+            self.cb.put(I("Error: Invalid url"))
             return 0, 0
 
         headers = {

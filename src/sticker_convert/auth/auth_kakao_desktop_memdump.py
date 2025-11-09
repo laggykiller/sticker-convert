@@ -9,20 +9,21 @@ from typing import Any, Optional, Tuple, Union, cast
 
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import find_pid_by_name, get_mem, killall
+from sticker_convert.utils.translate import I
 
-MSG_NO_BIN = """Kakao Desktop not detected.
+MSG_NO_BIN = I("""Kakao Desktop not detected.
 Download and install Kakao Desktop,
-then login to Kakao Desktop and try again."""
-MSG_NO_AUTH = """Kakao Desktop installed,
+then login to Kakao Desktop and try again.""")
+MSG_NO_AUTH = I("""Kakao Desktop installed,
 but kakao_auth not found.
-Please login to Kakao Desktop and try again."""
-MSG_SIP_ENABLED = """You need to disable SIP:
+Please login to Kakao Desktop and try again.""")
+MSG_SIP_ENABLED = I("""You need to disable SIP:
 1. Restart computer in Recovery mode
 2. Launch Terminal from the Utilities menu
 3. Run the command `csrutil disable`
-4. Restart your computer"""
-MSG_LAUNCH_FAIL = "Failed to launch Kakao"
-MSG_PERMISSION_ERROR = "Failed to read Kakao process memory"
+4. Restart your computer""")
+MSG_LAUNCH_FAIL = I("Failed to launch Kakao")
+MSG_PERMISSION_ERROR = I("Failed to read Kakao process memory")
 
 
 class AuthKakaoDesktopMemdump(AuthBase):
@@ -250,7 +251,9 @@ class AuthKakaoDesktopMemdump(AuthBase):
         # - Slow
         # - Cannot run on macOS
 
-        msg = "Getting Kakao authorization token by Desktop memdump...\n(This may take a minute)"
+        msg = I(
+            "Getting Kakao authorization token by Desktop memdump...\n(This may take a minute)"
+        )
         self.cb.put(("msg_dynamic", (msg,), None))
         if not kakao_bin_path:
             kakao_bin_path = self.get_kakao_desktop()

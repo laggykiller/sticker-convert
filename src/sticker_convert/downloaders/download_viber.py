@@ -13,6 +13,7 @@ from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.translate import I
 
 
 class DownloadViber(DownloadBase):
@@ -58,7 +59,7 @@ class DownloadViber(DownloadBase):
         self, zip_file: bytes, exts: Optional[Tuple[str, ...]] = None
     ) -> int:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
-            self.cb.put("Unzipping...")
+            self.cb.put(I("Unzipping..."))
 
             zf_files = zf.namelist()
             self.cb.put(
@@ -78,7 +79,7 @@ class DownloadViber(DownloadBase):
                 num = sticker.split(".")[0][-2:].zfill(3)
                 data = zf.read(sticker)
 
-                self.cb.put(f"Read {sticker}")
+                self.cb.put(I("Read {}").format(sticker))
 
                 out_path = Path(self.out_dir, num + ext)
                 with open(out_path, "wb") as f:
@@ -91,7 +92,7 @@ class DownloadViber(DownloadBase):
     def download_stickers_viber(self) -> Tuple[int, int]:
         pack_info = self.get_pack_info(self.url)
         if pack_info is None:
-            self.cb.put("Download failed: Cannot get pack info")
+            self.cb.put(I("Download failed: Cannot get pack info"))
             return 0, 0
         title, zip_url, cover_url, pack_id = pack_info
 

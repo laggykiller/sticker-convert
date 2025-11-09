@@ -10,12 +10,13 @@ from signalstickers_client.stickersclient import StickersClient
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
-from sticker_convert.uploaders.upload_base import UploadBase
+from sticker_convert.uploaders.upload_base import MSG_EMOJI_TXT_REQUIRED, UploadBase
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
+from sticker_convert.utils.translate import I
 
 
 class UploadSignal(UploadBase):
@@ -49,14 +50,16 @@ class UploadSignal(UploadBase):
     def create_sticker(
         self, src: Path, emoji_dict: Dict[str, str]
     ) -> Optional[Sticker]:
-        self.cb.put(f"Verifying {src} for uploading to signal")
+        self.cb.put(I("Verifying {} for uploading to signal").format(src))
 
         sticker = Sticker()
 
         emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
         if emoji == "":
             self.cb.put(
-                f"Warning: Cannot find emoji for file {Path(src).name}, using default emoji..."
+                I(
+                    "Warning: Cannot find emoji for file {}, using default emoji..."
+                ).format(Path(src).name)
             )
             emoji = self.opt_comp.default_emoji
         sticker.emoji = emoji
@@ -76,7 +79,9 @@ class UploadSignal(UploadBase):
             )
             if not success:
                 self.cb.put(
-                    f"Warning: Cannot compress file {Path(src).name}, skip uploading this file..."
+                    I(
+                        "Warning: Cannot compress file {}, skip uploading this file..."
+                    ).format(Path(src).name)
                 )
                 return None
 
@@ -121,10 +126,10 @@ class UploadSignal(UploadBase):
         urls: List[str] = []
 
         if not self.opt_cred.signal_uuid:
-            self.cb.put("uuid required for uploading to Signal")
+            self.cb.put(I("uuid required for uploading to Signal"))
             return 0, 0, urls
         if not self.opt_cred.signal_password:
-            self.cb.put("password required for uploading to Signal")
+            self.cb.put(I("password required for uploading to Signal"))
             return 0, 0, urls
 
         title, author, emoji_dict = MetadataHandler.get_metadata(
@@ -133,19 +138,25 @@ class UploadSignal(UploadBase):
             author=self.opt_output.author,
         )
         if title is None:
-            raise TypeError(f"title cannot be {title}")
+            raise TypeError(I("title cannot be {}").format(title))
         if author is None:
-            raise TypeError(f"author cannot be {author}")
+            raise TypeError(I("author cannot be {}").format(author))
         if emoji_dict is None:
-            msg_block = "emoji.txt is required for uploading signal stickers\n"
-            msg_block += f"emoji.txt generated for you in {self.opt_output.dir}\n"
-            msg_block += f"Default emoji is set to {self.opt_comp.default_emoji}.\n"
-            msg_block += "Please edit emoji.txt now, then continue"
             MetadataHandler.generate_emoji_file(
                 directory=self.opt_output.dir, default_emoji=self.opt_comp.default_emoji
             )
 
-            self.cb.put(("msg_block", (msg_block,), None))
+            self.cb.put(
+                (
+                    "msg_block",
+                    (
+                        MSG_EMOJI_TXT_REQUIRED.format(
+                            self.opt_output.dir, self.opt_comp.default_emoji
+                        ),
+                    ),
+                    None,
+                )
+            )
             if self.cb_return:
                 self.cb_return.get_response()
 
@@ -173,7 +184,7 @@ class UploadSignal(UploadBase):
             pack.author = author
 
             self.add_stickers_to_pack(pack, stickers, emoji_dict)
-            self.cb.put(f"Uploading pack {pack_title}")
+            self.cb.put(I("Uploading pack {}").format(pack_title))
             self.cb.put("update_bar")
             try:
                 result = anyio.run(
@@ -187,7 +198,11 @@ class UploadSignal(UploadBase):
                 stickers_ok += len(stickers)
 
             except SignalException as e:
-                self.cb.put(f"Failed to upload pack {pack_title} due to {repr(e)}")
+                self.cb.put(
+                    I("Failed to upload pack {}. Reason: {}").format(
+                        pack_title, repr(e)
+                    )
+                )
 
         return stickers_ok, stickers_total, urls
 

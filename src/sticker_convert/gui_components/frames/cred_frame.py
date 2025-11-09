@@ -11,6 +11,7 @@ from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGe
 from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
 from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
 from sticker_convert.gui_components.windows.viber_get_auth_window import ViberGetAuthWindow
+from sticker_convert.utils.translate import I
 
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
@@ -24,7 +25,7 @@ class CredFrame(LabelFrame):
         self.grid_columnconfigure(1, weight=1)
 
         self.signal_uuid_lbl = Label(
-            self, text="Signal uuid", width=18, justify="left", anchor="w"
+            self, text=I("Signal uuid"), width=18, justify="left", anchor="w"
         )
         self.signal_uuid_entry = Entry(
             self,
@@ -36,7 +37,7 @@ class CredFrame(LabelFrame):
         self.signal_uuid_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
         self.signal_password_lbl = Label(
-            self, text="Signal password", justify="left", anchor="w"
+            self, text=I("Signal password"), justify="left", anchor="w"
         )
         self.signal_password_entry = Entry(
             self,
@@ -49,13 +50,13 @@ class CredFrame(LabelFrame):
 
         self.signal_get_auth_btn = Button(
             self,
-            text="Generate",
+            text=I("Generate"),
             command=self.cb_signal_get_auth,
             bootstyle="secondary",  # type: ignore
         )
 
         self.telegram_token_lbl = Label(
-            self, text="Telegram token", justify="left", anchor="w"
+            self, text=I("Telegram token"), justify="left", anchor="w"
         )
         self.telegram_token_entry = Entry(
             self,
@@ -67,7 +68,7 @@ class CredFrame(LabelFrame):
         self.telegram_token_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
         self.telegram_userid_lbl = Label(
-            self, text="Telegram user_id", justify="left", anchor="w"
+            self, text=I("Telegram user_id"), justify="left", anchor="w"
         )
         self.telegram_userid_entry = Entry(
             self,
@@ -79,17 +80,17 @@ class CredFrame(LabelFrame):
         self.telegram_userid_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
         self.telethon_auth_lbl = Label(
-            self, text="Telethon authorization", justify="left", anchor="w"
+            self, text=I("Telethon authorization"), justify="left", anchor="w"
         )
         self.telethon_auth_btn = Button(
             self,
-            text="Generate",
+            text=I("Generate"),
             command=self.cb_telethon_get_auth,
             bootstyle="secondary",  # type: ignore
         )
 
         self.kakao_auth_token_lbl = Label(
-            self, text="Kakao auth_token", justify="left", anchor="w"
+            self, text=I("Kakao auth_token"), justify="left", anchor="w"
         )
         self.kakao_auth_token_entry = Entry(
             self, textvariable=self.gui.kakao_auth_token_var, width=35
@@ -97,13 +98,13 @@ class CredFrame(LabelFrame):
         self.kakao_auth_token_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
         self.kakao_get_auth_btn = Button(
             self,
-            text="Generate",
+            text=I("Generate"),
             command=self.cb_kakao_get_auth,
             bootstyle="secondary",  # type: ignore
         )
 
         self.line_cookies_lbl = Label(
-            self, text="Line cookies", width=18, justify="left", anchor="w"
+            self, text=I("Line cookies"), width=18, justify="left", anchor="w"
         )
         self.line_cookies_entry = Entry(
             self, textvariable=self.gui.line_cookies_var, width=35
@@ -111,13 +112,13 @@ class CredFrame(LabelFrame):
         self.line_cookies_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
         self.line_get_auth_btn = Button(
             self,
-            text="Generate",
+            text=I("Generate"),
             command=self.cb_line_get_auth,
             bootstyle="secondary",  # type: ignore
         )
 
         self.viber_auth_lbl = Label(
-            self, text="Viber auth", width=18, justify="left", anchor="w"
+            self, text=I("Viber auth"), width=18, justify="left", anchor="w"
         )
         self.viber_auth_entry = Entry(
             self, textvariable=self.gui.viber_auth_var, width=35
@@ -125,13 +126,13 @@ class CredFrame(LabelFrame):
         self.viber_auth_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
         self.viber_get_auth_btn = Button(
             self,
-            text="Generate",
+            text=I("Generate"),
             command=self.cb_viber_get_auth,
             bootstyle="secondary",  # type: ignore
         )
 
         self.discord_token_lbl = Label(
-            self, text="Discord token", width=18, justify="left", anchor="w"
+            self, text=I("Discord token"), width=18, justify="left", anchor="w"
         )
         self.discord_token_entry = Entry(
             self, textvariable=self.gui.discord_token_var, width=35
@@ -139,14 +140,14 @@ class CredFrame(LabelFrame):
         self.discord_token_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
         self.discord_get_auth_btn = Button(
             self,
-            text="Generate",
+            text=I("Generate"),
             command=self.cb_discord_get_auth,
             bootstyle="secondary",  # type: ignore
         )
 
         self.help_btn = Button(
             self,
-            text="Get help",
+            text=I("Get help"),
             command=self.cb_cred_help,
             bootstyle="secondary",  # type: ignore
         )
@@ -188,7 +189,7 @@ class CredFrame(LabelFrame):
         faq_site = "https://github.com/laggykiller/sticker-convert#faq"
         success = webbrowser.open(faq_site)
         if not success:
-            self.gui.cb.ask_str("You can get help from:", initialvalue=faq_site)
+            self.gui.cb.ask_str(I("You can get help from:"), initialvalue=faq_site)
 
     def cb_telethon_get_auth(self, *_: Any) -> None:
         success, _client, api_id, api_hash, msg = AuthTelethon(

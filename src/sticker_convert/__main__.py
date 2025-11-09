@@ -5,15 +5,12 @@ def main() -> None:
     import multiprocessing
     import sys
 
-    from sticker_convert.version import __version__
+    from sticker_convert.utils.translate import I
 
     multiprocessing.freeze_support()
-    print(f"sticker-convert {__version__}")
-    print("Free and Opensource software by laggykiller")
-    print("https://github.com/laggykiller/sticker-convert")
-    print()
+
     if len(sys.argv) == 1:
-        print("Launching GUI...")
+        print(I("Launching GUI..."))
         from sticker_convert.gui import GUI
 
         GUI().gui()

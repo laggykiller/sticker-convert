@@ -8,10 +8,11 @@ from datetime import datetime
 from multiprocessing import Manager, Process, Value
 from pathlib import Path
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, cast
 from urllib.parse import urlparse
 
 from sticker_convert.converter import StickerConvert
+from sticker_convert.definitions import RUNTIME_STATE
 from sticker_convert.downloaders.download_band import DownloadBand
 from sticker_convert.downloaders.download_discord import DownloadDiscord
 from sticker_convert.downloaders.download_kakao import DownloadKakao
@@ -27,10 +28,11 @@ from sticker_convert.uploaders.upload_telegram import UploadTelegram
 from sticker_convert.uploaders.upload_viber import UploadViber
 from sticker_convert.uploaders.xcode_imessage import XcodeImessage
 from sticker_convert.utils.callback import CallbackReturn, CbQueueType, ResultsListType, WorkQueueType
-from sticker_convert.utils.files.json_resources_loader import OUTPUT_JSON
+from sticker_convert.utils.chrome_remotedebug import CRD
+from sticker_convert.utils.files.json_resources_loader import load_resource_json
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
-from sticker_convert.utils.singletons import singletons
+from sticker_convert.utils.translate import I
 
 if TYPE_CHECKING:
     from sticker_convert.utils.callback import CallbackCli, CallbackGui
@@ -129,16 +131,24 @@ class Executor:
                         arg_dump.append("CredOption(REDACTED)")
                     else:
                         arg_dump.append(i)
-                e = "##### EXCEPTION #####\n"
-                e += "Function: " + repr(work_func) + "\n"
-                e += "Arguments: " + repr(arg_dump) + "\n"
-                e += traceback.format_exc()
-                e += "#####################"
+                e = I(
+                    "##### EXCEPTION #####\n"
+                    "Function: {function}\n"
+                    "Arguments: {args}\n"
+                    "{tb}\n"
+                    "#####################"
+                ).format(
+                    function=repr(work_func),
+                    args=repr(arg_dump),
+                    tb=traceback.format_exc(),
+                )
                 cb_queue.put(e)
 
         work_queue.put(None)
         cb_queue.put("__PROCESS_DONE__")
-        singletons.close()
+        crd = cast(CRD, RUNTIME_STATE.get("crd"))
+        if crd:
+            crd.close()
 
     def start_workers(self, processes: int = 1) -> None:
         self.cb_thread_instance = Thread(
@@ -177,7 +187,9 @@ class Executor:
                 process.join()
                 if process.exitcode != 0 and self.is_cancel_job.value == 0:
                     self.cb_msg(
-                        f"Warning: A process exited with error (code {process.exitcode})"
+                        I("Warning: A process exited with error (code {})").format(
+                            process.exitcode
+                        )
                     )
         except KeyboardInterrupt:
             pass
@@ -248,22 +260,20 @@ class Job:
                 break
             if not success:
                 code = 1
-                self.executor.cb("An error occured during this run.")
+                self.executor.cb(I("An error occured during this run."))
                 break
 
-        msg = "##########\n"
-        msg += "Summary:\n"
-        msg += "##########\n"
+        msg = I("##########\nSummary:\n##########\n")
 
         msg += "\n"
         msg += "\n".join(summaries)
         msg += "\n"
 
         if self.out_urls:
-            msg += "Export results:\n"
+            msg += I("Export results:\n")
             msg += "\n".join(self.out_urls)
         else:
-            msg += "Export result: None"
+            msg += I("Export result: None")
 
         self.executor.cb(msg)
 
@@ -278,29 +288,31 @@ class Job:
         info_msg = ""
         error_msg = ""
 
-        save_to_local_tip = ""
-        save_to_local_tip += "    If you want to upload the results by yourself,\n"
-        save_to_local_tip += '    select "Save to local directory only" for output\n'
+        save_to_local_tip = I(
+            "\n"
+            "    If you want to upload the results by yourself,\n"
+            '    select "Save to local directory only" for output\n'
+        )
 
         if Path(self.opt_input.dir).resolve() == Path(self.opt_output.dir).resolve():
-            error_msg += "\n"
-            error_msg += "[X] Input and output directories cannot be the same\n"
+            error_msg += I("\n[X] Input and output directories cannot be the same\n")
 
         if self.opt_input.option == "auto":
-            error_msg += "\n"
-            error_msg += "[X] Unrecognized URL input source\n"
+            error_msg += I("\n[X] Unrecognized URL input source\n")
 
         if self.opt_input.option != "local" and not self.opt_input.url:
-            error_msg += "\n"
-            error_msg += "[X] URL address cannot be empty.\n"
-            error_msg += "    If you only want to use local files,\n"
-            error_msg += '    choose "Save to local directory only"\n'
-            error_msg += '    in "Input source"\n'
+            error_msg += I(
+                "\n"
+                "[X] URL address cannot be empty.\n"
+                "    If you only want to use local files,\n"
+                '    choose "Save to local directory only"\n'
+                '    in "Input source"\n'
+            )
 
         if (
             self.opt_input.option == "telegram" or self.opt_output.option == "telegram"
         ) and not self.opt_cred.telegram_token:
-            error_msg += (
+            error_msg += I(
                 "[X] Downloading from and uploading to telegram requires bot token.\n"
             )
             error_msg += save_to_local_tip
@@ -309,24 +321,26 @@ class Job:
             self.opt_input.option.startswith("discord")
             and not self.opt_cred.discord_token
         ):
-            error_msg += "[X] Downloading from Discord requires token.\n"
+            error_msg += I("[X] Downloading from Discord requires token.\n")
 
         if self.opt_output.option == "telegram" and not self.opt_cred.telegram_userid:
-            error_msg += "[X] Uploading to telegram requires user_id \n"
-            error_msg += "    (From real account, not bot account).\n"
+            error_msg += I(
+                "[X] Uploading to telegram requires user_id \n"
+                "    (From real account, not bot account).\n"
+            )
             error_msg += save_to_local_tip
 
         if self.opt_output.option == "signal" and not (
             self.opt_cred.signal_uuid and self.opt_cred.signal_password
         ):
-            error_msg += "[X] Uploading to signal requires uuid and password.\n"
+            error_msg += I("[X] Uploading to signal requires uuid and password.\n")
             error_msg += save_to_local_tip
 
         if self.opt_output.option == "viber" and not self.opt_cred.viber_auth:
-            error_msg += "[X] Uploading to Viber requires auth data.\n"
+            error_msg += I("[X] Uploading to Viber requires auth data.\n")
             error_msg += save_to_local_tip
 
-        output_presets = OUTPUT_JSON
+        output_presets = load_resource_json("output")
 
         input_option = self.opt_input.option
         output_option = self.opt_output.option
@@ -338,23 +352,37 @@ class Job:
                 if not MetadataHandler.check_metadata_provided(
                     self.opt_input.dir, input_option, metadata
                 ):
-                    error_msg += f"[X] {output_presets[output_option]['full_name']} requires {metadata}\n"
-                    if self.opt_input.option == "local":
-                        error_msg += f"    {metadata} was not supplied and {metadata}.txt is absent\n"
-                    else:
-                        error_msg += f"    {metadata} was not supplied and input source will not provide {metadata}\n"
-                    error_msg += (
-                        f"    Supply the {metadata} by filling in the option, or\n"
+                    error_msg += I("[X] {output_option} requires {metadata}\n").format(
+                        output_option=output_presets[output_option]["full_name"],
+                        metadata=metadata,
                     )
-                    error_msg += f"    Create {metadata}.txt with the {metadata} name\n"
-                else:
-                    info_msg += f"[!] {output_presets[output_option]['full_name']} requires {metadata}\n"
                     if self.opt_input.option == "local":
-                        info_msg += f"    {metadata} was not supplied but {metadata}.txt is present\n"
-                        info_msg += f"    Using {metadata} name in {metadata}.txt\n"
+                        error_msg += I(
+                            "    {metadata} was not supplied and {metadata}.txt is absent\n"
+                        ).format(metadata=metadata)
                     else:
-                        info_msg += f"    {metadata} was not supplied but input source will provide {metadata}\n"
-                        info_msg += f"    Using {metadata} provided by input source\n"
+                        error_msg += I(
+                            "    {metadata} was not supplied and input source will not provide {metadata}\n"
+                        ).format(metadata=metadata)
+                    error_msg += I(
+                        "    Supply the {metadata} by filling in the option, or\n"
+                        "    Create {metadata}.txt with the {metadata} name\n"
+                    ).format(metadata=metadata)
+                else:
+                    info_msg += I("[!] {output_option} requires {metadata}\n").format(
+                        output_option=output_presets[output_option]["full_name"],
+                        metadata=metadata,
+                    )
+                    if self.opt_input.option == "local":
+                        info_msg += I(
+                            "    {metadata} was not supplied but {metadata}.txt is present\n"
+                            "    Using {metadata} name in {metadata}.txt\n"
+                        ).format(metadata=metadata)
+                    else:
+                        info_msg += I(
+                            f"    {metadata} was not supplied but input source will provide {metadata}\n"
+                            f"    Using {metadata} provided by input source\n"
+                        ).format(metadata=metadata)
 
         if info_msg != "":
             self.executor.cb(info_msg)
@@ -376,9 +404,11 @@ class Job:
                 and self.opt_comp.preset not in self.opt_output.option
             )
         ):
-            msg = "Compression preset does not match export option\n"
-            msg += "You may continue, but the files will need to be compressed again before export\n"
-            msg += "You are recommended to choose the matching option for compression and output. Continue?"
+            msg = I(
+                "Compression preset does not match export option\n"
+                "You may continue, but the files will need to be compressed again before export\n"
+                "You are recommended to choose the matching option for compression and output. Continue?"
+            )
 
             self.executor.cb("ask_bool", (msg,))
             response = self.executor.cb_return.get_response()
@@ -393,8 +423,10 @@ class Job:
             ("color_power", self.opt_comp.color_power),
         ):
             if value < -1:
-                error_msg += "\n"
-                error_msg += f"[X] {param} should be between -1 and positive infinity. {value} was given."
+                error_msg += I(
+                    "\n"
+                    "[X] {param} should be between -1 and positive infinity. {value} was given."
+                ).format(param=param, value=value)
 
         if self.opt_comp.scale_filter not in (
             "nearest",
@@ -404,13 +436,11 @@ class Job:
             "bicubic",
             "lanczos",
         ):
-            error_msg += "\n"
-            error_msg += (
-                f"[X] scale_filter {self.opt_comp.scale_filter} is not valid option\n"
-            )
-            error_msg += (
+            error_msg += I(
+                "\n"
+                "[X] scale_filter {scale_filter} is not valid option\n"
                 "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
-            )
+            ).format(scale_filter=self.opt_comp.scale_filter)
 
         if self.opt_comp.quantize_method not in (
             "imagequant",
@@ -419,18 +449,19 @@ class Job:
             "mediancut",
             "none",
         ):
-            error_msg += "\n"
-            error_msg += f"[X] quantize_method {self.opt_comp.quantize_method} is not valid option\n"
-            error_msg += "    Valid options: imagequant, fastoctree, maxcoverage, mediancut, none"
+            I(
+                "\n"
+                "[X] quantize_method {quantize_method} is not valid option\n"
+                "    Valid options: imagequant, fastoctree, maxcoverage, mediancut, none"
+            ).format(quantize_method=self.opt_comp.quantize_method)
 
         if self.opt_comp.bg_color:
             try:
                 _, _, _ = bytes.fromhex(self.opt_comp.bg_color)
             except ValueError:
-                error_msg += "\n"
-                error_msg += (
-                    f"[X] bg_color {self.opt_comp.bg_color} is not valid color hex"
-                )
+                error_msg += I(
+                    "\n[X] bg_color {bg_color} is not valid color hex"
+                ).format(bg_color=self.opt_comp.bg_color)
 
         # Warn about unable to download animated Kakao stickers with such link
         if (
@@ -438,12 +469,14 @@ class Job:
             and urlparse(self.opt_input.url).netloc == "e.kakao.com"
             and not self.opt_cred.kakao_auth_token
         ):
-            msg = "To download ANIMATED stickers from e.kakao.com,\n"
-            msg += "you need to generate auth_token.\n"
-            msg += "Alternatively, you can generate share link (emoticon.kakao.com/items/xxxxx)\n"
-            msg += "from Kakao app on phone.\n"
-            msg += "You are adviced to read documentations.\n"
-            msg += "If you continue, you will only download static stickers. Continue?"
+            msg = I(
+                "To download ANIMATED stickers from e.kakao.com,\n"
+                "you need to generate auth_token.\n"
+                "Alternatively, you can generate share link (emoticon.kakao.com/items/xxxxx)\n"
+                "from Kakao app on phone.\n"
+                "You are adviced to read documentations.\n"
+                "If you continue, you will only download static stickers. Continue?"
+            )
 
             self.executor.cb("ask_bool", (msg,))
             response = self.executor.cb_return.get_response()
@@ -473,15 +506,22 @@ class Job:
 
             related_files = MetadataHandler.get_files_related_to_sticker_convert(path)
             if any(i for i in path.iterdir() if i not in related_files):
-                msg = "WARNING: {} directory is set to {}.\n"
-                msg += 'It does not have default name of "{}",\n'
-                msg += "and It seems like it contains PERSONAL DATA.\n"
-                msg += "During execution, contents of this directory\n"
-                msg += 'maybe MOVED to "archive_*".\n'
-                msg += "THIS MAY CAUSE DAMAGE TO YOUR DATA. Continue?"
+                msg = I(
+                    "WARNING: {path_type} directory is set to {path}.\n"
+                    'It does not have default name of "{default_name}",\n'
+                    "and It seems like it contains PERSONAL DATA.\n"
+                    "During execution, contents of this directory\n"
+                    'maybe MOVED to "archive_*".\n'
+                    "THIS MAY CAUSE DAMAGE TO YOUR DATA. Continue?"
+                )
 
                 self.executor.cb(
-                    "ask_bool", (msg.format(path_type, path, default_name),)
+                    "ask_bool",
+                    (
+                        msg.format(
+                            path_type=path_type, path=path, default_name=default_name
+                        ),
+                    ),
                 )
                 response = self.executor.cb_return.get_response()
 
@@ -509,16 +549,18 @@ class Job:
 
         if self.opt_input.option == "local":
             self.executor.cb(
-                "Skip moving old files in input directory as input source is local"
+                I("Skip moving old files in input directory as input source is local")
             )
         elif len(in_dir_files) == 0:
             self.executor.cb(
-                "Skip moving old files in input directory as input source is empty"
+                I("Skip moving old files in input directory as input source is empty")
             )
         else:
             archive_dir = Path(self.opt_input.dir, dir_name)
             self.executor.cb(
-                f"Moving old files in input directory to {archive_dir} as input source is not local"
+                I(
+                    "Moving old files in input directory to {archive_dir} as input source is not local"
+                ).format(archive_dir=archive_dir)
             )
             archive_dir.mkdir(exist_ok=True)
             for old_path in in_dir_files:
@@ -527,15 +569,19 @@ class Job:
 
         if self.opt_comp.no_compress:
             self.executor.cb(
-                "Skip moving old files in output directory as no_compress is True"
+                I("Skip moving old files in output directory as no_compress is True")
             )
         elif len(out_dir_files) == 0:
             self.executor.cb(
-                "Skip moving old files in output directory as output source is empty"
+                I("Skip moving old files in output directory as output source is empty")
             )
         else:
             archive_dir = Path(self.opt_output.dir, dir_name)
-            self.executor.cb(f"Moving old files in output directory to {archive_dir}")
+            self.executor.cb(
+                I("Moving old files in output directory to {archive_dir}").format(
+                    archive_dir=archive_dir
+                )
+            )
             os.makedirs(archive_dir)
             for old_path in out_dir_files:
                 new_path = Path(archive_dir, old_path.name)
@@ -571,10 +617,10 @@ class Job:
             downloaders.append(DownloadDiscord.start)
 
         if len(downloaders) > 0:
-            self.executor.cb("Downloading...")
+            self.executor.cb(I("Downloading..."))
         else:
-            self.executor.cb("Skipped download (No files to download)")
-            return True, "Download: Skipped (No files to download)"
+            self.executor.cb(I("Skipped download (No files to download)"))
+            return True, I("Download: Skipped (No files to download)")
 
         self.executor.start_workers(processes=1)
 
@@ -604,7 +650,7 @@ class Job:
 
     def compress(self) -> Tuple[bool, str]:
         if self.opt_comp.no_compress is True:
-            self.executor.cb("Skipped compression (no_compress is set to True)")
+            self.executor.cb(I("Skipped compression (no_compress is set to True)"))
             in_dir_files = [
                 i
                 for i in sorted(self.opt_input.dir.iterdir())
@@ -617,15 +663,17 @@ class Job:
             ]
             if len(in_dir_files) == 0:
                 self.executor.cb(
-                    "Input directory is empty, nothing to copy to output directory"
+                    I("Input directory is empty, nothing to copy to output directory")
                 )
             elif len(out_dir_files) != 0:
                 self.executor.cb(
-                    "Output directory is not empty, not copying files from input directory"
+                    I(
+                        "Output directory is not empty, not copying files from input directory"
+                    )
                 )
             else:
                 self.executor.cb(
-                    "Output directory is empty, copying files from input directory"
+                    I("Output directory is empty, copying files from input directory")
                 )
                 for i in in_dir_files:
                     src_f = Path(self.opt_input.dir, i.name)
@@ -658,7 +706,7 @@ class Job:
 
         in_fs_count = len(in_fs)
         if in_fs_count == 0:
-            self.executor.cb("Skipped compression (No files to compress)")
+            self.executor.cb(I("Skipped compression (No files to compress)"))
             return True, "Compress: Skipped (No files to compress)"
 
         self.executor.cb(msg)
@@ -701,10 +749,10 @@ class Job:
 
     def export(self) -> Tuple[bool, str]:
         if self.opt_output.option == "local":
-            self.executor.cb("Skipped export (Saving to local directory only)")
-            return True, "Export: Skipped (Saving to local directory only)"
+            self.executor.cb(I("Skipped export (Saving to local directory only)"))
+            return True, I("Export: Skipped (Saving to local directory only)")
 
-        self.executor.cb("Exporting...")
+        self.executor.cb(I("Exporting..."))
 
         exporters: List[Callable[..., Tuple[int, int, List[str]]]] = []
 
@@ -746,7 +794,11 @@ class Job:
             ) as f:
                 f.write("\n".join(self.out_urls))
         else:
-            self.executor.cb("An error occured while exporting stickers")
-            return False, f"Export: {stickers_ok}/{stickers_total} stickers success"
+            self.executor.cb(I("An error occured while exporting stickers"))
+            return False, I(
+                "Export: {stickers_ok}/{stickers_total} stickers success"
+            ).format(stickers_ok=stickers_ok, stickers_total=stickers_total)
 
-        return True, f"Export: {stickers_ok}/{stickers_total} stickers success"
+        return True, I(
+            "Export: {stickers_ok}/{stickers_total} stickers success"
+        ).format(stickers_ok=stickers_ok, stickers_total=stickers_total)

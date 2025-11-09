@@ -11,6 +11,11 @@ from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.process import killall
+from sticker_convert.utils.translate import I
+
+MSG_NO_SIGDESK = I("""Signal Desktop not detected.
+Download and install Signal Desktop version
+After installation, quit Signal Desktop before continuing""")
 
 
 class AuthSignal(AuthBase):
@@ -28,10 +33,7 @@ class AuthSignal(AuthBase):
 
         self.cb.put(download_url)
 
-        prompt = "Signal Desktop not detected.\n"
-        prompt += "Download and install Signal Desktop version\n"
-        prompt += "After installation, quit Signal Desktop before continuing"
-        self.cb.put(("ask_str", (prompt,), None))
+        self.cb.put(("ask_str", (MSG_NO_SIGDESK,), None))
 
     def get_signal_bin_path(self) -> Optional[str]:
         signal_paths: Tuple[Optional[str], ...]
@@ -64,13 +66,13 @@ class AuthSignal(AuthBase):
         return None
 
     def get_cred(self) -> Tuple[Optional[str], Optional[str], str]:
-        msg = "Getting Signal credentials..."
+        msg = I("Getting Signal credentials...")
         self.cb.put(("msg_dynamic", (msg,), None))
         signal_bin_path = self.get_signal_bin_path()
         if signal_bin_path is None:
             self.cb.put(("msg_dynamic", (None,), None))
             self.download_signal_desktop()
-            return None, None, "Failed to get uuid and password"
+            return None, None, I("Failed to get uuid and password")
 
         if platform.system() == "Windows":
             killall("signal")
@@ -129,5 +131,7 @@ class AuthSignal(AuthBase):
         return (
             uuid,
             password,
-            f"Got uuid and password successfully:\nuuid={uuid}\npassword={password}",
+            I("Got uuid and password successfully:\nuuid={}\npassword={}").format(
+                uuid, password
+            ),
         )

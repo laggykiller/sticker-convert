@@ -14,6 +14,15 @@ from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
+from sticker_convert.utils.translate import I
+
+MSG_AUTH_ERROR = I("""Warning: Cannot get item code.
+Is auth_token invalid / expired? Try to regenerate it.
+Continue to download static stickers instead?""")
+
+MSG_CODE_NOT_FOUND = I("""Warning: Cannot get item code.
+Please use share link instead.
+Continue to download static stickers instead?""")
 
 
 class MetadataKakao:
@@ -174,7 +183,7 @@ class DownloadKakao(DownloadBase):
             pack_info_unauthed = MetadataKakao.get_pack_info_unauthed(self.pack_title)
             if pack_info_unauthed is None:
                 self.cb.put(
-                    "Download failed: Cannot download metadata for sticker pack"
+                    I("Download failed: Cannot download metadata for sticker pack")
                 )
                 return 0, 0
 
@@ -184,13 +193,15 @@ class DownloadKakao(DownloadBase):
             if item_code is None:
                 if self.auth_token is None:
                     self.cb.put(
-                        "Warning: Downloading animated sticker requires auth_token"
+                        I("Warning: Downloading animated sticker requires auth_token")
                     )
                 else:
                     self.cb.put(
-                        "Warning: auth_token invalid, cannot download animated sticker"
+                        I(
+                            "Warning: auth_token invalid, cannot download animated sticker"
+                        )
                     )
-                self.cb.put("Downloading static stickers...")
+                self.cb.put(I("Downloading static stickers..."))
                 return self.download_static(thumbnail_urls)
             else:
                 return self.download_animated(item_code)
@@ -204,11 +215,11 @@ class DownloadKakao(DownloadBase):
                 if self.pack_info_authed:
                     self.pack_title = self.pack_info_authed["itemUnitInfo"][0]["title"]
                 else:
-                    self.cb.put("Warning: Cannot get pack_title with auth_token.")
+                    self.cb.put(I("Warning: Cannot get pack_title with auth_token."))
                     self.cb.put(
-                        "Is auth_token invalid / expired? Try to regenerate it."
+                        I("Is auth_token invalid / expired? Try to regenerate it.")
                     )
-                    self.cb.put("Continuing without getting pack_title")
+                    self.cb.put(I("Continuing without getting pack_title"))
 
             return self.download_animated(self.url)
 
@@ -220,7 +231,7 @@ class DownloadKakao(DownloadBase):
 
             if not self.pack_info_unauthed:
                 self.cb.put(
-                    "Download failed: Cannot download metadata for sticker pack"
+                    I("Download failed: Cannot download metadata for sticker pack")
                 )
                 return 0, 0
 
@@ -233,24 +244,22 @@ class DownloadKakao(DownloadBase):
                     self.pack_title, title_ko, False, self.auth_token
                 )
                 if item_code == "auth_error":
-                    msg = "Warning: Cannot get item code.\n"
-                    msg += "Is auth_token invalid / expired? Try to regenerate it.\n"
-                    msg += "Continue to download static stickers instead?"
+                    msg = MSG_AUTH_ERROR
                 elif item_code == "code_not_found":
                     self.cb.put(
-                        "Cannot get item code, trying to search by author name, this may take long time..."
+                        I(
+                            "Cannot get item code, trying to search by author name, this may take long time..."
+                        )
                     )
                     self.cb.put(
-                        "Hint: Use share link instead to download more reliably"
+                        I("Hint: Use share link instead to download more reliably")
                     )
                     if self.author is not None:
                         item_code = MetadataKakao.get_item_code_from_search(
                             self.pack_title, self.author, True, self.auth_token
                         )
                     if item_code == "code_not_found":
-                        msg = "Warning: Cannot get item code.\n"
-                        msg += "Please use share link instead.\n"
-                        msg += "Continue to download static stickers instead?"
+                        msg = MSG_CODE_NOT_FOUND
                     else:
                         return self.download_animated(item_code)
                 else:
@@ -267,7 +276,7 @@ class DownloadKakao(DownloadBase):
 
             return self.download_static(thumbnail_urls)
 
-        self.cb.put("Download failed: Unrecognized URL")
+        self.cb.put(I("Download failed: Unrecognized URL"))
         return 0, 0
 
     def download_static(self, thumbnail_urls: str) -> Tuple[int, int]:
@@ -336,7 +345,7 @@ class DownloadKakao(DownloadBase):
                 if r.ok:
                     break
             if play_ext == "":
-                self.cb.put(f"Failed to determine extension of {item_code}")
+                self.cb.put(I("Failed to determine extension of {}").format(item_code))
                 return 0, 0
             else:
                 play_path_format = f"dw/{item_code}.{play_type}_0##{play_ext}"
@@ -385,11 +394,11 @@ class DownloadKakao(DownloadBase):
             with open(f_path, "rb") as f:
                 data = f.read()
             data = DecryptKakao.xor_data(data)
-            self.cb.put(f"Decrypted {f_path}")
+            self.cb.put(I("Decrypted {}").format(f_path))
             with open(f_path, "wb+") as f:
                 f.write(data)
 
-        self.cb.put(f"Finished getting {item_code}")
+        self.cb.put(I("Finished getting {}").format(item_code))
 
         return sum(results.values()), len(targets)
 

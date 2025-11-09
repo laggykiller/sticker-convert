@@ -10,20 +10,21 @@ from typing import Any, Callable, List, Optional, Tuple, cast
 
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import check_admin, find_pid_by_name, get_mem, killall
+from sticker_convert.utils.translate import I
 
-MSG_NO_BIN = """Viber Desktop not detected.
+MSG_NO_BIN = I("""Viber Desktop not detected.
 Download and install Viber Desktop,
-then login to Viber Desktop and try again."""
-MSG_NO_AUTH = """Viber Desktop installed,
+then login to Viber Desktop and try again.""")
+MSG_NO_AUTH = I("""Viber Desktop installed,
 but viber_auth not found.
-Please login to Viber Desktop and try again."""
-MSG_SIP_ENABLED = """You need to disable SIP:
+Please login to Viber Desktop and try again.""")
+MSG_SIP_ENABLED = I("""You need to disable SIP:
 1. Restart computer in Recovery mode
 2. Launch Terminal from the Utilities menu
 3. Run the command `csrutil disable`
-4. Restart your computer"""
-MSG_LAUNCH_FAIL = "Failed to launch Viber"
-MSG_PERMISSION_ERROR = "Failed to read Viber process memory"
+4. Restart your computer""")
+MSG_LAUNCH_FAIL = I("Failed to launch Viber")
+MSG_PERMISSION_ERROR = I("Failed to read Viber process memory")
 
 
 class AuthViber(AuthBase):
@@ -96,7 +97,7 @@ class AuthViber(AuthBase):
             return None, MSG_PERMISSION_ERROR
 
         viber_auth = f"member_id:{member_id};m_token:{m_token};m_ts:{m_ts}"
-        msg = "Got viber_auth successfully:\n"
+        msg = I("Got viber_auth successfully:\n")
         msg += f"{viber_auth=}\n"
 
         return viber_auth, msg
@@ -138,7 +139,7 @@ class AuthViber(AuthBase):
         s = get_mem(viber_pid, pw_func)
 
         if s is None:
-            return None, "Failed to dump memory"
+            return None, I("Failed to dump memory")
 
         member_id_addr = s.find(b"X-Viber-Auth-Mid: ")
         m_token_addr = s.find(b"X-Viber-Auth-Token: ")
@@ -161,7 +162,7 @@ class AuthViber(AuthBase):
         m_ts = s[m_ts_addr : m_ts_addr + 13].decode(encoding="ascii")
 
         viber_auth = f"member_id:{member_id};m_token:{m_token};m_ts:{m_ts}"
-        msg = "Got viber_auth successfully:\n"
+        msg = I("Got viber_auth successfully:\n")
         msg += f"{viber_auth=}\n"
 
         return viber_auth, msg
@@ -194,7 +195,7 @@ class AuthViber(AuthBase):
         self,
         viber_bin_path: Optional[str] = None,
     ) -> Tuple[Optional[str], str]:
-        msg = "Getting Viber credentials...\n(This may take a minute)"
+        msg = I("Getting Viber credentials...\n(This may take a minute)")
         self.cb.put(("msg_dynamic", (msg,), None))
         if not viber_bin_path:
             viber_bin_path = self.get_viber_desktop()

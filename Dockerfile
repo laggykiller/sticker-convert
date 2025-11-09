@@ -3,12 +3,15 @@ FROM debian:11 AS min-cli
 WORKDIR /app
 
 RUN apt update -y && \
-    apt install --no-install-recommends -y python3 python3-pip
+    apt install --no-install-recommends -y python3 python3-pip gettext
 
 COPY ./requirements.txt /app/
 RUN cat requirements.txt | grep -v 'ttkbootstrap' > requirements-cli.txt &&\
     rm requirements.txt &&\
     pip3 install --no-cache-dir -r requirements-cli.txt
+
+COPY ./scripts/update-locales.sh /update-locales.sh
+RUN /update-locales.sh
 
 COPY ./src /app/
 
@@ -32,10 +35,12 @@ WORKDIR /app
 RUN apt update -y && \
     apt install --no-install-recommends -y python3 python3-pip python3-opencv python3-tk \
     curl wget gpg zip unzip sed locales binutils psmisc git \
-    libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig
+    libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig gettext
 
 # Set locales
-RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
+COPY ./scripts/update-locales.sh /update-locales.sh
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen &&\
+    /update-locales.sh
 
 # Set application name displayed in Webpage
 RUN set-cont-env APP_NAME "sticker-convert"

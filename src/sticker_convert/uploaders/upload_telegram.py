@@ -9,12 +9,17 @@ from telegram import Sticker
 from sticker_convert.auth.telegram_api import BotAPI, TelegramAPI, TelegramSticker, TelethonAPI
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
-from sticker_convert.uploaders.upload_base import UploadBase
+from sticker_convert.uploaders.upload_base import MSG_EMOJI_TXT_REQUIRED, UploadBase
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.media.format_verify import FormatVerify
+from sticker_convert.utils.translate import I
+
+MSG_ASK_DEL_EXIST_PACK = I("""Warning: Pack {} already exists.
+Delete all stickers in pack?
+Note: After recreating set, please wait for about 3 minutes for the set to reappear.""")
 
 
 class UploadTelegram(UploadBase):
@@ -82,21 +87,17 @@ class UploadTelegram(UploadBase):
 
         success = await tg_api.setup(self.opt_cred, True, self.cb, self.cb_return)
         if success is False:
-            self.cb.put("Download failed: Invalid credentials")
+            self.cb.put(I("Download failed: Invalid credentials"))
             return None, len(stickers), 0
 
         pack_short_name = await tg_api.set_upload_pack_short_name(pack_title)
         await tg_api.set_upload_pack_type(is_emoji)
         pack_exist = await tg_api.check_pack_exist()
         if pack_exist:
-            question = f"Warning: Pack {pack_short_name} already exists.\n"
-            question += "Delete all stickers in pack?\n"
-            question += "Note: After recreating set, please wait for about 3 minutes for the set to reappear."
-
             self.cb.put(
                 (
                     "ask_bool",
-                    (question,),
+                    (MSG_ASK_DEL_EXIST_PACK.format(pack_short_name),),
                     None,
                 )
             )
@@ -106,11 +107,13 @@ class UploadTelegram(UploadBase):
                 response = False
 
             if response is True:
-                self.cb.put(f"Deleting all stickers from pack {pack_short_name}")
+                self.cb.put(
+                    I("Deleting all stickers from pack {}").format(pack_short_name)
+                )
                 await tg_api.pack_del()
                 pack_exist = False
             else:
-                self.cb.put(f"Not deleting existing pack {pack_short_name}")
+                self.cb.put(I("Not deleting existing pack {}").format(pack_short_name))
 
         if self.opt_output.option == "telegram_emoji":
             sticker_type = Sticker.CUSTOM_EMOJI
@@ -120,18 +123,22 @@ class UploadTelegram(UploadBase):
         stickers_list: List[TelegramSticker] = []
         sticker_format = None
         for src in stickers:
-            self.cb.put(f"Verifying {src} for uploading to telegram")
+            self.cb.put(I("Verifying {} for uploading to telegram").format(src))
 
             emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
             if emoji == "":
                 self.cb.put(
-                    f"Warning: Cannot find emoji for file {Path(src).name}, using default emoji..."
+                    I(
+                        "Warning: Cannot find emoji for file {}, using default emoji..."
+                    ).format(Path(src).name)
                 )
                 emoji_list = [self.opt_comp.default_emoji]
 
             if len(emoji) > 20:
                 self.cb.put(
-                    f"Warning: {len(emoji)} emoji for file {Path(src).name}, exceeding limit of 20, keep first 20 only..."
+                    I(
+                        "Warning: {emoji} emoji for file {file}, exceeding limit of 20, keep first 20 only..."
+                    ).format(emoji=len(emoji), file=Path(src).name)
                 )
             emoji_list = [*emoji][:20]
 
@@ -256,7 +263,7 @@ class UploadTelegram(UploadBase):
                 (cover_path, thumbnail_bytes, [], thumbnail_format)
             )
 
-        self.cb.put(f"Finish uploading {pack_short_name}")
+        self.cb.put(I("Finish uploading {}").format(pack_short_name))
         await tg_api.exit()
         return await tg_api.get_pack_url(), stickers_total, stickers_ok
 
@@ -269,17 +276,23 @@ class UploadTelegram(UploadBase):
             author=self.opt_output.author,
         )
         if title is None:
-            raise TypeError("title cannot be", title)
+            raise TypeError(I("title cannot be {}").format(title))
         if emoji_dict is None:
-            msg_block = "emoji.txt is required for uploading signal stickers\n"
-            msg_block += f"emoji.txt generated for you in {self.opt_output.dir}\n"
-            msg_block += f"Default emoji is set to {self.opt_comp.default_emoji}.\n"
-            msg_block += "Please edit emoji.txt now, then continue"
             MetadataHandler.generate_emoji_file(
                 directory=self.opt_output.dir, default_emoji=self.opt_comp.default_emoji
             )
 
-            self.cb.put(("msg_block", (msg_block,), None))
+            self.cb.put(
+                (
+                    "msg_block",
+                    (
+                        MSG_EMOJI_TXT_REQUIRED.format(
+                            self.opt_output.dir, self.opt_comp.default_emoji
+                        ),
+                    ),
+                    None,
+                )
+            )
             if self.cb_return:
                 self.cb_return.get_response()
 
@@ -308,7 +321,7 @@ class UploadTelegram(UploadBase):
         stickers_total = 0
         stickers_ok = 0
         for pack_title, stickers in packs.items():
-            self.cb.put(f"Uploading pack {pack_title}")
+            self.cb.put(I("Uploading pack {}").format(pack_title))
             result, stickers_total_pack, stickers_ok_pack = anyio.run(
                 self.upload_pack, pack_title, stickers, emoji_dict
             )

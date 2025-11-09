@@ -24,9 +24,25 @@ jobs:
         token: "${{ secrets.GITHUB_TOKEN }}"
         name: Release ${{ github.ref_name }}
   
+  generate-mo:
+    name: Generate .mo files
+    needs: createrelease
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Generate .mo files
+        run: ./scripts/update-locales.sh
+      
+      - name: Upload .mo files
+        uses: actions/upload-artifact@v4
+        with:
+          name: mo
+          path: src/sticker_convert/locales/**/*.mo
+
   build-wheel:
     name: Build wheel
-    needs: createrelease
+    needs: generate-mo
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -34,6 +50,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+
+      - name: Download .mo files
+        uses: actions/download-artifact@v4
+        with:
+          name: mo
+          path: src/sticker_convert/locales/
 
       - name: Build SDist and wheel
         run: pipx run build
@@ -48,7 +70,7 @@ jobs:
 
   build-binary-windows:
     name: Build packages (Windows)
-    needs: createrelease
+    needs: generate-mo
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -66,6 +88,11 @@ jobs:
       with:
         python-version: "3.12"
         allow-prereleases: true
+    - name: Download .mo files
+      uses: actions/download-artifact@v4
+      with:
+        name: mo
+        path: src/sticker_convert/locales/
     - name: Build for ${{matrix.TARGET}}
       run: |
         echo "STICKER_CONVERT_VERSION=$(cd src; python -c 'from sticker_convert.version import __version__; print(__version__)'; cd ..)" >> $env:GITHUB_ENV
@@ -123,7 +150,7 @@ jobs:
 
   build-binary-macos:
     name: Build packages (macOS)
-    needs: createrelease
+    needs: generate-mo
     runs-on: ${{ matrix.os }}
     permissions:
       contents: write
@@ -143,6 +170,11 @@ jobs:
       with:
         python-version: "3.12"
         allow-prereleases: true
+    - name: Download .mo files
+      uses: actions/download-artifact@v4
+      with:
+        name: mo
+        path: src/sticker_convert/locales/
     - name: Build for ${{matrix.TARGET}}
       run: |
         python ./compile.py
@@ -183,6 +215,11 @@ jobs:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
+    - name: Download .mo files
+      uses: actions/download-artifact@v4
+      with:
+        name: mo
+        path: src/sticker_convert/locales/
     - name: Build for ${{matrix.TARGET}}
       run: |
         docker build \

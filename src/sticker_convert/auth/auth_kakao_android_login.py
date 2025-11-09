@@ -9,8 +9,9 @@ import requests
 from bs4 import BeautifulSoup
 
 from sticker_convert.auth.auth_base import AuthBase
+from sticker_convert.utils.translate import I
 
-OK_MSG = "Got auth_token successfully:\n{auth_token=}\n"
+OK_MSG = I("Got auth_token successfully:\nauth_token={}\n")
 
 
 class AuthKakaoAndroidLogin(AuthBase):
@@ -61,7 +62,7 @@ class AuthKakaoAndroidLogin(AuthBase):
         return "25.2.1"
 
     def login(self) -> Tuple[bool, str]:
-        msg = "Getting Kakao authorization token by Android login: Logging in"
+        msg = I("Getting Kakao authorization token by Android login: Logging in")
         self.cb.put(("msg_dynamic", (msg,), None))
 
         json_data = {
@@ -98,7 +99,9 @@ class AuthKakaoAndroidLogin(AuthBase):
         return True, ""
 
     def enter_phone(self) -> Tuple[bool, str]:
-        msg = "Getting Kakao authorization token by Android login: Submitting phone number"
+        msg = I(
+            "Getting Kakao authorization token by Android login: Submitting phone number"
+        )
         self.cb.put(("msg_dynamic", (msg,), None))
 
         json_data: Dict[str, Any] = {
@@ -141,7 +144,9 @@ class AuthKakaoAndroidLogin(AuthBase):
         if response_json["status"] != 0:
             return False, f"Failed at confirm sending SMS: {response.text}"
 
-        prompt = f"Send this SMS message to number {dest_number} then press enter:"
+        prompt = I("Send this SMS message to number {} then press enter:").format(
+            dest_number
+        )
         self.cb.put(
             (
                 "ask_str",
@@ -171,7 +176,7 @@ class AuthKakaoAndroidLogin(AuthBase):
         return True, ""
 
     def verify_receive_sms(self) -> Tuple[bool, str]:
-        msg = "Enter passcode received from SMS:"
+        msg = I("Enter passcode received from SMS:")
         passcode = self.cb.put(("ask_str", (msg,), None))
 
         json_data = {
@@ -195,7 +200,7 @@ class AuthKakaoAndroidLogin(AuthBase):
         return True, ""
 
     def confirm_device_change(self) -> Tuple[bool, str]:
-        msg = (
+        msg = I(
             "Getting Kakao authorization token by Android login: Confirm device change"
         )
         self.cb.put(("msg_dynamic", (msg,), None))
@@ -241,7 +246,7 @@ class AuthKakaoAndroidLogin(AuthBase):
         return True, ""
 
     def passcode_callback(self) -> Tuple[bool, str]:
-        msg = "Getting Kakao authorization token by Android login: Passcode callback"
+        msg = I("Getting Kakao authorization token by Android login: Passcode callback")
         self.cb.put(("msg_dynamic", (msg,), None))
 
         response = requests.get(
@@ -258,7 +263,7 @@ class AuthKakaoAndroidLogin(AuthBase):
         return True, ""
 
     def skip_restoration(self) -> Tuple[bool, str]:
-        msg = "Getting Kakao authorization token by Android login: Skip restoration"
+        msg = I("Getting Kakao authorization token by Android login: Skip restoration")
         self.cb.put(("msg_dynamic", (msg,), None))
 
         response = requests.post(
@@ -279,7 +284,7 @@ class AuthKakaoAndroidLogin(AuthBase):
         return True, ""
 
     def get_profile(self) -> Tuple[bool, str]:
-        msg = "Getting Kakao authorization token by Android login: Get profile"
+        msg = I("Getting Kakao authorization token by Android login: Get profile")
         self.cb.put(("msg_dynamic", (msg,), None))
 
         json_data = {
@@ -323,4 +328,4 @@ class AuthKakaoAndroidLogin(AuthBase):
                 return None, msg
 
         auth_token = self.access_token + "-" + self.device_uuid
-        return auth_token, OK_MSG.format(auth_token=auth_token)
+        return auth_token, OK_MSG.format(auth_token)

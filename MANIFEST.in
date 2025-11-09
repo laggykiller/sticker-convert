@@ -1,2 +1,3 @@
+recursive-include src/sticker_convert/locales *.mo
 recursive-include src/sticker_convert/resources *
 recursive-include src/sticker_convert/ios-message-stickers-template *

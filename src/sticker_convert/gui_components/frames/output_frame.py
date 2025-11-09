@@ -7,6 +7,7 @@ from ttkbootstrap import Button, Entry, Label, LabelFrame, OptionMenu  # type: i
 
 from sticker_convert.definitions import DEFAULT_DIR
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
+from sticker_convert.utils.translate import I
 
 if TYPE_CHECKING:
     from sticker_convert.gui import GUI  # type: ignore
@@ -18,7 +19,7 @@ class OutputFrame(LabelFrame):
         super().__init__(*args, **kwargs)
 
         self.output_option_lbl = Label(
-            self, text="Output options", width=18, justify="left", anchor="w"
+            self, text=I("Output options"), width=18, justify="left", anchor="w"
         )
         output_full_names = [i["full_name"] for i in self.gui.output_presets.values()]
         defult_output_full_name = self.gui.output_presets[self.gui.default_output_mode][
@@ -35,7 +36,7 @@ class OutputFrame(LabelFrame):
         self.output_option_opt.config(width=32)
 
         self.output_setdir_lbl = Label(
-            self, text="Output directory", justify="left", anchor="w"
+            self, text=I("Output directory"), justify="left", anchor="w"
         )
         self.output_setdir_entry = Entry(
             self,
@@ -47,13 +48,13 @@ class OutputFrame(LabelFrame):
 
         self.output_setdir_btn = Button(
             self,
-            text="Choose directory",
+            text=I("Choose directory"),
             command=self.cb_set_outdir,
             width=16,
             bootstyle="secondary",  # type: ignore
         )
 
-        self.title_lbl = Label(self, text="Title")
+        self.title_lbl = Label(self, text=I("Title"))
         self.title_entry = Entry(
             self,
             textvariable=self.gui.title_var,
@@ -63,7 +64,7 @@ class OutputFrame(LabelFrame):
         )
         self.title_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
 
-        self.author_lbl = Label(self, text="Author")
+        self.author_lbl = Label(self, text=I("Author"))
         self.author_entry = Entry(
             self,
             textvariable=self.gui.author_var,

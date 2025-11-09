@@ -7,6 +7,7 @@ from ttkbootstrap import Button, Entry, Label, LabelFrame, OptionMenu  # type: i
 
 from sticker_convert.definitions import DEFAULT_DIR
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
+from sticker_convert.utils.translate import I
 from sticker_convert.utils.url_detect import UrlDetect
 
 if TYPE_CHECKING:
@@ -19,7 +20,7 @@ class InputFrame(LabelFrame):
         super().__init__(*args, **kwargs)
 
         self.input_option_lbl = Label(
-            self, text="Input source", width=15, justify="left", anchor="w"
+            self, text=I("Input source"), width=15, justify="left", anchor="w"
         )
         input_full_names = [i["full_name"] for i in self.gui.input_presets.values()]
         default_input_full_name = self.gui.input_presets[self.gui.default_input_mode][
@@ -36,7 +37,7 @@ class InputFrame(LabelFrame):
         self.input_option_opt.config(width=32)
 
         self.input_setdir_lbl = Label(
-            self, text="Input directory", width=35, justify="left", anchor="w"
+            self, text=I("Input directory"), width=35, justify="left", anchor="w"
         )
         self.input_setdir_entry = Entry(
             self,
@@ -47,7 +48,7 @@ class InputFrame(LabelFrame):
         self.input_setdir_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
         self.setdir_btn = Button(
             self,
-            text="Choose directory",
+            text=I("Choose directory"),
             command=self.cb_set_indir,
             width=16,
             bootstyle="secondary",  # type: ignore

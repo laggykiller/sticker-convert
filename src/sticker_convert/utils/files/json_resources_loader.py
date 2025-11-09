@@ -1,27 +1,39 @@
-from typing import Any, Dict
+#!/usr/bin/env python3
+from typing import Any, Dict, cast
 
 from mergedeep import merge  # type: ignore
 
-from sticker_convert.definitions import CONFIG_DIR, ROOT_DIR
+from sticker_convert.definitions import CONFIG_DIR, ROOT_DIR, RUNTIME_STATE
 from sticker_convert.utils.files.json_manager import JsonManager
 
 
-def _load_compression() -> Dict[Any, Any]:
-    compression_json = JsonManager.load_json(ROOT_DIR / "resources/compression.json")
-    custom_preset_json_path = CONFIG_DIR / "custom_preset.json"
-    if custom_preset_json_path.exists():
-        custom_preset_json = JsonManager.load_json(custom_preset_json_path)
-        compression_json: Dict[Any, Any] = merge(  # type: ignore
-            compression_json,  # type: ignore
-            custom_preset_json,
-        )
-    return compression_json
+def load_resource_json(json_name: str) -> Dict[Any, Any]:
+    if RUNTIME_STATE.get(f"{json_name}_json_outdated") is None:
+        RUNTIME_STATE[f"{json_name}_json_outdated"] = False
 
+    if (
+        RUNTIME_STATE[f"{json_name}_json_outdated"] is False
+        and RUNTIME_STATE.get(f"{json_name}_json") is not None
+    ):
+        return cast(Dict[Any, Any], RUNTIME_STATE[f"{json_name}_json"])
+    else:
+        loaded_json = JsonManager.load_json(ROOT_DIR / f"resources/{json_name}.json")
 
-HELP_JSON: Dict[str, Dict[str, str]] = JsonManager.load_json(
-    ROOT_DIR / "resources/help.json"
-)
-INPUT_JSON = JsonManager.load_json(ROOT_DIR / "resources/input.json")
-COMPRESSION_JSON = _load_compression()
-OUTPUT_JSON = JsonManager.load_json(ROOT_DIR / "resources/output.json")
-EMOJI_JSON = JsonManager.load_json(ROOT_DIR / "resources/emoji.json")
+        json_to_merge = None
+        lang = RUNTIME_STATE["LANG"]
+        if lang != "en_US":
+            # Translated json
+            json_to_merge = ROOT_DIR / f"resources/{json_name}.{lang}.json"
+        if json_name == "compression":
+            # Custom preset json
+            json_to_merge = CONFIG_DIR / "custom_preset.json"
+
+        if json_to_merge and json_to_merge.exists():
+            custom_preset_json = JsonManager.load_json(json_to_merge)
+            loaded_json: Dict[Any, Any] = merge(  # type: ignore
+                loaded_json,  # type: ignore
+                custom_preset_json,
+            )
+        RUNTIME_STATE[f"{json_name}_json"] = loaded_json
+        RUNTIME_STATE[f"{json_name}_json_outdated"] = False
+        return loaded_json

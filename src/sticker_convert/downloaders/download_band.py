@@ -14,6 +14,7 @@ from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.translate import I
 
 
 class DownloadBand(DownloadBase):
@@ -22,7 +23,7 @@ class DownloadBand(DownloadBase):
 
     def decompress(self, zip_file: bytes) -> int:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
-            self.cb.put("Unzipping...")
+            self.cb.put(I("Unzipping..."))
 
             zf_files = zf.namelist()
             animated = [i for i in zf_files if "animation/" in i]
@@ -67,7 +68,7 @@ class DownloadBand(DownloadBase):
 
     def download_stickers_band(self) -> Tuple[int, int]:
         if urlparse(self.url).netloc != "www.band.us" and self.url.isnumeric() is False:
-            self.cb.put("Download failed: Unsupported URL format")
+            self.cb.put(I("Download failed: Unsupported URL format"))
             return 0, 0
 
         if self.url.isnumeric():
@@ -78,7 +79,7 @@ class DownloadBand(DownloadBase):
         if metadata:
             self.title = metadata["result_data"]["sticker"]["name"]
         else:
-            self.cb.put("Download failed: Failed to get metadata")
+            self.cb.put(I("Download failed: Failed to get metadata"))
             return 0, 0
 
         MetadataHandler.set_metadata(self.out_dir, title=self.title)
@@ -87,9 +88,9 @@ class DownloadBand(DownloadBase):
         zip_file = self.download_file(pack_url)
 
         if zip_file:
-            self.cb.put(f"Downloaded {pack_url}")
+            self.cb.put(I("Downloaded {}").format(pack_url))
         else:
-            self.cb.put(f"Cannot download {pack_url}")
+            self.cb.put(I("Cannot download {}").format(pack_url))
             return 0, 0
 
         pack_files_no = self.decompress(zip_file)

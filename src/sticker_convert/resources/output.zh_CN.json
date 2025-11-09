@@ -1,0 +1,38 @@
+{
+    "signal": {
+        "full_name": "上载至Signal",
+        "help": "上载至Signal"
+    },
+    "telegram": {
+        "full_name": "上载至Telegram",
+        "help": "上载至Telegram"
+    },
+    "telegram_emoji": {
+        "full_name": "上载至Telegram (Custom emoji)",
+        "help": "上载至Telegram (Custom emoji)"
+    },
+    "telegram_telethon": {
+        "full_name": "以Telethon上载至Telegram",
+        "help": "以Telethon上载至Telegram *不建议，但可使连结结尾不含_by_xxxbot*"
+    },
+    "telegram_emoji_telethon": {
+        "full_name": "以Telethon上载至Telegram (自订表情符号)",
+        "help": "以Telethon上载至Telegram (自订表情符号) *不建议，但可使连结结尾不含_by_xxxbot*"
+    },
+    "viber": {
+        "full_name": "上载至Viber",
+        "help": "上载至Viber"
+    },
+    "whatsapp": {
+        "full_name": "压缩至 .wastickers (WhatsApp)",
+        "help": "创建 .wastickers档案以供上载至WhatsApp"
+    },
+    "imessage": {
+        "full_name": "创建Xcode专案 (iMessage)",
+        "help": "创建Xcode专案以供输入至iMessage"
+    },
+    "local": {
+        "full_name": "只储存至本机路径",
+        "help": "只储存至本机路径"
+    }
+}

@@ -12,9 +12,10 @@ from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.process import find_pid_by_name, killall
+from sticker_convert.utils.translate import I
 
-OK_MSG = "Got token successfully:\ntoken={token}"
-FAIL_MSG = "Failed to get token"
+OK_MSG = I("Got token successfully:\ntoken={}")
+FAIL_MSG = I("Failed to get token")
 
 
 class AuthDiscord(AuthBase):
@@ -73,7 +74,7 @@ class AuthDiscord(AuthBase):
         return None
 
     def get_cred(self) -> Tuple[Optional[str], str]:
-        msg = "Getting Discord authorization token..."
+        msg = I("Getting Discord authorization token...")
         self.cb.put(("msg_dynamic", (msg,), None))
 
         using_discord_app = False
@@ -86,7 +87,7 @@ class AuthDiscord(AuthBase):
             self.cb.put(("msg_dynamic", (None,), None))
             return (
                 None,
-                "Please install Discord Desktop or Chrome/Chromium and try again",
+                I("Please install Discord Desktop or Chrome/Chromium and try again"),
             )
 
         token = None
@@ -95,7 +96,11 @@ class AuthDiscord(AuthBase):
             response = self.cb.put(
                 (
                     "ask_bool",
-                    (f"All {Path(chrome_path).name} will be closed. Continue?",),
+                    (
+                        I("All {} will be closed. Continue?").format(
+                            Path(chrome_path).name
+                        ),
+                    ),
                     None,
                 )
             )
@@ -142,4 +147,4 @@ class AuthDiscord(AuthBase):
         if token is None:
             return None, FAIL_MSG
 
-        return token, OK_MSG.format(token=token)
+        return token, OK_MSG.format(token)

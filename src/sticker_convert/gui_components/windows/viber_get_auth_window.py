@@ -11,13 +11,14 @@ from ttkbootstrap import Button, Entry, Frame, Label  # type: ignore
 from sticker_convert.auth.auth_viber import AuthViber
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
+from sticker_convert.utils.translate import I
 
 
 class ViberGetAuthWindow(BaseWindow):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-        self.title("Get Viber auth data")
+        self.title(I("Get Viber auth data"))
 
         self.frame_info = Frame(self.scrollable_frame)
         self.frame_btns = Frame(self.scrollable_frame)
@@ -30,13 +31,13 @@ class ViberGetAuthWindow(BaseWindow):
         # Info frame
         self.explanation_lbl0 = Label(
             self.frame_info,
-            text="Please install Viber Desktop and login first.",
+            text=I("Please install Viber Desktop and login first."),
             justify="left",
             anchor="w",
         )
         self.explanation_lbl1 = Label(
             self.frame_info,
-            text="It may take a minute to get auth data.",
+            text=I("It may take a minute to get auth data."),
             justify="left",
             anchor="w",
         )
@@ -44,28 +45,30 @@ class ViberGetAuthWindow(BaseWindow):
         if platform.system() == "Darwin":
             self.explanation_lbl2 = Label(
                 self.frame_info,
-                text="You need to disable SIP and may be asked for user password.",
+                text=I("You need to disable SIP and may be asked for user password."),
                 justify="left",
                 anchor="w",
             )
         else:
             self.explanation_lbl2 = Label(
                 self.frame_info,
-                text="You may be asked for admin password.",
+                text=I("You may be asked for admin password."),
                 justify="left",
                 anchor="w",
             )
         if platform.system() != "Darwin":
             self.explanation_lbl3 = Label(
                 self.frame_info,
-                text="Note: This will download ProcDump and read memory of Viber Desktop",
+                text=I(
+                    "Note: This will download ProcDump and read memory of Viber Desktop"
+                ),
                 justify="left",
                 anchor="w",
             )
         else:
             self.explanation_lbl3 = Label(
                 self.frame_info,
-                text="Note: This will read memory of Viber Desktop",
+                text=I("Note: This will read memory of Viber Desktop"),
                 justify="left",
                 anchor="w",
             )
@@ -78,14 +81,14 @@ class ViberGetAuthWindow(BaseWindow):
         # Start button frame
         self.launch_btn = Button(
             self.frame_btns,
-            text="Launch Viber Desktop",
+            text=I("Launch Viber Desktop"),
             command=self.cb_launch_viber,
             bootstyle="secondary",  # type: ignore
         )
 
         self.get_cred_btn = Button(
             self.frame_btns,
-            text="Get auth data",
+            text=I("Get auth data"),
             command=self.cb_get_cred,
             bootstyle="default",  # type: ignore
         )
@@ -108,7 +111,7 @@ class ViberGetAuthWindow(BaseWindow):
         )
         self.setdir_btn = Button(
             self.frame_config,
-            text="Choose",
+            text=I("Choose"),
             command=self.cb_setdir,
             width=8,
             bootstyle="secondary",  # type: ignore

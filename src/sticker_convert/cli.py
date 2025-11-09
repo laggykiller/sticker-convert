@@ -24,8 +24,15 @@ from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
 from sticker_convert.utils.callback import CallbackCli
 from sticker_convert.utils.files.json_manager import JsonManager
+from sticker_convert.utils.translate import LANG_DICT, I
 from sticker_convert.utils.url_detect import UrlDetect
 from sticker_convert.version import __version__
+
+MSG_MORAL = I("""sticker-convert is Free and Opensource software by laggykiller
+{project_url}
+Please use the stickers with your friends only.
+It is illegal and immoral to sell stickers downloaded from this program.""")
+PROJECT_URL = "https://github.com/laggykiller/sticker-convert"
 
 
 class CLI:
@@ -33,20 +40,22 @@ class CLI:
         self.cb = CallbackCli()
 
     def cli(self) -> None:
+        print(MSG_MORAL.format(project_url=PROJECT_URL))
+        print()
         try:
-            from sticker_convert.utils.files.json_resources_loader import COMPRESSION_JSON, EMOJI_JSON, HELP_JSON, INPUT_JSON, OUTPUT_JSON
+            from sticker_convert.utils.files.json_resources_loader import load_resource_json
         except RuntimeError as e:
             self.cb.put(str(e))
             return
 
-        self.help = HELP_JSON
-        self.input_presets = INPUT_JSON
-        self.compression_presets = COMPRESSION_JSON
-        self.output_presets = OUTPUT_JSON
-        self.emoji_list = EMOJI_JSON
+        self.help = load_resource_json("help")
+        self.input_presets = load_resource_json("input")
+        self.compression_presets = load_resource_json("compression")
+        self.output_presets = load_resource_json("output")
+        self.emoji_list = load_resource_json("emoji")
 
         parser = argparse.ArgumentParser(
-            description="CLI for stickers-convert",
+            description=I("CLI for sticker-convert"),
             formatter_class=argparse.RawTextHelpFormatter,
         )
 
@@ -69,8 +78,15 @@ class CLI:
             default=None,
             help=self.help["global"]["custom_presets"],
         )
+        parser.add_argument(
+            "--lang",
+            dest="lang",
+            default=None,
+            help=self.help["global"]["lang"],
+            choices=LANG_DICT.keys(),
+        )
 
-        parser_input = parser.add_argument_group("Input options")
+        parser_input = parser.add_argument_group(I("Input options"))
         for k, v_str in self.help["input"].items():
             parser_input.add_argument(f"--{k.replace('_', '-')}", dest=k, help=v_str)
         parser_input_src = parser_input.add_mutually_exclusive_group()
@@ -83,7 +99,7 @@ class CLI:
                 help=f"{v_dict['help']}\n({v_dict['example']})",
             )
 
-        parser_output = parser.add_argument_group("Output options")
+        parser_output = parser.add_argument_group(I("Output options"))
         for k, v_str in self.help["output"].items():
             parser_output.add_argument(f"--{k.replace('_', '-')}", dest=k, help=v_str)
         parser_output_dst = parser_output.add_mutually_exclusive_group()
@@ -97,7 +113,7 @@ class CLI:
                 help=v_dict["help"],
             )
 
-        parser_comp = parser.add_argument_group("Compression options")
+        parser_comp = parser.add_argument_group(I("Compression options"))
         parser_comp.add_argument(
             "--no-compress",
             dest="no_compress",
@@ -173,7 +189,7 @@ class CLI:
             help=self.help["comp"]["default_emoji"],
         )
 
-        parser_cred = parser.add_argument_group("Credentials options")
+        parser_cred = parser.add_argument_group(I("Credentials options"))
         flags_cred_bool = (
             "signal_get_auth",
             "telethon_setup",
@@ -205,7 +221,11 @@ class CLI:
                     custom_presets,
                 )
             except RuntimeError:
-                print(f"Error: Cannot load custom presets from {args.custom_presets}")
+                print(
+                    I("Error: Cannot load custom presets from {}").format(
+                        args.custom_presets
+                    )
+                )
 
         self.cb.no_confirm = args.no_confirm
         self.cb.no_progress = args.no_progress
@@ -250,9 +270,11 @@ class CLI:
             detected_download_option = UrlDetect.detect(url)
             if detected_download_option:
                 download_option = detected_download_option
-                self.cb.put(f"Detected URL input source: {download_option}")
+                self.cb.put(I("Detected URL input source: {}").format(download_option))
             else:
-                self.cb.put(f"Error: Unrecognied URL input source for url: {url}")
+                self.cb.put(
+                    I("Error: Unrecognied URL input source for url: {}").format(url)
+                )
                 sys.exit()
 
         opt_input = InputOption(
@@ -329,6 +351,7 @@ class CLI:
             elif args.export_imessage:
                 preset = "imessage_small"
         elif args.preset == "auto":
+            msg_base = I("Auto compression option set to {}")
             output_option = (
                 self.opt_output.option if self.opt_output.option else "local"
             )
@@ -336,20 +359,21 @@ class CLI:
                 preset = "custom"
                 args.no_compress = True
                 self.cb.put(
-                    "Auto compression option set to no_compress (Reason: Export to local directory only)"
+                    msg_base.format("no_compress")
+                    + I(" Reason: Export to local directory only")
                 )
             elif "telegram_emoji" in output_option:
                 preset = "telegram_emoji"
-                self.cb.put(f"Auto compression option set to {preset}")
+                self.cb.put(msg_base.format(preset))
             elif "telegram" in output_option:
                 preset = "telegram"
-                self.cb.put(f"Auto compression option set to {preset}")
+                self.cb.put(msg_base.format(preset))
             elif output_option == "imessage":
                 preset = "imessage_small"
-                self.cb.put(f"Auto compression option set to {preset}")
+                self.cb.put(msg_base.format(preset))
             else:
                 preset = output_option
-                self.cb.put(f"Auto compression option set to {preset}")
+                self.cb.put(msg_base.format(preset))
 
         opt_comp = CompOption(
             preset=preset,
@@ -456,13 +480,13 @@ class CLI:
             try:
                 creds = JsonManager.load_json(creds_path)
             except JSONDecodeError:
-                self.cb.put("Warning: creds.json content is corrupted")
+                self.cb.put(I("Warning: creds.json content is corrupted"))
                 creds = {}
         else:
             creds = {}
 
         if creds:
-            self.cb.put("Loaded credentials from creds.json")
+            self.cb.put(I("Loaded credentials from creds.json"))
 
         opt_cred = CredOption(
             signal_uuid=args.signal_uuid
@@ -593,6 +617,6 @@ class CLI:
         if args.save_cred:
             creds_path = CONFIG_DIR / "creds.json"
             JsonManager.save_json(creds_path, opt_cred.to_dict())
-            self.cb.put("Saved credentials to creds.json")
+            self.cb.put(I("Saved credentials to creds.json"))
 
         return opt_cred

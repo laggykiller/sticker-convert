@@ -12,6 +12,7 @@ from sticker_convert.downloaders.download_base import DownloadBase
 from sticker_convert.job_option import CredOption, InputOption
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
+from sticker_convert.utils.translate import I
 
 # Reference: https://github.com/star-39/moe-sticker-bot/issues/49
 
@@ -27,7 +28,7 @@ class DownloadOgq(DownloadBase):
             url_parse.netloc != "ogqmarket.naver.com"
             or url_parse.path.startswith("/artworks/sticker/detail") is False
         ):
-            self.cb.put(f"Invalid url: {self.url}")
+            self.cb.put(I("Invalid url: {}").format(self.url))
         artwork_id = {
             i.split("=")[0]: i.split("=")[1] for i in url_parse.query.split("&")
         }["artworkId"]

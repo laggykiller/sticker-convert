@@ -7,13 +7,14 @@ from ttkbootstrap import Button, Frame, Label  # type: ignore
 from sticker_convert.auth.auth_discord import AuthDiscord
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
+from sticker_convert.utils.translate import I
 
 
 class DiscordGetAuthWindow(BaseWindow):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super(DiscordGetAuthWindow, self).__init__(*args, **kwargs)
 
-        self.title("Get Discord token")
+        self.title(I("Get Discord token"))
 
         self.frame_info = Frame(self.scrollable_frame)
         self.frame_start_btn = Frame(self.scrollable_frame)
@@ -24,19 +25,19 @@ class DiscordGetAuthWindow(BaseWindow):
         # Info frame
         self.explanation1_lbl = Label(
             self.frame_info,
-            text="Please install Discord Desktop or Chrome",
+            text=I("Please install Discord Desktop or Chrome"),
             justify="left",
             anchor="w",
         )
         self.explanation2_lbl = Label(
             self.frame_info,
-            text="After installation, you need to login to Discord",
+            text=I("After installation, you need to login to Discord"),
             justify="left",
             anchor="w",
         )
         self.explanation3_lbl = Label(
             self.frame_info,
-            text="Token will be automatically fetched",
+            text=I("Token will be automatically fetched"),
             justify="left",
             anchor="w",
         )
@@ -53,7 +54,7 @@ class DiscordGetAuthWindow(BaseWindow):
 
         # Start button frame
         self.login_btn = Button(
-            self.frame_start_btn, text="Get token", command=self.cb_login
+            self.frame_start_btn, text=I("Get token"), command=self.cb_login
         )
 
         self.login_btn.pack()
