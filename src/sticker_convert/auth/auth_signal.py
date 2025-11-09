@@ -13,13 +13,14 @@ from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.process import killall
 from sticker_convert.utils.translate import I
 
-MSG_NO_SIGDESK = I("""Signal Desktop not detected.
-Download and install Signal Desktop version
-After installation, quit Signal Desktop before continuing""")
-
-
 class AuthSignal(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.MSG_NO_SIGDESK = I(
+            "Signal Desktop not detected.\n"
+            "Download and install Signal Desktop version\n"
+            "After installation, quit Signal Desktop before continuing"
+        )
+        
         super().__init__(*args, **kwargs)
         chromedriver_download_dir = CONFIG_DIR / "bin"
         os.makedirs(chromedriver_download_dir, exist_ok=True)
@@ -33,7 +34,7 @@ class AuthSignal(AuthBase):
 
         self.cb.put(download_url)
 
-        self.cb.put(("ask_str", (MSG_NO_SIGDESK,), None))
+        self.cb.put(("ask_str", (self.MSG_NO_SIGDESK,), None))
 
     def get_signal_bin_path(self) -> Optional[str]:
         signal_paths: Tuple[Optional[str], ...]

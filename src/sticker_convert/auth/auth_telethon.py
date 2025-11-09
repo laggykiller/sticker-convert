@@ -9,24 +9,25 @@ from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.utils.translate import I
 
-GUIDE_MSG = I("""1. Visit {telegram_api_url}
-2. Login using your phone number
-3. Go to "API development tools"
-4. Fill form
-- App title: sticker-convert
-- Short name: sticker-convert
-- URL: www.telegram.org
-- Platform: Desktop
-- Description: sticker-convert
-5. Note down api_id and api_hash
-Continue when done""")
-TELEGRAM_API_URL = "https://my.telegram.org"
-OK_MSG = I("Telethon setup successful")
-FAIL_MSG = I("Telethon setup failed")
-
-
 class AuthTelethon(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.GUIDE_MSG = I(
+            "1. Visit {telegram_api_url}\n"
+            "2. Login using your phone number\n"
+            "3. Go to \"API development tools\"\n"
+            "4. Fill form\n"
+            "- App title: sticker-convert\n"
+            "- Short name: sticker-convert\n"
+            "- URL: www.telegram.org\n"
+            "- Platform: Desktop\n"
+            "- Description: sticker-convert\n"
+            "5. Note down api_id and api_hash\n"
+            "Continue when done"
+        )
+        self.TELEGRAM_API_URL = "https://my.telegram.org"
+        self.OK_MSG = I("Telethon setup successful")
+        self.FAIL_MSG = I("Telethon setup failed")
+
         super().__init__(*args, **kwargs)
 
     async def signin_async(
@@ -46,7 +47,7 @@ class AuthTelethon(AuthBase):
                 msg = error_msg + I("Enter phone number: ")
                 phone_number = self.cb.put(("ask_str", (msg,), None))
                 if phone_number == "":
-                    return False, client, 0, "", FAIL_MSG
+                    return False, client, 0, "", self.FAIL_MSG
                 try:
                     await client.send_code_request(phone_number)
                     break
@@ -58,7 +59,7 @@ class AuthTelethon(AuthBase):
                 msg = error_msg + I("Enter code: ")
                 code = self.cb.put(("ask_str", (msg,), None))
                 if code == "":
-                    return False, client, 0, "", FAIL_MSG
+                    return False, client, 0, "", self.FAIL_MSG
                 try:
                     await client.sign_in(phone_number, code)
                     break
@@ -84,12 +85,12 @@ class AuthTelethon(AuthBase):
             client,
             self.opt_cred.telethon_api_id,
             self.opt_cred.telethon_api_hash,
-            OK_MSG if authed else FAIL_MSG,
+            self.OK_MSG if authed else self.FAIL_MSG,
         )
 
     def guide(self) -> None:
         self.cb.put(
-            ("msg_block", (GUIDE_MSG.format(telegram_api_url=TELEGRAM_API_URL),), None)
+            ("msg_block", (self.GUIDE_MSG.format(telegram_api_url=self.TELEGRAM_API_URL),), None)
         )
 
     def get_api_info(self) -> bool:
@@ -147,7 +148,7 @@ class AuthTelethon(AuthBase):
                 client.disconnect()
             return success, client, api_id, api_hash, msg
         else:
-            return False, None, 0, "", FAIL_MSG
+            return False, None, 0, "", self.FAIL_MSG
 
     def start(
         self, check_auth_only: bool = False

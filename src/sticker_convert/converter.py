@@ -28,22 +28,6 @@ if TYPE_CHECKING:
     from av.video.frame import VideoFrame
     from av.video.plane import VideoPlane
 
-MSG_START_COMP = I("[I] Start compressing {} -> {}")
-MSG_SKIP_COMP = I("[S] Compatible file found, skip compress and just copy {} -> {}")
-MSG_COMP = I(
-    "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-{})"
-)
-MSG_REDO_COMP = I("[{}] Compressed {} -> {} but size {} {} limit {}, recompressing")
-MSG_DONE_COMP = I("[S] Successful compression {} -> {} size {} (step {})")
-MSG_FAIL_COMP = I(
-    "[F] Failed Compression {} -> {}, "
-    "cannot get below limit {} with lowest quality under current settings (Best size: {})"
-)
-MSG_QUANT_NO_ALPHA = I(
-    "[W] {} does not support RGBA, defaulted to fastoctree quantization"
-)
-MSG_SVG_LONG = I("[W] Importing SVG takes long time")
-
 YUV_RGB_MATRIX = np.array(
     [
         [1.164, 0.000, 1.793],
@@ -115,8 +99,8 @@ def yuva_to_rgba(frame: "VideoFrame") -> "np.ndarray[Any, Any]":
     v = useful_array(frame.planes[2]).reshape(height // 2, width // 2)
     a = useful_array(frame.planes[3]).reshape(height, width)
 
-    u = u.repeat(2, axis=0).repeat(2, axis=1)
-    v = v.repeat(2, axis=0).repeat(2, axis=1)
+    u = u.repeat(2, axis=0).repeat(2, axis=1)  # type: ignore
+    v = v.repeat(2, axis=0).repeat(2, axis=1)  # type: ignore
 
     y = y.reshape((y.shape[0], y.shape[1], 1))  # type: ignore
     u = u.reshape((u.shape[0], u.shape[1], 1))  # type: ignore
@@ -147,6 +131,22 @@ class StickerConvert:
         cb: CallbackProtocol,
         #  cb_return: CallbackReturn
     ) -> None:
+        self.MSG_START_COMP = I("[I] Start compressing {} -> {}")
+        self.MSG_SKIP_COMP = I("[S] Compatible file found, skip compress and just copy {} -> {}")
+        self.MSG_COMP = I(
+            "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-{})"
+        )
+        self.MSG_REDO_COMP = I("[{}] Compressed {} -> {} but size {} {} limit {}, recompressing")
+        self.MSG_DONE_COMP = I("[S] Successful compression {} -> {} size {} (step {})")
+        self.MSG_FAIL_COMP = I(
+            "[F] Failed Compression {} -> {}, "
+            "cannot get below limit {} with lowest quality under current settings (Best size: {})"
+        )
+        self.MSG_QUANT_NO_ALPHA = I(
+            "[W] {} does not support RGBA, defaulted to fastoctree quantization"
+        )
+        self.MSG_SVG_LONG = I("[W] Importing SVG takes long time")
+
         self.in_f: Union[bytes, Path]
         if isinstance(in_f, Path):
             self.in_f = in_f
@@ -223,7 +223,7 @@ class StickerConvert:
         if result:
             return self.compress_done(result)
 
-        self.cb.put((MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
+        self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
 
         steps_list = self.generate_steps_list()
 
@@ -255,7 +255,7 @@ class StickerConvert:
             self.color = param[4]
 
             self.tmp_f = BytesIO()
-            msg = MSG_COMP.format(
+            msg = self.MSG_COMP.format(
                 self.in_f_name,
                 self.out_f_name,
                 self.res_w,
@@ -332,7 +332,7 @@ class StickerConvert:
                 file_info=self.codec_info_orig,
             )
         ):
-            self.cb.put((MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name)))
+            self.cb.put((self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name)))
 
             if isinstance(self.in_f, Path):
                 with open(self.in_f, "rb") as f:
@@ -397,7 +397,7 @@ class StickerConvert:
         return steps_list
 
     def recompress(self, sign: str) -> None:
-        msg = MSG_REDO_COMP.format(
+        msg = self.MSG_REDO_COMP.format(
             sign, self.in_f_name, self.out_f_name, self.size, sign, self.size_max
         )
         self.cb.put(msg)
@@ -405,7 +405,7 @@ class StickerConvert:
     def compress_fail(
         self,
     ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
-        msg = MSG_FAIL_COMP.format(
+        msg = self.MSG_FAIL_COMP.format(
             self.in_f_name, self.out_f_name, self.size_max, self.size
         )
         self.cb.put(msg)
@@ -427,7 +427,7 @@ class StickerConvert:
                 f.write(data)
 
         if result_step is not None:
-            msg = MSG_DONE_COMP.format(
+            msg = self.MSG_DONE_COMP.format(
                 self.in_f_name, self.out_f_name, self.result_size, result_step
             )
             self.cb.put(msg)
@@ -474,7 +474,7 @@ class StickerConvert:
             ]
             if chrome_path is None:
                 raise RuntimeError("[F] Chrome/Chromium required for importing svg")
-            self.cb.put(MSG_SVG_LONG)
+            self.cb.put(self.MSG_SVG_LONG)
             RUNTIME_STATE["crd"] = CRD(chrome_path, args=args)
             RUNTIME_STATE["crd"].connect(-1)  # type: ignore
 
@@ -1050,7 +1050,7 @@ class StickerConvert:
             "mediancut",
             "maxcoverage",
         ):
-            self.cb.put(MSG_QUANT_NO_ALPHA.format(self.opt_comp.quantize_method))
+            self.cb.put(self.MSG_QUANT_NO_ALPHA.format(self.opt_comp.quantize_method))
             method = Image.Quantize.FASTOCTREE
         elif self.opt_comp.quantize_method == "mediancut":
             method = Image.Quantize.MEDIANCUT

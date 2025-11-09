@@ -10,12 +10,12 @@ import rookiepy
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.translate import I
 
-OK_MSG = I("Got Line cookies successfully")
-FAIL_MSG = I("Failed to get Line cookies. Have you logged in the web browser?")
-
 
 class AuthLine(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.OK_MSG = I("Got Line cookies successfully")
+        self.FAIL_MSG = I("Failed to get Line cookies. Have you logged in the web browser?")
+
         super().__init__(*args, **kwargs)
 
     def get_cred(self) -> Tuple[Optional[str], str]:
@@ -66,13 +66,13 @@ class AuthLine(AuthBase):
         if cookies_dict is None or cookies_jar is None:
             return (
                 None,
-                I("Failed to get Line cookies. Have you logged in the web browser?"),
+                self.FAIL_MSG,
             )
 
         cookies_list = ["%s=%s" % (i["name"], i["value"]) for i in cookies_dict]
         cookies = ";".join(cookies_list)
 
-        return cookies, OK_MSG
+        return cookies, self.OK_MSG
 
     @staticmethod
     def validate_cookies(cookies: Union[CookieJar, Dict[str, str]]) -> bool:

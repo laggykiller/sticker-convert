@@ -11,23 +11,28 @@ from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import find_pid_by_name, get_mem, killall
 from sticker_convert.utils.translate import I
 
-MSG_NO_BIN = I("""Kakao Desktop not detected.
-Download and install Kakao Desktop,
-then login to Kakao Desktop and try again.""")
-MSG_NO_AUTH = I("""Kakao Desktop installed,
-but kakao_auth not found.
-Please login to Kakao Desktop and try again.""")
-MSG_SIP_ENABLED = I("""You need to disable SIP:
-1. Restart computer in Recovery mode
-2. Launch Terminal from the Utilities menu
-3. Run the command `csrutil disable`
-4. Restart your computer""")
-MSG_LAUNCH_FAIL = I("Failed to launch Kakao")
-MSG_PERMISSION_ERROR = I("Failed to read Kakao process memory")
-
-
 class AuthKakaoDesktopMemdump(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.MSG_NO_BIN = I(
+            "Kakao Desktop not detected.\n"
+            "Download and install Kakao Desktop,\n"
+            "then login to Kakao Desktop and try again."
+        )
+        self.MSG_NO_AUTH = I(
+            "Kakao Desktop installed,\n"
+            "but kakao_auth not found.\n"
+            "Please login to Kakao Desktop and try again."
+        )
+        self.MSG_SIP_ENABLED = I(
+            "You need to disable SIP:\n"
+            "1. Restart computer in Recovery mode\n"
+            "2. Launch Terminal from the Utilities menu\n"
+            "3. Run the command `csrutil disable`\n"
+            "4. Restart your computer"
+        )
+        self.MSG_LAUNCH_FAIL = I("Failed to launch Kakao")
+        self.MSG_PERMISSION_ERROR = I("Failed to read Kakao process memory")
+
         super().__init__(*args, **kwargs)
 
     def launch_kakao(self, kakao_bin_path: str) -> None:
@@ -60,7 +65,7 @@ class AuthKakaoDesktopMemdump(AuthBase):
         else:
             kakao_pid = find_pid_by_name("kakaotalk")
         if kakao_pid is None:
-            return None, MSG_LAUNCH_FAIL
+            return None, self.MSG_LAUNCH_FAIL
 
         try:
             with OpenProcess(pid=int(kakao_pid)) as process:
@@ -81,10 +86,10 @@ class AuthKakaoDesktopMemdump(AuthBase):
                         auth_token = auth_token_candidate
                         break
         except PermissionError:
-            return None, MSG_PERMISSION_ERROR
+            return None, self.MSG_PERMISSION_ERROR
 
         if auth_token is None:
-            return None, MSG_NO_AUTH
+            return None, self.MSG_NO_AUTH
         else:
             msg = "(Note: auth_token will be invalid if you quit Kakao Desktop)"
             msg += "Got auth_token successfully:\n"
@@ -104,12 +109,12 @@ class AuthKakaoDesktopMemdump(AuthBase):
             else:
                 kakao_pid = find_pid_by_name("kakaotalk")
             if kakao_pid is None:
-                return None, MSG_LAUNCH_FAIL
+                return None, self.MSG_LAUNCH_FAIL
         else:
             is_wine = True
             kakao_pid = "KakaoTalk.exe"
             if relaunch and self.relaunch_kakao(kakao_bin_path) is None:
-                return None, MSG_LAUNCH_FAIL
+                return None, self.MSG_LAUNCH_FAIL
 
         def pw_func(msg: str) -> str:
             return self.cb.put(
@@ -144,7 +149,7 @@ class AuthKakaoDesktopMemdump(AuthBase):
                 break
 
         if auth_token is None:
-            return None, MSG_NO_AUTH
+            return None, self.MSG_NO_AUTH
         else:
             msg = "Got auth_token successfully:\n"
             msg += f"{auth_token=}\n"
@@ -157,7 +162,7 @@ class AuthKakaoDesktopMemdump(AuthBase):
         ).stdout
 
         if "enabled" in csrutil_status:
-            return None, MSG_SIP_ENABLED
+            return None, self.MSG_SIP_ENABLED
 
         killall("kakaotalk")
 
@@ -209,7 +214,7 @@ class AuthKakaoDesktopMemdump(AuthBase):
                 break
 
         if auth_token is None:
-            return None, MSG_NO_AUTH
+            return None, self.MSG_NO_AUTH
         else:
             msg = "Got auth_token successfully:\n"
             msg += f"{auth_token=}\n"
@@ -259,7 +264,7 @@ class AuthKakaoDesktopMemdump(AuthBase):
             kakao_bin_path = self.get_kakao_desktop()
 
         if not kakao_bin_path:
-            return None, MSG_NO_BIN
+            return None, self.MSG_NO_BIN
 
         if platform.system() == "Windows":
             kakao_auth, msg = self.get_auth_by_dump(kakao_bin_path)

@@ -34,21 +34,25 @@ from sticker_convert.utils.translate import SUPPORTED_LANG, I
 from sticker_convert.utils.url_detect import UrlDetect
 from sticker_convert.version import __version__
 
-MSG_MORAL = I("""sticker-convert is Free and Opensource software by laggykiller
-{project_url}
-Please use the stickers with your friends only.
-It is illegal and immoral to sell stickers downloaded from this program.""")
-PROJECT_URL = "https://github.com/laggykiller/sticker-convert"
-
-MSG_MAC14_TK_BUG = I("""NOTICE: If buttons are not responsive, try to press
-on title bar or move mouse cursor away from window for a while.
-(This is a bug in tkinter specific to macOS 14 python <=3.11.6)
-({mac14_tk_bug_url})""")
-MAC14_TK_BUG_URL = "https://github.com/python/cpython/issues/110218"
-
 
 class GUI(Window):
     def __init__(self) -> None:
+        self.MSG_MORAL = I(
+            "sticker-convert is Free and Opensource software by laggykiller\n"
+            "{project_url}\n"
+            "Please use the stickers with your friends only.\n"
+            "It is illegal and immoral to sell stickers downloaded from this program."
+        )
+        self.PROJECT_URL = "https://github.com/laggykiller/sticker-convert"
+
+        self.MSG_MAC14_TK_BUG = I(
+            "NOTICE: If buttons are not responsive, try to press\n"
+            "on title bar or move mouse cursor away from window for a while.\n"
+            "(This is a bug in tkinter specific to macOS 14 python <=3.11.6)\n"
+            "({mac14_tk_bug_url})"
+        )
+        self.MAC14_TK_BUG_URL = "https://github.com/python/cpython/issues/110218"
+
         super().__init__(themename="darkly", alpha=0)  # type: ignore
         self.cb = CallbackGui(self)
         self.init_done = False
@@ -254,7 +258,7 @@ class GUI(Window):
         )
 
     def author_info(self) -> None:
-        self.cb.put(MSG_MORAL.format(project_url=PROJECT_URL))
+        self.cb.put(self.MSG_MORAL.format(project_url=self.PROJECT_URL))
 
     def warn_tkinter_bug(self) -> None:
         if (
@@ -264,7 +268,7 @@ class GUI(Window):
             and sys.version_info[1] == 11
             and sys.version_info[2] <= 6
         ):
-            self.cb.put(MSG_MAC14_TK_BUG.format(mac14_tk_bug_url=MAC14_TK_BUG_URL))
+            self.cb.put(self.MSG_MAC14_TK_BUG.format(mac14_tk_bug_url=self.MAC14_TK_BUG_URL))
 
     def load_jsons(self) -> None:
         self.help = load_resource_json("help")

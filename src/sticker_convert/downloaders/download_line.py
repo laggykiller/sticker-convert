@@ -24,10 +24,6 @@ from sticker_convert.utils.translate import I
 
 # Reference: https://github.com/doubleplusc/Line-sticker-downloader/blob/master/sticker_dl.py
 
-MSG_CUSTOM_TEXT = I("""The Line sticker pack you are downloading can have customized text.
-line-sticker-text.txt has been created in input directory.
-Please edit line-sticker-text.txt, then continue.""")
-
 
 class MetadataLine:
     @staticmethod
@@ -167,6 +163,12 @@ class MetadataLine:
 
 class DownloadLine(DownloadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.MSG_CUSTOM_TEXT = I(
+            "The Line sticker pack you are downloading can have customized text.\n"
+            "line-sticker-text.txt has been created in input directory.\n"
+            "Please edit line-sticker-text.txt, then continue."
+        )
+
         super().__init__(*args, **kwargs)
         self.headers = {
             "referer": "https://store.line.me",
@@ -317,7 +319,7 @@ class DownloadLine(DownloadBase):
         if not line_sticker_text_path.is_file():
             with open(line_sticker_text_path, "w+", encoding="utf-8") as f:
                 json.dump(self.sticker_text_dict, f, indent=4, ensure_ascii=False)
-            self.cb.put(("msg_block", (MSG_CUSTOM_TEXT,), None))
+            self.cb.put(("msg_block", (self.MSG_CUSTOM_TEXT,), None))
             if self.cb_return:
                 self.cb_return.get_response()
 

@@ -10,7 +10,7 @@ from signalstickers_client.stickersclient import StickersClient
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
-from sticker_convert.uploaders.upload_base import MSG_EMOJI_TXT_REQUIRED, UploadBase
+from sticker_convert.uploaders.upload_base import get_msg_emoji_txt_required, UploadBase
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.emoji import extract_emojis
 from sticker_convert.utils.files.metadata_handler import MetadataHandler
@@ -150,7 +150,7 @@ class UploadSignal(UploadBase):
                 (
                     "msg_block",
                     (
-                        MSG_EMOJI_TXT_REQUIRED.format(
+                        get_msg_emoji_txt_required().format(
                             self.opt_output.dir, self.opt_comp.default_emoji
                         ),
                     ),

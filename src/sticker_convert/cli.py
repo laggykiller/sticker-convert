@@ -28,19 +28,20 @@ from sticker_convert.utils.translate import LANG_DICT, I
 from sticker_convert.utils.url_detect import UrlDetect
 from sticker_convert.version import __version__
 
-MSG_MORAL = I("""sticker-convert is Free and Opensource software by laggykiller
-{project_url}
-Please use the stickers with your friends only.
-It is illegal and immoral to sell stickers downloaded from this program.""")
-PROJECT_URL = "https://github.com/laggykiller/sticker-convert"
-
 
 class CLI:
     def __init__(self) -> None:
+        self.MSG_MORAL = I(
+            "sticker-convert is Free and Opensource software by laggykiller\n"
+            "{project_url}\n"
+            "Please use the stickers with your friends only.\n"
+            "It is illegal and immoral to sell stickers downloaded from this program."
+        )
+        self.PROJECT_URL = "https://github.com/laggykiller/sticker-convert"
         self.cb = CallbackCli()
 
     def cli(self) -> None:
-        print(MSG_MORAL.format(project_url=PROJECT_URL))
+        print(self.MSG_MORAL.format(project_url=self.PROJECT_URL))
         print()
         try:
             from sticker_convert.utils.files.json_resources_loader import load_resource_json

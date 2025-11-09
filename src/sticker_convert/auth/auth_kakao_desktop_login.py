@@ -19,11 +19,11 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.translate import I
 
-OK_MSG = I("Login successful, auth_token={}")
-
 
 class AuthKakaoDesktopLogin(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.OK_MSG = I("Login successful, auth_token={}")
+
         super().__init__(*args, **kwargs)
         self.username = self.opt_cred.kakao_username
         self.password = self.opt_cred.kakao_password
@@ -281,7 +281,7 @@ class AuthKakaoDesktopLogin(AuthBase):
         if access_token is not None:
             auth_token = access_token + "-" + self.device_uuid
             self.cb.put(("msg_dynamic", (None,), None))
-            return auth_token, OK_MSG.format(auth_token)
+            return auth_token, self.OK_MSG.format(auth_token)
 
         rjson = self.generate_passcode()
         if rjson.get("status") != 0:
@@ -324,4 +324,4 @@ class AuthKakaoDesktopLogin(AuthBase):
             return None, I("Failed to login after registering device: {}").format(rjson)
 
         auth_token = access_token + "-" + self.device_uuid
-        return auth_token, OK_MSG.format(auth_token)
+        return auth_token, self.OK_MSG.format(auth_token)

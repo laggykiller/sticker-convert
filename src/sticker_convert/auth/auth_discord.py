@@ -14,12 +14,10 @@ from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.process import find_pid_by_name, killall
 from sticker_convert.utils.translate import I
 
-OK_MSG = I("Got token successfully:\ntoken={}")
-FAIL_MSG = I("Failed to get token")
-
-
 class AuthDiscord(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.OK_MSG = I("Got token successfully:\ntoken={}")
+        self.FAIL_MSG = I("Failed to get token")
         super().__init__(*args, **kwargs)
         chromedriver_download_dir = CONFIG_DIR / "bin"
         os.makedirs(chromedriver_download_dir, exist_ok=True)
@@ -107,7 +105,7 @@ class AuthDiscord(AuthBase):
             if response is True:
                 killall(Path(chrome_path).name.lower())
             else:
-                return None, FAIL_MSG
+                return None, self.FAIL_MSG
 
         crd = CRD(chrome_path)
         while True:
@@ -145,6 +143,6 @@ class AuthDiscord(AuthBase):
 
         self.cb.put(("msg_dynamic", (None,), None))
         if token is None:
-            return None, FAIL_MSG
+            return None, self.FAIL_MSG
 
-        return token, OK_MSG.format(token)
+        return token, self.OK_MSG.format(token)

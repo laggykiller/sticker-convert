@@ -11,11 +11,10 @@ from bs4 import BeautifulSoup
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.translate import I
 
-OK_MSG = I("Got auth_token successfully:\nauth_token={}\n")
-
-
 class AuthKakaoAndroidLogin(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.OK_MSG = I("Got auth_token successfully:\nauth_token={}\n")
+
         super().__init__(*args, **kwargs)
         self.username = self.opt_cred.kakao_username
         self.password = self.opt_cred.kakao_password
@@ -328,4 +327,4 @@ class AuthKakaoAndroidLogin(AuthBase):
                 return None, msg
 
         auth_token = self.access_token + "-" + self.device_uuid
-        return auth_token, OK_MSG.format(auth_token)
+        return auth_token, self.OK_MSG.format(auth_token)

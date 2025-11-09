@@ -12,23 +12,28 @@ from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import check_admin, find_pid_by_name, get_mem, killall
 from sticker_convert.utils.translate import I
 
-MSG_NO_BIN = I("""Viber Desktop not detected.
-Download and install Viber Desktop,
-then login to Viber Desktop and try again.""")
-MSG_NO_AUTH = I("""Viber Desktop installed,
-but viber_auth not found.
-Please login to Viber Desktop and try again.""")
-MSG_SIP_ENABLED = I("""You need to disable SIP:
-1. Restart computer in Recovery mode
-2. Launch Terminal from the Utilities menu
-3. Run the command `csrutil disable`
-4. Restart your computer""")
-MSG_LAUNCH_FAIL = I("Failed to launch Viber")
-MSG_PERMISSION_ERROR = I("Failed to read Viber process memory")
-
-
 class AuthViber(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.MSG_NO_BIN = I(
+            "Viber Desktop not detected.\n"
+            "Download and install Viber Desktop,\n"
+            "then login to Viber Desktop and try again."
+        )
+        self.MSG_NO_AUTH = I(
+            "Viber Desktop installed,\n"
+            "but viber_auth not found.\n"
+            "Please login to Viber Desktop and try again."
+        )
+        self.MSG_SIP_ENABLED = I(
+            "You need to disable SIP:\n"
+            "1. Restart computer in Recovery mode\n"
+            "2. Launch Terminal from the Utilities menu\n"
+            "3. Run the command `csrutil disable`\n"
+            "4. Restart your computer"
+        )
+        self.MSG_LAUNCH_FAIL = I("Failed to launch Viber")
+        self.MSG_PERMISSION_ERROR = I("Failed to read Viber process memory")
+
         super().__init__(*args, **kwargs)
 
     def relaunch_viber(self, viber_bin_path: str) -> Optional[int]:
@@ -59,7 +64,7 @@ class AuthViber(AuthBase):
         else:
             viber_pid = find_pid_by_name("viber")
         if viber_pid is None:
-            return None, MSG_LAUNCH_FAIL
+            return None, self.MSG_LAUNCH_FAIL
 
         try:
             with OpenProcess(pid=int(viber_pid)) as process:
@@ -76,14 +81,14 @@ class AuthViber(AuthBase):
                     )
                     break
                 if member_id is None:
-                    return None, MSG_NO_AUTH
+                    return None, self.MSG_NO_AUTH
 
                 for address in process.search_by_value(str, 20, "X-Viber-Auth-Token: "):  # type: ignore
                     m_token_addr = cast(int, address) + 20
                     m_token = process.read_process_memory(m_token_addr, str, 64)
                     break
                 if m_token is None:
-                    return None, MSG_NO_AUTH
+                    return None, self.MSG_NO_AUTH
 
                 for address in process.search_by_value(  # type: ignore
                     str, 24, "X-Viber-Auth-Timestamp: "
@@ -92,9 +97,9 @@ class AuthViber(AuthBase):
                     m_ts = process.read_process_memory(m_ts_addr, str, 13)
                     break
                 if m_ts is None:
-                    return None, MSG_NO_AUTH
+                    return None, self.MSG_NO_AUTH
         except PermissionError:
-            return None, MSG_PERMISSION_ERROR
+            return None, self.MSG_PERMISSION_ERROR
 
         viber_auth = f"member_id:{member_id};m_token:{m_token};m_ts:{m_ts}"
         msg = I("Got viber_auth successfully:\n")
@@ -115,14 +120,14 @@ class AuthViber(AuthBase):
             ).stdout
 
             if "enabled" in csrutil_status:
-                return None, MSG_SIP_ENABLED
+                return None, self.MSG_SIP_ENABLED
 
         if relaunch:
             viber_pid = self.relaunch_viber(viber_bin_path)
         else:
             viber_pid = find_pid_by_name("viber")
         if viber_pid is None:
-            return None, MSG_LAUNCH_FAIL
+            return None, self.MSG_LAUNCH_FAIL
 
         def pw_func(msg: str) -> str:
             return self.cb.put(
@@ -146,7 +151,7 @@ class AuthViber(AuthBase):
         m_ts_addr = s.find(b"X-Viber-Auth-Timestamp: ")
 
         if member_id_addr == -1 or m_token_addr == -1 or m_ts_addr == -1:
-            return None, MSG_NO_AUTH
+            return None, self.MSG_NO_AUTH
 
         member_id_addr += 18
         m_token_addr += 20
@@ -155,7 +160,7 @@ class AuthViber(AuthBase):
         member_id_bytes = s[member_id_addr : member_id_addr + 20]
         member_id_term = member_id_bytes.find(b"\x0d\x0a")
         if member_id_term == -1:
-            return None, MSG_NO_AUTH
+            return None, self.MSG_NO_AUTH
         member_id = member_id_bytes[:member_id_term].decode(encoding="ascii")
 
         m_token = s[m_token_addr : m_token_addr + 64].decode(encoding="ascii")
@@ -201,7 +206,7 @@ class AuthViber(AuthBase):
             viber_bin_path = self.get_viber_desktop()
 
         if not viber_bin_path:
-            return None, MSG_NO_BIN
+            return None, self.MSG_NO_BIN
 
         # get_auth_by_dump()
         # + Fast

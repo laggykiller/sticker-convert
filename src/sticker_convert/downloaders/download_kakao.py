@@ -16,14 +16,6 @@ from sticker_convert.utils.files.metadata_handler import MetadataHandler
 from sticker_convert.utils.media.decrypt_kakao import DecryptKakao
 from sticker_convert.utils.translate import I
 
-MSG_AUTH_ERROR = I("""Warning: Cannot get item code.
-Is auth_token invalid / expired? Try to regenerate it.
-Continue to download static stickers instead?""")
-
-MSG_CODE_NOT_FOUND = I("""Warning: Cannot get item code.
-Please use share link instead.
-Continue to download static stickers instead?""")
-
 
 class MetadataKakao:
     @staticmethod
@@ -159,6 +151,18 @@ class MetadataKakao:
 
 class DownloadKakao(DownloadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
+        self.MSG_AUTH_ERROR = I(
+            "Warning: Cannot get item code.\n"
+            "Is auth_token invalid / expired? Try to regenerate it.\n"
+            "Continue to download static stickers instead?"
+        )
+
+        self.MSG_CODE_NOT_FOUND = I(
+            "Warning: Cannot get item code.\n"
+            "Please use share link instead.\n"
+            "Continue to download static stickers instead?"
+        )
+
         super().__init__(*args, **kwargs)
         self.pack_title: Optional[str] = None
         self.author: Optional[str] = None
@@ -244,7 +248,7 @@ class DownloadKakao(DownloadBase):
                     self.pack_title, title_ko, False, self.auth_token
                 )
                 if item_code == "auth_error":
-                    msg = MSG_AUTH_ERROR
+                    msg = self.MSG_AUTH_ERROR
                 elif item_code == "code_not_found":
                     self.cb.put(
                         I(
@@ -259,7 +263,7 @@ class DownloadKakao(DownloadBase):
                             self.pack_title, self.author, True, self.auth_token
                         )
                     if item_code == "code_not_found":
-                        msg = MSG_CODE_NOT_FOUND
+                        msg = self.MSG_CODE_NOT_FOUND
                     else:
                         return self.download_animated(item_code)
                 else:

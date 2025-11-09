@@ -3,7 +3,7 @@ import re
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Protocol, Tuple, Union, cast
+from typing import Any, Dict, List, Tuple, Union, cast
 
 import anyio
 from telegram import InputSticker, PhotoSize, Sticker
@@ -23,40 +23,55 @@ from sticker_convert.utils.translate import I
 # sticker_path: Path, sticker_bytes: bytes, emoji_list: List[str], sticker_format: str
 TelegramSticker = Tuple[Path, bytes, List[str], str]
 
-MSG_FAIL_ALL = I("Cannot upload any sticker. Reason: {}")
-MSG_FAIL_PACK = I("Cannot upload pack {}. Reason: {}")
-MSG_FAIL_DEL = I("Cannot delete pack of {}. Reason: {}")
-MSG_FAIL_STICKER = I("Cannot upload sticker {sticker} of {pack}. Reason: {reason}")
-MSG_FAIL_PACK_ICON = I("Cannot set pack icon for {}. Reason: {}")
 
+class TelegramAPI:
+    def __init__(self):
+        self.MSG_FAIL_ALL = I("Cannot upload any sticker. Reason: {}")
+        self.MSG_FAIL_PACK = I("Cannot upload pack {}. Reason: {}")
+        self.MSG_FAIL_DEL = I("Cannot delete pack of {}. Reason: {}")
+        self.MSG_FAIL_STICKER = I("Cannot upload sticker {sticker} of {pack}. Reason: {reason}")
+        self.MSG_FAIL_PACK_ICON = I("Cannot set pack icon for {}. Reason: {}")
 
-class TelegramAPI(Protocol):
     async def setup(
         self,
         opt_cred: CredOption,
         is_upload: bool,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> bool: ...
-    async def exit(self) -> None: ...
-    async def set_upload_pack_type(self, is_emoji: bool) -> None: ...
-    async def set_upload_pack_short_name(self, pack_title: str) -> str: ...
-    async def check_pack_exist(self) -> bool: ...
-    async def pack_del(self) -> bool: ...
+    ) -> bool:
+        raise NotImplementedError
+    async def exit(self) -> None:
+        raise NotImplementedError
+    async def set_upload_pack_type(self, is_emoji: bool) -> None:
+        raise NotImplementedError
+    async def set_upload_pack_short_name(self, pack_title: str) -> str:
+        raise NotImplementedError
+    async def check_pack_exist(self) -> bool:
+        raise NotImplementedError
+    async def pack_del(self) -> bool:
+        raise NotImplementedError
     async def pack_new(
         self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]: ...
+    ) -> Tuple[int, int]:
+        raise NotImplementedError
     async def pack_add(
         self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]: ...
-    async def pack_thumbnail(self, thumbnail: TelegramSticker) -> bool: ...
-    async def get_pack_url(self) -> str: ...
+    ) -> Tuple[int, int]:
+        raise NotImplementedError
+    async def pack_thumbnail(self, thumbnail: TelegramSticker) -> bool:
+        raise NotImplementedError
+    async def get_pack_url(self) -> str:
+        raise NotImplementedError
     async def pack_dl(
         self, pack_short_name: str, out_dir: Path
-    ) -> Tuple[Dict[str, bool], Dict[str, str]]: ...
+    ) -> Tuple[Dict[str, bool], Dict[str, str]]:
+        raise NotImplementedError
 
 
 class BotAPI(TelegramAPI):
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+
     async def setup(
         self,
         opt_cred: CredOption,
@@ -226,7 +241,7 @@ class BotAPI(TelegramAPI):
                 stickers_ok += 1
             except BadRequest as e:
                 self.cb.put(
-                    MSG_FAIL_STICKER.format(
+                    self.MSG_FAIL_STICKER.format(
                         sticker=i[0], pack=self.pack_short_name, reason=e
                     )
                 )
@@ -238,7 +253,7 @@ class BotAPI(TelegramAPI):
                     )
             except TelegramError as e:
                 self.cb.put(
-                    MSG_FAIL_STICKER.format(
+                    self.MSG_FAIL_STICKER.format(
                         sticker=i[0], pack=self.pack_short_name, reason=e
                     )
                 )
@@ -369,6 +384,9 @@ class BotAPI(TelegramAPI):
 
 
 class TelethonAPI(TelegramAPI):
+    def __init__(self, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+
     async def setup(
         self,
         opt_cred: CredOption,
@@ -444,15 +462,15 @@ class TelethonAPI(TelegramAPI):
         else:
             repl = await self._send_and_recv("/delpack")
         if repl != "Choose the sticker set you want to delete.":
-            self.cb.put(MSG_FAIL_DEL.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_DEL.format(self.pack_short_name, repl))
             return False
         repl = await self._send_and_recv(self.pack_short_name)
         if "Yes, I am totally sure." not in repl:
-            self.cb.put(MSG_FAIL_DEL.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_DEL.format(self.pack_short_name, repl))
             return False
         repl = await self._send_and_recv("Yes, I am totally sure.")
         if "Done!" not in repl:
-            self.cb.put(MSG_FAIL_DEL.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_DEL.format(self.pack_short_name, repl))
             return False
 
         return True
@@ -477,7 +495,7 @@ class TelethonAPI(TelegramAPI):
             )
             return len(stickers_list), 0
         if "Yay!" not in repl:
-            self.cb.put(MSG_FAIL_ALL.format(repl))
+            self.cb.put(self.MSG_FAIL_ALL.format(repl))
             return len(stickers_list), 0
 
         if self.is_emoji:
@@ -485,12 +503,12 @@ class TelethonAPI(TelegramAPI):
                 f"{stickers_list[0][3].capitalize()} emoji"
             )
             if "Yay!" not in repl:
-                self.cb.put(MSG_FAIL_ALL.format(repl))
+                self.cb.put(self.MSG_FAIL_ALL.format(repl))
                 return len(stickers_list), 0
 
         repl = await self._send_and_recv(self.pack_title)
         if "Alright!" not in repl:
-            self.cb.put(MSG_FAIL_ALL.format(repl))
+            self.cb.put(self.MSG_FAIL_ALL.format(repl))
             return len(stickers_list), 0
         self.cb.put(
             (
@@ -506,7 +524,7 @@ class TelethonAPI(TelegramAPI):
             repl = await self._send_and_recv(i[0])
             if "Thanks!" not in repl:
                 self.cb.put(
-                    MSG_FAIL_STICKER.format(
+                    self.MSG_FAIL_STICKER.format(
                         sticker=i[0], pack=self.pack_short_name, reason=repl
                     )
                 )
@@ -515,7 +533,7 @@ class TelethonAPI(TelegramAPI):
             repl = await self._send_and_recv("".join(i[2]))
             if "Congratulations." not in repl:
                 self.cb.put(
-                    MSG_FAIL_STICKER.format(
+                    self.MSG_FAIL_STICKER.format(
                         sticker=i[0], pack=self.pack_short_name, reason=repl
                     )
                 )
@@ -525,15 +543,15 @@ class TelethonAPI(TelegramAPI):
             self.cb.put("update_bar")
         repl = await self._send_and_recv("/publish")
         if "icon" not in repl:
-            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
         repl = await self._send_and_recv("/skip")
         if "Please provide a short name" not in repl:
-            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
         repl = await self._send_and_recv(self.pack_short_name)
         if "Kaboom!" not in repl:
-            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
 
         self.cb.put(("bar", None, {"set_progress_mode": "indeterminate"}))
@@ -549,11 +567,11 @@ class TelethonAPI(TelegramAPI):
         else:
             repl = await self._send_and_recv("/addsticker")
         if "Choose" not in repl:
-            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
         repl = await self._send_and_recv(self.pack_short_name)
         if "Alright!" not in repl:
-            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
 
         self.cb.put(
@@ -570,7 +588,7 @@ class TelethonAPI(TelegramAPI):
             repl = await self._send_and_recv(i[0])
             if "Thanks!" not in repl:
                 self.cb.put(
-                    MSG_FAIL_STICKER.format(
+                    self.MSG_FAIL_STICKER.format(
                         sticker=i[0], pack=self.pack_short_name, reason=repl
                     )
                 )
@@ -579,7 +597,7 @@ class TelethonAPI(TelegramAPI):
             repl = await self._send_and_recv("".join(i[2]))
             if "There we go." not in repl:
                 self.cb.put(
-                    MSG_FAIL_STICKER.format(
+                    self.MSG_FAIL_STICKER.format(
                         sticker=i[0], pack=self.pack_short_name, reason=repl
                     )
                 )
@@ -592,7 +610,7 @@ class TelethonAPI(TelegramAPI):
 
         repl = await self._send_and_recv("/done")
         if "OK" not in repl:
-            self.cb.put(MSG_FAIL_PACK.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK.format(self.pack_short_name, repl))
             return len(stickers_list), 0
 
         return len(stickers_list), stickers_ok
@@ -600,11 +618,11 @@ class TelethonAPI(TelegramAPI):
     async def pack_thumbnail(self, thumbnail: TelegramSticker) -> bool:
         repl = await self._send_and_recv("/setpackicon")
         if "OK" not in repl:
-            self.cb.put(MSG_FAIL_PACK_ICON.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK_ICON.format(self.pack_short_name, repl))
             return False
         repl = await self._send_and_recv(thumbnail[0])
         if "Enjoy!" not in repl:
-            self.cb.put(MSG_FAIL_PACK_ICON.format(self.pack_short_name, repl))
+            self.cb.put(self.MSG_FAIL_PACK_ICON.format(self.pack_short_name, repl))
             return False
         return True
 
