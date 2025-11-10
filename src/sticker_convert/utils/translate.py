@@ -75,14 +75,8 @@ def gettext_dummy(x: str) -> str:
     return x
 
 
-RUNTIME_STATE["TRANS_OUTDATED"] = False
-
-
 def get_translator() -> Callable[[str], str]:
-    if (
-        RUNTIME_STATE["TRANS_OUTDATED"] is False
-        and RUNTIME_STATE.get("TRANS") is not None
-    ):
+    if RUNTIME_STATE.get("TRANS") is not None:
         return RUNTIME_STATE["TRANS"]
 
     try:
@@ -97,7 +91,6 @@ def get_translator() -> Callable[[str], str]:
             )
             print("Fallback to using English...")
         trans = gettext_dummy
-    RUNTIME_STATE["TRANS_OUTDATED"] = False
     RUNTIME_STATE["TRANS"] = trans
     return trans
 

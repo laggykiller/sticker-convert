@@ -145,7 +145,7 @@ class ConfigFrame(LabelFrame):
         self.gui.lang_true_var.set(SUPPORTED_LANG[self.gui.lang_display_var.get()])
         self.gui.save_config()
         RUNTIME_STATE["LANG"] = get_lang()
-        RUNTIME_STATE["TRANS_OUTDATED"] = True
+        RUNTIME_STATE["TRANS"] = None
         self.gui.reset()
 
     def set_states(self, state: str) -> None:

@@ -8,13 +8,7 @@ from sticker_convert.utils.files.json_manager import JsonManager
 
 
 def load_resource_json(json_name: str) -> Dict[Any, Any]:
-    if RUNTIME_STATE.get(f"{json_name}_json_outdated") is None:
-        RUNTIME_STATE[f"{json_name}_json_outdated"] = False
-
-    if (
-        RUNTIME_STATE[f"{json_name}_json_outdated"] is False
-        and RUNTIME_STATE.get(f"{json_name}_json") is not None
-    ):
+    if RUNTIME_STATE.get(f"{json_name}_json") is not None:
         return cast(Dict[Any, Any], RUNTIME_STATE[f"{json_name}_json"])
     else:
         loaded_json = JsonManager.load_json(ROOT_DIR / f"resources/{json_name}.json")
@@ -35,5 +29,4 @@ def load_resource_json(json_name: str) -> Dict[Any, Any]:
                 custom_preset_json,
             )
         RUNTIME_STATE[f"{json_name}_json"] = loaded_json
-        RUNTIME_STATE[f"{json_name}_json_outdated"] = False
         return loaded_json

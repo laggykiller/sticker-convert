@@ -118,9 +118,9 @@ class GUI(Window):
         self.init_done = False
 
         # These json have translated version
-        RUNTIME_STATE["help_json_outdated"] = True
-        RUNTIME_STATE["input_json_outdated"] = True
-        RUNTIME_STATE["output_json_outdated"] = True
+        RUNTIME_STATE["help_json"] = None
+        RUNTIME_STATE["input_json"] = None
+        RUNTIME_STATE["output_json"] = None
         self.load_jsons()
         self.apply_config()
 
