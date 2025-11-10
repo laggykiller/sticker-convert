@@ -4,7 +4,7 @@
 ![/imgs/banner.png](https://socialify.git.ci/laggykiller/sticker-convert/image?description=1&font=Inter&logo=https%3A%2F%2Fgithub.com%2Flaggykiller%2Fsticker-convert%2Fblob%2Fmaster%2Fsrc%2Fsticker_convert%2Fresources%2Fappicon.png%3Fraw%3Dtrue&name=1&owner=1&theme=Dark)
 ![/imgs/screenshot](/imgs/screenshot.png)
 
-- 一個用於建立、下載、轉換壓縮並上傳來自多個即時通訊應用程式的貼圖的 Python 腳本。
+- 一個用於建立、下載、轉換+壓縮並上傳即時通訊應用程式的貼圖的 Python 腳本。
 - 提供圖形使用者介面 (GUI) 和命令列介面 (CLI)，可在 Windows、macOS 和 Linux 系統上運作。
 - 目前支援 Signal、Telegram、WhatsApp（建立 .wastickers 檔案）、Line（僅下載）、Kakao（僅下載）、Naver Band（僅下載）、OGQ（僅下載）、Viber、Discord（僅下載）和 iMessage（建立 Xcode 貼紙包專案）。
 - 支援靜態和動態貼紙，並支援透明度。
@@ -64,14 +64,14 @@
     - 下載: 支援貼圖和自訂表情符號 (例：`https://telegram.me/addstickers/xxxxx`)，但需要bot token或使用Telethon
     - 上載: 支援貼圖和自訂表情符號，但需要bot token和user_id或使用Telethon。你亦可以手動上載此程式製作出來的貼圖檔。
 - WhatsApp
-    - 下載: You have to manually find sticker packs / extract from your phone or from WhatsApp Web. Learn more from [/docs/zh_TW/guide_whatsapp.md](/docs/zh_TW/guide_whatsapp.md)
-    - 上載: The program can create .wastickers file, which could then be imported into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information.
+    - 下載：您需要手動尋找貼圖包/從手機或 WhatsApp 網頁版提取。請參閱 [/docs/zh_TW/guide_whatsapp.md](/docs/zh_TW/guide_whatsapp.md)。
+    - 上傳：程式可以建立 .wastickers 文件，然後可以透過第三方應用程式「Sticker Maker」將其匯入 WhatsApp（本倉庫作者與 Sticker Maker 無任何關聯）。請參閱常見問題。
 - Line
     - 下載: 支援 (例：`https://store.line.me/stickershop/product/1234/en`或`line://shop/detail/1234`或`1234`)
-        - Search on official site: https://store.line.me/stickershop
-        - Search on non-official site (Include region locked and expired packs): http://www.line-stickers.com/
-        - For more information: https://github.com/doubleplusc/Line-sticker-下載er
-    - 上載: 不支援. You need to manually submit sticker pack for approval before you can use in app.
+        - 官方網站搜尋：https://store.line.me/stickershop
+        - 在非官方網站上搜尋（包括區域鎖定和過期的套件）：http://www.line-stickers.com/
+        - 欲了解更多資訊：https://github.com/doubleplusc/Line-sticker-downloader
+    - 上傳：不支援。您需要手動提交貼紙包以獲得批准才能在應用程式中使用。
 - Kakao
     - 下載: 支援 (例：`https://e.kakao.com/t/xxxxx`或`https://emoticon.kakao.com/items/xxxxx`或`4404400`). 有點複雜，請參照[/docs/zh_TW/guide_kakao.md](/docs/zh_TW/guide_kakao.md)
     - 上載: 不支援。你需要手動上傳貼圖包作檢核以在程式裏使用。
@@ -132,8 +132,9 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--cus
                           [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
                           [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
                           [--kakao-device-uuid KAKAO_DEVICE_UUID] [--line-get-auth] [--line-cookies LINE_COOKIES]
-                          [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH] [--viber-bin-path VIBER_BIN_PATH]
-                          [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--save-cred]
+                          [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
+                          [--save-cred]
 
 sticker-convert的CLI
 
@@ -153,43 +154,43 @@ options:
   --input-dir INPUT_DIR
                         選擇輸入路徑。
   --download-auto DOWNLOAD_AUTO
-                        Auto detect URL type and download
+                        自動偵測URL類型並下載
                         (支援輸入來源: Signal, Telegram, Line, Kakao, Naver Band, OGQ, Viber, Discord)
   --download-signal DOWNLOAD_SIGNAL
-                        Download signal stickers from a URL as input
+                        從URL下載Signal貼圖
                         (例子: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx)
   --download-telegram DOWNLOAD_TELEGRAM
-                        Download telegram stickers from a URL as input
+                        從URL下載Telegram貼圖
                         (例子: https://telegram.me/addstickers/xxxxx
                          OR https://telegram.me/addemoji/xxxxx)
   --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON
-                        Download telegram stickers from a URL as input with Telethon
+                        從URL以Telethon下載Telegram貼圖
                         (例子: https://telegram.me/addstickers/xxxxx
                          OR https://telegram.me/addemoji/xxxxx)
   --download-line DOWNLOAD_LINE
-                        Download line stickers from a URL / ID as input
+                        從URL/ID下載Line貼圖
                         (例子: https://store.line.me/stickershop/product/1234/en
                          OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234)
   --download-kakao DOWNLOAD_KAKAO
-                        Download kakao stickers from a URL / ID as input
+                        從URL/ID下載Kakao貼圖
                         (例子: https://e.kakao.com/t/xxxxx 
                         OR https://emoticon.kakao.com/items/xxxxx OR 4404400)
   --download-band DOWNLOAD_BAND
-                        Download Naver Band stickers from a URL / ID as input
+                        從URL/ID下載Naver Band貼圖
                         (例子: https://www.band.us/sticker/xxxx OR 2535)
   --download-ogq DOWNLOAD_OGQ
-                        Download OGQ stickers from a URL / ID as input
+                        從URL下載OGQ貼圖
                         (Example: https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx)
   --download-viber DOWNLOAD_VIBER
-                        Download viber stickers from a URL as input
+                        從URL下載Viber貼圖
                         (例子: https://stickers.viber.com/pages/example
                         OR https://stickers.viber.com/pages/custom-sticker-packs/example)
   --download-discord DOWNLOAD_DISCORD
-                        Download discord stickers from a channel URL / ID as input
+                        從頻道URL/ID下載Discord貼圖
                         (例子: https://discord.com/channels/169256939211980800/@home
                         OR 169256939211980800)
   --download-discord-emoji DOWNLOAD_DISCORD_EMOJI
-                        Download discord emojis from a channel URL / ID as input
+                        從頻道URL/ID下載Discord表情
                         (例子: https://discord.com/channels/169256939211980800/@home
                         OR 169256939211980800)
 
@@ -378,7 +379,7 @@ options:
 
 轉換Signal貼圖到Telegram並上載
 
-`sticker-convert --download-signal <url> --export-telegram --telegram-token <your_bot_token_here> --telegram-userid <your_userid_here> --save-cred`
+`sticker-convert --download-signal <url> --export-telegram --telegram-token <你的_bot_token> --telegram-userid <你的_userid_here> --save-cred`
 
 轉換本機檔案到多個格式並輸出
 
@@ -396,7 +397,7 @@ sticker-convert --no-confirm --download-auto https://store.line.me/stickershop/p
 sticker-convert --no-confirm --export-telegram
 sticker-convert --no-confirm --export-whatsapp
 
-sticker-convert --no-confirm --下載-line https://store.line.me/stickershop/product/2/en --preset signal --export-signal
+sticker-convert --no-confirm --download-line https://store.line.me/stickershop/product/2/en --preset signal --export-signal
 sticker-convert --no-confirm --preset telegram --export-telegram
 sticker-convert --no-confirm --preset whatsapp --export-whatsapp
 ```
@@ -409,14 +410,20 @@ sticker-convert --no-confirm --preset whatsapp --export-whatsapp
 下載
 ```
 # 選項1: 從Dockerhub
+## 完整版
 docker pull laggykiller/sticker-convert:latest
-docker pull laggykiller/sticker-convert:latest-min-gui # No signal-desktop
-docker pull laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
+## 沒有多語言, Signal 桌面版, Viber 桌面版, Kakao 桌面版, Chromium
+docker pull laggykiller/sticker-convert:latest-min-gui
+## 沒有多語言, Signal 桌面版, Viber 桌面版, Kakao 桌面版, Chromium；只有CLI
+docker pull laggykiller/sticker-convert:latest-min-cli
 
 # 選項2: 從ghcr
+## 完整版
 docker pull ghcr.io/laggykiller/sticker-convert:latest
-docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui # No signal-desktop
-docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
+## 沒有多語言, Signal 桌面版, Viber 桌面版, Kakao 桌面版, Chromium
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui
+## 沒有多語言, Signal 桌面版, Viber 桌面版, Kakao 桌面版, Chromium；只有CLI
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli
 ```
 
 執行（GUI）
@@ -521,9 +528,9 @@ GUI：選擇`從本機路徑`作為輸入來源，勾選`不壓縮`複選框，�
 ## 鳴謝
 - Signal 和 Telegram 貼紙資訊：https://github.com/teynav/signalApngSticker
 - Line 和 Kakao 貼圖資訊：https://github.com/star-39/moe-sticker-bot
-- Line 貼圖資訊：https://github.com/doubleplusc/Line-sticker-下載器
+- Line 貼圖資訊：https://github.com/doubleplusc/Line-sticker-downloader
 - Kakao 動態貼圖資訊：https://gist.github.com/chitacan/9802668
-- Kakao 動態貼圖的下載與解密：https://github.com/blluv/KakaoTalkEmoticon下載器
+- Kakao 動態貼圖的下載與解密：https://github.com/blluv/KakaoTalkEmoticonDownloader
 - 尋找瀏覽器執行檔路徑：https://github.com/roniemartinez/browsers
 - 應用程式圖示來自 [Icons8](https://icons8.com/)
 - 橫幅由 [GitHub Socialify](https://socialify.git.ci/) 生成

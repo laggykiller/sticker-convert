@@ -4,13 +4,13 @@
 ![/imgs/banner.png](https://socialify.git.ci/laggykiller/sticker-convert/image?description=1&font=Inter&logo=https%3A%2F%2Fgithub.com%2Flaggykiller%2Fsticker-convert%2Fblob%2Fmaster%2Fsrc%2Fsticker_convert%2Fresources%2Fappicon.png%3Fraw%3Dtrue&name=1&owner=1&theme=Dark)
 ![/imgs/screenshot](/imgs/screenshot.png)
 
-- 複数のインスタントメッセージングアプリケーションからスタンプを作成、ダウンロード、変換・圧縮、アップロードするためのPythonスクリプトです。
+- 複数のインスタントメッセージングアプリケーションからスタンプを作成、ダウンロード、変換+圧縮、アップロードするためのPythonスクリプトです。
 - Windows、MacOS、Linuxで動作するGUIとCLIを備えています。
 - 現在、Signal、Telegram、WhatsApp（.wastickersを作成）、Line（ダウンロードのみ）、Kakao（ダウンロードのみ）、Naver Band（ダウンロードのみ）、OGQ（ダウンロードのみ）、Viber、Discord（ダウンロードのみ）、iMessage（Xcodeスタンプパックプロジェクトを作成）をサポートしています。
 - 画像スタンプと動画スタンプをサポートし、透明度もサポートしています。
 
 ## ダウンロード
-- Windows、MacOS、Linux（AppImage形式）向けの[実行ファイル](https://github.com/laggykiller/sticker-convert/releases)。
+- [実行ファイル]：Windows、MacOS、Linux（AppImage形式）バージョンあり(https://github.com/laggykiller/sticker-convert/releases)。
 - Windows：ダウンロードしたファイルを展開し、`sticker-convert.exe`を実行する；又はインストール用のmsiファイルをダウンロードしてください。
 - MacOS：ダウンロードしたファイルを展開し、Ctrlキーを押しながら`hold_control_and_click_open_me.command`（初回のみ）を開いてください。次回からは`sticker-convert.app`を実行してください。
 - Linux：
@@ -132,8 +132,9 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--cus
                           [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
                           [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
                           [--kakao-device-uuid KAKAO_DEVICE_UUID] [--line-get-auth] [--line-cookies LINE_COOKIES]
-                          [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH] [--viber-bin-path VIBER_BIN_PATH]
-                          [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--save-cred]
+                          [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
+                          [--save-cred]
 
 sticker-convertのCLI
 
@@ -178,7 +179,7 @@ options:
                         入力としてURL/IDからNaver Bandスタンプをダウンロードする
                         (例: https://www.band.us/sticker/xxxx OR 2535)
   --download-ogq DOWNLOAD_OGQ
-                        入力としてURL/IDからOGQスタンプをダウンロードする
+                        入力としてURLからOGQスタンプをダウンロードする
                         (例: https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx)
   --download-viber DOWNLOAD_VIBER
                         入力としてURL/IDからViberスタンプをダウンロードする
@@ -405,14 +406,20 @@ sticker-convert --no-confirm --preset whatsapp --export-whatsapp
 ダウンロード
 ```
 # 選択 1: Dockerhubから
+## 完全版
 docker pull laggykiller/sticker-convert:latest
-docker pull laggykiller/sticker-convert:latest-min-gui # No signal-desktop
-docker pull laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし
+docker pull laggykiller/sticker-convert:latest-min-gui
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし；CLIだけ
+docker pull laggykiller/sticker-convert:latest-min-cli
 
 # 選択 2: ghcrから
+## 完全版
 docker pull ghcr.io/laggykiller/sticker-convert:latest
-docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui # No signal-desktop
-docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし；CLIだけ
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli
 ```
 
 実行 (GUI)

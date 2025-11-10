@@ -43,7 +43,7 @@
     },
     "ogq": {
         "full_name": "OGQからダウンロード",
-        "help": "入力としてURL/IDからOGQスタンプをダウンロードする",
+        "help": "入力としてURLからOGQスタンプをダウンロードする",
         "example": "例: https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx",
         "address_lbls": "URLアドレス"
     },

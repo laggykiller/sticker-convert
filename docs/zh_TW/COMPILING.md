@@ -13,8 +13,8 @@
 
 在Linux，你亦可以在容器(Docker)中編譯
 ```bash
-ARCH=amd64  # Choose one only
-ARCH=arm64  # Choose one only
+ARCH=amd64  # 只選一個
+ARCH=arm64  # 只選一個
 
 # 如要交叉編譯，請執行：
 # sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes

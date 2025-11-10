@@ -1,67 +1,67 @@
 {
     "auto": {
         "full_name": "下載(自動偵測)",
-        "help": "Auto detect URL type and download",
+        "help": "自動偵測URL類型並下載",
         "example": "支援輸入來源: Signal, Telegram, Line, Kakao, Naver Band, OGQ, Viber, Discord",
         "address_lbls": "URL 地址"
     },
     "signal": {
         "full_name": "從Signal下載",
-        "help": "Download signal stickers from a URL as input",
+        "help": "從URL下載Signal貼圖",
         "example": "例子: https://signal.art/addstickers/#pack_id=xxxxx&pack_key=xxxxx",
         "address_lbls": "URL 地址"
     },
     "telegram": {
         "full_name": "從Telegram下載",
-        "help": "Download telegram stickers from a URL as input",
+        "help": "從URL下載Telegram貼圖",
         "example": "例子: https://telegram.me/addstickers/xxxxx\n OR https://telegram.me/addemoji/xxxxx",
         "address_lbls": "URL 地址"
     },
     "telegram_telethon": {
         "full_name": "從Telegram以Telethon下載",
-        "help": "Download telegram stickers from a URL as input with Telethon",
+        "help": "從URL以Telethon下載Telegram貼圖",
         "example": "例子: https://telegram.me/addstickers/xxxxx\n OR https://telegram.me/addemoji/xxxxx",
         "address_lbls": "URL 地址"
     },
     "line": {
         "full_name": "從Line下載",
-        "help": "Download line stickers from a URL / ID as input",
+        "help": "從URL/ID下載Line貼圖",
         "example": "例子: https://store.line.me/stickershop/product/1234/en\n OR https://line.me/S/sticker/1234/?lang=en OR line://shop/detail/1234 OR 1234",
         "address_lbls": "URL 地址 / ID"
     },
     "kakao": {
         "full_name": "從Kakao下載",
-        "help": "Download kakao stickers from a URL / ID as input",
+        "help": "從URL/ID下載Kakao貼圖",
         "example": "例子: https://e.kakao.com/t/xxxxx \nOR https://emoticon.kakao.com/items/xxxxx OR 4404400",
         "address_lbls": "URL 地址 / ID"
     },
     "band": {
         "full_name": "從Naver Band下載",
-        "help": "Download Naver Band stickers from a URL / ID as input",
+        "help": "從URL/ID下載Naver Band貼圖",
         "example": "例子: https://www.band.us/sticker/xxxx OR 2535",
         "address_lbls": "URL 地址 / ID"
     },
     "ogq": {
         "full_name": "從OGQ下載",
-        "help": "Download OGQ stickers from a URL / ID as input",
+        "help": "從URL下載OGQ貼圖",
         "example": "Example: https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx",
         "address_lbls": "URL 地址"
     },
     "viber": {
         "full_name": "從Viber下載",
-        "help": "Download viber stickers from a URL as input",
+        "help": "從URL下載Viber貼圖",
         "example": "例子: https://stickers.viber.com/pages/example\nOR https://stickers.viber.com/pages/custom-sticker-packs/example",
         "address_lbls": "URL 地址 / ID"
     },
     "discord": {
         "full_name": "從Discord下載",
-        "help": "Download discord stickers from a channel URL / ID as input",
+        "help": "從頻道URL/ID下載Discord貼圖",
         "example": "例子: https://discord.com/channels/169256939211980800/@home\nOR 169256939211980800",
         "address_lbls": "URL 地址 / ID"
     },
     "discord_emoji": {
         "full_name": "從Discord下載(表情)",
-        "help": "Download discord emojis from a channel URL / ID as input",
+        "help": "從頻道URL/ID下載Discord表情",
         "example": "例子: https://discord.com/channels/169256939211980800/@home\nOR 169256939211980800",
         "address_lbls": "URL 地址 / ID"
     },

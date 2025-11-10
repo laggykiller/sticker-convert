@@ -132,8 +132,9 @@ usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--cus
                           [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
                           [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
                           [--kakao-device-uuid KAKAO_DEVICE_UUID] [--line-get-auth] [--line-cookies LINE_COOKIES]
-                          [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH] [--viber-bin-path VIBER_BIN_PATH]
-                          [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--save-cred]
+                          [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
+                          [--save-cred]
 
 CLI for sticker-convert
 
@@ -178,7 +179,7 @@ Input options:
                         Download Naver Band stickers from a URL / ID as input
                         (Example: https://www.band.us/sticker/xxxx OR 2535)
   --download-ogq DOWNLOAD_OGQ
-                        Download OGQ stickers from a URL / ID as input
+                        Download OGQ stickers from a URL as input
                         (Example: https://ogqmarket.naver.com/artworks/sticker/detail?artworkId=xxxxx)
   --download-viber DOWNLOAD_VIBER
                         Download viber stickers from a URL as input
@@ -411,14 +412,20 @@ Note that you can see the conversion result in export-result.txt
 Downloading
 ```
 # Option 1: From Dockerhub
+## Full version
 docker pull laggykiller/sticker-convert:latest
-docker pull laggykiller/sticker-convert:latest-min-gui # No signal-desktop
-docker pull laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
+## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium
+docker pull laggykiller/sticker-convert:latest-min-gui
+## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium; Only CLI
+docker pull laggykiller/sticker-convert:latest-min-cli
 
 # Option 2: From ghcr
+## Full version
 docker pull ghcr.io/laggykiller/sticker-convert:latest
-docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui # No signal-desktop
-docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli # No signal-desktop, CLI only
+## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui
+## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium; Only CLI
+docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli
 ```
 
 Running (GUI)
