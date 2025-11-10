@@ -787,7 +787,8 @@ class GUI(Window):
             not self.no_compress_var.get()
             and self.get_output_name() != "local"
             and self.comp_preset_var.get() not in ("auto", "custom")
-            and self.get_output_name().replace("_telethon", "") not in self.comp_preset_var.get()
+            and self.get_output_name().replace("_telethon", "")
+            not in self.comp_preset_var.get()
         ):
             self.comp_frame.comp_preset_opt.config(bootstyle="warning")  # type: ignore
             self.output_frame.output_option_opt.config(bootstyle="warning")  # type: ignore
