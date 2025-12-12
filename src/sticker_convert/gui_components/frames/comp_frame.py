@@ -148,9 +148,12 @@ class CompFrame(LabelFrame):
 
     def cb_compress_advanced(self, *_: Any) -> None:
         AdvancedCompressionWindow(self.gui)
-    
+
     def cb_no_compress_toggle(self, *_: Any) -> None:
-        if self.gui.comp_preset_var.get() == "auto" and self.gui.get_output_name() == "local":
+        if (
+            self.gui.comp_preset_var.get() == "auto"
+            and self.gui.get_output_name() == "local"
+        ):
             self.gui.no_compress_var.set(True)
         else:
             self.gui.no_compress_var.set(False)
