@@ -109,15 +109,9 @@ class CompFrame(LabelFrame):
         self.comp_advanced_btn.grid(column=2, row=4, sticky="nes", padx=3, pady=3)
 
         self.cb_comp_apply_preset()
-        self.cb_no_compress()
 
     def cb_comp_apply_preset(self, *_: Any) -> None:
         selection = self.gui.get_preset()
-        if selection == "auto":
-            if self.gui.get_input_name() == "local":
-                self.gui.no_compress_var.set(True)
-            else:
-                self.gui.no_compress_var.set(False)
 
         preset = self.gui.compression_presets[selection]
         self.gui.fps_min_var.set(preset.get("fps", {}).get("min"))
@@ -148,11 +142,18 @@ class CompFrame(LabelFrame):
         self.gui.default_emoji_var.set(preset.get("default_emoji"))
         self.gui.steps_var.set(preset.get("steps"))
 
-        self.cb_no_compress()
         self.gui.highlight_fields()
+        self.cb_no_compress_toggle()
+        self.cb_no_compress()
 
     def cb_compress_advanced(self, *_: Any) -> None:
         AdvancedCompressionWindow(self.gui)
+    
+    def cb_no_compress_toggle(self, *_: Any) -> None:
+        if self.gui.comp_preset_var.get() == "auto" and self.gui.get_output_name() == "local":
+            self.gui.no_compress_var.set(True)
+        else:
+            self.gui.no_compress_var.set(False)
 
     def cb_no_compress(self, *_: Any) -> None:
         if self.gui.no_compress_var.get() is True:
@@ -173,3 +174,4 @@ class CompFrame(LabelFrame):
     def set_states(self, state: str) -> None:
         self.no_compress_cbox.config(state=state)
         self.set_inputs_comp(state=state)
+        self.cb_no_compress()

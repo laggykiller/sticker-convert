@@ -631,10 +631,6 @@ class GUI(Window):
         self.cred_frame.set_states(state=state)
         self.settings_frame.set_states(state=state)
 
-        if state == "normal":
-            self.input_frame.cb_input_option()
-            self.comp_frame.cb_no_compress()
-
     def exec_in_main(self, _evt: Any) -> Any:
         if self.action:
             self.response = self.action()
@@ -733,13 +729,6 @@ class GUI(Window):
             self.output_frame.author_entry.config(bootstyle="warning")  # type: ignore
         else:
             self.output_frame.author_entry.config(bootstyle="default")  # type: ignore
-
-        if self.comp_preset_var.get() == "auto":
-            if output_option == "local":
-                self.no_compress_var.set(True)
-            else:
-                self.no_compress_var.set(False)
-            self.comp_frame.cb_no_compress()
 
         # Credentials
         if output_option == "signal" and not self.signal_uuid_var.get():

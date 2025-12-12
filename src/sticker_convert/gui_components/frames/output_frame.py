@@ -102,6 +102,7 @@ class OutputFrame(LabelFrame):
         self.gui.output_option_true_var.set(self.gui.output_option_display_var.get())
         self.gui.comp_frame.cb_comp_apply_preset()
         self.gui.highlight_fields()
+        self.gui.comp_frame.cb_no_compress_toggle()
 
     def set_states(self, state: str) -> None:
         self.title_entry.config(state=state)

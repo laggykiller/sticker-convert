@@ -128,6 +128,7 @@ class InputFrame(LabelFrame):
             self.gui.input_option_true_var.set(self.gui.input_option_display_var.get())
 
         self.gui.highlight_fields()
+        self.gui.comp_frame.cb_no_compress_toggle()
 
         return True
 
