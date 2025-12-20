@@ -8,7 +8,7 @@
 
 ## 方法 2（手动）
 
-![../imgs/discord-token.png](../imgs/discord-token.png)
+![/imgs/discord-token.png](/imgs/discord-token.png)
 
 1. 登入 Discord：https://discord.com/login
 2. 按 `F12` 开启开发者工具 (Developer tools)

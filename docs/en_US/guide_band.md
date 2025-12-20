@@ -1,5 +1,5 @@
 # Downloading Band stickers
-![../imgs/band-share.png](../imgs/band-share.png)
+![/imgs/band-share.png](/imgs/band-share.png)
 1. You may search for stickers from Band Sticker Shop (Access from Band app in Android/iOS after registering account)
 2. Copy the share URL of the sticker pack to input url of sticker-convert
 

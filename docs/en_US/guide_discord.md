@@ -7,7 +7,7 @@ You can get them easily with `Generate` button (In GUI) or `--discord-get-auth` 
 Note that you need to install Discord Desktop or Chrome browser.
 
 ## Method 2 (Manually)
-![../imgs/discord-token.png](../imgs/discord-token.png)
+![/imgs/discord-token.png](/imgs/discord-token.png)
 1. Login to discord on https://discord.com/login
 2. Open DevTool by pressing `F12`
 3. Open Console in DevTool

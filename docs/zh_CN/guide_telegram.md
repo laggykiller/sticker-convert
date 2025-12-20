@@ -5,7 +5,7 @@
 上传和下载 Telegram 貼纸需要 `token`
 （注意：如果您不想这样做，仍然可以使用此连结手动上传貼纸：https://t.me/stickers）
 
-![../imgs/telegram-bot.png](../imgs/telegram-bot.png)
+![/imgs/telegram-bot.png](/imgs/telegram-bot.png)
 
 1. 在 Telegram 联络 botfather：https://t.me/botfather
 2. 请依照此处的说明建立机器人并取得token：https://core.telegram.org/bots/features#creating-a-new-bot
@@ -18,7 +18,7 @@
 
 请按照此貼文的说明：https://stackoverflow.com/a/52667196
 
-![../imgs/telegram-userid.png](../imgs/telegram-userid.png)
+![/imgs/telegram-userid.png](/imgs/telegram-userid.png)
 
 ## 为什么 Telegram 貼图连结以 _by_xxxbot 结尾？
 根据 Telegram 的规定，机器人创建的貼纸包必须以该后缀结尾。

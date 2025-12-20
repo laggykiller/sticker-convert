@@ -9,7 +9,7 @@
 - 動画スタンプのダウンロードにおいて、`https://e.kakao.com/t/xxxxx` ではなく `https://emoticon.kakao.com/items/xxxxx` を使用すると、ダウンロードに失敗する可能性がわずかにあります。
 
 ## 共有リンクの取得方法
-![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
+![/imgs/kakao-share.jpeg](/imgs/kakao-share.jpeg)
 
 ウェブリンク (`https://e.kakao.com/t/xxxxx`) から見つけたスタンプパックをダウンロードするには、以下の手順に従ってください。
 1. e.kakao.com で Kakao にログイン

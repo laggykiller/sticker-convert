@@ -8,7 +8,7 @@
 自 v2.7.0 起，您可以从 Signal 的非测试版中取得 Signal UUID 和密码。
 
 ## 方法二：手动（使用 Signal Beta 版）
-![../imgs/signal-uuid-password.png](../imgs/signal-uuid-password.png)
+![/imgs/signal-uuid-password.png](/imgs/signal-uuid-password.png)
 
 1. 从 https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta 安装Signal Desktop Beta版
 2. 将 Signal Desktop 与您的手机连接

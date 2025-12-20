@@ -8,7 +8,7 @@ You can get them easily with `Generate` button (In GUI) or `--signal-get-auth` (
 Since v2.7.0, you can get Signal uuid and password from non-beta version of Signal.
 
 ## Method 2: Manual (Using Signal Beta)
-![../imgs/signal-uuid-password.png](../imgs/signal-uuid-password.png)
+![/imgs/signal-uuid-password.png](/imgs/signal-uuid-password.png)
 
 1. Install Signal Desktop BETA VERSION from https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta
 2. Link Signal Desktop with your phone

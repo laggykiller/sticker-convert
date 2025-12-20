@@ -1,5 +1,5 @@
 # Bandスタンプのダウンロード
-![../imgs/band-share.png](../imgs/band-share.png)
+![/imgs/band-share.png](/imgs/band-share.png)
 1. Bandスタンプショップでスタンプを検索できます（アカウント登録後、Android/iOSのバンドアプリからアクセスできます）。
 2. スタンプパックの共有URLをコピーし、sticker-convertのURLを入力します。
 

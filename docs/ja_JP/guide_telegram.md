@@ -5,7 +5,7 @@
 Telegramスタンプのアップロードとダウンロードには`token`が必要です
 (注: この手順を省きたい場合は、https://t.me/stickers から手動でスタンプをアップロードすることもできます)
 
-![../imgs/telegram-bot.png](../imgs/telegram-bot.png)
+![/imgs/telegram-bot.png](/imgs/telegram-bot.png)
 
 1. Telegramでbotfatherに連絡してください: https://t.me/botfather
 2. こちらの手順に従ってボットを作成し、トークンを取得してください: https://core.telegram.org/bots/features#creating-a-new-bot
@@ -18,7 +18,7 @@ Telegramスタンプのアップロードに必要な`user_id`。 user_id はボ
 
 こちらの投稿の手順に従ってください: https://stackoverflow.com/a/52667196
 
-![../imgs/telegram-userid.png](../imgs/telegram-userid.png)
+![/imgs/telegram-userid.png](/imgs/telegram-userid.png)
 
 ## Telegram スタンプのリンクが _by_xxxbot で終わるのはなぜですか？
 ボットによって作成されたスタンプパックは、Telegram の規定により、このサフィックスで終わる必要があります。

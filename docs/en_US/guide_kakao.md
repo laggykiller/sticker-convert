@@ -9,7 +9,7 @@
 - For downloading animated sticker, there is small chance of failing if you are using `https://e.kakao.com/t/xxxxx` instead of `https://emoticon.kakao.com/items/xxxxx`
 
 ## How to get share link
-![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
+![/imgs/kakao-share.jpeg](/imgs/kakao-share.jpeg)
 
 If you want to download sticker pack that you found from web link (`https://e.kakao.com/t/xxxxx`), you can:
 1. Login to Kakao in e.kakao.com

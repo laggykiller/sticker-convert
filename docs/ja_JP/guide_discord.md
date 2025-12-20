@@ -7,7 +7,7 @@ Discord スタンプと絵文字をダウンロードするには、認証トー
 Discord デスクトップ版または Chrome ブラウザが必要があります。
 
 ## 方法 2 (手動)
-![../imgs/discord-token.png](../imgs/discord-token.png)
+![/imgs/discord-token.png](/imgs/discord-token.png)
 1. https://discord.com/login で Discord にログインします。
 2. `F12` キーを押して DevTool を開きます。
 3. DevTool でコンソールを開きます。

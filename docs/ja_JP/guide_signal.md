@@ -8,7 +8,7 @@ Signal スタンプをアップロードするには、`UUID` と `Password` が
 v2.7.0 以降では、Signal のベータ版以外からSignalのUUIDとPasswordを取得できます。
 
 ## 方法 2: 手動 (Signal Beta版を使用)
-![../imgs/signal-uuid-password.png](../imgs/signal-uuid-password.png)
+![/imgs/signal-uuid-password.png](/imgs/signal-uuid-password.png)
 
 1. https://support.signal.org/hc/en-us/articles/360007318471-Signal-Beta から Signal Desktop Beta版をインストールします。
 2. Signal Desktop をスマートフォンにリンクします。

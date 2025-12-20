@@ -9,7 +9,7 @@
 - 下載動態貼圖時，使用`https://e.kakao.com/t/xxxxx`而不使用`https://emoticon.kakao.com/items/xxxxx`會有細小機會下載失敗。
 
 ## 如何取得分享連結
-![../imgs/kakao-share.jpeg](../imgs/kakao-share.jpeg)
+![/imgs/kakao-share.jpeg](/imgs/kakao-share.jpeg)
 
 如果您想下載從網頁連結（`https://e.kakao.com/t/xxxxx`）找到的表情包，您可以：
 
