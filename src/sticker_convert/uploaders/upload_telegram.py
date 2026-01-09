@@ -134,7 +134,7 @@ class UploadTelegram(UploadBase):
                         "Warning: Cannot find emoji for file {}, using default emoji..."
                     ).format(Path(src).name)
                 )
-                emoji_list = [self.opt_comp.default_emoji]
+                emoji = self.opt_comp.default_emoji
 
             if len(emoji) > 20:
                 self.cb.put(
