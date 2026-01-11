@@ -6,8 +6,6 @@ from multiprocessing.managers import ListProxy, SyncManager
 from queue import Queue
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Protocol, Tuple, Union
 
-from tqdm import tqdm
-
 CbQueueTupleType = Tuple[
     Optional[str], Optional[Tuple[Any, ...]], Optional[Dict[str, Any]]
 ]
@@ -69,6 +67,8 @@ class CallbackCli(CallbackProtocol):
         no_confirm: bool = False,
         no_progress: bool = False,
     ) -> None:
+        from tqdm import tqdm
+
         self.progress_bar: Optional[tqdm[Any]] = None
 
         if msg:
@@ -126,6 +126,8 @@ class CallbackCli(CallbackProtocol):
         steps: int = 0,
         update_bar: int = 0,
     ) -> None:
+        from tqdm import tqdm
+
         if self.silent or self.no_progress:
             return
 

@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 import mmap
-import warnings
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
 from io import BytesIO
@@ -11,13 +10,10 @@ from math import ceil, gcd
 from pathlib import Path
 from typing import BinaryIO, List, Optional, Tuple, Union, cast
 
-from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
 from PIL import Image, UnidentifiedImageError
 from rlottie_python.rlottie_wrapper import LottieAnimation
 
 from sticker_convert.definitions import SVG_DEFAULT_HEIGHT, SVG_DEFAULT_WIDTH, SVG_SAMPLE_FPS
-
-warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
 
 
 def lcm(a: int, b: int) -> int:
@@ -452,6 +448,12 @@ class CodecInfo:
     def get_svg_info(
         file: Union[Path, bytes],
     ) -> Tuple[float, int, int, Tuple[int, int]]:
+        import warnings
+
+        from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning
+
+        warnings.filterwarnings("ignore", category=XMLParsedAsHTMLWarning)
+
         if isinstance(file, Path):
             with open(file) as f:
                 svg = f.read()

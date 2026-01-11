@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from pathlib import Path
-from tkinter import filedialog
 from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Entry, Label, LabelFrame, OptionMenu  # type: ignore
@@ -102,6 +101,8 @@ class InputFrame(LabelFrame):
             self.address_entry.config(state="normal")
 
     def cb_set_indir(self, *_args: Any) -> None:
+        from tkinter import filedialog
+
         orig_input_dir = self.gui.input_setdir_var.get()
         if not Path(orig_input_dir).is_dir():
             orig_input_dir = DEFAULT_DIR

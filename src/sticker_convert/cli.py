@@ -11,14 +11,6 @@ from typing import Any, Dict
 
 from mergedeep import merge  # type: ignore
 
-from sticker_convert.auth.auth_discord import AuthDiscord
-from sticker_convert.auth.auth_kakao_android_login import AuthKakaoAndroidLogin
-from sticker_convert.auth.auth_kakao_desktop_login import AuthKakaoDesktopLogin
-from sticker_convert.auth.auth_kakao_desktop_memdump import AuthKakaoDesktopMemdump
-from sticker_convert.auth.auth_line import AuthLine
-from sticker_convert.auth.auth_signal import AuthSignal
-from sticker_convert.auth.auth_telethon import AuthTelethon
-from sticker_convert.auth.auth_viber import AuthViber
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR
 from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
@@ -526,6 +518,8 @@ class CLI:
         )
 
         if args.kakao_get_auth_android_login:
+            from sticker_convert.auth.auth_kakao_android_login import AuthKakaoAndroidLogin
+
             get_kakao_auth_android_login = AuthKakaoAndroidLogin(opt_cred, self.cb)
             auth_token, msg = get_kakao_auth_android_login.get_cred()
 
@@ -535,6 +529,8 @@ class CLI:
             self.cb.put(msg)
 
         if args.kakao_get_auth_desktop_memdump:
+            from sticker_convert.auth.auth_kakao_desktop_memdump import AuthKakaoDesktopMemdump
+
             get_kakao_auth_desktop_memdump = AuthKakaoDesktopMemdump(opt_cred, self.cb)
             kakao_bin_path = None
             if args.kakao_bin_path:
@@ -547,6 +543,8 @@ class CLI:
             self.cb.put(msg)
 
         if args.kakao_get_auth_desktop_login:
+            from sticker_convert.auth.auth_kakao_desktop_login import AuthKakaoDesktopLogin
+
             get_kakao_auth_desktop_login = AuthKakaoDesktopLogin(opt_cred, self.cb)
             auth_token, msg = get_kakao_auth_desktop_login.get_cred()
 
@@ -556,6 +554,8 @@ class CLI:
             self.cb.put(msg)
 
         if args.signal_get_auth:
+            from sticker_convert.auth.auth_signal import AuthSignal
+
             m = AuthSignal(opt_cred, self.cb)
 
             uuid, password, msg = m.get_cred()
@@ -566,6 +566,8 @@ class CLI:
             self.cb.put(msg)
 
         if args.telethon_setup:
+            from sticker_convert.auth.auth_telethon import AuthTelethon
+
             telethon_setup = AuthTelethon(opt_cred, self.cb)
             success, _, telethon_api_id, telethon_api_hash, msg = telethon_setup.start(
                 check_auth_only=True
@@ -578,6 +580,8 @@ class CLI:
             self.cb.put(msg)
 
         if args.line_get_auth:
+            from sticker_convert.auth.auth_line import AuthLine
+
             get_line_auth = AuthLine(opt_cred, self.cb)
 
             line_cookies, msg = get_line_auth.get_cred()
@@ -588,6 +592,8 @@ class CLI:
             self.cb.put(msg)
 
         if args.viber_get_auth:
+            from sticker_convert.auth.auth_viber import AuthViber
+
             get_viber_auth = AuthViber(opt_cred, self.cb)
 
             viber_bin_path = None
@@ -602,6 +608,8 @@ class CLI:
             self.cb.put(msg)
 
         if args.discord_get_auth:
+            from sticker_convert.auth.auth_discord import AuthDiscord
+
             get_discord_auth = AuthDiscord(opt_cred, self.cb)
             discord_token, msg = get_discord_auth.get_cred()
 

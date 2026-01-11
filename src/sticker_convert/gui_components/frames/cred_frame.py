@@ -4,13 +4,7 @@ from typing import TYPE_CHECKING, Any
 
 from ttkbootstrap import Button, Entry, Label, LabelFrame  # type: ignore
 
-from sticker_convert.auth.auth_telethon import AuthTelethon
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
-from sticker_convert.gui_components.windows.discord_get_auth_window import DiscordGetAuthWindow
-from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGetAuthWindow
-from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
-from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
-from sticker_convert.gui_components.windows.viber_get_auth_window import ViberGetAuthWindow
 from sticker_convert.utils.translate import I
 
 if TYPE_CHECKING:
@@ -192,6 +186,8 @@ class CredFrame(LabelFrame):
             self.gui.cb.ask_str(I("You can get help from:"), initialvalue=faq_site)
 
     def cb_telethon_get_auth(self, *_: Any) -> None:
+        from sticker_convert.auth.auth_telethon import AuthTelethon
+
         success, _client, api_id, api_hash, msg = AuthTelethon(
             self.gui.get_opt_cred(), self.gui.cb
         ).start(check_auth_only=True)
@@ -202,18 +198,28 @@ class CredFrame(LabelFrame):
         self.gui.cb.put(("msg_block", (msg,), None))
 
     def cb_kakao_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.kakao_get_auth_window import KakaoGetAuthWindow
+
         KakaoGetAuthWindow(self.gui)
 
     def cb_signal_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.signal_get_auth_window import SignalGetAuthWindow
+
         SignalGetAuthWindow(self.gui)
 
     def cb_line_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
+
         LineGetAuthWindow(self.gui)
 
     def cb_viber_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.viber_get_auth_window import ViberGetAuthWindow
+
         ViberGetAuthWindow(self.gui)
 
     def cb_discord_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.discord_get_auth_window import DiscordGetAuthWindow
+
         DiscordGetAuthWindow(self.gui)
 
     def set_states(self, state: str) -> None:

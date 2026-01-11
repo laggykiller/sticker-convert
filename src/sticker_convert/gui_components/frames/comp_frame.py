@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING, Any
 from ttkbootstrap import Button, Checkbutton, Entry, Label, LabelFrame, OptionMenu  # type: ignore
 
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
-from sticker_convert.gui_components.windows.advanced_compression_window import AdvancedCompressionWindow
 from sticker_convert.utils.translate import I
 
 if TYPE_CHECKING:
@@ -147,6 +146,8 @@ class CompFrame(LabelFrame):
         self.cb_no_compress()
 
     def cb_compress_advanced(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.advanced_compression_window import AdvancedCompressionWindow
+
         AdvancedCompressionWindow(self.gui)
 
     def cb_no_compress_toggle(self, *_: Any) -> None:

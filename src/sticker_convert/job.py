@@ -11,27 +11,10 @@ from threading import Thread
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, cast
 from urllib.parse import urlparse
 
-from sticker_convert.converter import StickerConvert
 from sticker_convert.definitions import RUNTIME_STATE
-from sticker_convert.downloaders.download_band import DownloadBand
-from sticker_convert.downloaders.download_discord import DownloadDiscord
-from sticker_convert.downloaders.download_kakao import DownloadKakao
-from sticker_convert.downloaders.download_line import DownloadLine
-from sticker_convert.downloaders.download_ogq import DownloadOgq
-from sticker_convert.downloaders.download_signal import DownloadSignal
-from sticker_convert.downloaders.download_telegram import DownloadTelegram
-from sticker_convert.downloaders.download_viber import DownloadViber
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
-from sticker_convert.uploaders.compress_wastickers import CompressWastickers
-from sticker_convert.uploaders.upload_signal import UploadSignal
-from sticker_convert.uploaders.upload_telegram import UploadTelegram
-from sticker_convert.uploaders.upload_viber import UploadViber
-from sticker_convert.uploaders.xcode_imessage import XcodeImessage
 from sticker_convert.utils.callback import CallbackReturn, CbQueueType, ResultsListType, WorkQueueType
-from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.files.json_resources_loader import load_resource_json
-from sticker_convert.utils.files.metadata_handler import MetadataHandler
-from sticker_convert.utils.media.codec_info import CodecInfo
 from sticker_convert.utils.translate import I
 
 if TYPE_CHECKING:
@@ -120,6 +103,8 @@ class Executor:
         cb_queue: CbQueueType,
         cb_return: CallbackReturn,
     ) -> None:
+        from sticker_convert.utils.chrome_remotedebug import CRD
+
         for work_func, work_args in iter(work_queue.get, None):
             try:
                 results = work_func(*work_args, cb_queue, cb_return)
@@ -285,6 +270,8 @@ class Job:
         self.executor.kill_workers()
 
     def verify_input(self) -> Tuple[bool, None]:
+        from sticker_convert.utils.files.metadata_handler import MetadataHandler
+
         info_msg = ""
         error_msg = ""
 
@@ -533,6 +520,8 @@ class Job:
         return True, None
 
     def cleanup(self) -> Tuple[bool, None]:
+        from sticker_convert.utils.files.metadata_handler import MetadataHandler
+
         # If input is 'From local directory', then we should keep files in input/output directory as it maybe edited by user
         # If input is not 'From local directory', then we should move files in input/output directory as new files will be downloaded
         # Output directory should be cleanup unless no_compress is true (meaning files in output directory might be edited by user)
@@ -593,27 +582,43 @@ class Job:
         downloaders: List[Callable[..., Tuple[int, int]]] = []
 
         if self.opt_input.option == "signal":
+            from sticker_convert.downloaders.download_signal import DownloadSignal
+
             downloaders.append(DownloadSignal.start)
 
         if self.opt_input.option == "line":
+            from sticker_convert.downloaders.download_line import DownloadLine
+
             downloaders.append(DownloadLine.start)
 
         if self.opt_input.option.startswith("telegram"):
+            from sticker_convert.downloaders.download_telegram import DownloadTelegram
+
             downloaders.append(DownloadTelegram.start)
 
         if self.opt_input.option == "kakao":
+            from sticker_convert.downloaders.download_kakao import DownloadKakao
+
             downloaders.append(DownloadKakao.start)
 
         if self.opt_input.option == "band":
+            from sticker_convert.downloaders.download_band import DownloadBand
+
             downloaders.append(DownloadBand.start)
 
         if self.opt_input.option == "ogq":
+            from sticker_convert.downloaders.download_ogq import DownloadOgq
+
             downloaders.append(DownloadOgq.start)
 
         if self.opt_input.option == "viber":
+            from sticker_convert.downloaders.download_viber import DownloadViber
+
             downloaders.append(DownloadViber.start)
 
         if self.opt_input.option.startswith("discord"):
+            from sticker_convert.downloaders.download_discord import DownloadDiscord
+
             downloaders.append(DownloadDiscord.start)
 
         if len(downloaders) > 0:
@@ -649,6 +654,9 @@ class Job:
         )
 
     def compress(self) -> Tuple[bool, str]:
+        from sticker_convert.converter import StickerConvert
+        from sticker_convert.utils.media.codec_info import CodecInfo
+
         if self.opt_comp.no_compress is True:
             self.executor.cb(I("Skipped compression (no_compress is set to True)"))
             in_dir_files = [
@@ -757,18 +765,28 @@ class Job:
         exporters: List[Callable[..., Tuple[int, int, List[str]]]] = []
 
         if self.opt_output.option == "whatsapp":
+            from sticker_convert.uploaders.compress_wastickers import CompressWastickers
+
             exporters.append(CompressWastickers.start)
 
         if self.opt_output.option == "signal":
+            from sticker_convert.uploaders.upload_signal import UploadSignal
+
             exporters.append(UploadSignal.start)
 
         if self.opt_output.option.startswith("telegram"):
+            from sticker_convert.uploaders.upload_telegram import UploadTelegram
+
             exporters.append(UploadTelegram.start)
 
         if self.opt_output.option == "imessage":
+            from sticker_convert.uploaders.xcode_imessage import XcodeImessage
+
             exporters.append(XcodeImessage.start)
 
         if self.opt_output.option == "viber":
+            from sticker_convert.uploaders.upload_viber import UploadViber
+
             exporters.append(UploadViber.start)
 
         self.executor.start_workers(processes=1)
