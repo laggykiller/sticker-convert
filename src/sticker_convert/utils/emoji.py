@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
-from typing import Callable, List, Sequence, Set
+from typing import Callable, List, cast
 
-from ugrapheme import graphemes  # type: ignore
+from ugrapheme import grapheme_split  # type: ignore
 
+from sticker_convert.definitions import RUNTIME_STATE
 from sticker_convert.utils.files.json_resources_loader import load_resource_json
 
-graphemes: Callable[[str], Sequence[str]]  # type: ignore
-
-
-# https://stackoverflow.com/a/480227
-# Return list of unique items of list while preserve order
-def uniques(seq: List[str]):
-    seen: Set[str] = set()
-    seen_add = seen.add
-    return [x for x in seq if not (x in seen or seen_add(x))]
+grapheme_split: Callable[[str], List[str]]  # type: ignore
 
 
 def get_emoji_list() -> List[str]:
-    return [i["emoji"] for i in load_resource_json("emoji")]
+    if RUNTIME_STATE.get("EMOJI_LIST") is not None:
+        return cast(List[str], RUNTIME_STATE["EMOJI_LIST"])
+    else:
+        emoji_list = [i["emoji"] for i in load_resource_json("emoji")]
+        RUNTIME_STATE["EMOJI_LIST"] = emoji_list
+        return emoji_list
 
 
 EMOJI_LIST = get_emoji_list()
@@ -25,4 +23,9 @@ EMOJI_LIST = get_emoji_list()
 
 # https://stackoverflow.com/a/43146653
 def extract_emojis(s: str) -> str:
-    return "".join(uniques(list(c for c in graphemes(s) if c in EMOJI_LIST)))
+    emojis: List[str] = []
+    for c in grapheme_split(s):
+        if c in EMOJI_LIST and c not in emojis:
+            emojis.append(c)
+
+    return "".join(emojis)
