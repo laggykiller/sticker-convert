@@ -123,7 +123,7 @@ ENV WINEPREFIX=/home/app/.wine
 RUN dpkg --add-architecture i386 && \
     mkdir -pm755 /etc/apt/keyrings && \
     curl -s https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
-    curl -o /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources && \
+    curl -O --output-dir /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources && \
     apt update && \
     apt install -y winehq-stable=10.0.0.0~bullseye-1 && \
     # msi=$(strings -e l "/opt/wine-stable/lib64/wine/x86_64-windows/appwiz.cpl" | grep -o "wine-mono-.*msi") && \
