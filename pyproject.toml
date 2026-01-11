@@ -2,7 +2,7 @@
 name = "sticker-convert"
 description = "Convert (animated) stickers to/from WhatsApp, Telegram, Signal, Line, Kakao, Viber, Discord, iMessage. Written in Python."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {file = "LICENSE"}
 keywords = ["telegram", "line", "tgs", "whatsapp", "kakao", "signal", "imessage", "wastickers", "viber", "discord"]
 authors = [
@@ -17,7 +17,6 @@ classifiers = [
   "Topic :: Multimedia :: Graphics :: Graphics Conversion",
   "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
