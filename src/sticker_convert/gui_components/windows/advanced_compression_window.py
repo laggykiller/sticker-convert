@@ -11,6 +11,7 @@ from ttkbootstrap import Button, Canvas, Checkbutton, Entry, Frame, Label, Label
 from sticker_convert.gui_components.frames.right_clicker import RightClicker
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
+from sticker_convert.utils.files.json_resources_loader import load_resource_json
 from sticker_convert.utils.translate import I
 
 
@@ -20,7 +21,9 @@ class AdvancedCompressionWindow(BaseWindow):
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self.categories = list({entry["category"] for entry in self.gui.emoji_list})
+        self.categories = list(
+            {entry["category"] for entry in load_resource_json("emoji")}
+        )
 
         self.title(I("Advanced compression options"))
 
@@ -684,7 +687,7 @@ class AdvancedCompressionWindow(BaseWindow):
         emoji_column_per_row = 0
 
         self.emoji_btns = []
-        for entry in self.gui.emoji_list:
+        for entry in load_resource_json("emoji"):
             # Filtering
             search_term = self.search_var.get().lower()
             emoji = entry["emoji"]

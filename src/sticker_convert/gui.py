@@ -277,7 +277,6 @@ class GUI(Window):
         self.input_presets = load_resource_json("input")
         self.compression_presets = load_resource_json("compression")
         self.output_presets = load_resource_json("output")
-        self.emoji_list = load_resource_json("emoji")
 
         self.settings_path = CONFIG_DIR / "config.json"
         if self.settings_path.is_file():

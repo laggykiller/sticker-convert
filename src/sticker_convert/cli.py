@@ -24,6 +24,7 @@ from sticker_convert.job import Job
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
 from sticker_convert.utils.callback import CallbackCli
 from sticker_convert.utils.files.json_manager import JsonManager
+from sticker_convert.utils.files.json_resources_loader import load_resource_json
 from sticker_convert.utils.translate import LANG_DICT, I
 from sticker_convert.utils.url_detect import UrlDetect
 from sticker_convert.version import __version__
@@ -43,17 +44,11 @@ class CLI:
     def cli(self) -> None:
         print(self.MSG_MORAL.format(project_url=self.PROJECT_URL))
         print()
-        try:
-            from sticker_convert.utils.files.json_resources_loader import load_resource_json
-        except RuntimeError as e:
-            self.cb.put(str(e))
-            return
 
         self.help = load_resource_json("help")
         self.input_presets = load_resource_json("input")
         self.compression_presets = load_resource_json("compression")
         self.output_presets = load_resource_json("output")
-        self.emoji_list = load_resource_json("emoji")
 
         parser = argparse.ArgumentParser(
             description=I("CLI for sticker-convert"),
