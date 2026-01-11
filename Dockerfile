@@ -1,9 +1,27 @@
 FROM debian:11 AS min-cli
 
-WORKDIR /app
+ENV HOME=/home/app
+ENV PYENV_ROOT=/home/app/.pyenv
+ENV PATH="/home/app/.pyenv/shims:/home/app/.pyenv/bin:$PATH"
 
-RUN apt update -y && \
-    apt install --no-install-recommends -y python3 python3-pip gettext
+RUN useradd --create-home app && \
+    apt update -y && \
+    apt install --no-install-recommends -y git curl gettext ca-certificates \
+    build-essential gdb lcov libbz2-dev libffi-dev libgdbm-dev liblzma-dev \
+    libncurses5-dev libreadline6-dev libsqlite3-dev \
+    libssl-dev lzma lzma-dev uuid-dev xvfb zlib1g-dev && \
+    update-ca-certificates && \
+    curl -fsSL https://pyenv.run | bash && \
+    pyenv install 3.12 && \
+    pyenv global 3.12 && \
+    pyenv rehash && \
+    apt purge -y build-essential curl git gdb lcov libbz2-dev libffi-dev libgdbm-dev \
+    liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev \
+    libssl-dev lzma-dev uuid-dev zlib1g-dev && \
+    apt clean autoclean && \
+    apt autoremove --yes && \
+    rm -rf /var/lib/{apt,dpkg,cache,log}/
+WORKDIR /app
 
 COPY ./requirements.txt /app/
 RUN cat requirements.txt | grep -v 'ttkbootstrap' > requirements-cli.txt &&\
@@ -15,30 +33,44 @@ COPY ./src /app/
 COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
 RUN /app/scripts/update-locales.sh /app
 
-RUN apt purge -y python3-pip && \
-    apt clean autoclean && \
-    apt autoremove --yes && \
-    rm -rf /var/lib/{apt,dpkg,cache,log}/
-
-RUN useradd --create-home app
 USER app
-
 VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
-
-ENTRYPOINT ["/app/sticker-convert.py"]
+ENTRYPOINT ["/home/app/.pyenv/shims/python", "/app/sticker-convert.py"]
 
 FROM jlesage/baseimage-gui:debian-11-v4 AS base-gui
 
 WORKDIR /app
 
-# Install dependency
-RUN apt update -y && \
-    apt install --no-install-recommends -y python3 python3-pip python3-opencv python3-tk \
-    curl wget gpg zip unzip sed locales binutils psmisc git \
-    libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig gettext
+ENV HOME=/home/app
+ENV PYENV_ROOT=/home/app/.pyenv
+ENV PATH="/home/app/.pyenv/shims:/home/app/.pyenv/bin:$PATH"
 
-# Set locales
-RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && locale-gen
+RUN mkdir -p '/home/app' && \
+    chmod -R 777 '/home/app' && \
+    # Install dependency
+    apt update -y && \
+    apt install --no-install-recommends -y ca-certificates \
+    curl gpg zip unzip sed locales binutils psmisc git libtk8.6 \
+    libfribidi-dev libharfbuzz-dev libx11-6 libfontconfig gettext \
+    build-essential gdb lcov libbz2-dev libffi-dev libgdbm-dev liblzma-dev \
+    libncurses5-dev libreadline6-dev libsqlite3-dev \
+    libssl-dev lzma lzma-dev tk-dev uuid-dev xvfb zlib1g-dev && \
+    update-ca-certificates && \
+    # Set locales
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    locale-gen && \
+    # Build python
+    curl -fsSL https://pyenv.run | bash && \
+    pyenv install 3.12 && \
+    pyenv global 3.12 && \
+    pyenv rehash && \
+    # Cleanup python build requirements
+    apt purge -y build-essential git gdb lcov libbz2-dev libffi-dev libgdbm-dev \
+    liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev \
+    libssl-dev lzma-dev tk-dev uuid-dev zlib1g-dev && \
+    apt clean autoclean && \
+    apt autoremove --yes && \
+    rm -rf /var/lib/{apt,dpkg,cache,log}/
 
 # Set application name displayed in Webpage
 RUN set-cont-env APP_NAME "sticker-convert"
@@ -59,27 +91,17 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY ./scripts/startapp.sh /startapp.sh
 
-ENV HOME=/home/app
-
 VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 
 FROM base-gui AS min-gui
-RUN apt purge -y curl wget gpg git && \
-    apt clean autoclean && \
-    apt autoremove --yes && \
-    rm -rf /var/lib/{apt,dpkg,cache,log}/
-
 COPY ./src /app/
-
 COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
 RUN /app/scripts/update-locales.sh /app
 
 FROM base-gui AS full
-RUN mkdir -p '/home/app' && \
-    chmod -R 777 '/home/app'
 
 # Install signal-desktop
-RUN wget -O- https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
+RUN curl -s https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
     cat signal-desktop-keyring.gpg | tee -a /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null && \
     echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/signal-desktop-keyring.gpg] https://updates.signal.org/desktop/apt xenial main' |\
     tee -a /etc/apt/sources.list.d/signal-xenial.list && \
@@ -92,7 +114,7 @@ RUN curl -o /tmp/viber.deb -L https://download.cdn.viber.com/cdn/desktop/Linux/v
     rm /tmp/viber.deb
 
 # Install Chromium
-RUN apt install --no-install-recommends -y chromium xvfb
+RUN apt install --no-install-recommends -y chromium
 
 ENV QT_QUICK_BACKEND="software"
 
@@ -100,8 +122,8 @@ ENV QT_QUICK_BACKEND="software"
 ENV WINEPREFIX=/home/app/.wine
 RUN dpkg --add-architecture i386 && \
     mkdir -pm755 /etc/apt/keyrings && \
-    wget -O- https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
-    wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources && \
+    curl -s https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
+    curl -o /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources && \
     apt update && \
     apt install -y winehq-stable=10.0.0.0~bullseye-1 && \
     # msi=$(strings -e l "/opt/wine-stable/lib64/wine/x86_64-windows/appwiz.cpl" | grep -o "wine-mono-.*msi") && \
@@ -119,21 +141,13 @@ RUN dpkg --add-architecture i386 && \
     rm /tmp/wine-mono-10.0.0-x86.msi
 
 # Additional language support
-RUN sed -i -e 's/# ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/' /etc/locale.gen &&\
-    sed -i -e 's/# zh_TW.UTF-8 UTF-8/zh_TW.UTF-8 UTF-8/' /etc/locale.gen &&\
-    sed -i -e 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen &&\
+RUN sed -i -e 's/# ja_JP.UTF-8 UTF-8/ja_JP.UTF-8 UTF-8/' /etc/locale.gen && \
+    sed -i -e 's/# zh_TW.UTF-8 UTF-8/zh_TW.UTF-8 UTF-8/' /etc/locale.gen && \
+    sed -i -e 's/# zh_CN.UTF-8 UTF-8/zh_CN.UTF-8 UTF-8/' /etc/locale.gen && \
     locale-gen
 
 RUN apt install --no-install-recommends -y fonts-noto-cjk
 
-RUN apt purge -y curl wget gpg git && \
-    apt clean autoclean && \
-    apt autoremove --yes && \
-    rm -rf /var/lib/{apt,dpkg,cache,log}/ && \
-    chmod -R 777 '/home/app' && \
-    chown -R 1000 '/home/app'
-
 COPY ./src /app/
-
 COPY ./scripts/update-locales.sh /app/scripts/update-locales.sh
 RUN /app/scripts/update-locales.sh /app
