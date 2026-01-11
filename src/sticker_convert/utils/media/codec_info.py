@@ -347,6 +347,9 @@ class CodecInfo:
             if last_frame is None:
                 return 0, 0
 
+            assert last_frame.time_base is not None
+            assert last_frame.pts is not None
+
             time_base_ms = (
                 last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
             )
