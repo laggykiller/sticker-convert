@@ -134,6 +134,8 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         "--include-data-dir=src/sticker_convert/locales=locales",
         "--enable-plugin=tk-inter",
         "--include-package-data=signalstickers_client",
+        # Temporary fix until merged: https://github.com/Nuitka/Nuitka/pull/3732
+        "--include-module=av.sidedata.encparams",
         "--noinclude-data-file=tcl/opt0.4",
         "--noinclude-data-file=tcl/http1.0",
         "--product-name=sticker-convert",
