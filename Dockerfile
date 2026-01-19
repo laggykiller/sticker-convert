@@ -1,8 +1,8 @@
-FROM debian:11 AS min-cli
+FROM debian:12 AS min-cli
 
-ENV HOME=/home/app
-ENV PYENV_ROOT=/home/app/.pyenv
-ENV PATH="/home/app/.pyenv/shims:/home/app/.pyenv/bin:$PATH"
+ENV HOME=/home/app \
+    PYENV_ROOT=/home/app/.pyenv \
+    PATH="/home/app/.pyenv/shims:/home/app/.pyenv/bin:$PATH"
 
 RUN useradd --create-home app && \
     apt update -y && \
@@ -37,13 +37,15 @@ USER app
 VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 ENTRYPOINT ["/home/app/.pyenv/shims/python", "/app/sticker-convert.py"]
 
-FROM jlesage/baseimage-gui:debian-11-v4 AS base-gui
+FROM jlesage/baseimage-gui:debian-12-v4 AS base-gui
 
 WORKDIR /app
 
-ENV HOME=/home/app
-ENV PYENV_ROOT=/home/app/.pyenv
-ENV PATH="/home/app/.pyenv/shims:/home/app/.pyenv/bin:$PATH"
+ENV HOME=/home/app \
+    PYENV_ROOT=/home/app/.pyenv \
+    PATH="/home/app/.pyenv/shims:/home/app/.pyenv/bin:$PATH" \
+    DISPLAY_WIDTH=1920 \
+    DISPLAY_HEIGHT=1080
 
 RUN mkdir -p '/home/app' && \
     chmod -R 777 '/home/app' && \
@@ -80,9 +82,6 @@ COPY ./src/sticker_convert/resources/appicon.png /app/
 RUN APP_ICON_URL=/app/appicon.png && \
     install_app_icon.sh "$APP_ICON_URL"
 
-ENV DISPLAY_WIDTH=1920
-ENV DISPLAY_HEIGHT=1080
-
 RUN mkdir /etc/openbox && \
     printf '<Type>normal</Type>\n<Name>sticker-convert</Name>' >> /etc/openbox/main-window-selection.xml
 
@@ -100,6 +99,11 @@ RUN /app/scripts/update-locales.sh /app
 
 FROM base-gui AS full
 
+# QT_QUICK_BACKEND for chromium
+# WINEPREFIX for KakaoTalk Desktop
+ENV QT_QUICK_BACKEND="software" \
+    WINEPREFIX=/home/app/.wine
+
 # Install signal-desktop
 RUN curl -s https://updates.signal.org/desktop/apt/keys.asc | gpg --dearmor > signal-desktop-keyring.gpg && \
     cat signal-desktop-keyring.gpg | tee -a /usr/share/keyrings/signal-desktop-keyring.gpg > /dev/null && \
@@ -116,16 +120,13 @@ RUN curl -o /tmp/viber.deb -L https://download.cdn.viber.com/cdn/desktop/Linux/v
 # Install Chromium
 RUN apt install --no-install-recommends -y chromium
 
-ENV QT_QUICK_BACKEND="software"
-
 # Install KakaoTalk Desktop
-ENV WINEPREFIX=/home/app/.wine
 RUN dpkg --add-architecture i386 && \
     mkdir -pm755 /etc/apt/keyrings && \
     curl -s https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key && \
-    curl -O --output-dir /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bullseye/winehq-bullseye.sources && \
+    curl -O --output-dir /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/debian/dists/bookworm/winehq-bookworm.sources && \
     apt update && \
-    apt install -y winehq-stable=10.0.0.0~bullseye-1 && \
+    apt install -y winehq-stable=11.0.0.0~bookworm-1 && \
     # msi=$(strings -e l "/opt/wine-stable/lib64/wine/x86_64-windows/appwiz.cpl" | grep -o "wine-mono-.*msi") && \
     # pkgver="${msi##wine-mono-}" && \
     # pkgver="${pkgver%%-*}" && \
