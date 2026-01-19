@@ -127,22 +127,22 @@ class UploadTelegram(UploadBase):
         for src in stickers:
             self.cb.put(I("Verifying {} for uploading to telegram").format(src))
 
-            emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
-            if emoji == "":
+            emoji_list = extract_emojis(emoji_dict.get(Path(src).stem, ""))
+            if len(emoji_list) == 0:
                 self.cb.put(
                     I(
                         "Warning: Cannot find emoji for file {}, using default emoji..."
                     ).format(Path(src).name)
                 )
-                emoji = self.opt_comp.default_emoji
+                emoji_list.append(self.opt_comp.default_emoji)
 
-            if len(emoji) > 20:
+            if len(emoji_list) > 20:
                 self.cb.put(
                     I(
                         "Warning: {emoji} emoji for file {file}, exceeding limit of 20, keep first 20 only..."
-                    ).format(emoji=len(emoji), file=Path(src).name)
+                    ).format(emoji=len(emoji_list), file=Path(src).name)
                 )
-            emoji_list = [*emoji][:20]
+            emoji_list = emoji_list[:20]
 
             ext = Path(src).suffix
             if ext == ".tgs":

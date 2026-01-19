@@ -64,7 +64,7 @@ class DownloadDiscord(DownloadBase):
                 format_type = cast(int, sticker["format_type"])
                 f_ext = [".png", ".png", ".json", ".gif"][format_type - 1]
                 sticker_url = f"https://cdn.discordapp.com/stickers/{sticker_id}{f_ext}?size=4096&quality=lossless"
-                emoji_dict[f_id] = extract_emojis(sticker["tags"])
+                emoji_dict[f_id] = "".join(extract_emojis(sticker["tags"]))
             f_name = f_id + f_ext
             f_path = Path(self.out_dir, f_name)
             targets.append((sticker_url, f_path))

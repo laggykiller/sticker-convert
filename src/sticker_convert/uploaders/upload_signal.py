@@ -54,15 +54,21 @@ class UploadSignal(UploadBase):
 
         sticker = Sticker()
 
-        emoji = extract_emojis(emoji_dict.get(Path(src).stem, ""))
-        if emoji == "":
+        emoji_list = extract_emojis(emoji_dict.get(Path(src).stem, ""))
+        if len(emoji_list) == 0:
             self.cb.put(
                 I(
                     "Warning: Cannot find emoji for file {}, using default emoji..."
                 ).format(Path(src).name)
             )
-            emoji = self.opt_comp.default_emoji
-        sticker.emoji = emoji
+            emoji_list.append(self.opt_comp.default_emoji)
+        elif len(emoji_list) > 1:
+            self.cb.put(
+                I(
+                    "Warning: Too many emoji for file {}, using first emoji only..."
+                ).format(Path(src).name)
+            )
+        sticker.emoji = emoji_list[0]
 
         if Path(src).suffix == ".webp":
             spec_choice = self.webp_spec

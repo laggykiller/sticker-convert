@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-09 22:57+0800\n"
+"POT-Creation-Date: 2026-01-19 23:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -60,7 +60,7 @@ msgstr "[W] {}不支持RGBA，默認為fastoctree量化"
 msgid "[W] Importing SVG takes long time"
 msgstr "[W] 導入 SVG 需要很長時間"
 
-#: src/sticker_convert/cli.py:35 src/sticker_convert/gui.py:41
+#: src/sticker_convert/cli.py:28 src/sticker_convert/gui.py:41
 #, python-brace-format
 msgid ""
 "sticker-convert is Free and Opensource software by laggykiller\n"
@@ -72,60 +72,60 @@ msgstr ""
 "{project_url}\n"
 "尊重智慧財產權，做個文明人，請不要轉售貼圖！"
 
-#: src/sticker_convert/cli.py:59
+#: src/sticker_convert/cli.py:46
 msgid "CLI for sticker-convert"
 msgstr "sticker-convert的CLI"
 
-#: src/sticker_convert/cli.py:90
+#: src/sticker_convert/cli.py:77
 msgid "Input options"
 msgstr "輸入選項"
 
-#: src/sticker_convert/cli.py:103
+#: src/sticker_convert/cli.py:90
 #: src/sticker_convert/gui_components/frames/output_frame.py:22
 msgid "Output options"
 msgstr "輸出選項"
 
-#: src/sticker_convert/cli.py:117 src/sticker_convert/gui.py:231
+#: src/sticker_convert/cli.py:104 src/sticker_convert/gui.py:231
 msgid "Compression options"
 msgstr "壓縮選項"
 
-#: src/sticker_convert/cli.py:193
+#: src/sticker_convert/cli.py:180
 msgid "Credentials options"
 msgstr "認證選項"
 
-#: src/sticker_convert/cli.py:226
+#: src/sticker_convert/cli.py:213
 #, python-brace-format
 msgid "Error: Cannot load custom presets from {}"
 msgstr "錯誤：無法從 {} 載入自訂預設"
 
-#: src/sticker_convert/cli.py:274
+#: src/sticker_convert/cli.py:261
 #, python-brace-format
 msgid "Detected URL input source: {}"
 msgstr "檢測到的 URL 輸入來源：{}"
 
-#: src/sticker_convert/cli.py:277
+#: src/sticker_convert/cli.py:264
 #, python-brace-format
 msgid "Error: Unrecognied URL input source for url: {}"
 msgstr "錯誤：無法識別連結的輸入來源：{}"
 
-#: src/sticker_convert/cli.py:355
+#: src/sticker_convert/cli.py:342
 #, python-brace-format
 msgid "Auto compression option set to {}"
 msgstr "自動壓縮選項設置為 {}"
 
-#: src/sticker_convert/cli.py:364
+#: src/sticker_convert/cli.py:351
 msgid " Reason: Export to local directory only"
 msgstr "原因：僅導出到本地目錄"
 
-#: src/sticker_convert/cli.py:484 src/sticker_convert/gui.py:299
+#: src/sticker_convert/cli.py:471 src/sticker_convert/gui.py:298
 msgid "Warning: creds.json content is corrupted"
 msgstr "警告：creds.json 內容已損壞"
 
-#: src/sticker_convert/cli.py:490
+#: src/sticker_convert/cli.py:477
 msgid "Loaded credentials from creds.json"
 msgstr "從creds.json加載憑證"
 
-#: src/sticker_convert/cli.py:621
+#: src/sticker_convert/cli.py:624
 msgid "Saved credentials to creds.json"
 msgstr "將憑證保存到creds.json"
 
@@ -170,24 +170,24 @@ msgstr "設定"
 msgid "Progress"
 msgstr "進展"
 
-#: src/sticker_convert/gui.py:289
+#: src/sticker_convert/gui.py:288
 msgid "Warning: config.json content is corrupted"
 msgstr "警告：config.json 內容已損壞"
 
-#: src/sticker_convert/gui.py:496
+#: src/sticker_convert/gui.py:495
 msgid "Cancel"
 msgstr "取消"
 
-#: src/sticker_convert/gui.py:618
+#: src/sticker_convert/gui.py:617
 #: src/sticker_convert/gui_components/frames/control_frame.py:19
 msgid "Start"
 msgstr "開始"
 
-#: src/sticker_convert/gui.py:698
+#: src/sticker_convert/gui.py:693
 msgid "Invalid URL: "
 msgstr "URL無效："
 
-#: src/sticker_convert/gui.py:704
+#: src/sticker_convert/gui.py:699
 msgid "Detected URL: "
 msgstr "偵查到URL："
 
@@ -195,69 +195,69 @@ msgstr "偵查到URL："
 msgid "Launching GUI..."
 msgstr "GUI起動中..."
 
-#: src/sticker_convert/gui_components/frames/input_frame.py:23
+#: src/sticker_convert/gui_components/frames/input_frame.py:22
 msgid "Input source"
 msgstr "輸入來源"
 
-#: src/sticker_convert/gui_components/frames/input_frame.py:40
+#: src/sticker_convert/gui_components/frames/input_frame.py:39
 msgid "Input directory"
 msgstr "輸入路徑"
 
-#: src/sticker_convert/gui_components/frames/input_frame.py:51
+#: src/sticker_convert/gui_components/frames/input_frame.py:50
 #: src/sticker_convert/gui_components/frames/output_frame.py:51
 msgid "Choose directory"
 msgstr "選擇路徑"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:28
+#: src/sticker_convert/gui_components/frames/cred_frame.py:22
 msgid "Signal uuid"
 msgstr "Signal uuid"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:40
+#: src/sticker_convert/gui_components/frames/cred_frame.py:34
 msgid "Signal password"
 msgstr "Signal密碼"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:53
-#: src/sticker_convert/gui_components/frames/cred_frame.py:87
-#: src/sticker_convert/gui_components/frames/cred_frame.py:101
-#: src/sticker_convert/gui_components/frames/cred_frame.py:115
-#: src/sticker_convert/gui_components/frames/cred_frame.py:129
-#: src/sticker_convert/gui_components/frames/cred_frame.py:143
+#: src/sticker_convert/gui_components/frames/cred_frame.py:47
+#: src/sticker_convert/gui_components/frames/cred_frame.py:81
+#: src/sticker_convert/gui_components/frames/cred_frame.py:95
+#: src/sticker_convert/gui_components/frames/cred_frame.py:109
+#: src/sticker_convert/gui_components/frames/cred_frame.py:123
+#: src/sticker_convert/gui_components/frames/cred_frame.py:137
 msgid "Generate"
 msgstr "生成"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:59
+#: src/sticker_convert/gui_components/frames/cred_frame.py:53
 msgid "Telegram token"
 msgstr "Telegram token"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:71
+#: src/sticker_convert/gui_components/frames/cred_frame.py:65
 msgid "Telegram user_id"
 msgstr "Telegram user_id"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:83
+#: src/sticker_convert/gui_components/frames/cred_frame.py:77
 msgid "Telethon authorization"
 msgstr "Telethon授權"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:93
+#: src/sticker_convert/gui_components/frames/cred_frame.py:87
 msgid "Kakao auth_token"
 msgstr "kakao auth_token"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:107
+#: src/sticker_convert/gui_components/frames/cred_frame.py:101
 msgid "Line cookies"
 msgstr "Line cookies"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:121
+#: src/sticker_convert/gui_components/frames/cred_frame.py:115
 msgid "Viber auth"
 msgstr "Viber 驗證"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:135
+#: src/sticker_convert/gui_components/frames/cred_frame.py:129
 msgid "Discord token"
 msgstr "Discord token"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:150
+#: src/sticker_convert/gui_components/frames/cred_frame.py:144
 msgid "Get help"
 msgstr "幫助"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:192
+#: src/sticker_convert/gui_components/frames/cred_frame.py:186
 msgid "You can get help from:"
 msgstr "您可以通過以下方式獲得幫助："
 
@@ -265,23 +265,23 @@ msgstr "您可以通過以下方式獲得幫助："
 msgid "Cancel job?"
 msgstr "取消工作嗎？"
 
-#: src/sticker_convert/gui_components/frames/comp_frame.py:30
+#: src/sticker_convert/gui_components/frames/comp_frame.py:29
 msgid "No compression"
 msgstr "不壓縮"
 
-#: src/sticker_convert/gui_components/frames/comp_frame.py:49
+#: src/sticker_convert/gui_components/frames/comp_frame.py:48
 msgid "Preset"
 msgstr "預設"
 
-#: src/sticker_convert/gui_components/frames/comp_frame.py:69
+#: src/sticker_convert/gui_components/frames/comp_frame.py:68
 msgid "Number of steps"
 msgstr "步數"
 
-#: src/sticker_convert/gui_components/frames/comp_frame.py:82
+#: src/sticker_convert/gui_components/frames/comp_frame.py:81
 msgid "Number of processes"
 msgstr "線程數"
 
-#: src/sticker_convert/gui_components/frames/comp_frame.py:88
+#: src/sticker_convert/gui_components/frames/comp_frame.py:87
 msgid "Advanced..."
 msgstr "進階..."
 
@@ -380,142 +380,142 @@ msgstr "token將自動獲取"
 msgid "Get token"
 msgstr "獲取token"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:25
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:28
 msgid "Advanced compression options"
 msgstr "進階壓縮選項"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:28
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:31
 msgid "Advanced compression option"
 msgstr "進階壓縮選項"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:31
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:34
 msgid "Setting default emoji"
 msgstr "設置默認表情符號"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:38
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:41
 msgid "Output FPS"
 msgstr "輸出幀率"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:39
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:61
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:83
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:119
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:141
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:163
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:42
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:64
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:86
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:122
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:144
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:166
 msgid "Min:"
 msgstr "最小："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:44
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:66
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:88
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:124
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:146
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:168
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:47
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:69
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:91
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:127
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:149
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:171
 msgid "Max:"
 msgstr "最大："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:60
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:63
 msgid "Output resolution (Width)"
 msgstr "輸出分辨率（寬度）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:82
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:85
 msgid "Output resolution (Height)"
 msgstr "輸出分辨率（高度）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:107
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:110
 msgid "Snap resolution to power of 2"
 msgstr "將分辨率更換成最近之2的冪"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:118
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:121
 msgid "Output quality (0-100)"
 msgstr "輸出質量（0-100）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:140
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:143
 msgid "Colors (0-256)"
 msgstr "顏色 (0-256)"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:162
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:165
 msgid "Duration (Miliseconds)"
 msgstr "持續時間（毫秒）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:184
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:187
 msgid "Maximum file size (bytes)"
 msgstr "最大檔案大小（字節）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:185
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:188
 msgid "Img:"
 msgstr "靜態："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:190
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:212
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:193
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:215
 msgid "Vid:"
 msgstr "動態："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:206
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:209
 msgid "File format"
 msgstr "檔案格式"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:219
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:222
 msgid "Power (Importance)"
 msgstr "幕（重要性）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:220
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:223
 msgid "FPS:"
 msgstr "幀率："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:225
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:228
 msgid "Res:"
 msgstr "分辨率："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:238
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:241
 msgid "Color:"
 msgstr "顏色："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:247
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:250
 msgid "Padding"
 msgstr "填充"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:248
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:251
 msgid "0-100%"
 msgstr "0-100%"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:256
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:259
 msgid "Convert (faking) image to video"
 msgstr "將（偽造）圖像轉換為視頻"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:267
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:270
 msgid "Background color"
 msgstr "背景顏色"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:273
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:276
 msgid "Set"
 msgstr "設置"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:281
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:284
 msgid "Scale filter"
 msgstr "縮放濾鏡"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:298
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:301
 msgid "Quantize method"
 msgstr "量化方式"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:315
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:318
 msgid "Chromium/Chrome directory"
 msgstr "Chromium/Chrome 目錄"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:323
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:326
 msgid "Custom cache directory"
 msgstr "自定義緩存目錄"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:332
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:335
 msgid "Default emoji"
 msgstr "默認表情符號"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:474
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:477
 msgid "Category"
 msgstr "類別"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:491
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:494
 msgid "Search"
 msgstr "搜尋"
 
@@ -779,38 +779,43 @@ msgstr "正在驗證 {} 是否上傳到Signal"
 msgid "Warning: Cannot find emoji for file {}, using default emoji..."
 msgstr "警告：無法找到檔案{}的表情符號，使用默認表情符號..."
 
-#: src/sticker_convert/uploaders/upload_signal.py:83
+#: src/sticker_convert/uploaders/upload_signal.py:68
+#, python-brace-format
+msgid "Warning: Too many emoji for file {}, using first emoji only..."
+msgstr "警告：檔案 {} 中表情符號過多，僅使用第一個表情符號..."
+
+#: src/sticker_convert/uploaders/upload_signal.py:89
 #, python-brace-format
 msgid "Warning: Cannot compress file {}, skip uploading this file..."
 msgstr "警告：無法壓縮檔案{}，跳過上傳此檔案..."
 
-#: src/sticker_convert/uploaders/upload_signal.py:129
+#: src/sticker_convert/uploaders/upload_signal.py:135
 msgid "uuid required for uploading to Signal"
 msgstr "上傳到 Signal需要uuid"
 
-#: src/sticker_convert/uploaders/upload_signal.py:132
+#: src/sticker_convert/uploaders/upload_signal.py:138
 msgid "password required for uploading to Signal"
 msgstr "上傳到Signal需要密碼"
 
-#: src/sticker_convert/uploaders/upload_signal.py:141
+#: src/sticker_convert/uploaders/upload_signal.py:147
 #: src/sticker_convert/uploaders/upload_viber.py:66
 #: src/sticker_convert/uploaders/upload_telegram.py:281
 #, python-brace-format
 msgid "title cannot be {}"
 msgstr "標題不能是 {}"
 
-#: src/sticker_convert/uploaders/upload_signal.py:143
+#: src/sticker_convert/uploaders/upload_signal.py:149
 #, python-brace-format
 msgid "author cannot be {}"
 msgstr "作者不能是 {}"
 
-#: src/sticker_convert/uploaders/upload_signal.py:187
+#: src/sticker_convert/uploaders/upload_signal.py:193
 #: src/sticker_convert/uploaders/upload_telegram.py:326
 #, python-brace-format
 msgid "Uploading pack {}"
 msgstr "正在上傳包{}"
 
-#: src/sticker_convert/uploaders/upload_signal.py:202
+#: src/sticker_convert/uploaders/upload_signal.py:208
 #, python-brace-format
 msgid "Failed to upload pack {}. Reason: {}"
 msgstr "無法上傳表情包{}。原因：{}"
@@ -1098,7 +1103,7 @@ msgstr "下載失敗：無法獲取貼圖包信息"
 msgid "Download failed: No credentials"
 msgstr "下載失敗：沒有憑證"
 
-#: src/sticker_convert/job.py:135
+#: src/sticker_convert/job.py:120
 #, python-brace-format
 msgid ""
 "##### EXCEPTION #####\n"
@@ -1113,16 +1118,16 @@ msgstr ""
 "{tb}\n"
 "################"
 
-#: src/sticker_convert/job.py:190
+#: src/sticker_convert/job.py:175
 #, python-brace-format
 msgid "Warning: A process exited with error (code {})"
 msgstr "警告：進程因錯誤退出（代碼 {}）"
 
-#: src/sticker_convert/job.py:263
+#: src/sticker_convert/job.py:248
 msgid "An error occured during this run."
 msgstr "在此運行期間發生錯誤。"
 
-#: src/sticker_convert/job.py:266
+#: src/sticker_convert/job.py:251
 msgid ""
 "##########\n"
 "Summary:\n"
@@ -1132,15 +1137,15 @@ msgstr ""
 "總結:\n"
 "#####\n"
 
-#: src/sticker_convert/job.py:273
+#: src/sticker_convert/job.py:258
 msgid "Export results:\n"
 msgstr "輸出結果:\n"
 
-#: src/sticker_convert/job.py:276
+#: src/sticker_convert/job.py:261
 msgid "Export result: None"
 msgstr "輸出結果: 無"
 
-#: src/sticker_convert/job.py:292
+#: src/sticker_convert/job.py:279
 msgid ""
 "\n"
 "    If you want to upload the results by yourself,\n"
@@ -1150,7 +1155,7 @@ msgstr ""
 "    如果您想自己上傳結果，\n"
 "    選擇\"只儲存至本機路徑\"作為輸出\n"
 
-#: src/sticker_convert/job.py:298
+#: src/sticker_convert/job.py:285
 msgid ""
 "\n"
 "[X] Input and output directories cannot be the same\n"
@@ -1158,7 +1163,7 @@ msgstr ""
 "\n"
 "[X] 輸入和輸出目錄不能相同\n"
 
-#: src/sticker_convert/job.py:301
+#: src/sticker_convert/job.py:288
 msgid ""
 "\n"
 "[X] Unrecognized URL input source\n"
@@ -1166,7 +1171,7 @@ msgstr ""
 "\n"
 "[X] 無法識別的 URL 輸入來源\n"
 
-#: src/sticker_convert/job.py:305
+#: src/sticker_convert/job.py:292
 msgid ""
 "\n"
 "[X] URL address cannot be empty.\n"
@@ -1179,15 +1184,15 @@ msgstr ""
 "    如果您只想使用本地檔案，\n"
 "    請在\"輸入來源\"選擇\"只儲存至本機路徑\"\n"
 
-#: src/sticker_convert/job.py:316
+#: src/sticker_convert/job.py:303
 msgid "[X] Downloading from and uploading to telegram requires bot token.\n"
 msgstr "[X] 從 telegram 下載和上傳需要bot token。\n"
 
-#: src/sticker_convert/job.py:324
+#: src/sticker_convert/job.py:311
 msgid "[X] Downloading from Discord requires token.\n"
 msgstr "[X] 從 Discord 下載需要token。\n"
 
-#: src/sticker_convert/job.py:328
+#: src/sticker_convert/job.py:315
 msgid ""
 "[X] Uploading to telegram requires user_id \n"
 "    (From real account, not bot account).\n"
@@ -1195,44 +1200,44 @@ msgstr ""
 "[X] 上傳到 telegram 需要 user_id \n"
 "    (來自真實帳戶，而不是機器人帳號)\n"
 
-#: src/sticker_convert/job.py:336
+#: src/sticker_convert/job.py:323
 msgid "[X] Uploading to signal requires uuid and password.\n"
 msgstr "[X] 上傳到signal需要uuid和密碼。\n"
 
-#: src/sticker_convert/job.py:340
+#: src/sticker_convert/job.py:327
 msgid "[X] Uploading to Viber requires auth data.\n"
 msgstr "[X] 上傳到 Viber 需要身份驗證數據。\n"
 
-#: src/sticker_convert/job.py:355
+#: src/sticker_convert/job.py:342
 #, python-brace-format
 msgid "[X] {output_option} requires {metadata}\n"
 msgstr "[X] {output_option} 需要 {metadata}\n"
 
-#: src/sticker_convert/job.py:361
+#: src/sticker_convert/job.py:348
 #, python-brace-format
 msgid "    {metadata} was not supplied and {metadata}.txt is absent\n"
 msgstr "    未提供 {metadata} 並且不存在 {metadata}.txt\n"
 
-#: src/sticker_convert/job.py:365
+#: src/sticker_convert/job.py:352
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied and input source will not provide "
 "{metadata}\n"
 msgstr "    未提供{metadata}並輸入源不會提供{metadata}\n"
 
-#: src/sticker_convert/job.py:368
+#: src/sticker_convert/job.py:355
 #, python-brace-format
 msgid ""
 "    Supply the {metadata} by filling in the option, or\n"
 "    Create {metadata}.txt with the {metadata} name\n"
 msgstr "    請提供{metadata}，或創建 {metadata}.txt並寫入{metadata}\n"
 
-#: src/sticker_convert/job.py:372
+#: src/sticker_convert/job.py:359
 #, python-brace-format
 msgid "[!] {output_option} requires {metadata}\n"
 msgstr "[!] {output_option} 需要 {metadata}\n"
 
-#: src/sticker_convert/job.py:378
+#: src/sticker_convert/job.py:365
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied but {metadata}.txt is present\n"
@@ -1241,7 +1246,7 @@ msgstr ""
 "    未提供{metadata}但{metadata}.txt存在\n"
 "    使用在{metadata}.txt中的{metadata}\n"
 
-#: src/sticker_convert/job.py:408
+#: src/sticker_convert/job.py:395
 msgid ""
 "Compression preset does not match export option\n"
 "You may continue, but the files will need to be compressed again before "
@@ -1253,7 +1258,7 @@ msgstr ""
 "您可以繼續，但在輸出之前需要再次壓縮檔案\n"
 "建議您選擇匹配的壓縮和輸出選項。要繼續嗎？ "
 
-#: src/sticker_convert/job.py:427
+#: src/sticker_convert/job.py:414
 #, python-brace-format
 msgid ""
 "\n"
@@ -1262,7 +1267,7 @@ msgstr ""
 "\n"
 "[X] {param} 應介於-1和正無窮大之間。得到無效值{value}。"
 
-#: src/sticker_convert/job.py:440
+#: src/sticker_convert/job.py:427
 #, python-brace-format
 msgid ""
 "\n"
@@ -1273,7 +1278,7 @@ msgstr ""
 "[X] scale_filter {scale_filter} 不是有效選項\n"
 "    有效選項: nearest, box, bilinear, hamming, bicubic, lanczos"
 
-#: src/sticker_convert/job.py:453
+#: src/sticker_convert/job.py:440
 #, python-brace-format
 msgid ""
 "\n"
@@ -1284,7 +1289,7 @@ msgstr ""
 "[X] quantize_method {quantize_method} 不是有效選項\n"
 "    有效選項: imagequant, fastoctree, maxcoverage, mediancut, none"
 
-#: src/sticker_convert/job.py:463
+#: src/sticker_convert/job.py:450
 #, python-brace-format
 msgid ""
 "\n"
@@ -1293,7 +1298,7 @@ msgstr ""
 "\n"
 "[X] bg_color {bg_color} 不是有效十六進位值色碼"
 
-#: src/sticker_convert/job.py:473
+#: src/sticker_convert/job.py:460
 msgid ""
 "To download ANIMATED stickers from e.kakao.com,\n"
 "you need to generate auth_token.\n"
@@ -1309,7 +1314,7 @@ msgstr ""
 "建議您閱讀文檔。\n"
 "如果繼續，您只會下載靜態貼紙。繼續嗎？"
 
-#: src/sticker_convert/job.py:510
+#: src/sticker_convert/job.py:497
 #, python-brace-format
 msgid ""
 "WARNING: {path_type} directory is set to {path}.\n"
@@ -1326,83 +1331,83 @@ msgstr ""
 "可能會被移到\"archive_*\"。\n"
 "這可能會損壞您的數據。繼續嗎？"
 
-#: src/sticker_convert/job.py:552
+#: src/sticker_convert/job.py:541
 msgid "Skip moving old files in input directory as input source is local"
 msgstr "由於輸入源是本機的，因此跳過移動輸入目錄中的舊檔案"
 
-#: src/sticker_convert/job.py:556
+#: src/sticker_convert/job.py:545
 msgid "Skip moving old files in input directory as input source is empty"
 msgstr "由於輸入源為空，因此跳過移動輸入目錄中的舊檔案"
 
-#: src/sticker_convert/job.py:562
+#: src/sticker_convert/job.py:551
 #, python-brace-format
 msgid ""
 "Moving old files in input directory to {archive_dir} as input source is not "
 "local"
 msgstr "將輸入目錄中的舊檔案移至 {archive_dir}，因為輸入源不是本機的"
 
-#: src/sticker_convert/job.py:572
+#: src/sticker_convert/job.py:561
 msgid "Skip moving old files in output directory as no_compress is True"
 msgstr "由於 no_compress 為 True，因此跳過移動輸出目錄中的舊檔案"
 
-#: src/sticker_convert/job.py:576
+#: src/sticker_convert/job.py:565
 msgid "Skip moving old files in output directory as output source is empty"
 msgstr "由於輸出源為空，因此跳過移動輸出目錄中的舊檔案"
 
-#: src/sticker_convert/job.py:581
+#: src/sticker_convert/job.py:570
 #, python-brace-format
 msgid "Moving old files in output directory to {archive_dir}"
 msgstr "將輸出目錄中的舊檔案移至 {archive_dir}"
 
-#: src/sticker_convert/job.py:620
+#: src/sticker_convert/job.py:625
 msgid "Downloading..."
 msgstr "下載中..."
 
-#: src/sticker_convert/job.py:622
+#: src/sticker_convert/job.py:627
 msgid "Skipped download (No files to download)"
 msgstr "跳過下載（沒有檔案可供下載）"
 
-#: src/sticker_convert/job.py:623
+#: src/sticker_convert/job.py:628
 msgid "Download: Skipped (No files to download)"
 msgstr "下載: 已跳過（沒有檔案可供下載）"
 
-#: src/sticker_convert/job.py:653
+#: src/sticker_convert/job.py:661
 msgid "Skipped compression (no_compress is set to True)"
 msgstr "跳過壓縮（no_compress 設置為 True）"
 
-#: src/sticker_convert/job.py:666
+#: src/sticker_convert/job.py:674
 msgid "Input directory is empty, nothing to copy to output directory"
 msgstr "輸入目錄為空，沒有任何內容可複製到輸出目錄"
 
-#: src/sticker_convert/job.py:671
+#: src/sticker_convert/job.py:679
 msgid "Output directory is not empty, not copying files from input directory"
 msgstr "輸出目錄不為空，不從輸入目錄複製文件"
 
-#: src/sticker_convert/job.py:676
+#: src/sticker_convert/job.py:684
 msgid "Output directory is empty, copying files from input directory"
 msgstr "輸出目錄為空，正在從輸入目錄複製文件"
 
-#: src/sticker_convert/job.py:709
+#: src/sticker_convert/job.py:717
 msgid "Skipped compression (No files to compress)"
 msgstr "跳過壓縮（沒有要壓縮的文件）"
 
-#: src/sticker_convert/job.py:752
+#: src/sticker_convert/job.py:760
 msgid "Skipped export (Saving to local directory only)"
 msgstr "跳過輸出（僅保存到本機）"
 
-#: src/sticker_convert/job.py:753
+#: src/sticker_convert/job.py:761
 msgid "Export: Skipped (Saving to local directory only)"
 msgstr "輸出：已跳過（僅保存到本機）"
 
-#: src/sticker_convert/job.py:755
+#: src/sticker_convert/job.py:763
 msgid "Exporting..."
 msgstr "正在輸出..."
 
-#: src/sticker_convert/job.py:797
+#: src/sticker_convert/job.py:815
 msgid "An error occured while exporting stickers"
 msgstr "輸出貼紙時發生錯誤"
 
-#: src/sticker_convert/job.py:799 src/sticker_convert/job.py:803
+#: src/sticker_convert/job.py:817 src/sticker_convert/job.py:821
 #, python-brace-format
 msgid "Export: {stickers_ok}/{stickers_total} stickers success"
 msgstr "輸出：{stickers_ok}/{stickers_total} 個貼紙成功"
@@ -1813,6 +1818,6 @@ msgstr "錯誤：api_id 只包括數字\n"
 msgid "Enter api_hash: "
 msgstr "輸入 api_hash："
 
-#: src/sticker_convert/utils/translate.py:110
+#: src/sticker_convert/utils/translate.py:103
 msgid "Auto"
 msgstr "自動選擇"

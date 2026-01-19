@@ -20,10 +20,10 @@ EMOJI_LIST = get_emoji_list()
 
 
 # https://stackoverflow.com/a/43146653
-def extract_emojis(s: str) -> str:
+def extract_emojis(s: str) -> List[str]:
     emojis: List[str] = []
     for c in cast(List[str], EGC(s)):
         if c in EMOJI_LIST and c not in emojis:
             emojis.append(c)
 
-    return "".join(emojis)
+    return emojis
