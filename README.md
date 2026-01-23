@@ -12,7 +12,7 @@
 ## Downloads
 - [Pre-compiled releases](https://github.com/laggykiller/sticker-convert/releases) for Windows, MacOS and Linux (As AppImage).
     - Windows: Unzip the downloaded file and run `sticker-convert.exe`, or download msi file for installation
-    - MacOS: Unzip the downloaded file, hold control and open `hold_control_and_click_open_me.command` for the first time, then `sticker-convert.app` in the future
+    - MacOS: Unzip the downloaded file, open `first_launch.command` for the first time. It may refuse to open, instead of clicking "Move to Trash", click "Done". Then open System Preferences (or System Settings on newer macOS), go to "Security & Privacy" or "Privacy & Security". In the "General" tab, you should see a message about "first_launch.command" being blocked, click "Allow Anyway" or "Open Anyway" to run `first_launch.command`. You can then open `sticker-convert.app` directly in the future.
     - Linux:
         - AppImage: `chmod +x` the downloaded AppImage and run it
         - Zip: unzip and run `sticker-convert.bin`

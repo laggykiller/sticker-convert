@@ -182,8 +182,9 @@ jobs:
     - name: Build for ${{matrix.TARGET}}
       run: |
         python ./compile.py
-        cp ./scripts/hold_control_and_click_open_me_first.command ./
-        zip -r9 sticker-convert-${{matrix.TARGET}}.zip sticker-convert.app hold_control_and_click_open_me_first.command
+        cp ./scripts/macos_first_launch.command ./
+        cp ./scripts/macos_read_me_first ./
+        zip -r9 sticker-convert-${{matrix.TARGET}}.zip sticker-convert.app macos_first_launch.command macos_read_me_first.txt
     - name: Upload artifact
       id: upload-artifact
       uses: actions/upload-artifact@v4

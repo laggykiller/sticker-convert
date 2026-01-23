@@ -12,7 +12,7 @@
 ## 下载
 - [预编译版本](https://github.com/laggykiller/sticker-convert/releases)，适用于 Windows、macOS 和 Linux（AppImage 格式）。
     - Windows：解压缩下载的档案并执行 `sticker-convert.exe`，或下载 msi 档案进行安装。
-    - macOS：解压缩下载的文件，首次使用时按住 Ctrl 键并点击 `hold_control_and_click_open_me.command` 打开，之后使用 `sticker-convert.app` 打开。
+    - macOS：解压缩下载的文件，首次开启 `first_launch.command`。如果无法打开，请不要点击“移到废纸篓”，而是点击“完成”。然后开启「系统偏好设定」（或较新版本的 macOS 系统中的「系统设定」），前往「隐私权与安全性」。在「一般」标签页中，您应该会看到一条关于 `first_launch.command` 被封锁的讯息，点击「强制打开」即可执行 `first_launch.command`。之后您就可以直接开启 `sticker-convert.app` 了。
     - Linux：
         - AppImage：使用 `chmod +x` 指令为下载的 AppImage 档案新增权限并执行。
         - Zip：解压缩并执行 `sticker-convert.bin`。
