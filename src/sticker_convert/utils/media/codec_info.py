@@ -465,8 +465,16 @@ class CodecInfo:
 
         soup = BeautifulSoup(svg, "html.parser")
         svg_tag = soup.find_all("svg")[0]
-        width = int(svg_tag.get("width", SVG_DEFAULT_WIDTH))
-        height = int(svg_tag.get("height", SVG_DEFAULT_HEIGHT))
+        width = int(
+            "".join(
+                c for c in str(svg_tag.get("width", SVG_DEFAULT_WIDTH)) if c.isdigit()
+            )
+        )
+        height = int(
+            "".join(
+                c for c in str(svg_tag.get("height", SVG_DEFAULT_HEIGHT)) if c.isdigit()
+            )
+        )
 
         animate_elements = [*soup.find_all("animate")] + [
             *soup.find_all("animateTransform")
