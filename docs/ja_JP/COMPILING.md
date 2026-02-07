@@ -13,24 +13,11 @@ https://www.python.org/ から Python3 をインストールします。
 
 Linux では、docker ビルドを実行することもできます。
 ```bash
-ARCH=amd64  # 1つだけ選択してください
-ARCH=arm64  # 1つだけ選択してください
-
 # クロスコンパイルする場合はこれを実行してください
 # sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-docker build \
-    -t nuitka_build_${ARCH} \
-    -f ./scripts/nuitka_build_${ARCH}.dockerfile \
-    --platform linux/${ARCH} \
-    ./
-docker run \
-    --rm \
-    -v $(pwd):/sticker-convert \
-    -w /sticker-convert \
-    --platform linux/${ARCH} \
-    nuitka_build_${ARCH} \
-    python ./compile.py
+./scripts/nuitka_build_with_docker.sh x86_64
+./scripts/nuitka_build_with_docker.sh aarch64
 ```
 
 ## LinuxでAppImageの作成

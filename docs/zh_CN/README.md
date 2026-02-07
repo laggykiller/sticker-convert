@@ -17,6 +17,7 @@
         - AppImage：使用 `chmod +x` 指令为下载的 AppImage 档案新增权限并执行。
         - Zip：解压缩并执行 `sticker-convert.bin`。
         - [AUR 套件](https://aur.archlinux.org/packages/sticker-convert)：`makepkg -si`
+        - 注意：sticker-convert 是用 glibc 2.17 编译的，因此需要 Debian 8+ / Ubuntu 13.10 / Fedora 19+ / CentOS/RHEL 7+。
 - [pip 套件](https://pypi.org/project/sticker-convert/)：`pip install sticker-convert`。使用 `sticker-convert` 或 `python -m sticker_convert` 启动。
 - [Docker 映像](https://hub.docker.com/r/laggykiller/sticker-convert) 用于在 Linux 上运行。
 - [无需下载，在 Google Colab 中试用](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb)（需要 Google 帐户），程式码在 Google 伺服器上运行，结果从 Google 云端硬碟取得。但是，速度可能比在您的电脑上运行慢。 （如果不转换为 .apng 格式，每个档案大约需要 15 秒；如果转换为 .apng 格式，则每个档案大约需要 1 分钟。）

@@ -17,6 +17,7 @@
     - AppImage：ダウンロードしたAppImageを`chmod +x`で実行してください。
     - Zip：展開し、`sticker-convert.bin`を実行してください。
     - [AURパッケージ](https://aur.archlinux.org/packages/sticker-convert): `makepkg -si`
+    - 注意: sticker-convert は glibc 2.17 でコンパイルされているため、Debian 8+ / Ubuntu 13.10 / Fedora 19+ / CentOS/RHEL 7+ が必要です。
 - [pipパッケージ](https://pypi.org/project/sticker-convert/): `pip install sticker-convert` `sticker-convert` または `python -m sticker_convert` で起動します。
 - [Docker イメージ](https://hub.docker.com/r/laggykiller/sticker-convert) をLinuxに使用できます。
 - [Google Colab](https://colab.research.google.com/github/laggykiller/sticker-convert/blob/master/sticker_convert_colab.ipynb) でダウンロードせずに試す(Google アカウントが必要です)。Google サーバー上でコードを実行し、Google ドライブから結果を取得します。ただし、パソコンで実行するよりも遅くなる可能性があります。(.apng に変換しない場合はファイルあたり約 15 秒、.apng に変換する場合はファイルあたり約 1 分)

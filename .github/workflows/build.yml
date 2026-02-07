@@ -212,10 +212,10 @@ jobs:
         include:
           - os: ubuntu-latest
             TARGET: linux-x86_64
-            ARCH: amd64
+            ARCH: x86_64
           - os: ubuntu-24.04-arm
             TARGET: linux-aarch64
-            ARCH: arm64
+            ARCH: aarch64
     steps:
     - uses: actions/checkout@v4
       with:
@@ -225,20 +225,13 @@ jobs:
       with:
         name: mo
         path: src/sticker_convert/locales/
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2
+      with:
+        platforms: all
     - name: Build for ${{matrix.TARGET}}
       run: |
-        docker build \
-          -t nuitka_build_${{matrix.ARCH}} \
-          -f ./scripts/nuitka_build_${{matrix.ARCH}}.dockerfile \
-          --platform linux/${{matrix.ARCH}} \
-          ./
-        docker run \
-          --rm \
-          -v $(pwd):/${GITHUB_WORKSPACE} \
-          -w ${GITHUB_WORKSPACE} \
-          --platform linux/${{matrix.ARCH}} \
-          nuitka_build_${{matrix.ARCH}} \
-          python ./compile.py
+        ./scripts/nuitka_build_with_docker.sh ${{matrix.ARCH}}
         mv ./sticker-convert.dist ./sticker-convert-${{matrix.TARGET}}
         zip -r9 sticker-convert-${{matrix.TARGET}}.zip ./sticker-convert-${{matrix.TARGET}}
     - name: Upload artifact

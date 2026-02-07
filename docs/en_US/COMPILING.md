@@ -13,24 +13,11 @@ This repository uses `nuitka` for compiling. Just run `python3 compile.py`, comp
 
 On Linux, you may also perform dockerized build
 ```bash
-ARCH=amd64  # Choose one only
-ARCH=arm64  # Choose one only
-
 # Run this if you are crosscompiling
 # sudo docker run --rm --privileged multiarch/qemu-user-static --reset -p yes
 
-docker build \
-    -t nuitka_build_${ARCH} \
-    -f ./scripts/nuitka_build_${ARCH}.dockerfile \
-    --platform linux/${ARCH} \
-    ./
-docker run \
-    --rm \
-    -v $(pwd):/sticker-convert \
-    -w /sticker-convert \
-    --platform linux/${ARCH} \
-    nuitka_build_${ARCH} \
-    python ./compile.py
+./scripts/nuitka_build_with_docker.sh x86_64
+./scripts/nuitka_build_with_docker.sh aarch64
 ```
 
 ## Creating AppImage on Linux
