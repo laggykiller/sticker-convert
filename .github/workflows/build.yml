@@ -183,7 +183,7 @@ jobs:
       run: |
         python ./compile.py
         cp ./scripts/macos_first_launch.command ./
-        cp ./scripts/macos_read_me_first ./
+        cp ./scripts/macos_read_me_first.txt ./
         zip -r9 sticker-convert-${{matrix.TARGET}}.zip sticker-convert.app macos_first_launch.command macos_read_me_first.txt
     - name: Upload artifact
       id: upload-artifact
