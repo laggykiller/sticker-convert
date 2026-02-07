@@ -15,6 +15,10 @@ import requests
 import websocket
 from PIL import Image
 
+from sticker_convert.utils.translate import get_translator
+
+I = get_translator()  # noqa: E741
+
 # References
 # https://github.com/yeongbin-jo/python-chromedriver-autoinstaller/blob/master/chromedriver_autoinstaller/utils.py
 # https://chromedevtools.github.io/devtools-protocol/
@@ -108,10 +112,10 @@ class CRD:
                 time.sleep(1)
 
         if r is None:
-            raise RuntimeError("Cannot connect to chrome debugging port")
+            raise RuntimeError(I("Cannot connect to chrome debugging port"))
 
         if len(targets) == 0:
-            raise RuntimeError("Cannot create websocket connection with debugger")
+            raise RuntimeError(I("Cannot create websocket connection with debugger"))
 
         self.ws = websocket.create_connection(  # type: ignore
             targets[target_id]["webSocketDebuggerUrl"]
@@ -129,7 +133,7 @@ class CRD:
             except BrokenPipeError:
                 self.connect()
 
-        raise RuntimeError("Websocket keep disconnecting")
+        raise RuntimeError(I("Websocket keep disconnecting"))
 
     def exec_js(self, js: str, context_id: Optional[int] = None) -> Union[str, bytes]:
         command: Dict[str, Any] = {
@@ -181,7 +185,7 @@ class CRD:
         result = cast(str, self.send_cmd(command))
         frame_id = json.loads(result).get("result", {}).get("frameId", None)
         if frame_id is None:
-            raise RuntimeError(f"Cannot navigate to about:blank ({result})")
+            raise RuntimeError(I("Cannot navigate to about:blank ({})").format(result))
 
         self.exec_js('document.getElementsByTagName("html")[0].remove()')
 

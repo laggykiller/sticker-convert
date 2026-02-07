@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 02:10+0800\n"
+"POT-Creation-Date: 2026-02-08 02:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -63,6 +63,11 @@ msgstr "[W] 导入 SVG 需要很长时间"
 #: src/sticker_convert/converter.py:497
 msgid "[F] Chrome/Chromium required for importing animated svg"
 msgstr "[F] 导入SVG动画需要 Chrome/Chromium 浏览器"
+
+#: src/sticker_convert/converter.py:951
+#, python-brace-format
+msgid "Invalid format {}"
+msgstr "无效格式{}"
 
 #: src/sticker_convert/cli.py:28 src/sticker_convert/gui.py:41
 #, python-brace-format
@@ -1825,3 +1830,25 @@ msgstr "输入 api_hash："
 #: src/sticker_convert/utils/translate.py:103
 msgid "Auto"
 msgstr "自动选择"
+
+#: src/sticker_convert/utils/files/json_manager.py:14
+#, python-brace-format
+msgid "{} cannot be found"
+msgstr "找不到{}"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:115
+msgid "Cannot connect to chrome debugging port"
+msgstr "无法连接到 Chrome 调试端口"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:118
+msgid "Cannot create websocket connection with debugger"
+msgstr "无法使用调试器创建 WebSocket 连接"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:136
+msgid "Websocket keep disconnecting"
+msgstr "WebSocket 连接不断断线"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:188
+#, python-brace-format
+msgid "Cannot navigate to about:blank ({})"
+msgstr "无法到访about:blank ({})"

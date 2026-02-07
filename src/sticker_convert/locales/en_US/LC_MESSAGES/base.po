@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 02:10+0800\n"
-"PO-Revision-Date: 2026-02-08 02:10+0800\n"
+"POT-Creation-Date: 2026-02-08 02:21+0800\n"
+"PO-Revision-Date: 2026-02-08 02:21+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_US\n"
@@ -67,6 +67,11 @@ msgstr "[W] Importing SVG takes long time"
 #: src/sticker_convert/converter.py:497
 msgid "[F] Chrome/Chromium required for importing animated svg"
 msgstr "[F] Chrome/Chromium required for importing animated svg"
+
+#: src/sticker_convert/converter.py:951
+#, python-brace-format
+msgid "Invalid format {}"
+msgstr "Invalid format {}"
 
 #: src/sticker_convert/cli.py:28 src/sticker_convert/gui.py:41
 #, python-brace-format
@@ -1852,3 +1857,25 @@ msgstr "Enter api_hash: "
 #: src/sticker_convert/utils/translate.py:103
 msgid "Auto"
 msgstr "Auto"
+
+#: src/sticker_convert/utils/files/json_manager.py:14
+#, python-brace-format
+msgid "{} cannot be found"
+msgstr "{} cannot be found"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:115
+msgid "Cannot connect to chrome debugging port"
+msgstr "Cannot connect to chrome debugging port"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:118
+msgid "Cannot create websocket connection with debugger"
+msgstr "Cannot create websocket connection with debugger"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:136
+msgid "Websocket keep disconnecting"
+msgstr "Websocket keep disconnecting"
+
+#: src/sticker_convert/utils/chrome_remotedebug.py:188
+#, python-brace-format
+msgid "Cannot navigate to about:blank ({})"
+msgstr "Cannot navigate to about:blank ({})"

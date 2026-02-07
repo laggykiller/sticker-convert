@@ -948,7 +948,7 @@ class StickerConvert:
                 extra_kwargs["method"] = 4 + int(2 * (100 - self.quality) / 100)
                 extra_kwargs["alpha_quality"] = self.quality
         else:
-            raise RuntimeError(f"Invalid format {self.out_f.suffix}")
+            raise RuntimeError(I("Invalid format {}").format(self.out_f.suffix))
 
         if self.fps:
             extra_kwargs["save_all"] = True
