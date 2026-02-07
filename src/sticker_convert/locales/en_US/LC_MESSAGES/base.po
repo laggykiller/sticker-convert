@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 23:31+0800\n"
-"PO-Revision-Date: 2026-01-19 23:31+0800\n"
+"POT-Creation-Date: 2026-02-08 02:10+0800\n"
+"PO-Revision-Date: 2026-02-08 02:10+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_US\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/sticker_convert/converter.py:134
+#: src/sticker_convert/converter.py:133
 #, python-brace-format
 msgid "[I] Start compressing {} -> {}"
 msgstr "[I] Start compressing {} -> {}"
 
-#: src/sticker_convert/converter.py:136
+#: src/sticker_convert/converter.py:135
 #, python-brace-format
 msgid "[S] Compatible file found, skip compress and just copy {} -> {}"
 msgstr "[S] Compatible file found, skip compress and just copy {} -> {}"
 
-#: src/sticker_convert/converter.py:139
+#: src/sticker_convert/converter.py:138
 #, python-brace-format
 msgid ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
@@ -36,17 +36,17 @@ msgstr ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
 "{})"
 
-#: src/sticker_convert/converter.py:142
+#: src/sticker_convert/converter.py:141
 #, python-brace-format
 msgid "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 msgstr "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 
-#: src/sticker_convert/converter.py:144
+#: src/sticker_convert/converter.py:143
 #, python-brace-format
 msgid "[S] Successful compression {} -> {} size {} (step {})"
 msgstr "[S] Successful compression {} -> {} size {} (step {})"
 
-#: src/sticker_convert/converter.py:146
+#: src/sticker_convert/converter.py:145
 #, python-brace-format
 msgid ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
@@ -55,14 +55,18 @@ msgstr ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
 "quality under current settings (Best size: {})"
 
-#: src/sticker_convert/converter.py:150
+#: src/sticker_convert/converter.py:149
 #, python-brace-format
 msgid "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 msgstr "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 
-#: src/sticker_convert/converter.py:152
+#: src/sticker_convert/converter.py:151
 msgid "[W] Importing SVG takes long time"
 msgstr "[W] Importing SVG takes long time"
+
+#: src/sticker_convert/converter.py:497
+msgid "[F] Chrome/Chromium required for importing animated svg"
+msgstr "[F] Chrome/Chromium required for importing animated svg"
 
 #: src/sticker_convert/cli.py:28 src/sticker_convert/gui.py:41
 #, python-brace-format

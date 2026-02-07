@@ -8,7 +8,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
 
 import numpy as np
-from bs4 import BeautifulSoup
 from PIL import Image
 from PIL import __version__ as PillowVersion
 from PIL import features
@@ -451,11 +450,28 @@ class StickerConvert:
             # ffmpeg could fail to decode apng if file is buggy
             self._frames_import_pillow()
         elif suffix == ".svg":
-            self._frames_import_svg()
+            if self.codec_info_orig.fps == 0:
+                self._frames_import_svg_static()
+            else:
+                self._frames_import_svg_anim()
         else:
             self._frames_import_pyav()
 
-    def _frames_import_svg(self) -> None:
+    def _frames_import_svg_static(self) -> None:
+        import resvg_py
+
+        if isinstance(self.in_f, bytes):
+            svg = self.in_f.decode()
+        else:
+            with open(self.in_f) as f:
+                svg = f.read()
+
+        png_bytes = resvg_py.svg_to_bytes(svg_string=svg)
+        self.frames_raw.append(np.asarray(Image.open(BytesIO(png_bytes))))
+
+    def _frames_import_svg_anim(self) -> None:
+        from bs4 import BeautifulSoup
+
         width = self.codec_info_orig.res[0]
         height = self.codec_info_orig.res[1]
 
@@ -477,7 +493,9 @@ class StickerConvert:
                 "about:blank",
             ]
             if chrome_path is None:
-                raise RuntimeError("[F] Chrome/Chromium required for importing svg")
+                raise RuntimeError(
+                    I("[F] Chrome/Chromium required for importing animated svg")
+                )
             self.cb.put(self.MSG_SVG_LONG)
             RUNTIME_STATE["crd"] = CRD(chrome_path, args=args)
             RUNTIME_STATE["crd"].connect(-1)  # type: ignore

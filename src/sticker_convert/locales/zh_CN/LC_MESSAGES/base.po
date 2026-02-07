@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 23:31+0800\n"
+"POT-Creation-Date: 2026-02-08 02:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,17 +15,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
-#: src/sticker_convert/converter.py:134
+#: src/sticker_convert/converter.py:133
 #, python-brace-format
 msgid "[I] Start compressing {} -> {}"
 msgstr "[I] 开始压缩 {} -> {}"
 
-#: src/sticker_convert/converter.py:136
+#: src/sticker_convert/converter.py:135
 #, python-brace-format
 msgid "[S] Compatible file found, skip compress and just copy {} -> {}"
 msgstr "[S] 找到兼容档案，跳过压缩并仅复制 {} -> {}"
 
-#: src/sticker_convert/converter.py:139
+#: src/sticker_convert/converter.py:138
 #, python-brace-format
 msgid ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
@@ -33,17 +33,17 @@ msgid ""
 msgstr ""
 "[C] 压缩 {} -> {} 解像度={}x{}，质量={}，帧率={}，颜色={}（步骤 {}-{}-{}）"
 
-#: src/sticker_convert/converter.py:142
+#: src/sticker_convert/converter.py:141
 #, python-brace-format
 msgid "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 msgstr "[{}] 已压缩 {} -> {} 但大小 {} {} 限制 {}，正在重新压缩"
 
-#: src/sticker_convert/converter.py:144
+#: src/sticker_convert/converter.py:143
 #, python-brace-format
 msgid "[S] Successful compression {} -> {} size {} (step {})"
 msgstr "[S] 成功压缩 {} -> {} 大小 {}（步骤 {}）"
 
-#: src/sticker_convert/converter.py:146
+#: src/sticker_convert/converter.py:145
 #, python-brace-format
 msgid ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
@@ -51,14 +51,18 @@ msgid ""
 msgstr ""
 "[F] 压缩失败 {} -> {}，在当前设置下无法达到最低大小的限制 {}（最佳大小：{}）"
 
-#: src/sticker_convert/converter.py:150
+#: src/sticker_convert/converter.py:149
 #, python-brace-format
 msgid "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 msgstr "[W] {}不支持RGBA，默认为fastoctree量化"
 
-#: src/sticker_convert/converter.py:152
+#: src/sticker_convert/converter.py:151
 msgid "[W] Importing SVG takes long time"
 msgstr "[W] 导入 SVG 需要很长时间"
+
+#: src/sticker_convert/converter.py:497
+msgid "[F] Chrome/Chromium required for importing animated svg"
+msgstr "[F] 导入SVG动画需要 Chrome/Chromium 浏览器"
 
 #: src/sticker_convert/cli.py:28 src/sticker_convert/gui.py:41
 #, python-brace-format
