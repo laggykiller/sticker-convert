@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 import gettext
+import json
 import locale
 import platform
 import sys
-from json import JSONDecodeError
 from multiprocessing import current_process
 from typing import Any, Callable, Dict, cast
 
 from sticker_convert.definitions import CONFIG_DIR, ROOT_DIR, RUNTIME_STATE
-from sticker_convert.utils.files.json_manager import JsonManager
 
 LANG_DICT = {
     "en_US": ("en_US",),
@@ -52,14 +51,15 @@ def get_lang() -> str:
     settings_path = CONFIG_DIR / "config.json"
     if settings_path.is_file():
         try:
-            settings: Dict[Any, Any] = JsonManager.load_json(settings_path)
+            with open(settings_path, encoding="utf-8") as f:
+                settings: Dict[Any, Any] = json.load(f)
             lang = settings.get("lang")
             if lang:
                 if lang in LANG_DICT:
                     return lang
                 elif lang != "auto":
                     return "en_US"
-        except JSONDecodeError:
+        except json.JSONDecodeError:
             pass
 
     # Priority 3: Default locale
