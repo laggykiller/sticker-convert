@@ -9,8 +9,6 @@ from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Uni
 
 import numpy as np
 from PIL import Image
-from PIL import __version__ as PillowVersion
-from PIL import features
 
 from sticker_convert.definitions import RUNTIME_STATE
 from sticker_convert.job_option import CompOption
@@ -34,10 +32,6 @@ YUV_RGB_MATRIX = np.array(
         [1.164, 2.112, 0.000],
     ]
 )
-
-# Whether animated WebP is supported
-# See https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#saving-sequences
-PIL_WEBP_ANIM = cast(bool, features.check("webp_anim"))  # type: ignore
 
 
 def get_step_value(
@@ -909,6 +903,8 @@ class StickerConvert:
         # disposal=2 on gif cause flicker in image with transparency
         # Occurs in Pillow == 10.2.0
         # https://github.com/python-pillow/Pillow/issues/7787
+        from PIL import __version__ as PillowVersion
+
         if PillowVersion == "10.2.0":
             extra_kwargs["optimize"] = False
         else:
