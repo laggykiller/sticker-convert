@@ -42,7 +42,7 @@ Linux では、docker ビルドを実行することもできます。
 # 開発
 まず開発に必要なものをインストールします。
 ```bash
-pip install -r requirements-dev.txt
+pip install -e ".[dev]"
 ```
 
 テストを実行するには:

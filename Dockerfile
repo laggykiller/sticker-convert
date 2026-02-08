@@ -24,9 +24,7 @@ RUN useradd --create-home app && \
 WORKDIR /app
 
 COPY ./requirements.txt /app/
-RUN cat requirements.txt | grep -v 'ttkbootstrap' > requirements-cli.txt &&\
-    rm requirements.txt &&\
-    pip3 install --no-cache-dir -r requirements-cli.txt
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY ./src /app/
 

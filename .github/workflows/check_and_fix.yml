@@ -26,9 +26,7 @@ jobs:
         python-version: '3.12'
     - name: Install test
       run: |
-        pip install -r requirements-dev.txt
-        pip install -r requirements-type.txt
-        pip install .
+        pip install ".[dev,type]"
     - name: Update emoji data
       run: |
         curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/rhysd/gemoji/refs/heads/unicode-16.0/db/emoji.json

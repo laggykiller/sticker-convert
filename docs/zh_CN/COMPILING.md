@@ -42,7 +42,7 @@
 # 开发
 先安装开发所需模块：
 ```bash
-pip install -r requirements-dev.txt
+pip install -e ".[dev]"
 ```
 
 要执行测试：

@@ -42,7 +42,7 @@
 # 開發
 先安裝開發所需模塊：
 ```bash
-pip install -r requirements-dev.txt
+pip install -e ".[dev]"
 ```
 
 要執行測試：

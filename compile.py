@@ -90,18 +90,7 @@ def compile() -> None:
         python_bin = os.path.abspath("venv/Scripts/python.exe")
     else:
         python_bin = os.path.abspath("venv/bin/python")
-    subprocess.run([python_bin, "-m", "pip", "install", "-r", "requirements-build.txt"])
-    subprocess.run(
-        [
-            python_bin,
-            "-m",
-            "pip",
-            "install",
-            "--prefer-binary",
-            "-r",
-            "requirements.txt",
-        ]
-    )
+    subprocess.run([python_bin, "-m", "pip", "install", "--prefer-binary", ".[build]"])
 
     nuitka(python_bin, arch)
 

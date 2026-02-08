@@ -42,7 +42,7 @@ Note: You must run this on x86_64 machine
 # Development
 Install development requirements first:
 ```bash
-pip install -r requirements-dev.txt
+pip install -e ".[dev]"
 ```
 
 To run tests:
