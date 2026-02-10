@@ -23,6 +23,6 @@ resvg_py>=0.2.0
 signalstickers-client-fork-laggykiller~=3.3.0.post2
 socksio~=1.0.0
 telethon~=1.42.0
-tqdm~=4.67.2
+tqdm~=4.67.3
 ttkbootstrap-fork-laggykiller~=1.5.1
 websocket_client>=1.8.0
