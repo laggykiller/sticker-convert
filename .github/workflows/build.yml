@@ -91,7 +91,7 @@ jobs:
       run: |
         [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
         Invoke-WebRequest -Uri "https://github.com/adang1345/PythonVista/raw/refs/heads/master/3.12.12/python-3.12.12-amd64-full.exe" -OutFile "python-install.exe"
-        python-install.exe /quiet InstallAllUsers=0 InstallLauncherAllUsers=0 PrependPath=1 Include_test=0
+        .\python-install.exe /quiet InstallAllUsers=0 InstallLauncherAllUsers=0 PrependPath=1 Include_test=0
     - name: Download .mo files
       uses: actions/download-artifact@v4
       with:
