@@ -169,6 +169,7 @@ class GUI(Window):
         self.color_power_var = DoubleVar()
         self.duration_min_var = IntVar(self)
         self.duration_max_var = IntVar(self)
+        self.duration_spoof_var = BooleanVar()
         self.duration_disable_var = BooleanVar()
         self.padding_percent_var = IntVar(self)
         self.img_size_max_var = IntVar(self)

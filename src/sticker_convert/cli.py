@@ -147,6 +147,7 @@ class CLI:
             "chromium_path",
         )
         flags_comp_bool = (
+            "duration_spoof",
             "fake_vid",
             "no_fake_vid",
             "res_snap_pow2",
@@ -432,6 +433,9 @@ class CLI:
             duration_max=self.compression_presets[preset]["duration"]["max"]
             if args.duration_max is None
             else args.duration_max,
+            duration_spoof=self.compression_presets[preset]["duration"]["spoof"]
+            if args.duration_spoof is None
+            else args.duration_spoof,
             bg_color=self.compression_presets[preset]["bg_color"]
             if args.bg_color is None
             else args.bg_color,

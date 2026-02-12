@@ -50,3 +50,13 @@ Reference: https://core.telegram.org/api/obtaining_api_id#obtaining-api-id
 5. Setup complete
 
 Note: api_id, api_hash are saved and "telethon-x.session" file will generated in credentials directory. You need not set up Telethon next time as long as these info are present.
+
+# Duration spoofing
+Telegram officially allows video stickers with duration less than 3 seconds.
+However, you can spoof webm video sticker duration by enabling `Duration spoof` under advanced compression options (GUI) or `--duration-spoof` (CLI), such that longer video stickers can be uploaded
+This works by spoofing duration metadata in Matroska EBML.
+
+Note that the stickers still have to meet size limit of 256KB.
+
+Note that stickers created this way may fail to playback in the future or deleted.
+It also carries a very small risk of getting your account banned.

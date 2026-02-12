@@ -108,34 +108,54 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
-                          [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress]
+                          [--custom-presets CUSTOM_PRESETS]
+                          [--lang {en_US,ja_JP,zh_CN,zh_TW}]
+                          [--input-dir INPUT_DIR]
                           [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
-                          [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
+                          [--output-dir OUTPUT_DIR] [--author AUTHOR]
+                          [--title TITLE]
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage]
                           [--no-compress]
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                          [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
-                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
-                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR]
-                          [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                          [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid] [--scale-filter SCALE_FILTER]
-                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH]
-                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
-                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN]
-                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--kakao-auth-token KAKAO_AUTH_TOKEN]
-                          [--kakao-get-auth-android-login] [--kakao-get-auth-desktop-memdump]
-                          [--kakao-get-auth-desktop-login] [--kakao-bin-path KAKAO_BIN_PATH]
-                          [--kakao-username KAKAO_USERNAME] [--kakao-password KAKAO_PASSWORD]
-                          [--kakao-country-code KAKAO_COUNTRY_CODE] [--kakao-phone-number KAKAO_PHONE_NUMBER]
-                          [--kakao-device-uuid KAKAO_DEVICE_UUID] [--line-get-auth] [--line-cookies LINE_COOKIES]
-                          [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
-                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
-                          [--save-cred]
+                          [--steps STEPS] [--processes PROCESSES]
+                          [--fps-min FPS_MIN] [--fps-max FPS_MAX]
+                          [--fps-power FPS_POWER] [--res-min RES_MIN]
+                          [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
+                          [--res-h-max RES_H_MAX] [--res-power RES_POWER]
+                          [--res-snap-pow2] [--no-res-snap-pow2]
+                          [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
+                          [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
+                          [--color-max COLOR_MAX] [--color-power COLOR_POWER]
+                          [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--duration-spoof]
+                          [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR]
+                          [--vid-size-max VID_SIZE_MAX]
+                          [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
+                          [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
+                          [--scale-filter SCALE_FILTER]
+                          [--quantize-method QUANTIZE_METHOD]
+                          [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH]
+                          [--default-emoji DEFAULT_EMOJI]
+                          [--signal-uuid SIGNAL_UUID]
+                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
+                          [--telegram-token TELEGRAM_TOKEN]
+                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup]
+                          [--kakao-auth-token KAKAO_AUTH_TOKEN]
+                          [--kakao-get-auth-android-login]
+                          [--kakao-get-auth-desktop-memdump]
+                          [--kakao-get-auth-desktop-login]
+                          [--kakao-bin-path KAKAO_BIN_PATH]
+                          [--kakao-username KAKAO_USERNAME]
+                          [--kakao-password KAKAO_PASSWORD]
+                          [--kakao-country-code KAKAO_COUNTRY_CODE]
+                          [--kakao-phone-number KAKAO_PHONE_NUMBER]
+                          [--kakao-device-uuid KAKAO_DEVICE_UUID] [--line-get-auth]
+                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH]
+                          [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth]
+                          [--discord-token DISCORD_TOKEN] [--save-cred]
 
 CLI for sticker-convert
 
@@ -258,6 +278,8 @@ Compression options:
                         Set minimum output duration in miliseconds.
   --duration-max DURATION_MAX
                         Set maximum output duration in miliseconds.
+  --duration-spoof      Allow spoofing duration of matroska video (mkv/webm) to within limit.
+                        Useful for uploading video sticker >3s to Telegram, but may not be supported in the future.
   --padding-percent PADDING_PERCENT
                         Set percentage of space used as padding.
   --bg-color BG_COLOR   Set custom background color in rrggbbaa format.
@@ -533,6 +555,7 @@ See [/docs/TODO.md](/docs/TODO.md)
 - Information about Line stickers: https://github.com/doubleplusc/Line-sticker-downloader
 - Information about Kakao animated stickers: https://gist.github.com/chitacan/9802668
 - Downloading and decrypting Kakao animated stickers: https://github.com/blluv/KakaoTalkEmoticonDownloader
+- Matroska EBML duration spoofing: https://github.com/sliva0/tgradish/blob/master/src/tgradish/spoofer.py
 - Finding browser executable paths: https://github.com/roniemartinez/browsers
 - Application icon taken from [Icons8](https://icons8.com/)
 - Banner generated from [GitHub Socialify](https://socialify.git.ci/)

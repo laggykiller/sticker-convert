@@ -37,7 +37,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 10000
+            "max": 10000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -85,7 +86,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 3000
+            "max": 3000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -133,7 +135,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 3000
+            "max": 3000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -181,7 +184,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 3000
+            "max": 3000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -229,7 +233,8 @@
         },
         "duration": {
             "min": 8,
-            "max": 10000
+            "max": 10000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -277,7 +282,8 @@
         },
         "duration": {
             "min": 83,
-            "max": 4000
+            "max": 4000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -325,7 +331,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 5000
+            "max": 5000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -373,7 +380,8 @@
         },
         "duration": {
             "min": 83,
-            "max": 4000
+            "max": 4000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -421,7 +429,8 @@
         },
         "duration": {
             "min": 83,
-            "max": 4000
+            "max": 4000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -469,7 +478,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 0
+            "max": 0,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -517,7 +527,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 5000
+            "max": 5000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -565,7 +576,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 5000
+            "max": 5000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -613,7 +625,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 2000
+            "max": 2000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -661,7 +674,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 2000
+            "max": 2000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -709,7 +723,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 2000
+            "max": 2000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",
@@ -757,7 +772,8 @@
         },
         "duration": {
             "min": 0,
-            "max": 10000
+            "max": 10000,
+            "spoof": false
         },
         "padding_percent": 0,
         "bg_color": "",

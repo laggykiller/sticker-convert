@@ -281,6 +281,30 @@ class Job:
             '    select "Save to local directory only" for output\n'
         )
 
+        if self.opt_comp.format_vid[0].lower() in (".mkv", ".webm"):
+            telegram_duration_spoof_hint = I(
+                "\nNot officially supported by telegram, sticker may become broken / removed in the future.\n"
+            )
+            if self.opt_comp.duration_spoof is True:
+                info_msg += I("\nHint: duration spoof is enabled.")
+            else:
+                info_msg += I("\nHint: duration spoof is disabled.")
+                info_msg += I(
+                    "\nIf duration exceeds limit, playback speed will be adjusted such that duration is within limit."
+                )
+                info_msg += I(
+                    "\nYou may enable duration spoof to pretend duration is within limit without changing playback speed."
+                )
+            if self.opt_comp.preset.startswith(
+                "telegram"
+            ) or self.opt_output.option.startswith("telegram"):
+                info_msg += telegram_duration_spoof_hint
+        elif self.opt_comp.duration_spoof is True:
+            info_msg += I(
+                "\nHint: duration spoof is enabled, but video format does not support this."
+            )
+            info_msg += I("\nOnly mkv/webm video format support this option.\n")
+
         if Path(self.opt_input.dir).resolve() == Path(self.opt_output.dir).resolve():
             error_msg += I("\n[X] Input and output directories cannot be the same\n")
 

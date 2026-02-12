@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-08 02:21+0800\n"
-"PO-Revision-Date: 2026-02-08 02:21+0800\n"
+"POT-Creation-Date: 2026-02-12 21:47+0800\n"
+"PO-Revision-Date: 2026-02-12 21:47+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en_US\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/sticker_convert/converter.py:133
+#: src/sticker_convert/converter.py:128
 #, python-brace-format
 msgid "[I] Start compressing {} -> {}"
 msgstr "[I] Start compressing {} -> {}"
 
-#: src/sticker_convert/converter.py:135
+#: src/sticker_convert/converter.py:130
 #, python-brace-format
 msgid "[S] Compatible file found, skip compress and just copy {} -> {}"
 msgstr "[S] Compatible file found, skip compress and just copy {} -> {}"
 
-#: src/sticker_convert/converter.py:138
+#: src/sticker_convert/converter.py:133
 #, python-brace-format
 msgid ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
@@ -36,17 +36,17 @@ msgstr ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
 "{})"
 
-#: src/sticker_convert/converter.py:141
+#: src/sticker_convert/converter.py:136
 #, python-brace-format
 msgid "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 msgstr "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 
-#: src/sticker_convert/converter.py:143
+#: src/sticker_convert/converter.py:138
 #, python-brace-format
 msgid "[S] Successful compression {} -> {} size {} (step {})"
 msgstr "[S] Successful compression {} -> {} size {} (step {})"
 
-#: src/sticker_convert/converter.py:145
+#: src/sticker_convert/converter.py:140
 #, python-brace-format
 msgid ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
@@ -55,20 +55,20 @@ msgstr ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
 "quality under current settings (Best size: {})"
 
-#: src/sticker_convert/converter.py:149
+#: src/sticker_convert/converter.py:144
 #, python-brace-format
 msgid "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 msgstr "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 
-#: src/sticker_convert/converter.py:151
+#: src/sticker_convert/converter.py:146
 msgid "[W] Importing SVG takes long time"
 msgstr "[W] Importing SVG takes long time"
 
-#: src/sticker_convert/converter.py:497
+#: src/sticker_convert/converter.py:496
 msgid "[F] Chrome/Chromium required for importing animated svg"
 msgstr "[F] Chrome/Chromium required for importing animated svg"
 
-#: src/sticker_convert/converter.py:951
+#: src/sticker_convert/converter.py:965
 #, python-brace-format
 msgid "Invalid format {}"
 msgstr "Invalid format {}"
@@ -99,47 +99,47 @@ msgstr "Input options"
 msgid "Output options"
 msgstr "Output options"
 
-#: src/sticker_convert/cli.py:104 src/sticker_convert/gui.py:231
+#: src/sticker_convert/cli.py:104 src/sticker_convert/gui.py:232
 msgid "Compression options"
 msgstr "Compression options"
 
-#: src/sticker_convert/cli.py:180
+#: src/sticker_convert/cli.py:181
 msgid "Credentials options"
 msgstr "Credentials options"
 
-#: src/sticker_convert/cli.py:213
+#: src/sticker_convert/cli.py:214
 #, python-brace-format
 msgid "Error: Cannot load custom presets from {}"
 msgstr "Error: Cannot load custom presets from {}"
 
-#: src/sticker_convert/cli.py:261
+#: src/sticker_convert/cli.py:262
 #, python-brace-format
 msgid "Detected URL input source: {}"
 msgstr "Detected URL input source: {}"
 
-#: src/sticker_convert/cli.py:264
+#: src/sticker_convert/cli.py:265
 #, python-brace-format
 msgid "Error: Unrecognied URL input source for url: {}"
 msgstr "Error: Unrecognied URL input source for url: {}"
 
-#: src/sticker_convert/cli.py:342
+#: src/sticker_convert/cli.py:343
 #, python-brace-format
 msgid "Auto compression option set to {}"
 msgstr "Auto compression option set to {}"
 
-#: src/sticker_convert/cli.py:351
+#: src/sticker_convert/cli.py:352
 msgid " Reason: Export to local directory only"
 msgstr " Reason: Export to local directory only"
 
-#: src/sticker_convert/cli.py:471 src/sticker_convert/gui.py:298
+#: src/sticker_convert/cli.py:475 src/sticker_convert/gui.py:299
 msgid "Warning: creds.json content is corrupted"
 msgstr "Warning: creds.json content is corrupted"
 
-#: src/sticker_convert/cli.py:477
+#: src/sticker_convert/cli.py:481
 msgid "Loaded credentials from creds.json"
 msgstr "Loaded credentials from creds.json"
 
-#: src/sticker_convert/cli.py:624
+#: src/sticker_convert/cli.py:628
 msgid "Saved credentials to creds.json"
 msgstr "Saved credentials to creds.json"
 
@@ -164,44 +164,44 @@ msgstr "Job is running, really quit?"
 msgid "Quitting, please wait..."
 msgstr "Quitting, please wait..."
 
-#: src/sticker_convert/gui.py:228
+#: src/sticker_convert/gui.py:229
 msgid "Input"
 msgstr "Input"
 
-#: src/sticker_convert/gui.py:234
+#: src/sticker_convert/gui.py:235
 msgid "Output"
 msgstr "Output"
 
-#: src/sticker_convert/gui.py:237
+#: src/sticker_convert/gui.py:238
 msgid "Credentials"
 msgstr "Credentials"
 
-#: src/sticker_convert/gui.py:240
+#: src/sticker_convert/gui.py:241
 msgid "Config"
 msgstr "Config"
 
-#: src/sticker_convert/gui.py:243
+#: src/sticker_convert/gui.py:244
 msgid "Progress"
 msgstr "Progress"
 
-#: src/sticker_convert/gui.py:288
+#: src/sticker_convert/gui.py:289
 msgid "Warning: config.json content is corrupted"
 msgstr "Warning: config.json content is corrupted"
 
-#: src/sticker_convert/gui.py:495
+#: src/sticker_convert/gui.py:496
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/sticker_convert/gui.py:617
+#: src/sticker_convert/gui.py:618
 #: src/sticker_convert/gui_components/frames/control_frame.py:19
 msgid "Start"
 msgstr "Start"
 
-#: src/sticker_convert/gui.py:693
+#: src/sticker_convert/gui.py:694
 msgid "Invalid URL: "
 msgstr "Invalid URL: "
 
-#: src/sticker_convert/gui.py:699
+#: src/sticker_convert/gui.py:700
 msgid "Detected URL: "
 msgstr "Detected URL: "
 
@@ -455,83 +455,87 @@ msgid "Duration (Miliseconds)"
 msgstr "Duration (Miliseconds)"
 
 #: src/sticker_convert/gui_components/windows/advanced_compression_window.py:187
+msgid "Duration spoof"
+msgstr "Duration spoof"
+
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:197
 msgid "Maximum file size (bytes)"
 msgstr "Maximum file size (bytes)"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:188
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:198
 msgid "Img:"
 msgstr "Img:"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:193
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:215
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:203
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:225
 msgid "Vid:"
 msgstr "Vid:"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:209
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:219
 msgid "File format"
 msgstr "File format"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:222
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:232
 msgid "Power (Importance)"
 msgstr "Power (Importance)"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:223
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:233
 msgid "FPS:"
 msgstr "FPS:"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:228
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:238
 msgid "Res:"
 msgstr "Res:"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:241
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:251
 msgid "Color:"
 msgstr "Color:"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:250
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:260
 msgid "Padding"
 msgstr "Padding"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:251
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:261
 msgid "0-100%"
 msgstr "0-100%"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:259
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:269
 msgid "Convert (faking) image to video"
 msgstr "Convert (faking) image to video"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:270
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:280
 msgid "Background color"
 msgstr "Background color"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:276
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:286
 msgid "Set"
 msgstr "Set"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:284
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:294
 msgid "Scale filter"
 msgstr "Scale filter"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:301
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:311
 msgid "Quantize method"
 msgstr "Quantize method"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:318
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:328
 msgid "Chromium/Chrome directory"
 msgstr "Chromium/Chrome directory"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:326
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:336
 msgid "Custom cache directory"
 msgstr "Custom cache directory"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:335
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:345
 msgid "Default emoji"
 msgstr "Default emoji"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:477
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:491
 msgid "Category"
 msgstr "Category"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:494
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:508
 msgid "Search"
 msgstr "Search"
 
@@ -1179,12 +1183,74 @@ msgstr ""
 #: src/sticker_convert/job.py:285
 msgid ""
 "\n"
+"Not officially supported by telegram, sticker may become broken / removed in "
+"the future.\n"
+msgstr ""
+"\n"
+"Not officially supported by telegram, sticker may become broken / removed in "
+"the future.\n"
+
+#: src/sticker_convert/job.py:287
+msgid ""
+"\n"
+"Hint: duration spoof is enabled."
+msgstr ""
+"\n"
+"Hint: duration spoof is enabled."
+
+#: src/sticker_convert/job.py:289
+msgid ""
+"\n"
+"Hint: duration spoof is disabled."
+msgstr ""
+"\n"
+"Hint: duration spoof is disabled."
+
+#: src/sticker_convert/job.py:290
+msgid ""
+"\n"
+"If duration exceeds limit, playback speed will be adjusted such that "
+"duration is within limit."
+msgstr ""
+"\n"
+"If duration exceeds limit, playback speed will be adjusted such that "
+"duration is within limit."
+
+#: src/sticker_convert/job.py:291
+msgid ""
+"\n"
+"You may enable duration spoof to pretend duration is within limit without "
+"changing playback speed."
+msgstr ""
+"\n"
+"You may enable duration spoof to pretend duration is within limit without "
+"changing playback speed."
+
+#: src/sticker_convert/job.py:295
+msgid ""
+"\n"
+"Hint: duration spoof is enabled, but video format does not support this."
+msgstr ""
+"\n"
+"Hint: duration spoof is enabled, but video format does not support this."
+
+#: src/sticker_convert/job.py:296
+msgid ""
+"\n"
+"Only mkv/webm video format support this option.\n"
+msgstr ""
+"\n"
+"Only mkv/webm video format support this option.\n"
+
+#: src/sticker_convert/job.py:299
+msgid ""
+"\n"
 "[X] Input and output directories cannot be the same\n"
 msgstr ""
 "\n"
 "[X] Input and output directories cannot be the same\n"
 
-#: src/sticker_convert/job.py:288
+#: src/sticker_convert/job.py:302
 msgid ""
 "\n"
 "[X] Unrecognized URL input source\n"
@@ -1192,7 +1258,7 @@ msgstr ""
 "\n"
 "[X] Unrecognized URL input source\n"
 
-#: src/sticker_convert/job.py:292
+#: src/sticker_convert/job.py:306
 msgid ""
 "\n"
 "[X] URL address cannot be empty.\n"
@@ -1206,15 +1272,15 @@ msgstr ""
 "    choose \"Save to local directory only\"\n"
 "    in \"Input source\"\n"
 
-#: src/sticker_convert/job.py:303
+#: src/sticker_convert/job.py:317
 msgid "[X] Downloading from and uploading to telegram requires bot token.\n"
 msgstr "[X] Downloading from and uploading to telegram requires bot token.\n"
 
-#: src/sticker_convert/job.py:311
+#: src/sticker_convert/job.py:325
 msgid "[X] Downloading from Discord requires token.\n"
 msgstr "[X] Downloading from Discord requires token.\n"
 
-#: src/sticker_convert/job.py:315
+#: src/sticker_convert/job.py:329
 msgid ""
 "[X] Uploading to telegram requires user_id \n"
 "    (From real account, not bot account).\n"
@@ -1222,25 +1288,25 @@ msgstr ""
 "[X] Uploading to telegram requires user_id \n"
 "    (From real account, not bot account).\n"
 
-#: src/sticker_convert/job.py:323
+#: src/sticker_convert/job.py:337
 msgid "[X] Uploading to signal requires uuid and password.\n"
 msgstr "[X] Uploading to signal requires uuid and password.\n"
 
-#: src/sticker_convert/job.py:327
+#: src/sticker_convert/job.py:341
 msgid "[X] Uploading to Viber requires auth data.\n"
 msgstr "[X] Uploading to Viber requires auth data.\n"
 
-#: src/sticker_convert/job.py:342
+#: src/sticker_convert/job.py:356
 #, python-brace-format
 msgid "[X] {output_option} requires {metadata}\n"
 msgstr "[X] {output_option} requires {metadata}\n"
 
-#: src/sticker_convert/job.py:348
+#: src/sticker_convert/job.py:362
 #, python-brace-format
 msgid "    {metadata} was not supplied and {metadata}.txt is absent\n"
 msgstr "    {metadata} was not supplied and {metadata}.txt is absent\n"
 
-#: src/sticker_convert/job.py:352
+#: src/sticker_convert/job.py:366
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied and input source will not provide "
@@ -1249,7 +1315,7 @@ msgstr ""
 "    {metadata} was not supplied and input source will not provide "
 "{metadata}\n"
 
-#: src/sticker_convert/job.py:355
+#: src/sticker_convert/job.py:369
 #, python-brace-format
 msgid ""
 "    Supply the {metadata} by filling in the option, or\n"
@@ -1258,12 +1324,12 @@ msgstr ""
 "    Supply the {metadata} by filling in the option, or\n"
 "    Create {metadata}.txt with the {metadata} name\n"
 
-#: src/sticker_convert/job.py:359
+#: src/sticker_convert/job.py:373
 #, python-brace-format
 msgid "[!] {output_option} requires {metadata}\n"
 msgstr "[!] {output_option} requires {metadata}\n"
 
-#: src/sticker_convert/job.py:365
+#: src/sticker_convert/job.py:379
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied but {metadata}.txt is present\n"
@@ -1272,7 +1338,7 @@ msgstr ""
 "    {metadata} was not supplied but {metadata}.txt is present\n"
 "    Using {metadata} name in {metadata}.txt\n"
 
-#: src/sticker_convert/job.py:395
+#: src/sticker_convert/job.py:409
 msgid ""
 "Compression preset does not match export option\n"
 "You may continue, but the files will need to be compressed again before "
@@ -1286,7 +1352,7 @@ msgstr ""
 "You are recommended to choose the matching option for compression and "
 "output. Continue?"
 
-#: src/sticker_convert/job.py:414
+#: src/sticker_convert/job.py:428
 #, python-brace-format
 msgid ""
 "\n"
@@ -1295,7 +1361,7 @@ msgstr ""
 "\n"
 "[X] {param} should be between -1 and positive infinity. {value} was given."
 
-#: src/sticker_convert/job.py:427
+#: src/sticker_convert/job.py:441
 #, python-brace-format
 msgid ""
 "\n"
@@ -1306,7 +1372,7 @@ msgstr ""
 "[X] scale_filter {scale_filter} is not valid option\n"
 "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
 
-#: src/sticker_convert/job.py:440
+#: src/sticker_convert/job.py:454
 #, python-brace-format
 msgid ""
 "\n"
@@ -1317,7 +1383,7 @@ msgstr ""
 "[X] quantize_method {quantize_method} is not valid option\n"
 "    Valid options: imagequant, fastoctree, maxcoverage, mediancut, none"
 
-#: src/sticker_convert/job.py:450
+#: src/sticker_convert/job.py:464
 #, python-brace-format
 msgid ""
 "\n"
@@ -1326,7 +1392,7 @@ msgstr ""
 "\n"
 "[X] bg_color {bg_color} is not valid color hex"
 
-#: src/sticker_convert/job.py:460
+#: src/sticker_convert/job.py:474
 msgid ""
 "To download ANIMATED stickers from e.kakao.com,\n"
 "you need to generate auth_token.\n"
@@ -1342,7 +1408,7 @@ msgstr ""
 "You are adviced to read documentations.\n"
 "If you continue, you will only download static stickers. Continue?"
 
-#: src/sticker_convert/job.py:497
+#: src/sticker_convert/job.py:511
 #, python-brace-format
 msgid ""
 "WARNING: {path_type} directory is set to {path}.\n"
@@ -1359,15 +1425,15 @@ msgstr ""
 "maybe MOVED to \"archive_*\".\n"
 "THIS MAY CAUSE DAMAGE TO YOUR DATA. Continue?"
 
-#: src/sticker_convert/job.py:541
+#: src/sticker_convert/job.py:555
 msgid "Skip moving old files in input directory as input source is local"
 msgstr "Skip moving old files in input directory as input source is local"
 
-#: src/sticker_convert/job.py:545
+#: src/sticker_convert/job.py:559
 msgid "Skip moving old files in input directory as input source is empty"
 msgstr "Skip moving old files in input directory as input source is empty"
 
-#: src/sticker_convert/job.py:551
+#: src/sticker_convert/job.py:565
 #, python-brace-format
 msgid ""
 "Moving old files in input directory to {archive_dir} as input source is not "
@@ -1376,68 +1442,68 @@ msgstr ""
 "Moving old files in input directory to {archive_dir} as input source is not "
 "local"
 
-#: src/sticker_convert/job.py:561
+#: src/sticker_convert/job.py:575
 msgid "Skip moving old files in output directory as no_compress is True"
 msgstr "Skip moving old files in output directory as no_compress is True"
 
-#: src/sticker_convert/job.py:565
+#: src/sticker_convert/job.py:579
 msgid "Skip moving old files in output directory as output source is empty"
 msgstr "Skip moving old files in output directory as output source is empty"
 
-#: src/sticker_convert/job.py:570
+#: src/sticker_convert/job.py:584
 #, python-brace-format
 msgid "Moving old files in output directory to {archive_dir}"
 msgstr "Moving old files in output directory to {archive_dir}"
 
-#: src/sticker_convert/job.py:625
+#: src/sticker_convert/job.py:639
 msgid "Downloading..."
 msgstr "Downloading..."
 
-#: src/sticker_convert/job.py:627
+#: src/sticker_convert/job.py:641
 msgid "Skipped download (No files to download)"
 msgstr "Skipped download (No files to download)"
 
-#: src/sticker_convert/job.py:628
+#: src/sticker_convert/job.py:642
 msgid "Download: Skipped (No files to download)"
 msgstr "Download: Skipped (No files to download)"
 
-#: src/sticker_convert/job.py:661
+#: src/sticker_convert/job.py:675
 msgid "Skipped compression (no_compress is set to True)"
 msgstr "Skipped compression (no_compress is set to True)"
 
-#: src/sticker_convert/job.py:674
+#: src/sticker_convert/job.py:688
 msgid "Input directory is empty, nothing to copy to output directory"
 msgstr "Input directory is empty, nothing to copy to output directory"
 
-#: src/sticker_convert/job.py:679
+#: src/sticker_convert/job.py:693
 msgid "Output directory is not empty, not copying files from input directory"
 msgstr "Output directory is not empty, not copying files from input directory"
 
-#: src/sticker_convert/job.py:684
+#: src/sticker_convert/job.py:698
 msgid "Output directory is empty, copying files from input directory"
 msgstr "Output directory is empty, copying files from input directory"
 
-#: src/sticker_convert/job.py:717
+#: src/sticker_convert/job.py:731
 msgid "Skipped compression (No files to compress)"
 msgstr "Skipped compression (No files to compress)"
 
-#: src/sticker_convert/job.py:760
+#: src/sticker_convert/job.py:774
 msgid "Skipped export (Saving to local directory only)"
 msgstr "Skipped export (Saving to local directory only)"
 
-#: src/sticker_convert/job.py:761
+#: src/sticker_convert/job.py:775
 msgid "Export: Skipped (Saving to local directory only)"
 msgstr "Export: Skipped (Saving to local directory only)"
 
-#: src/sticker_convert/job.py:763
+#: src/sticker_convert/job.py:777
 msgid "Exporting..."
 msgstr "Exporting..."
 
-#: src/sticker_convert/job.py:815
+#: src/sticker_convert/job.py:829
 msgid "An error occured while exporting stickers"
 msgstr "An error occured while exporting stickers"
 
-#: src/sticker_convert/job.py:817 src/sticker_convert/job.py:821
+#: src/sticker_convert/job.py:831 src/sticker_convert/job.py:835
 #, python-brace-format
 msgid "Export: {stickers_ok}/{stickers_total} stickers success"
 msgstr "Export: {stickers_ok}/{stickers_total} stickers success"
@@ -1858,7 +1924,7 @@ msgstr "Enter api_hash: "
 msgid "Auto"
 msgstr "Auto"
 
-#: src/sticker_convert/utils/files/json_manager.py:14
+#: src/sticker_convert/utils/files/json_manager.py:15
 #, python-brace-format
 msgid "{} cannot be found"
 msgstr "{} cannot be found"

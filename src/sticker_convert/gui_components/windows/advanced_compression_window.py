@@ -183,6 +183,18 @@ class AdvancedCompressionWindow(BaseWindow):
             bootstyle="danger-round-toggle",  # type: ignore
         )
 
+        self.duration_spoof_help_btn = self.add_help_btn(
+            self.gui.help["comp"]["duration_spoof"]
+        )
+        self.duration_spoof_lbl = Label(self.frame_advcomp, text=I("Duration spoof"))
+        self.duration_spoof_cbox = Checkbutton(
+            self.frame_advcomp,
+            variable=self.gui.duration_spoof_var,
+            onvalue=True,
+            offvalue=False,
+            bootstyle="success-round-toggle",  # type: ignore
+        )
+
         self.size_help_btn = self.add_help_btn(self.gui.help["comp"]["size"])
         self.size_lbl = Label(self.frame_advcomp, text=I("Maximum file size (bytes)"))
         self.img_size_max_lbl = Label(self.frame_advcomp, text=I("Img:"))
@@ -389,6 +401,10 @@ class AdvancedCompressionWindow(BaseWindow):
         self.duration_max_lbl.grid(column=4, row=r, sticky="w", padx=3, pady=3)
         self.duration_max_entry.grid(column=5, row=r, sticky="nes", padx=3, pady=3)
         self.duration_disable_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
+        r += 1
+        self.duration_spoof_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
+        self.duration_spoof_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)
+        self.duration_spoof_cbox.grid(column=6, row=r, sticky="w", padx=3, pady=3)
         r += 1
         self.size_help_btn.grid(column=0, row=r, sticky="w", padx=3, pady=3)
         self.size_lbl.grid(column=1, row=r, sticky="w", padx=3, pady=3)

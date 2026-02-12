@@ -67,6 +67,7 @@ class CompOption(BaseOption):
 
     duration_min: Optional[int] = None
     duration_max: Optional[int] = None
+    duration_spoof: bool = False
 
     bg_color: Optional[str] = None
 
@@ -105,7 +106,11 @@ class CompOption(BaseOption):
                 "max": self.color_max,
                 "power": self.color_power,
             },
-            "duration": {"min": self.duration_min, "max": self.duration_max},
+            "duration": {
+                "min": self.duration_min,
+                "max": self.duration_max,
+                "spoof": self.duration_spoof,
+            },
             "steps": self.steps,
             "bg_color": self.bg_color,
             "padding_percent": self.padding_percent,
@@ -194,6 +199,12 @@ class CompOption(BaseOption):
 
     def set_duration(self, value: Optional[int]) -> None:
         self.duration_min, self.duration_max = to_int(value), to_int(value)
+
+    def get_duration_spoof(self) -> bool:
+        return self.duration_spoof
+
+    def set_duration_spoof(self, value: bool):
+        self.duration_spoof = value
 
 
 @dataclass

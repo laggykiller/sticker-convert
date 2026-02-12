@@ -16,6 +16,7 @@ from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
 from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.files.cache_store import CacheStore
 from sticker_convert.utils.media.codec_info import CodecInfo, rounding
+from sticker_convert.utils.media.ebml_duration_spoof import spoof_duration
 from sticker_convert.utils.media.format_verify import FormatVerify
 from sticker_convert.utils.translate import get_translator
 
@@ -189,6 +190,10 @@ class StickerConvert:
         self.quality: Optional[int] = None
         self.fps: Optional[Fraction] = None
         self.color: Optional[int] = None
+        self.duration_spoof = (
+            self.opt_comp.duration_spoof is True
+            and self.out_f.suffix.lower() in (".mkv", ".webm")
+        )
 
         self.bg_color: Optional[Tuple[int, int, int, int]] = None
         if self.opt_comp.bg_color:
@@ -780,11 +785,13 @@ class StickerConvert:
         if (
             self.opt_comp.duration_min
             and self.codec_info_orig.duration < self.opt_comp.duration_min
+            and self.duration_spoof is False
         ):
             speed_ratio = self.codec_info_orig.duration / self.opt_comp.duration_min
         elif (
             self.opt_comp.duration_max
             and self.codec_info_orig.duration > self.opt_comp.duration_max
+            and self.duration_spoof is False
         ):
             speed_ratio = self.codec_info_orig.duration / self.opt_comp.duration_max
         else:
@@ -795,9 +802,9 @@ class StickerConvert:
 
         frames_out_min = None
         frames_out_max = None
-        if self.opt_comp.duration_min:
+        if self.opt_comp.duration_min and self.duration_spoof is False:
             frames_out_min = ceil(self.fps * self.opt_comp.duration_min / 1000)
-        if self.opt_comp.duration_max:
+        if self.opt_comp.duration_max and self.duration_spoof is False:
             frames_out_max = floor(self.fps * self.opt_comp.duration_max / 1000)
 
         frame_current = 0
@@ -896,6 +903,20 @@ class StickerConvert:
                 av_frame = av.VideoFrame.from_ndarray(frame, format="rgba")
                 output.mux(out_stream.encode(av_frame))
             output.mux(out_stream.encode())
+
+        if self.duration_spoof and self.fps:
+            duration = len(self.frames_processed) / self.fps * 1000
+            if self.opt_comp.duration_min and duration < self.opt_comp.duration_min:
+                fake_duration = self.opt_comp.duration_min
+            elif self.opt_comp.duration_max and duration > self.opt_comp.duration_max:
+                fake_duration = self.opt_comp.duration_max
+            else:
+                return
+            self.tmp_f.seek(0)
+            tmp_f_new = spoof_duration(self.tmp_f.read(), fake_duration)
+            self.tmp_f.seek(0)
+            self.tmp_f.truncate(0)
+            self.tmp_f.write(tmp_f_new)
 
     def _frames_export_pil_anim(self) -> None:
         extra_kwargs: Dict[str, Any] = {}
