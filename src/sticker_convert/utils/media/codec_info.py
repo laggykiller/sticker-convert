@@ -127,6 +127,8 @@ class CodecInfo:
             )
         elif file_ext in (".gif", ".apng", ".png"):
             fps, frames, duration = CodecInfo._get_file_fps_frames_duration_pillow(file)
+        elif file_ext == ".svg":
+            fps, frames, duration, _ = CodecInfo.get_svg_info(file)
         else:
             frames, duration = CodecInfo._get_file_frames_duration_av(file)
 
@@ -150,6 +152,8 @@ class CodecInfo:
         elif file_ext in (".gif", ".apng", ".png"):
             fps, _, _ = CodecInfo._get_file_fps_frames_duration_pillow(file)
             return fps
+        elif file_ext == ".svg":
+            fps, _, _, _ = CodecInfo.get_svg_info(file)
 
         frames, duration = CodecInfo._get_file_frames_duration_av(
             file, frames_to_iterate=10
@@ -171,6 +175,9 @@ class CodecInfo:
 
         if file_ext in (".tgs", ".json", ".lottie"):
             return CodecInfo._get_file_frames_lottie(file)
+        if file_ext == ".svg":
+            _, frames, _, _ = CodecInfo.get_svg_info(file)
+            return frames
         if file_ext in (".gif", ".webp", ".png", ".apng"):
             _, frames, _ = CodecInfo._get_file_fps_frames_duration_pillow(
                 file, frames_only=True
@@ -206,6 +213,8 @@ class CodecInfo:
             _, _, duration, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
         elif file_ext in (".gif", ".png", ".apng"):
             _, _, duration = CodecInfo._get_file_fps_frames_duration_pillow(file)
+        elif file_ext == ".svg":
+            _, _, duration, _ = CodecInfo.get_svg_info(file)
         else:
             _, duration = CodecInfo._get_file_frames_duration_av(file)
 
@@ -319,7 +328,6 @@ class CodecInfo:
 
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
-
         # duration could be spoofed
         # https://github.com/sliva0/tgradish/blob/master/src/tgradish/spoofer.py
 
@@ -350,7 +358,9 @@ class CodecInfo:
             assert last_frame.time_base is not None
             assert last_frame.pts is not None
 
-            duration = ((last_frame.pts + last_frame.duration) * last_frame.time_base) * 1000
+            duration = (
+                (last_frame.pts + last_frame.duration) * last_frame.time_base
+            ) * 1000
             return frame_count, int(rounding(float(duration)))
 
     @staticmethod
@@ -366,7 +376,7 @@ class CodecInfo:
 
         codec = None
         animated = False
-        if file_ext in (".tgs", ".lottie", ".json"):
+        if file_ext in (".tgs", ".lottie", ".json", ".svg"):
             return file_ext.replace(".", "")
         try:
             with Image.open(file) as im:
@@ -412,6 +422,9 @@ class CodecInfo:
             with Image.open(file) as im:
                 width = im.width
                 height = im.height
+        elif file_ext == ".svg":
+            _, _, _, res = CodecInfo.get_svg_info(file)
+            return res[0], res[1]
         else:
             import av
 
