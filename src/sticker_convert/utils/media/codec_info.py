@@ -320,6 +320,9 @@ class CodecInfo:
         # Getting fps and frame count from metadata is not reliable
         # Example: https://github.com/laggykiller/sticker-convert/issues/114
 
+        # duration could be spoofed
+        # https://github.com/sliva0/tgradish/blob/master/src/tgradish/spoofer.py
+
         file_ref: Union[str, BinaryIO]
         if isinstance(file, Path):
             file_ref = file.as_posix()
@@ -329,38 +332,26 @@ class CodecInfo:
         with av.open(file_ref) as container:
             container = cast(InputContainer, container)
             stream = container.streams.video[0]
-            if container.duration:
-                duration_metadata = int(rounding(container.duration / 1000))
-            else:
-                duration_metadata = 0
-
             if frames_only is True and stream.frames > 1:
-                return stream.frames, duration_metadata
+                return stream.frames, 0
 
-            frame_count = 0
+            frame_count = 1
             last_frame = None
-            for frame_count, frame in enumerate(container.decode(stream)):
+            for frame_count, frame in enumerate(container.decode(stream), 1):
                 if frames_to_iterate is not None and frame_count == frames_to_iterate:
                     break
                 last_frame = frame
 
             if last_frame is None:
                 return 0, 0
+            if frame_count == 1:
+                return frame_count, 0
 
             assert last_frame.time_base is not None
             assert last_frame.pts is not None
 
-            time_base_ms = (
-                last_frame.time_base.numerator / last_frame.time_base.denominator * 1000
-            )
-            if frame_count <= 1 or duration_metadata != 0:
-                return frame_count, duration_metadata
-            duration_n_minus_one = last_frame.pts * time_base_ms
-            ms_per_frame = duration_n_minus_one / (frame_count - 1)
-            duration = frame_count * ms_per_frame
-            return frame_count, int(rounding(duration))
-
-        return 0, 0
+            duration = ((last_frame.pts + last_frame.duration) * last_frame.time_base) * 1000
+            return frame_count, int(rounding(float(duration)))
 
     @staticmethod
     def get_file_codec(file: Union[Path, bytes], file_ext: Optional[str] = None) -> str:
