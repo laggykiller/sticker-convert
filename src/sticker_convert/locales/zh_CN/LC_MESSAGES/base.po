@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-12 21:47+0800\n"
+"POT-Creation-Date: 2026-02-13 03:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,7 +64,7 @@ msgstr "[W] 导入 SVG 需要很长时间"
 msgid "[F] Chrome/Chromium required for importing animated svg"
 msgstr "[F] 导入SVG动画需要 Chrome/Chromium 浏览器"
 
-#: src/sticker_convert/converter.py:965
+#: src/sticker_convert/converter.py:966
 #, python-brace-format
 msgid "Invalid format {}"
 msgstr "无效格式{}"
@@ -447,88 +447,88 @@ msgstr "颜色 (0-256)"
 msgid "Duration (Miliseconds)"
 msgstr "持续时间（毫秒）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:187
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:189
 msgid "Duration spoof"
 msgstr "伪造"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:197
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:199
 msgid "Maximum file size (bytes)"
 msgstr "最大档案大小（字节）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:198
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:200
 msgid "Img:"
 msgstr "静态："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:203
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:225
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:205
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:227
 msgid "Vid:"
 msgstr "动态："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:219
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:221
 msgid "File format"
 msgstr "档案格式"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:232
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:234
 msgid "Power (Importance)"
 msgstr "幕（重要性）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:233
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:235
 msgid "FPS:"
 msgstr "帧率："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:238
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:240
 msgid "Res:"
 msgstr "分辨率："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:251
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:253
 msgid "Color:"
 msgstr "颜色："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:260
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:262
 msgid "Padding"
 msgstr "填充"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:261
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:263
 msgid "0-100%"
 msgstr "0-100%"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:269
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:271
 msgid "Convert (faking) image to video"
 msgstr "将（伪造）图像转换为视频"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:280
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:282
 msgid "Background color"
 msgstr "背景颜色"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:286
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:288
 msgid "Set"
 msgstr "设置"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:294
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:296
 msgid "Scale filter"
 msgstr "缩放滤镜"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:311
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:313
 msgid "Quantize method"
 msgstr "量化方式"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:328
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:330
 msgid "Chromium/Chrome directory"
 msgstr "Chromium/Chrome 目录"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:336
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:338
 msgid "Custom cache directory"
 msgstr "自定义缓存目录"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:345
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:347
 msgid "Default emoji"
 msgstr "默认表情符号"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:491
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:493
 msgid "Category"
 msgstr "类别"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:508
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:510
 msgid "Search"
 msgstr "搜寻"
 
@@ -1168,7 +1168,7 @@ msgstr ""
 "    如果您想自己上传结果，\n"
 "    选择\"只储存至本机路径\"作为输出\n"
 
-#: src/sticker_convert/job.py:285
+#: src/sticker_convert/job.py:286
 msgid ""
 "\n"
 "Not officially supported by telegram, sticker may become broken / removed in "
@@ -1177,7 +1177,7 @@ msgstr ""
 "\n"
 "由于 Telegram 官方不支持，贴纸未来可能会损坏/被删除。\n"
 
-#: src/sticker_convert/job.py:287
+#: src/sticker_convert/job.py:289
 msgid ""
 "\n"
 "Hint: duration spoof is enabled."
@@ -1185,7 +1185,7 @@ msgstr ""
 "\n"
 "提示：已启用伪造播放时长。"
 
-#: src/sticker_convert/job.py:289
+#: src/sticker_convert/job.py:291
 msgid ""
 "\n"
 "Hint: duration spoof is disabled."
@@ -1193,7 +1193,7 @@ msgstr ""
 "\n"
 "提示：已禁用伪造播放时长。"
 
-#: src/sticker_convert/job.py:290
+#: src/sticker_convert/job.py:293
 msgid ""
 "\n"
 "If duration exceeds limit, playback speed will be adjusted such that "
@@ -1202,7 +1202,7 @@ msgstr ""
 "\n"
 "若播放时间超过限制，播放速度将调整，以控制播放时间至限制范围内。"
 
-#: src/sticker_convert/job.py:291
+#: src/sticker_convert/job.py:296
 msgid ""
 "\n"
 "You may enable duration spoof to pretend duration is within limit without "
@@ -1211,7 +1211,7 @@ msgstr ""
 "\n"
 "您可以启用伪造播放时长，使播放时长看似在限制范围内，而无需改变播放速度。"
 
-#: src/sticker_convert/job.py:295
+#: src/sticker_convert/job.py:304
 msgid ""
 "\n"
 "Hint: duration spoof is enabled, but video format does not support this."
@@ -1219,7 +1219,7 @@ msgstr ""
 "\n"
 "提示：已启用伪造播放时长，但影片格式不支援此功能。"
 
-#: src/sticker_convert/job.py:296
+#: src/sticker_convert/job.py:306
 msgid ""
 "\n"
 "Only mkv/webm video format support this option.\n"
@@ -1227,7 +1227,7 @@ msgstr ""
 "\n"
 "只有mkv/webm影片格式支援此选项。\n"
 
-#: src/sticker_convert/job.py:299
+#: src/sticker_convert/job.py:309
 msgid ""
 "\n"
 "[X] Input and output directories cannot be the same\n"
@@ -1235,7 +1235,7 @@ msgstr ""
 "\n"
 "[X] 输入和输出目录不能相同\n"
 
-#: src/sticker_convert/job.py:302
+#: src/sticker_convert/job.py:312
 msgid ""
 "\n"
 "[X] Unrecognized URL input source\n"
@@ -1243,7 +1243,7 @@ msgstr ""
 "\n"
 "[X] 无法识别的 URL 输入来源\n"
 
-#: src/sticker_convert/job.py:306
+#: src/sticker_convert/job.py:316
 msgid ""
 "\n"
 "[X] URL address cannot be empty.\n"
@@ -1256,15 +1256,15 @@ msgstr ""
 "    如果您只想使用本地档案，\n"
 "    请在\"输入来源\"选择\"只储存至本机路径\"\n"
 
-#: src/sticker_convert/job.py:317
+#: src/sticker_convert/job.py:327
 msgid "[X] Downloading from and uploading to telegram requires bot token.\n"
 msgstr "[X] 从 telegram 下载和上传需要bot token。\n"
 
-#: src/sticker_convert/job.py:325
+#: src/sticker_convert/job.py:335
 msgid "[X] Downloading from Discord requires token.\n"
 msgstr "[X] 从 Discord 下载需要token。\n"
 
-#: src/sticker_convert/job.py:329
+#: src/sticker_convert/job.py:339
 msgid ""
 "[X] Uploading to telegram requires user_id \n"
 "    (From real account, not bot account).\n"
@@ -1272,44 +1272,44 @@ msgstr ""
 "[X] 上传到 telegram 需要 user_id \n"
 "    (来自真实帐户，而不是机器人帐号)\n"
 
-#: src/sticker_convert/job.py:337
+#: src/sticker_convert/job.py:347
 msgid "[X] Uploading to signal requires uuid and password.\n"
 msgstr "[X] 上传到signal需要uuid和密码。\n"
 
-#: src/sticker_convert/job.py:341
+#: src/sticker_convert/job.py:351
 msgid "[X] Uploading to Viber requires auth data.\n"
 msgstr "[X] 上传到 Viber 需要身份验证数据。\n"
 
-#: src/sticker_convert/job.py:356
+#: src/sticker_convert/job.py:366
 #, python-brace-format
 msgid "[X] {output_option} requires {metadata}\n"
 msgstr "[X] {output_option} 需要 {metadata}\n"
 
-#: src/sticker_convert/job.py:362
+#: src/sticker_convert/job.py:372
 #, python-brace-format
 msgid "    {metadata} was not supplied and {metadata}.txt is absent\n"
 msgstr "    未提供 {metadata} 并且不存在 {metadata}.txt\n"
 
-#: src/sticker_convert/job.py:366
+#: src/sticker_convert/job.py:376
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied and input source will not provide "
 "{metadata}\n"
 msgstr "    未提供{metadata}并输入源不会提供{metadata}\n"
 
-#: src/sticker_convert/job.py:369
+#: src/sticker_convert/job.py:379
 #, python-brace-format
 msgid ""
 "    Supply the {metadata} by filling in the option, or\n"
 "    Create {metadata}.txt with the {metadata} name\n"
 msgstr "    请提供{metadata}，或创建 {metadata}.txt并写入{metadata}\n"
 
-#: src/sticker_convert/job.py:373
+#: src/sticker_convert/job.py:383
 #, python-brace-format
 msgid "[!] {output_option} requires {metadata}\n"
 msgstr "[!] {output_option} 需要 {metadata}\n"
 
-#: src/sticker_convert/job.py:379
+#: src/sticker_convert/job.py:389
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied but {metadata}.txt is present\n"
@@ -1318,7 +1318,7 @@ msgstr ""
 "    未提供{metadata}但{metadata}.txt存在\n"
 "    使用在{metadata}.txt中的{metadata}\n"
 
-#: src/sticker_convert/job.py:409
+#: src/sticker_convert/job.py:419
 msgid ""
 "Compression preset does not match export option\n"
 "You may continue, but the files will need to be compressed again before "
@@ -1330,7 +1330,7 @@ msgstr ""
 "您可以继续，但在输出之前需要再次压缩档案\n"
 "建议您选择匹配的压缩和输出选项。要继续吗？ "
 
-#: src/sticker_convert/job.py:428
+#: src/sticker_convert/job.py:438
 #, python-brace-format
 msgid ""
 "\n"
@@ -1339,7 +1339,7 @@ msgstr ""
 "\n"
 "[X] {param} 应介于-1和正无穷大之间。得到无效值{value}。"
 
-#: src/sticker_convert/job.py:441
+#: src/sticker_convert/job.py:451
 #, python-brace-format
 msgid ""
 "\n"
@@ -1350,7 +1350,7 @@ msgstr ""
 "[X] scale_filter {scale_filter} 不是有效选项\n"
 "    有效选项: nearest, box, bilinear, hamming, bicubic, lanczos"
 
-#: src/sticker_convert/job.py:454
+#: src/sticker_convert/job.py:464
 #, python-brace-format
 msgid ""
 "\n"
@@ -1361,7 +1361,7 @@ msgstr ""
 "[X] quantize_method {quantize_method} 不是有效选项\n"
 "    有效选项: imagequant, fastoctree, maxcoverage, mediancut, none"
 
-#: src/sticker_convert/job.py:464
+#: src/sticker_convert/job.py:474
 #, python-brace-format
 msgid ""
 "\n"
@@ -1370,7 +1370,7 @@ msgstr ""
 "\n"
 "[X] bg_color {bg_color} 不是有效十六进位值色码"
 
-#: src/sticker_convert/job.py:474
+#: src/sticker_convert/job.py:484
 msgid ""
 "To download ANIMATED stickers from e.kakao.com,\n"
 "you need to generate auth_token.\n"
@@ -1386,7 +1386,7 @@ msgstr ""
 "建议您阅读文档。\n"
 "如果继续，您只会下载静态贴纸。继续吗？"
 
-#: src/sticker_convert/job.py:511
+#: src/sticker_convert/job.py:521
 #, python-brace-format
 msgid ""
 "WARNING: {path_type} directory is set to {path}.\n"
@@ -1403,83 +1403,83 @@ msgstr ""
 "可能会被移到\"archive_*\"。\n"
 "这可能会损坏您的数据。继续吗？"
 
-#: src/sticker_convert/job.py:555
+#: src/sticker_convert/job.py:565
 msgid "Skip moving old files in input directory as input source is local"
 msgstr "由于输入源是本机的，因此跳过移动输入目录中的旧档案"
 
-#: src/sticker_convert/job.py:559
+#: src/sticker_convert/job.py:569
 msgid "Skip moving old files in input directory as input source is empty"
 msgstr "由于输入源为空，因此跳过移动输入目录中的旧档案"
 
-#: src/sticker_convert/job.py:565
+#: src/sticker_convert/job.py:575
 #, python-brace-format
 msgid ""
 "Moving old files in input directory to {archive_dir} as input source is not "
 "local"
 msgstr "将输入目录中的旧档案移至 {archive_dir}，因为输入源不是本机的"
 
-#: src/sticker_convert/job.py:575
+#: src/sticker_convert/job.py:585
 msgid "Skip moving old files in output directory as no_compress is True"
 msgstr "由于 no_compress 为 True，因此跳过移动输出目录中的旧档案"
 
-#: src/sticker_convert/job.py:579
+#: src/sticker_convert/job.py:589
 msgid "Skip moving old files in output directory as output source is empty"
 msgstr "由于输出源为空，因此跳过移动输出目录中的旧档案"
 
-#: src/sticker_convert/job.py:584
+#: src/sticker_convert/job.py:594
 #, python-brace-format
 msgid "Moving old files in output directory to {archive_dir}"
 msgstr "将输出目录中的旧档案移至 {archive_dir}"
 
-#: src/sticker_convert/job.py:639
+#: src/sticker_convert/job.py:649
 msgid "Downloading..."
 msgstr "下载中..."
 
-#: src/sticker_convert/job.py:641
+#: src/sticker_convert/job.py:651
 msgid "Skipped download (No files to download)"
 msgstr "跳过下载（沒有档案可供下載）"
 
-#: src/sticker_convert/job.py:642
+#: src/sticker_convert/job.py:652
 msgid "Download: Skipped (No files to download)"
 msgstr "下载: 已跳过（没有档案可供下载）"
 
-#: src/sticker_convert/job.py:675
+#: src/sticker_convert/job.py:685
 msgid "Skipped compression (no_compress is set to True)"
 msgstr "跳过压缩（no_compress 设置为 True）"
 
-#: src/sticker_convert/job.py:688
+#: src/sticker_convert/job.py:698
 msgid "Input directory is empty, nothing to copy to output directory"
 msgstr "输入目录为空，没有任何内容可复制到输出目录"
 
-#: src/sticker_convert/job.py:693
+#: src/sticker_convert/job.py:703
 msgid "Output directory is not empty, not copying files from input directory"
 msgstr "输出目录不为空，不从输入目录复制文件"
 
-#: src/sticker_convert/job.py:698
+#: src/sticker_convert/job.py:708
 msgid "Output directory is empty, copying files from input directory"
 msgstr "输出目录为空，正在从输入目录复制文件"
 
-#: src/sticker_convert/job.py:731
+#: src/sticker_convert/job.py:741
 msgid "Skipped compression (No files to compress)"
 msgstr "跳过压缩（没有要压缩的文件）"
 
-#: src/sticker_convert/job.py:774
+#: src/sticker_convert/job.py:784
 msgid "Skipped export (Saving to local directory only)"
 msgstr "跳过输出（仅保存到本机）"
 
-#: src/sticker_convert/job.py:775
+#: src/sticker_convert/job.py:785
 msgid "Export: Skipped (Saving to local directory only)"
 msgstr "输出：已跳过（仅保存到本机）"
 
-#: src/sticker_convert/job.py:777
+#: src/sticker_convert/job.py:787
 msgid "Exporting..."
 msgstr "正在输出..."
 
-#: src/sticker_convert/job.py:829
+#: src/sticker_convert/job.py:839
 msgid "An error occured while exporting stickers"
 msgstr "输出贴纸时发生错误"
 
-#: src/sticker_convert/job.py:831 src/sticker_convert/job.py:835
+#: src/sticker_convert/job.py:841 src/sticker_convert/job.py:845
 #, python-brace-format
 msgid "Export: {stickers_ok}/{stickers_total} stickers success"
 msgstr "输出：{stickers_ok}/{stickers_total} 个贴纸成功"

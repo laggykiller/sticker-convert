@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-12 21:47+0800\n"
+"POT-Creation-Date: 2026-02-13 03:14+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -72,7 +72,7 @@ msgstr "[W] SVGのインポートに時間がかかる"
 msgid "[F] Chrome/Chromium required for importing animated svg"
 msgstr "[F] SVGアニメーションのインポートにはChrome/Chromiumが必要です"
 
-#: src/sticker_convert/converter.py:965
+#: src/sticker_convert/converter.py:966
 #, python-brace-format
 msgid "Invalid format {}"
 msgstr "無効なフォーマット{}"
@@ -460,88 +460,88 @@ msgstr "色の数 (0-256)"
 msgid "Duration (Miliseconds)"
 msgstr "期間 (ミリ秒)"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:187
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:189
 msgid "Duration spoof"
 msgstr "再生時間偽装"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:197
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:199
 msgid "Maximum file size (bytes)"
 msgstr "最大ファイルサイズ（バイト）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:198
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:200
 msgid "Img:"
 msgstr "画像"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:203
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:225
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:205
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:227
 msgid "Vid:"
 msgstr "動画："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:219
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:221
 msgid "File format"
 msgstr "ファイル形式"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:232
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:234
 msgid "Power (Importance)"
 msgstr "冪指数（重要性）"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:233
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:235
 msgid "FPS:"
 msgstr "FPS:"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:238
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:240
 msgid "Res:"
 msgstr "解像度:"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:251
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:253
 msgid "Color:"
 msgstr "色："
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:260
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:262
 msgid "Padding"
 msgstr "パディング"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:261
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:263
 msgid "0-100%"
 msgstr "0-100%"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:269
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:271
 msgid "Convert (faking) image to video"
 msgstr "画像をビデオに変換 (偽装)"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:280
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:282
 msgid "Background color"
 msgstr "背景色"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:286
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:288
 msgid "Set"
 msgstr "設定する"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:294
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:296
 msgid "Scale filter"
 msgstr "リサンプリングフィルター"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:311
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:313
 msgid "Quantize method"
 msgstr "色の量子化方式"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:328
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:330
 msgid "Chromium/Chrome directory"
 msgstr "Chromium/Chrome ディレクトリ"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:336
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:338
 msgid "Custom cache directory"
 msgstr "カスタムキャッシュディレクトリ"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:345
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:347
 msgid "Default emoji"
 msgstr "デフォルトの絵文字"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:491
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:493
 msgid "Category"
 msgstr "カテゴリ"
 
-#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:508
+#: src/sticker_convert/gui_components/windows/advanced_compression_window.py:510
 msgid "Search"
 msgstr "検索"
 
@@ -1206,14 +1206,17 @@ msgstr ""
 "    結果を自分でアップロードしたい場合は、\n"
 "    出力には\"ローカルディレクトリのみに保存\"を選択します\n"
 
-#: src/sticker_convert/job.py:285
+#: src/sticker_convert/job.py:286
 msgid ""
 "\n"
 "Not officially supported by telegram, sticker may become broken / removed in "
 "the future.\n"
-msgstr "\nTelegram では公式にサポートされていないため、将来的にステッカーが再生不能、又は削除される可能性があります。\n"
+msgstr ""
+"\n"
+"Telegram では公式にサポートされていないため、将来的にステッカーが再生不能、又"
+"は削除される可能性があります。\n"
 
-#: src/sticker_convert/job.py:287
+#: src/sticker_convert/job.py:289
 msgid ""
 "\n"
 "Hint: duration spoof is enabled."
@@ -1221,7 +1224,7 @@ msgstr ""
 "\n"
 "ヒント：再生時間偽装がオンになっている。"
 
-#: src/sticker_convert/job.py:289
+#: src/sticker_convert/job.py:291
 msgid ""
 "\n"
 "Hint: duration spoof is disabled."
@@ -1229,41 +1232,44 @@ msgstr ""
 "\n"
 "ヒント：再生時間偽装がオフになっている。"
 
-#: src/sticker_convert/job.py:290
+#: src/sticker_convert/job.py:293
 msgid ""
 "\n"
 "If duration exceeds limit, playback speed will be adjusted such that "
 "duration is within limit."
 msgstr ""
 "\n"
-"再生時間が制限を超える場合、再生時間が制限内に収まるように再生速度が調整されます。"
+"再生時間が制限を超える場合、再生時間が制限内に収まるように再生速度が調整され"
+"ます。"
 
-#: src/sticker_convert/job.py:291
+#: src/sticker_convert/job.py:296
 msgid ""
 "\n"
 "You may enable duration spoof to pretend duration is within limit without "
 "changing playback speed."
 msgstr ""
 "\n"
-"再生時間偽装をオンすると、再生速度を変えずに再生時間が制限内であるかのように見えます。"
+"再生時間偽装をオンすると、再生速度を変えずに再生時間が制限内であるかのように"
+"見えます。"
 
-#: src/sticker_convert/job.py:295
+#: src/sticker_convert/job.py:304
 msgid ""
 "\n"
 "Hint: duration spoof is enabled, but video format does not support this."
 msgstr ""
 "\n"
-"ヒント：再生時間偽装がオンですが、動画フォーマットがこの機能をサポート出来ません。"
+"ヒント：再生時間偽装がオンですが、動画フォーマットがこの機能をサポート出来ま"
+"せん。"
 
-#: src/sticker_convert/job.py:296
+#: src/sticker_convert/job.py:306
 msgid ""
 "\n"
 "Only mkv/webm video format support this option.\n"
 msgstr ""
 "\n"
-"このオプションをサポートするのは mkv/webm ビデオフォーマットのみです。"
+"このオプションをサポートするのは mkv/webm ビデオフォーマットのみです。\n"
 
-#: src/sticker_convert/job.py:299
+#: src/sticker_convert/job.py:309
 msgid ""
 "\n"
 "[X] Input and output directories cannot be the same\n"
@@ -1271,7 +1277,7 @@ msgstr ""
 "\n"
 "[X] 入力ディレクトリと出力ディレクトリを同じにすることはできません\n"
 
-#: src/sticker_convert/job.py:302
+#: src/sticker_convert/job.py:312
 msgid ""
 "\n"
 "[X] Unrecognized URL input source\n"
@@ -1279,7 +1285,7 @@ msgstr ""
 "\n"
 "[X] 認識できない URL 入力ソース\n"
 
-#: src/sticker_convert/job.py:306
+#: src/sticker_convert/job.py:316
 msgid ""
 "\n"
 "[X] URL address cannot be empty.\n"
@@ -1292,17 +1298,17 @@ msgstr ""
 "    ローカルファイルのみを使用したい場合は、\n"
 "    \"入力ソース\"に\"ローカルディレクトリのみに保存\"を選択してください。\n"
 
-#: src/sticker_convert/job.py:317
+#: src/sticker_convert/job.py:327
 msgid "[X] Downloading from and uploading to telegram requires bot token.\n"
 msgstr ""
 "[X] TelegramからのダウンロードとTelegramへのアップロードにはbot tokenが必要で"
 "す。\n"
 
-#: src/sticker_convert/job.py:325
+#: src/sticker_convert/job.py:335
 msgid "[X] Downloading from Discord requires token.\n"
 msgstr "[X] Discord からダウンロードするにはtokenが必要です。\n"
 
-#: src/sticker_convert/job.py:329
+#: src/sticker_convert/job.py:339
 msgid ""
 "[X] Uploading to telegram requires user_id \n"
 "    (From real account, not bot account).\n"
@@ -1310,25 +1316,25 @@ msgstr ""
 "[X] Telegramにアップロードするには user_id が必要です \n"
 "    (ボットアカウントではなく、実際のアカウントから)。\n"
 
-#: src/sticker_convert/job.py:337
+#: src/sticker_convert/job.py:347
 msgid "[X] Uploading to signal requires uuid and password.\n"
 msgstr "[X] シグナルにアップロードするには、uuid とパスワードが必要です。\n"
 
-#: src/sticker_convert/job.py:341
+#: src/sticker_convert/job.py:351
 msgid "[X] Uploading to Viber requires auth data.\n"
 msgstr "[X] Viber へのアップロードには認証データが必要です。\n"
 
-#: src/sticker_convert/job.py:356
+#: src/sticker_convert/job.py:366
 #, python-brace-format
 msgid "[X] {output_option} requires {metadata}\n"
 msgstr "[X] {output_option} には {metadata} が必要です\n"
 
-#: src/sticker_convert/job.py:362
+#: src/sticker_convert/job.py:372
 #, python-brace-format
 msgid "    {metadata} was not supplied and {metadata}.txt is absent\n"
 msgstr "    {metadata} が指定されておらず、{metadata}.txt がありません\n"
 
-#: src/sticker_convert/job.py:366
+#: src/sticker_convert/job.py:376
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied and input source will not provide "
@@ -1336,7 +1342,7 @@ msgid ""
 msgstr ""
 "    {metadata} が指定されていないため、入力ソースが提供しません {metadata}\n"
 
-#: src/sticker_convert/job.py:369
+#: src/sticker_convert/job.py:379
 #, python-brace-format
 msgid ""
 "    Supply the {metadata} by filling in the option, or\n"
@@ -1345,12 +1351,12 @@ msgstr ""
 "    オプションで{metadata}を指定するか、\n"
 "    {metadata}.txtに{metadata}を入力してください。\n"
 
-#: src/sticker_convert/job.py:373
+#: src/sticker_convert/job.py:383
 #, python-brace-format
 msgid "[!] {output_option} requires {metadata}\n"
 msgstr "[!] {output_option} には {metadata} が必要です\n"
 
-#: src/sticker_convert/job.py:379
+#: src/sticker_convert/job.py:389
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied but {metadata}.txt is present\n"
@@ -1359,7 +1365,7 @@ msgstr ""
 "    {metadata} が指定されていませんでしたが、{metadata}.txt は存在します\n"
 "    {metadata}.txt で {metadata} 名を使用しています\n"
 
-#: src/sticker_convert/job.py:409
+#: src/sticker_convert/job.py:419
 msgid ""
 "Compression preset does not match export option\n"
 "You may continue, but the files will need to be compressed again before "
@@ -1371,7 +1377,7 @@ msgstr ""
 "続行できますが、エクスポート前にファイルを再度圧縮する必要があります。圧縮プ"
 "リセットが出力オプションと一致するを選択することをお勧めします。続けますか?"
 
-#: src/sticker_convert/job.py:428
+#: src/sticker_convert/job.py:438
 #, python-brace-format
 msgid ""
 "\n"
@@ -1381,7 +1387,7 @@ msgstr ""
 "[X] {param} は -1 から正の無限大まででなければなりません。{value} が指定され"
 "ました。"
 
-#: src/sticker_convert/job.py:441
+#: src/sticker_convert/job.py:451
 #, python-brace-format
 msgid ""
 "\n"
@@ -1392,7 +1398,7 @@ msgstr ""
 "[X] scale_filter {scale_filter} は有効なオプションではありません\n"
 "    有効なオプション: nearest, box, bilinear, hamming, bicubic, lanczos"
 
-#: src/sticker_convert/job.py:454
+#: src/sticker_convert/job.py:464
 #, python-brace-format
 msgid ""
 "\n"
@@ -1403,7 +1409,7 @@ msgstr ""
 "[X] quantize_method {quantize_method} は有効なオプションではありません\n"
 "    有効なオプション: imagequant、fastoctree、maxcoverage、mediancut、none"
 
-#: src/sticker_convert/job.py:464
+#: src/sticker_convert/job.py:474
 #, python-brace-format
 msgid ""
 "\n"
@@ -1412,7 +1418,7 @@ msgstr ""
 "\n"
 "[X] bg_color {bg_color} は有効な色の 16 進数ではありません"
 
-#: src/sticker_convert/job.py:474
+#: src/sticker_convert/job.py:484
 msgid ""
 "To download ANIMATED stickers from e.kakao.com,\n"
 "you need to generate auth_token.\n"
@@ -1429,7 +1435,7 @@ msgstr ""
 "ドキュメントを読むことをお勧めします。\n"
 "続行すると、画像スタンプのみがダウンロードされます。続行しますか?"
 
-#: src/sticker_convert/job.py:511
+#: src/sticker_convert/job.py:521
 #, python-brace-format
 msgid ""
 "WARNING: {path_type} directory is set to {path}.\n"
@@ -1446,19 +1452,19 @@ msgstr ""
 "\"archive_*\" に移動されるの可能性があります。\n"
 "データに損傷を与える可能性があります。続行しますか?"
 
-#: src/sticker_convert/job.py:555
+#: src/sticker_convert/job.py:565
 msgid "Skip moving old files in input directory as input source is local"
 msgstr ""
 "入力ソースがローカルであるため、入力ディレクトリ内の古いファイルの移動をス"
 "キップします"
 
-#: src/sticker_convert/job.py:559
+#: src/sticker_convert/job.py:569
 msgid "Skip moving old files in input directory as input source is empty"
 msgstr ""
 "入力ソースが空であるため、入力ディレクトリ内の古いファイルの移動をスキップし"
 "ます"
 
-#: src/sticker_convert/job.py:565
+#: src/sticker_convert/job.py:575
 #, python-brace-format
 msgid ""
 "Moving old files in input directory to {archive_dir} as input source is not "
@@ -1467,77 +1473,77 @@ msgstr ""
 "入力ソースがローカルではないため、入力ディレクトリ内の古いファイルを"
 "{archive_dir}に移動します"
 
-#: src/sticker_convert/job.py:575
+#: src/sticker_convert/job.py:585
 msgid "Skip moving old files in output directory as no_compress is True"
 msgstr ""
 "no_compress が True であるため、出力ディレクトリ内の古いファイルの移動をス"
 "キップします"
 
-#: src/sticker_convert/job.py:579
+#: src/sticker_convert/job.py:589
 msgid "Skip moving old files in output directory as output source is empty"
 msgstr ""
 "出力ソースが空であるため、出力ディレクトリ内の古いファイルの移動をスキップし"
 "ます"
 
-#: src/sticker_convert/job.py:584
+#: src/sticker_convert/job.py:594
 #, python-brace-format
 msgid "Moving old files in output directory to {archive_dir}"
 msgstr "出力ディレクトリ内の古いファイルを {archive_dir} に移動します"
 
-#: src/sticker_convert/job.py:639
+#: src/sticker_convert/job.py:649
 msgid "Downloading..."
 msgstr "ダウンロード中..."
 
-#: src/sticker_convert/job.py:641
+#: src/sticker_convert/job.py:651
 msgid "Skipped download (No files to download)"
 msgstr "ダウンロードをスキップしました (ダウンロードするファイルがありません)"
 
-#: src/sticker_convert/job.py:642
+#: src/sticker_convert/job.py:652
 msgid "Download: Skipped (No files to download)"
 msgstr ""
 "ダウンロード: スキップされました (ダウンロードするファイルがありません)"
 
-#: src/sticker_convert/job.py:675
+#: src/sticker_convert/job.py:685
 msgid "Skipped compression (no_compress is set to True)"
 msgstr "圧縮をスキップしました (no_compress が True に設定されています)"
 
-#: src/sticker_convert/job.py:688
+#: src/sticker_convert/job.py:698
 msgid "Input directory is empty, nothing to copy to output directory"
 msgstr "入力ディレクトリが空です。出力ディレクトリにコピーするものはありません"
 
-#: src/sticker_convert/job.py:693
+#: src/sticker_convert/job.py:703
 msgid "Output directory is not empty, not copying files from input directory"
 msgstr ""
 "出力ディレクトリが空ではありません。入力ディレクトリからファイルをコピーして"
 "いません"
 
-#: src/sticker_convert/job.py:698
+#: src/sticker_convert/job.py:708
 msgid "Output directory is empty, copying files from input directory"
 msgstr ""
 "出力ディレクトリが空です。入力ディレクトリからファイルをコピーしています"
 
-#: src/sticker_convert/job.py:731
+#: src/sticker_convert/job.py:741
 msgid "Skipped compression (No files to compress)"
 msgstr "圧縮をスキップしました (圧縮するファイルがありません)"
 
-#: src/sticker_convert/job.py:774
+#: src/sticker_convert/job.py:784
 msgid "Skipped export (Saving to local directory only)"
 msgstr "エクスポートをスキップしました (ローカル ディレクトリにのみ保存します)"
 
-#: src/sticker_convert/job.py:775
+#: src/sticker_convert/job.py:785
 msgid "Export: Skipped (Saving to local directory only)"
 msgstr ""
 "エクスポート: スキップされました (ローカル ディレクトリにのみ保存します)"
 
-#: src/sticker_convert/job.py:777
+#: src/sticker_convert/job.py:787
 msgid "Exporting..."
 msgstr "エクスポート中..."
 
-#: src/sticker_convert/job.py:829
+#: src/sticker_convert/job.py:839
 msgid "An error occured while exporting stickers"
 msgstr "ステッカーのエクスポート中にエラーが発生しました"
 
-#: src/sticker_convert/job.py:831 src/sticker_convert/job.py:835
+#: src/sticker_convert/job.py:841 src/sticker_convert/job.py:845
 #, python-brace-format
 msgid "Export: {stickers_ok}/{stickers_total} stickers success"
 msgstr ""
