@@ -165,7 +165,7 @@ jobs:
     - name: Upload signed artifact
       uses: actions/upload-artifact@v4
       with:
-        name: ${{matrix.TARGET}}-signed
+        name: windows-signed
         if-no-files-found: error
         path: windows-signed/
     - name: Upload Release Asset
