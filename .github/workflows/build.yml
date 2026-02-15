@@ -106,7 +106,6 @@ jobs:
       env:
         NUITKA_VER: ${{ matrix.NUITKA_VER }}
       run: |
-        echo "STICKER_CONVERT_VERSION=$(cd src; python -c 'from sticker_convert.version import __version__; print(__version__)'; cd ..)" >> $env:GITHUB_ENV
         python compile.py
         move sticker-convert.dist sticker-convert
         Compress-Archive -Path sticker-convert -DestinationPath sticker-convert-${{matrix.TARGET}}.zip
@@ -124,6 +123,29 @@ jobs:
         path: |
           ./sticker-convert-${{matrix.TARGET}}.zip
           ./sticker-convert-${{matrix.TARGET}}.msi
+  sign-binary-windows:
+    name: Sign packages (Windows)
+    needs: build-binary-windows
+    runs-on: windows-2022
+    permissions:
+      contents: write
+    steps:
+    - name: Combine artifact
+      uses: actions/download-artifact@v4
+      with:
+        path: windows-batch-unsigned
+        pattern: windows*-unsigned
+        merge-multiple: true
+    - name: Upload batch unsigned artifact
+      id: upload-batch-unsigned-artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: windows-batch-unsigned
+        if-no-files-found: error
+        path: windows-batch-unsigned/
+    - name: Get version
+      run: |
+        echo "STICKER_CONVERT_VERSION=$(cd src; python -c 'from sticker_convert.version import __version__; print(__version__)'; cd ..)" >> $env:GITHUB_ENV
     - name: Sign
       uses: signpath/github-action-submit-signing-request@v1.1
       env:
@@ -134,10 +156,10 @@ jobs:
         organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
         project-slug: 'sticker-convert'
         signing-policy-slug:  '${{ env.SIGNPATH_SIGNING_POLICY_SLUG }}'
-        github-artifact-id:  "${{steps.upload-unsigned-artifact.outputs.artifact-id}}"
+        github-artifact-id:  "${{steps.upload-batch-unsigned-artifact.outputs.artifact-id}}"
         wait-for-completion: true
         wait-for-completion-timeout-in-seconds: 18000
-        output-artifact-directory: ${{matrix.TARGET}}-signed
+        output-artifact-directory: windows-signed
         parameters: |
           version: "${{ env.STICKER_CONVERT_VERSION }}"
     - name: Upload signed artifact
@@ -145,9 +167,7 @@ jobs:
       with:
         name: ${{matrix.TARGET}}-signed
         if-no-files-found: error
-        path:  |
-          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.zip
-          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.msi
+        path: windows-signed/
     - name: Upload Release Asset
       id: upload-release-asset
       uses: softprops/action-gh-release@v2
@@ -156,8 +176,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         files: |
-          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.zip
-          ./${{matrix.TARGET}}-signed/sticker-convert-${{matrix.TARGET}}.msi
+          windows-signed/*.zip
+          windows-signed/*.msi
 
   build-binary-macos:
     name: Build packages (macOS)
@@ -380,7 +400,7 @@ jobs:
   
   upload-pypi:
     name: Upload to pypi
-    needs: [build-wheel, build-binary-windows, build-binary-macos, build-appimage]
+    needs: [build-wheel, sign-binary-windows, build-binary-macos, build-appimage]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
     permissions:
