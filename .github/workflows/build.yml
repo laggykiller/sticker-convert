@@ -83,15 +83,18 @@ jobs:
         include:
           - os: windows-2022
             TARGET: windows-x86_64
+            PYVER: "3.12"
+          - os: windows-2022
+            TARGET: windows7-x86_64
+            PYVER: "3.8"
     steps:
     - uses: actions/checkout@v4
       with:
         submodules: recursive
-    - name: Set up Python 3.12 (PythonVista)
-      run: |
-        [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
-        Invoke-WebRequest -Uri "https://github.com/adang1345/PythonVista/raw/refs/heads/master/3.12.12/python-3.12.12-amd64-full.exe" -OutFile "python-install.exe"
-        .\python-install.exe /quiet InstallAllUsers=0 InstallLauncherAllUsers=0 PrependPath=1 Include_test=0
+    - name: Set up Python ${{ matrix.PYVER }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.PYVER }}
     - name: Download .mo files
       uses: actions/download-artifact@v4
       with:
