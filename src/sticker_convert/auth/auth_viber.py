@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import importlib.util
 import os
 import platform
 import shutil
@@ -224,18 +223,15 @@ class AuthViber(AuthBase):
         viber_auth = None
         msg = ""
 
-        pme_present = importlib.util.find_spec("PyMemoryEditor") is not None
         if platform.system() == "Darwin":
             methods.append(self.get_auth_by_dump)
         elif platform.system() == "Windows":
             methods.append(self.get_auth_by_dump)
-            if pme_present:
-                methods.append(self.get_auth_by_pme)
+            methods.append(self.get_auth_by_pme)
         else:
             if not os.path.isfile("/.dockerenv"):
                 methods.append(self.get_auth_by_dump)
-            if pme_present:
-                methods.append(self.get_auth_by_pme)
+            methods.append(self.get_auth_by_pme)
             if check_admin() is False:
                 methods.reverse()
 
