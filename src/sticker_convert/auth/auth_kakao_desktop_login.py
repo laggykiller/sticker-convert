@@ -100,6 +100,16 @@ class AuthKakaoDesktopLogin(AuthBase):
             version_str = version_tag.text.replace("Version ", "")
         return version_str
 
+    def windows_get_reg(self, regkey: str, val: str, use_wine: bool = False) -> Optional[str]:
+        wine = "wine " if use_wine else ""
+        cmd = f"{wine}reg query {regkey} /v {val}"
+        result = subprocess.run(
+            cmd, stdout=subprocess.PIPE, shell=True
+        ).stdout.decode()
+        if "REG_SZ" not in result:
+            return None
+        return result.split("\n")[2].split()[2]
+
     def windows_get_pragma(self, use_wine: bool = False) -> Optional[str]:
         sys_uuid = None
         hdd_model = None
@@ -109,38 +119,14 @@ class AuthKakaoDesktopLogin(AuthBase):
             return None
 
         regkey = "HKEY_CURRENT_USER\\Software\\Kakao\\KakaoTalk\\DeviceInfo"
-        wine = "wine " if use_wine else ""
-        cmd = f"{wine}reg query '{regkey}' /v Last"
-        last_device_info = subprocess.run(
-            cmd, stdout=subprocess.PIPE, shell=True
-        ).stdout.decode()
-        if "REG_SZ" not in last_device_info:
-            return None
-        last_device_info = last_device_info.split("\n")[2].split()[2]
+        last_device_info = self.windows_get_reg(regkey, "Last", use_wine)
 
         if self.opt_cred.kakao_device_uuid:
             sys_uuid = self.opt_cred.kakao_device_uuid
         else:
-            cmd = f"{wine}reg query '{regkey}\\{last_device_info}' /v sys_uuid"
-            sys_uuid = subprocess.run(
-                cmd, stdout=subprocess.PIPE, shell=True
-            ).stdout.decode()
-            if "REG_SZ" in sys_uuid:
-                sys_uuid = sys_uuid.split("\n")[2].split()[2]
-
-        cmd = f"{wine}reg query '{regkey}\\{last_device_info}' /v hdd_model"
-        hdd_model = subprocess.run(
-            cmd, stdout=subprocess.PIPE, shell=True
-        ).stdout.decode()
-        if "REG_SZ" in hdd_model:
-            hdd_model = hdd_model.split("\n")[2].split()[2]
-
-        cmd = f"{wine}reg query '{regkey}\\{last_device_info}' /v hdd_serial"
-        hdd_serial = subprocess.run(
-            cmd, stdout=subprocess.PIPE, shell=True
-        ).stdout.decode()
-        if "REG_SZ" in hdd_serial:
-            hdd_serial = hdd_serial.split("\n")[2].split()[2]
+            sys_uuid = self.windows_get_reg(f"{regkey}\\{last_device_info}", "sys_uuid", use_wine)
+        hdd_model = self.windows_get_reg(f"{regkey}\\{last_device_info}", "hdd_model", use_wine)
+        hdd_serial = self.windows_get_reg(f"{regkey}\\{last_device_info}", "hdd_serial", use_wine)
 
         if sys_uuid and hdd_model and hdd_serial:
             return f"{sys_uuid}|{hdd_model}|{hdd_serial}"
