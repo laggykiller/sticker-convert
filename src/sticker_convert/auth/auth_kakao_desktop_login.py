@@ -100,12 +100,12 @@ class AuthKakaoDesktopLogin(AuthBase):
             version_str = version_tag.text.replace("Version ", "")
         return version_str
 
-    def windows_get_reg(self, regkey: str, val: str, use_wine: bool = False) -> Optional[str]:
+    def windows_get_reg(
+        self, regkey: str, val: str, use_wine: bool = False
+    ) -> Optional[str]:
         wine = "wine " if use_wine else ""
         cmd = f"{wine}reg query {regkey} /v {val}"
-        result = subprocess.run(
-            cmd, stdout=subprocess.PIPE, shell=True
-        ).stdout.decode()
+        result = subprocess.run(cmd, stdout=subprocess.PIPE, shell=True).stdout.decode()
         if "REG_SZ" not in result:
             return None
         return result.split("\n")[2].split()[2]
@@ -124,9 +124,15 @@ class AuthKakaoDesktopLogin(AuthBase):
         if self.opt_cred.kakao_device_uuid:
             sys_uuid = self.opt_cred.kakao_device_uuid
         else:
-            sys_uuid = self.windows_get_reg(f"{regkey}\\{last_device_info}", "sys_uuid", use_wine)
-        hdd_model = self.windows_get_reg(f"{regkey}\\{last_device_info}", "hdd_model", use_wine)
-        hdd_serial = self.windows_get_reg(f"{regkey}\\{last_device_info}", "hdd_serial", use_wine)
+            sys_uuid = self.windows_get_reg(
+                f"{regkey}\\{last_device_info}", "sys_uuid", use_wine
+            )
+        hdd_model = self.windows_get_reg(
+            f"{regkey}\\{last_device_info}", "hdd_model", use_wine
+        )
+        hdd_serial = self.windows_get_reg(
+            f"{regkey}\\{last_device_info}", "hdd_serial", use_wine
+        )
 
         if sys_uuid and hdd_model and hdd_serial:
             return f"{sys_uuid}|{hdd_model}|{hdd_serial}"
