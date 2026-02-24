@@ -91,15 +91,9 @@ def compile() -> None:
     else:
         python_bin = os.path.abspath("venv/bin/python")
 
-    # https://github.com/Nuitka/Nuitka/issues/3765
-    nuitka_ver = os.environ.get("NUITKA_VER")
-    if nuitka_ver is None or nuitka_ver == "default":
-        subprocess.run(
-            [python_bin, "-m", "pip", "install", "--prefer-binary", ".[build]"]
-        )
-    else:
-        subprocess.run([python_bin, "-m", "pip", "install", "--prefer-binary", "."])
-        subprocess.run([python_bin, "-m", "pip", "install", f"nuitka=={nuitka_ver}"])
+    subprocess.run(
+        [python_bin, "-m", "pip", "install", "--prefer-binary", ".[build]"]
+    )
 
     nuitka(python_bin, arch)
 

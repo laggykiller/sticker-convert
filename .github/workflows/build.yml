@@ -84,11 +84,9 @@ jobs:
           - os: windows-2022
             TARGET: windows-x86_64
             PYVER: "3.12"
-            NUITKA_VER: default
           - os: windows-2022
             TARGET: windows7-x86_64
             PYVER: "3.8"
-            NUITKA_VER: "2.8.10"
     steps:
     - uses: actions/checkout@v4
       with:
@@ -103,8 +101,6 @@ jobs:
         name: mo
         path: src/sticker_convert/locales/
     - name: Build for ${{matrix.TARGET}}
-      env:
-        NUITKA_VER: ${{ matrix.NUITKA_VER }}
       run: |
         python compile.py
         move sticker-convert.dist sticker-convert
