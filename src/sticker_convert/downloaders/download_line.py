@@ -100,7 +100,7 @@ class MetadataLine:
 
         pack_store_page_soup = BeautifulSoup(pack_store_page.text, "html.parser")
 
-        title_tag = pack_store_page_soup.find(class_="mdCMN38Item01Txt")  # type: ignore
+        title_tag = pack_store_page_soup.find(class_="mdCMN38Item01Ttl")  # type: ignore
         if title_tag:
             title = title_tag.text
         else:
