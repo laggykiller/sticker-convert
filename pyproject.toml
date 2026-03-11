@@ -40,7 +40,7 @@ Repository = "https://github.com/laggykiller/sticker-convert"
 sticker-convert = "sticker_convert.__main__:main"
 
 [project.optional-dependencies]
-build = ["nuitka==4.0.1"]
+build = ["nuitka==4.0.3"]
 dev = [
   "pytest",
   "pyright",
