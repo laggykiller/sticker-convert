@@ -611,7 +611,7 @@ class StickerConvert:
                 )
 
             for packet in container.demux(container.streams.video):
-                for frame in context.decode(packet):
+                for frame in context.decode(packet):  # type: ignore
                     width_orig = frame.width
                     height_orig = frame.height
 
@@ -901,8 +901,8 @@ class StickerConvert:
 
             for frame in self.frames_processed:
                 av_frame = av.VideoFrame.from_ndarray(frame, format="rgba")
-                output.mux(out_stream.encode(av_frame))
-            output.mux(out_stream.encode())
+                output.mux(out_stream.encode(av_frame))  # type: ignore
+            output.mux(out_stream.encode())  # type: ignore
 
         if self.duration_spoof and self.fps:
             duration = len(self.frames_processed) / self.fps * 1000
