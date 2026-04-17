@@ -63,6 +63,14 @@
             "author": true
         }
     },
+    "misskey": {
+        "full_name": "Compress to Misskey packed emoji ZIP",
+        "help": "Create a Misskey packed emoji ZIP with meta.json",
+        "metadata_requirements": {
+            "title": false,
+            "author": false
+        }
+    },
     "local": {
         "full_name": "Save to local directory only",
         "help": "Save to local directory only",

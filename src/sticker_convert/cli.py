@@ -245,6 +245,7 @@ class CLI:
             "viber": args.download_viber,
             "discord": args.download_discord,
             "discord_emoji": args.download_discord_emoji,
+            "misskey": args.download_misskey,
         }
 
         download_option = "local"
@@ -293,6 +294,8 @@ class CLI:
             export_option = "viber"
         elif args.export_imessage:
             export_option = "imessage"
+        elif args.export_misskey:
+            export_option = "misskey"
         else:
             export_option = "local"
 
@@ -321,6 +324,7 @@ class CLI:
                         args.export_telegram_emoji_telethon,
                         args.export_viber,
                         args.export_imessage,
+                        args.export_misskey,
                     )
                 )
                 > 1
@@ -339,6 +343,8 @@ class CLI:
                 preset = "viber"
             elif args.export_imessage:
                 preset = "imessage_small"
+            elif args.export_misskey:
+                preset = "misskey"
         elif args.preset == "auto":
             msg_base = I("Auto compression option set to {}")
             output_option = (
@@ -359,6 +365,9 @@ class CLI:
                 self.cb.put(msg_base.format(preset))
             elif output_option == "imessage":
                 preset = "imessage_small"
+                self.cb.put(msg_base.format(preset))
+            elif output_option == "misskey":
+                preset = "misskey"
                 self.cb.put(msg_base.format(preset))
             else:
                 preset = output_option

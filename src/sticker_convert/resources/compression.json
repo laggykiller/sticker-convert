@@ -587,6 +587,55 @@
         "quantize_method": "imagequant",
         "default_emoji": "😀"
     },
+    "misskey": {
+        "size_max": {
+            "img": 50000,
+            "vid": 50000
+        },
+        "format": {
+            "img": ".png",
+            "vid": ".gif"
+        },
+        "fps": {
+            "min": 1,
+            "max": 10,
+            "power": -0.5
+        },
+        "res": {
+            "w": {
+                "min": 128,
+                "max": 128
+            },
+            "h": {
+                "min": 128,
+                "max": 128
+            },
+            "power": 1,
+            "snap_pow2": false
+        },
+        "quality": {
+            "min": 10,
+            "max": 95,
+            "power": 5
+        },
+        "color": {
+            "min": 32,
+            "max": 257,
+            "power": 3
+        },
+        "duration": {
+            "min": 0,
+            "max": 10000,
+            "spoof": false
+        },
+        "padding_percent": 0,
+        "bg_color": "",
+        "steps": 16,
+        "fake_vid": false,
+        "scale_filter": "bicubic",
+        "quantize_method": "imagequant",
+        "default_emoji": "😀"
+    },
     "imessage_small": {
         "size_max": {
             "img": 500000,
