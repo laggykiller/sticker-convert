@@ -129,6 +129,7 @@ class CompressWastickers(UploadBase):
 
                 assert isinstance(cover_data, bytes)
                 zipf.writestr("tray.png", cover_data)
+                zipf.writestr("cover.png", cover_data)
                 zipf.write(Path(self.opt_output.dir, "author.txt"), "author.txt")
                 zipf.write(Path(self.opt_output.dir, "title.txt"), "title.txt")
 
