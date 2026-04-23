@@ -1,6 +1,10 @@
+import json
 import os
 import sys
+import zipfile
 from pathlib import Path
+from shutil import copy2
+from tempfile import TemporaryDirectory
 from typing import List, Optional
 
 import pytest
@@ -172,6 +176,53 @@ def test_export_wastickers(tmp_path: LocalPath) -> None:
 
     wastickers_path = Path(tmp_path, "sticker-convert-test.wastickers")
     assert Path(wastickers_path).is_file()
+
+
+def test_export_misskey(tmp_path: LocalPath) -> None:
+    with TemporaryDirectory() as input_dir_name:
+        input_dir = Path(input_dir_name)
+        copy2(SAMPLE_DIR / "static_png_RGBA_800x600.png", input_dir / "alpha.png")
+        copy2(SAMPLE_DIR / "animated_webp_160x90_1s.webp", input_dir / "wave.webp")
+
+        run_cmd(
+            [
+                PYTHON_EXE,
+                "sticker-convert.py",
+                "--input-dir",
+                str(input_dir),
+                "--output-dir",
+                str(tmp_path),
+                "--preset",
+                "misskey",
+                "--export-misskey",
+                "--no-confirm",
+                "--author",
+                "example.com",
+                "--title",
+                "Misskey Test Pack",
+            ],
+            cwd=SRC_DIR,
+        )
+
+    export_path = Path(tmp_path, "Misskey Test Pack.zip")
+    assert export_path.is_file()
+    assert Path(tmp_path, "alpha.png").is_file()
+    assert Path(tmp_path, "wave.gif").is_file()
+
+    with zipfile.ZipFile(export_path) as zf:
+        names = zf.namelist()
+        assert "meta.json" in names
+        meta = json.loads(zf.read("meta.json"))
+        assert meta["metaVersion"] == 2
+        assert meta["host"] == "example.com"
+        assert len(meta["emojis"]) == 2
+        assert {Path(entry["fileName"]).suffix for entry in meta["emojis"]} == {
+            ".png",
+            ".gif",
+        }
+        for entry in meta["emojis"]:
+            assert entry["emoji"]["category"] == "misskey_test_pack"
+            assert zf.getinfo(entry["fileName"]).file_size <= 50000
 
 
 def test_export_line(tmp_path: LocalPath) -> None:

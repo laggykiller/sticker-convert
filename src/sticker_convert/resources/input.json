@@ -109,6 +109,16 @@
             "author": true
         }
     },
+    "misskey": {
+        "full_name": "Download from Misskey",
+        "help": "Download a Misskey packed emoji ZIP as input",
+        "example": "Example: https://example.com/emojis.zip\nOR a page that links to a Misskey emoji ZIP",
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": true,
+            "author": true
+        }
+    },
     "local": {
         "full_name": "From local directory",
         "help": "Load files from local directory on computer",

@@ -1,5 +1,10 @@
 import os
+import json
+import threading
+import zipfile
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import List
 
 import pytest
@@ -64,6 +69,65 @@ def _run_sticker_convert(
         assert "author.txt" in os.listdir(input_dir)
     if with_emoji:
         assert "emoji.txt" in os.listdir(input_dir)
+
+
+def test_download_misskey(tmp_path: LocalPath) -> None:
+    with TemporaryDirectory() as server_dir_name:
+        server_dir = Path(server_dir_name)
+        archive_path = server_dir / "pack.zip"
+        png_bytes = (Path(__file__).resolve().parent / "samples/static_png_RGBA_80x60.png").read_bytes()
+        gif_bytes = (Path(__file__).resolve().parent / "samples/animated_gif_160x90_1s.gif").read_bytes()
+
+        meta = {
+            "metaVersion": 2,
+            "host": "example.com",
+            "exportedAt": "2026-03-12T00:00:00.000Z",
+            "emojis": [
+                {
+                    "downloaded": True,
+                    "fileName": "alpha.png",
+                    "emoji": {"name": "example_smile", "category": "example", "aliases": []},
+                },
+                {
+                    "downloaded": True,
+                    "fileName": "wave.gif",
+                    "emoji": {"name": "example_wave", "category": "example", "aliases": []},
+                },
+            ],
+        }
+
+        with zipfile.ZipFile(archive_path, "w", zipfile.ZIP_DEFLATED) as zf:
+            zf.writestr("meta.json", json.dumps(meta))
+            zf.writestr("alpha.png", png_bytes)
+            zf.writestr("wave.gif", gif_bytes)
+
+        class Handler(SimpleHTTPRequestHandler):
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, directory=server_dir_name, **kwargs)
+
+        server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+        thread = threading.Thread(target=server.serve_forever, daemon=True)
+        thread.start()
+        try:
+            _run_sticker_convert(
+                tmp_path=tmp_path,
+                source="misskey",
+                url=f"http://127.0.0.1:{server.server_port}/pack.zip",
+                expected_file_count=0,
+                expected_file_formats=[],
+                with_title=True,
+                with_author=True,
+                with_emoji=False,
+            )
+        finally:
+            server.shutdown()
+            thread.join()
+
+    input_dir = Path(tmp_path) / "input"
+    assert "example_smile.png" in os.listdir(input_dir)
+    assert "example_wave.gif" in os.listdir(input_dir)
+    assert Path(input_dir, "title.txt").read_text(encoding="utf-8").strip() == "pack"
+    assert Path(input_dir, "author.txt").read_text(encoding="utf-8").strip() == "example.com"
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
