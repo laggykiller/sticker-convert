@@ -1,5 +1,6 @@
 import os
 import sys
+import zipfile
 from pathlib import Path
 from typing import List, Optional
 
@@ -172,6 +173,10 @@ def test_export_wastickers(tmp_path: LocalPath) -> None:
 
     wastickers_path = Path(tmp_path, "sticker-convert-test.wastickers")
     assert Path(wastickers_path).is_file()
+    with zipfile.ZipFile(wastickers_path) as zf:
+        assert "tray.png" in zf.namelist()
+        assert "cover.png" in zf.namelist()
+        assert zf.read("tray.png") == zf.read("cover.png")
 
 
 def test_export_line(tmp_path: LocalPath) -> None:
