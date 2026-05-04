@@ -32,7 +32,7 @@
     "kakao": {
         "full_name": "從Kakao下載",
         "help": "從URL/ID下載Kakao貼圖",
-        "example": "例子: https://e.kakao.com/t/xxxxx \nOR https://emoticon.kakao.com/items/xxxxx OR 4404400",
+        "example": "例子: https://e.kakao.com/t/xxxxx \nOR https://emoticon.kakao.com/items/xxxxx",
         "address_lbls": "URL 地址 / ID"
     },
     "band": {

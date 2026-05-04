@@ -34,6 +34,7 @@ class DownloadBase:
         targets: List[Tuple[str, Path]],
         retries: int = 3,
         headers: Optional[dict[Any, Any]] = None,
+        semaphore_cnt: int = 4,
         **kwargs: Any,
     ) -> Dict[str, bool]:
         results: Dict[str, bool] = {}
@@ -44,6 +45,7 @@ class DownloadBase:
                 retries,
                 headers,
                 results,
+                semaphore_cnt,
                 **kwargs,
             )
         )
@@ -55,6 +57,7 @@ class DownloadBase:
         retries: int = 3,
         headers: Optional[dict[Any, Any]] = None,
         results: Optional[dict[str, bool]] = None,
+        semaphore_cnt: int = 4,
         **kwargs: Any,
     ) -> None:
         # targets format: [(url1, dest2), (url2, dest2), ...]
@@ -62,7 +65,7 @@ class DownloadBase:
             ("bar", None, {"set_progress_mode": "determinate", "steps": len(targets)})
         )
 
-        semaphore = anyio.Semaphore(4)
+        semaphore = anyio.Semaphore(semaphore_cnt)
 
         async with httpx.AsyncClient() as client:
             async with anyio.create_task_group() as tg:

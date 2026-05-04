@@ -9,7 +9,6 @@ from multiprocessing import Event, cpu_count
 from pathlib import Path
 from threading import Thread
 from typing import Any, Callable, Dict, Optional
-from urllib.parse import urlparse
 
 from mergedeep import merge  # type: ignore
 from PIL import ImageFont
@@ -201,13 +200,6 @@ class GUI(Window):
         self.telegram_userid_var = StringVar(self)
         self.telethon_api_id_var = IntVar(self)
         self.telethon_api_hash_var = StringVar(self)
-        self.kakao_auth_token_var = StringVar(self)
-        self.kakao_username_var = StringVar(self)
-        self.kakao_password_var = StringVar(self)
-        self.kakao_country_code_var = StringVar(self)
-        self.kakao_phone_number_var = StringVar(self)
-        self.kakao_device_uuid_var = StringVar(self)
-        self.kakao_bin_path_var = StringVar(self)
         self.line_cookies_var = StringVar(self)
         self.viber_auth_var = StringVar(self)
         self.viber_bin_path_var = StringVar(self)
@@ -426,18 +418,6 @@ class GUI(Window):
         self.telethon_api_hash_var.set(
             self.creds.get("telethon", {}).get("api_hash", "")
         )
-        self.kakao_auth_token_var.set(self.creds.get("kakao", {}).get("auth_token", ""))
-        self.kakao_username_var.set(self.creds.get("kakao", {}).get("username", ""))
-        self.kakao_password_var.set(self.creds.get("kakao", {}).get("password", ""))
-        self.kakao_country_code_var.set(
-            self.creds.get("kakao", {}).get("country_code", "")
-        )
-        self.kakao_phone_number_var.set(
-            self.creds.get("kakao", {}).get("phone_number", "")
-        )
-        self.kakao_device_uuid_var.set(
-            self.creds.get("kakao", {}).get("device_uuid", "")
-        )
         self.line_cookies_var.set(self.creds.get("line", {}).get("cookies", ""))
         self.viber_auth_var.set(self.creds.get("viber", {}).get("auth", ""))
         self.discord_token_var.set(self.creds.get("discord", {}).get("token", ""))
@@ -595,12 +575,6 @@ class GUI(Window):
             telegram_userid=self.telegram_userid_var.get(),
             telethon_api_id=self.telethon_api_id_var.get(),
             telethon_api_hash=self.telethon_api_hash_var.get(),
-            kakao_auth_token=self.kakao_auth_token_var.get(),
-            kakao_username=self.kakao_username_var.get(),
-            kakao_password=self.kakao_password_var.get(),
-            kakao_country_code=self.kakao_country_code_var.get(),
-            kakao_phone_number=self.kakao_phone_number_var.get(),
-            kakao_device_uuid=self.kakao_device_uuid_var.get(),
             line_cookies=self.line_cookies_var.get(),
             viber_auth=self.viber_auth_var.get(),
             discord_token=self.discord_token_var.get(),
@@ -757,14 +731,6 @@ class GUI(Window):
             self.cred_frame.viber_auth_entry.config(bootstyle="warning")  # type: ignore
         else:
             self.cred_frame.viber_auth_entry.config(bootstyle="default")  # type: ignore
-
-        if (
-            urlparse(url).netloc == "e.kakao.com"
-            and not self.kakao_auth_token_var.get()
-        ):
-            self.cred_frame.kakao_auth_token_entry.config(bootstyle="warning")  # type: ignore
-        else:
-            self.cred_frame.kakao_auth_token_entry.config(bootstyle="default")  # type: ignore
 
         if input_option.startswith("discord") and not self.discord_token_var.get():
             self.cred_frame.discord_token_entry.config(bootstyle="warning")  # type: ignore

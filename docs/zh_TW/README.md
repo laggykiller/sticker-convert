@@ -108,54 +108,29 @@
 如要使用CLI模式，請輸入任何參數
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress]
-                          [--custom-presets CUSTOM_PRESETS]
-                          [--lang {en_US,ja_JP,zh_CN,zh_TW}]
-                          [--input-dir INPUT_DIR]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
+                          [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
                           [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
-                          [--output-dir OUTPUT_DIR] [--author AUTHOR]
-                          [--title TITLE]
+                          [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage]
                           [--no-compress]
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES]
-                          [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                          [--fps-power FPS_POWER] [--res-min RES_MIN]
-                          [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
-                          [--res-h-max RES_H_MAX] [--res-power RES_POWER]
-                          [--res-snap-pow2] [--no-res-snap-pow2]
-                          [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX]
-                          [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
-                          [--color-max COLOR_MAX] [--color-power COLOR_POWER]
-                          [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--duration-spoof]
-                          [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR]
-                          [--vid-size-max VID_SIZE_MAX]
-                          [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT]
-                          [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
-                          [--scale-filter SCALE_FILTER]
-                          [--quantize-method QUANTIZE_METHOD]
-                          [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH]
-                          [--default-emoji DEFAULT_EMOJI]
-                          [--signal-uuid SIGNAL_UUID]
-                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                          [--telegram-token TELEGRAM_TOKEN]
-                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup]
-                          [--kakao-auth-token KAKAO_AUTH_TOKEN]
-                          [--kakao-get-auth-android-login]
-                          [--kakao-get-auth-desktop-memdump]
-                          [--kakao-get-auth-desktop-login]
-                          [--kakao-bin-path KAKAO_BIN_PATH]
-                          [--kakao-username KAKAO_USERNAME]
-                          [--kakao-password KAKAO_PASSWORD]
-                          [--kakao-country-code KAKAO_COUNTRY_CODE]
-                          [--kakao-phone-number KAKAO_PHONE_NUMBER]
-                          [--kakao-device-uuid KAKAO_DEVICE_UUID] [--line-get-auth]
-                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH]
-                          [--viber-get-auth VIBER_GET_AUTH]
-                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth]
-                          [--discord-token DISCORD_TOKEN] [--save-cred]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
+                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
+                          [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
+                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
+                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT]
+                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
+                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
+                          [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
+                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN]
+                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth]
+                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
+                          [--save-cred]
 
 sticker-convert的CLI
 
@@ -334,37 +309,6 @@ options:
   --telegram-userid TELEGRAM_USERID
                         設定Telegram user_id (從真實賬戶，而非機械人帳戶)n。需用於上載和下載Telegram貼圖。
   --telethon-setup      設定Telethon
-  --kakao-auth-token KAKAO_AUTH_TOKEN
-                        設定Kakao auth_token。需用於從 https://e.kakao.com/t/xxxxx 上載和下載動態貼圖。
-  --kakao-get-auth-android-login
-                        透過模擬登入Kakao安卓版取得auth_token。需要Kakao使用者名稱、密碼、國家代碼和電話號碼。
-  --kakao-get-auth-desktop-memdump
-                        透過memdump從已安裝的Kakao桌面版中取得 Kakao auth_token。
-  --kakao-get-auth-desktop-login
-                        透過模擬登入Kakao桌面版取得auth_token。需要Kakao使用者名稱、密碼。
-  --kakao-bin-path KAKAO_BIN_PATH
-                        設定Kakao桌面版路徑以開啟程式並取得auth_token。
-                        適用於免安裝版。
-  --kakao-username KAKAO_USERNAME
-                        設定Kakao使用者名，即註冊Kakao帳戶時使用的電子郵件地址或電話號碼
-                        範例：+447700900142
-                        需用於模擬安卓/桌面版登入以取得Kakao auth_token。
-  --kakao-password KAKAO_PASSWORD
-                        設定Kakao帳戶密碼。
-                        需用於模擬安卓/桌面版登入以取得Kakao auth_token。
-  --kakao-country-code KAKAO_COUNTRY_CODE
-                        設定Kakao國際電話區號。
-                        範例: 82 (韓國), 44 (英國), 1 (美國).
-                        需用於模擬安卓版登入以取得Kakao auth_token。
-  --kakao-phone-number KAKAO_PHONE_NUMBER
-                        設定Kakao電話號碼 (與Kakao帳號連結的電話號碼)
-                        不要輸入國際電話區號
-                        範例: 7700900142
-                        用於收/發短信.
-                        需用於模擬安卓版登入以取得Kakao auth_token。
-  --kakao-device-uuid KAKAO_DEVICE_UUID
-                        設定Kakao device uuid以登入桌面版。預設為真實device uuid。
-                        選填，以模擬桌面版登入以取得Kakao auth_token。
   --line-get-auth       從瀏覽器取得Line cookies, 以用於製作訊息貼圖。
   --line-cookies LINE_COOKIES
                         設定Line cookies, 以用於製作訊息貼圖。

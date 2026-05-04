@@ -9,7 +9,6 @@ from multiprocessing import Manager, Process, Value
 from pathlib import Path
 from threading import Thread
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, cast
-from urllib.parse import urlparse
 
 from sticker_convert.definitions import RUNTIME_STATE
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
@@ -473,27 +472,6 @@ class Job:
                 error_msg += I(
                     "\n[X] bg_color {bg_color} is not valid color hex"
                 ).format(bg_color=self.opt_comp.bg_color)
-
-        # Warn about unable to download animated Kakao stickers with such link
-        if (
-            self.opt_output.option == "kakao"
-            and urlparse(self.opt_input.url).netloc == "e.kakao.com"
-            and not self.opt_cred.kakao_auth_token
-        ):
-            msg = I(
-                "To download ANIMATED stickers from e.kakao.com,\n"
-                "you need to generate auth_token.\n"
-                "Alternatively, you can generate share link (emoticon.kakao.com/items/xxxxx)\n"
-                "from Kakao app on phone.\n"
-                "You are adviced to read documentations.\n"
-                "If you continue, you will only download static stickers. Continue?"
-            )
-
-            self.executor.cb("ask_bool", (msg,))
-            response = self.executor.cb_return.get_response()
-
-            if response is False:
-                return False, None
 
         # Warn about in/output directories that might contain other files
         # Directory is safe if the name is stickers_input/stickers_output, or

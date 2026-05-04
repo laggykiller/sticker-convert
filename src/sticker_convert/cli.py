@@ -495,21 +495,6 @@ class CLI:
             else creds.get("telegram", {}).get("userid"),
             telethon_api_id=creds.get("telethon", {}).get("api_id"),
             telethon_api_hash=creds.get("telethon", {}).get("api_hash"),
-            kakao_auth_token=args.kakao_auth_token
-            if args.kakao_auth_token
-            else creds.get("kakao", {}).get("auth_token"),
-            kakao_username=args.kakao_username
-            if args.kakao_username
-            else creds.get("kakao", {}).get("username"),
-            kakao_password=args.kakao_password
-            if args.kakao_password
-            else creds.get("kakao", {}).get("password"),
-            kakao_country_code=args.kakao_country_code
-            if args.kakao_country_code
-            else creds.get("kakao", {}).get("country_code"),
-            kakao_phone_number=args.kakao_phone_number
-            if args.kakao_phone_number
-            else creds.get("kakao", {}).get("phone_number"),
             line_cookies=args.line_cookies
             if args.line_cookies
             else creds.get("line", {}).get("cookies"),
@@ -520,42 +505,6 @@ class CLI:
             if args.discord_token
             else creds.get("discord", {}).get("token"),
         )
-
-        if args.kakao_get_auth_android_login:
-            from sticker_convert.auth.auth_kakao_android_login import AuthKakaoAndroidLogin
-
-            get_kakao_auth_android_login = AuthKakaoAndroidLogin(opt_cred, self.cb)
-            auth_token, msg = get_kakao_auth_android_login.get_cred()
-
-            if auth_token:
-                opt_cred.kakao_auth_token = auth_token
-
-            self.cb.put(msg)
-
-        if args.kakao_get_auth_desktop_memdump:
-            from sticker_convert.auth.auth_kakao_desktop_memdump import AuthKakaoDesktopMemdump
-
-            get_kakao_auth_desktop_memdump = AuthKakaoDesktopMemdump(opt_cred, self.cb)
-            kakao_bin_path = None
-            if args.kakao_bin_path:
-                kakao_bin_path = args.kakao_bin_path
-            auth_token, msg = get_kakao_auth_desktop_memdump.get_cred(kakao_bin_path)
-
-            if auth_token:
-                opt_cred.kakao_auth_token = auth_token
-
-            self.cb.put(msg)
-
-        if args.kakao_get_auth_desktop_login:
-            from sticker_convert.auth.auth_kakao_desktop_login import AuthKakaoDesktopLogin
-
-            get_kakao_auth_desktop_login = AuthKakaoDesktopLogin(opt_cred, self.cb)
-            auth_token, msg = get_kakao_auth_desktop_login.get_cred()
-
-            if auth_token:
-                opt_cred.kakao_auth_token = auth_token
-
-            self.cb.put(msg)
 
         if args.signal_get_auth:
             from sticker_convert.auth.auth_signal import AuthSignal

@@ -5,7 +5,7 @@ from typing import List
 import pytest
 from _pytest._py.path import LocalPath  # type: ignore
 
-from tests.common import KAKAO_TOKEN, LINE_COOKIES, PYTHON_EXE, SRC_DIR, TELEGRAM_TOKEN, run_cmd
+from tests.common import LINE_COOKIES, PYTHON_EXE, SRC_DIR, TELEGRAM_TOKEN, run_cmd
 
 TEST_DOWNLOAD = os.environ.get("TEST_DOWNLOAD")
 
@@ -398,23 +398,7 @@ def test_download_kakao_static_png(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-def test_download_kakao_animated_gif_store_link_no_token(tmp_path: LocalPath) -> None:
-    _run_sticker_convert(
-        tmp_path=tmp_path,
-        source="kakao",
-        url="https://e.kakao.com/t/lovey-dovey-healing-bear",
-        expected_file_count=24,
-        expected_file_formats=[".png"],
-        with_title=True,
-        with_author=True,
-        with_emoji=False,
-        file_count_start=1,
-    )
-
-
-@pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
-def test_download_kakao_animated_gif_store_link_with_token(tmp_path: LocalPath) -> None:
+def test_download_kakao_animated_gif_store_link(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
         source="kakao",
@@ -429,7 +413,6 @@ def test_download_kakao_animated_gif_store_link_with_token(tmp_path: LocalPath) 
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
 def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
@@ -445,7 +428,6 @@ def test_download_kakao_animated_gif_share_link(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
 def test_download_kakao_mini_share_link(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
@@ -460,7 +442,6 @@ def test_download_kakao_mini_share_link(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
 def test_download_band_static(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,
@@ -475,7 +456,6 @@ def test_download_band_static(tmp_path: LocalPath) -> None:
 
 
 @pytest.mark.skipif(not TEST_DOWNLOAD, reason="TEST_DOWNLOAD not set")
-@pytest.mark.skipif(not KAKAO_TOKEN, reason="No credentials")
 def test_download_ogq_animated(tmp_path: LocalPath) -> None:
     _run_sticker_convert(
         tmp_path=tmp_path,

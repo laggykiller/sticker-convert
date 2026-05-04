@@ -33,7 +33,6 @@ if CREDS_JSON_PATH.is_file():
         SIGNAL_PASSWORD = CREDS_JSON_DICT.get("signal", {}).get("password")
         TELEGRAM_TOKEN = CREDS_JSON_DICT.get("telegram", {}).get("token")
         TELEGRAM_USERID = CREDS_JSON_DICT.get("telegram", {}).get("userid")
-        KAKAO_TOKEN = CREDS_JSON_DICT.get("kakao", {}).get("auth_token")
         LINE_COOKIES = CREDS_JSON_DICT.get("line", {}).get("cookies")
         VIBER_AUTH = CREDS_JSON_DICT.get("viber", {}).get("auth")
 else:
@@ -41,7 +40,6 @@ else:
     SIGNAL_PASSWORD = os.environ.get("SIGNAL_PASSWORD")  # type: ignore
     TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")  # type: ignore
     TELEGRAM_USERID = os.environ.get("TELEGRAM_USERID")  # type: ignore
-    KAKAO_TOKEN = os.environ.get("KAKAO_TOKEN")  # type: ignore
     LINE_COOKIES = os.environ.get("LINE_COOKIES")  # type: ignore
     VIBER_AUTH = os.environ.get("VIBER_AUTH")  # type: ignore
 

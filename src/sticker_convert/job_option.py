@@ -231,12 +231,6 @@ class CredOption(BaseOption):
     telegram_userid: str = ""
     telethon_api_id: int = 0
     telethon_api_hash: str = ""
-    kakao_auth_token: str = ""
-    kakao_username: str = ""
-    kakao_password: str = ""
-    kakao_device_uuid: str = ""
-    kakao_country_code: str = ""
-    kakao_phone_number: str = ""
     line_cookies: str = ""
     viber_auth: str = ""
     discord_token: str = ""
@@ -248,13 +242,6 @@ class CredOption(BaseOption):
             "telethon": {
                 "api_id": self.telethon_api_id,
                 "api_hash": self.telethon_api_hash,
-            },
-            "kakao": {
-                "auth_token": self.kakao_auth_token,
-                "username": self.kakao_username,
-                "password": self.kakao_password,
-                "country_code": self.kakao_country_code,
-                "phone_number": self.kakao_phone_number,
             },
             "line": {"cookies": self.line_cookies},
             "viber": {"auth": self.viber_auth},
