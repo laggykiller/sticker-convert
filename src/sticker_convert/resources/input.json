@@ -109,6 +109,26 @@
             "author": true
         }
     },
+    "mastodon": {
+        "full_name": "Download from Mastodon",
+        "help": "Download Mastodon emojis from a URL as input",
+        "example": "Example: https://mastodon.social/",
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": true,
+            "author": true
+        }
+    },
+    "misskey": {
+        "full_name": "Download from Misskey",
+        "help": "Download Misskey emojis from a URL as input",
+        "example": "Example: https://misskey.io/",
+        "address_lbls": "URL address",
+        "metadata_provides": {
+            "title": true,
+            "author": true
+        }
+    },
     "local": {
         "full_name": "From local directory",
         "help": "Load files from local directory on computer",

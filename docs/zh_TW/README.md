@@ -41,17 +41,19 @@
 - [免責聲明](#免責聲明)
 
 ## 兼容性
-| 應用程式                               | ⬇️ 下載                         | ⬆️ 上載                                       |
-| ------------------------------------- | --------------------------------| --------------------------------------------- |
-| [Signal](/docs/zh_TW/guide_signal.md)     | ✅                              | ✅ (需要`uuid`&`password`或手動上傳)           |
-| [Telegram](/docs/zh_TW/guide_telegram.md) | ✅ (需要`token`或telethon)      | ✅ (需要`token`&`user_id`或telethon或手動上傳) |
-| [WhatsApp](/docs/zh_TW/guide_whatsapp.md) | ⭕ (以安卓或網頁版)              | ⭕ (創建`.wastickers`, 以Sticker Maker輸入)   |
-| [Line](/docs/zh_TW/guide_line.md)         | ✅                              | 🚫 (需要人工審核)                             |
-| [Kakao](/docs/zh_TW/guide_kakao.md)       | ✅ (需要'auth_token'下載動態貼圖) | 🚫 (需要人工審核)                            |
+| 應用程式                                   | ⬇️ 下載                          | ⬆️ 上載                                       |
+| ----------------------------------------- | -------------------------------- | --------------------------------------------- |
+| [Signal](/docs/zh_TW/guide_signal.md)     | ✅                               | ✅ (需要`uuid`&`password`或手動上傳)           |
+| [Telegram](/docs/zh_TW/guide_telegram.md) | ✅ (需要`token`或telethon)       | ✅ (需要`token`&`user_id`或telethon或手動上傳) |
+| [WhatsApp](/docs/zh_TW/guide_whatsapp.md) | ⭕ (以安卓或網頁版)               | ⭕ (創建`.wastickers`, 以Sticker Maker輸入)   |
+| [Line](/docs/zh_TW/guide_line.md)         | ✅                               | 🚫 (需要人工審核)                             |
+| [Kakao](/docs/zh_TW/guide_kakao.md)       | ✅ (需要'auth_token'下載動態貼圖) | 🚫 (需要人工審核)                             |
 | [Band](/docs/zh_TW/guide_band.md)         | ✅                              | 🚫 (需要人工審核)                             |
 | [OGQ](/docs/zh_TW/guide_ogq.md)           | ✅                              | 🚫 (需要人工審核)                             |
 | [Viber](/docs/zh_TW/guide_viber.md)       | ✅                              | ✅ (需要`viber_auth`)                        |
 | [Discord](/docs/zh_TW/guide_discord.md)   | ✅ (需要`token`)                | 🚫                                           |
+| [Mastodon](/docs/zh_TW/guide_mastodon.md) | ✅ (需要`token`)                | ✅ (需要`mastodon_cookies`)                   |
+| [Misskey](/docs/zh_TW/guide_misskey.md)   | ✅ (需要`token`)                | ✅ (需要`misskey_token`)                      |
 | [iMessage](/docs/zh_TW/guide_imessage.md) | 🚫                              | ⭕ (創建Xcode貼圖包專案以作側載)               |
 
 ✅ = 支援 ⭕ = 部分支援 🚫 = 不支援
@@ -88,6 +90,12 @@
 - Discord
     - 下載: 支援 (例：`https://discord.com/channels/169256939211980800/@home`或`169256939211980800`)，但需要user token。
     - 上載: 不支援
+- Mastodon
+    - 下载: 支援 (例：`https://mastodon.social/`)
+    - 上载: 支援。有认证资料时上载至Mastodon, 或压缩.tar.gz档案以使用toolctl上载到Mastodon。
+- Misskey
+    - 下载: 支援 (例：`https://misskey.io/`)
+    - 上载: 支援。压缩.zip档案并在有认证资料时上载至Misskey。
 - iMessage
     - 下載: 不支援
     - 上載: 此程式可以創建Xcode貼圖包專案以作編譯和側載。
@@ -108,29 +116,18 @@
 如要使用CLI模式，請輸入任何參數
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
-                          [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
-                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
+                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI | --download-mastodon DOWNLOAD_MASTODON | --download-misskey DOWNLOAD_MISSKEY]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
-                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage]
-                          [--no-compress]
-                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                          [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
-                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
-                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT]
-                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
-                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
-                          [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
-                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN]
-                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth]
-                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
-                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
-                          [--save-cred]
+                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage | --export-mastodon | --export-misskey]
+                          [--no-compress] [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}] [--steps STEPS] [--processes PROCESSES]
+                          [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
+                          [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
+                          [--no-fake-vid] [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                          [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth] [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--mastodon-get-auth] [--mastodon-url MASTODON_URL] [--mastodon-cookies MASTODON_COOKIES] [--misskey-get-auth] [--misskey-url MISSKEY_URL]
+                          [--misskey-token MISSKEY_TOKEN] [--save-cred]
 
 sticker-convert的CLI
 
@@ -170,7 +167,7 @@ options:
   --download-kakao DOWNLOAD_KAKAO
                         從URL/ID下載Kakao貼圖
                         (例子: https://e.kakao.com/t/xxxxx 
-                        OR https://emoticon.kakao.com/items/xxxxx OR 4404400)
+                        OR https://emoticon.kakao.com/items/xxxxx)
   --download-band DOWNLOAD_BAND
                         從URL/ID下載Naver Band貼圖
                         (例子: https://www.band.us/sticker/xxxx OR 2535)
@@ -189,6 +186,12 @@ options:
                         從頻道URL/ID下載Discord表情
                         (例子: https://discord.com/channels/169256939211980800/@home
                         OR 169256939211980800)
+  --download-mastodon DOWNLOAD_MASTODON
+                        從URL下載Mastodon表情
+                        (例子: https://mastodon.social/)
+  --download-misskey DOWNLOAD_MISSKEY
+                        從URL下載Misskey表情
+                        (例子: https://misskey.io/)
 
 輸出選項:
   --output-dir OUTPUT_DIR
@@ -206,10 +209,12 @@ options:
   --export-viber        上載至Viber
   --export-whatsapp     創建 .wastickers檔案以供上載至WhatsApp
   --export-imessage     創建Xcode專案以供輸入至iMessage
+  --export-mastodon     有認證資料時上載至Mastodon, 或壓縮.tar.gz檔案以使用toolctl上載到Mastodon
+  --export-misskey      壓縮.zip檔案並在有認證資料時上載至Misskey
 
 壓縮選項:
   --no-compress         不要壓縮檔案，適用於只下載貼圖。
-  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}
                         套用壓縮的預設值。
   --steps STEPS         設定最少與最大值之間的分割數。
                         數值越大 = 較慢但生成的檔案更接近檔案大小限制。
@@ -323,6 +328,16 @@ options:
   --discord-get-auth    取得Discord token。
   --discord-token DISCORD_TOKEN
                         設定Discord token。用於下載Discord貼圖和表情。
+  --mastodon-get-auth   從瀏覽器取得Mastodon cookies, 用於上載自訂表情。
+  --mastodon-url MASTODON_URL
+                        設定Mastodon URL, 用於上載自訂表情。
+  --mastodon-cookies MASTODON_COOKIES
+                        設定Mastodon cookies, 用於上載自訂表情。
+  --misskey-get-auth    從瀏覽器取得Misskey cookies, 用於上載自訂表情。
+  --misskey-url MISSKEY_URL
+                        設定Misskey URL, 用於上載自訂表情。
+  --misskey-token MISSKEY_TOKEN
+                        設定Misskey token, 用於上載自訂表情。
   --save-cred           儲存身份驗證數據。
 ```
 

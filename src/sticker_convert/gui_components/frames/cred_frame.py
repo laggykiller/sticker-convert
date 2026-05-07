@@ -125,6 +125,50 @@ class CredFrame(LabelFrame):
             bootstyle="secondary",  # type: ignore
         )
 
+        self.mastodon_url_lbl = Label(
+            self, text=I("Mastodon URL"), width=18, justify="left", anchor="w"
+        )
+        self.mastodon_url_entry = Entry(
+            self, textvariable=self.gui.mastodon_url_var, width=50
+        )
+        self.mastodon_url_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+
+        self.mastodon_cookies_lbl = Label(
+            self, text=I("Mastodon cookies"), width=18, justify="left", anchor="w"
+        )
+        self.mastodon_cookies_entry = Entry(
+            self, textvariable=self.gui.mastodon_cookies_var, width=35
+        )
+        self.mastodon_cookies_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+        self.mastodon_get_auth_btn = Button(
+            self,
+            text=I("Generate"),
+            command=self.cb_mastodon_get_auth,
+            bootstyle="secondary",  # type: ignore
+        )
+
+        self.misskey_url_lbl = Label(
+            self, text=I("Misskey URL"), width=18, justify="left", anchor="w"
+        )
+        self.misskey_url_entry = Entry(
+            self, textvariable=self.gui.misskey_url_var, width=50
+        )
+        self.misskey_url_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+
+        self.misskey_token_lbl = Label(
+            self, text=I("Misskey token"), width=18, justify="left", anchor="w"
+        )
+        self.misskey_token_entry = Entry(
+            self, textvariable=self.gui.misskey_token_var, width=35
+        )
+        self.misskey_token_entry.bind("<Button-3><ButtonRelease-3>", RightClicker)
+        self.misskey_get_auth_btn = Button(
+            self,
+            text=I("Generate"),
+            command=self.cb_misskey_get_auth,
+            bootstyle="secondary",  # type: ignore
+        )
+
         self.help_btn = Button(
             self,
             text=I("Get help"),
@@ -160,7 +204,21 @@ class CredFrame(LabelFrame):
         self.discord_token_lbl.grid(column=0, row=9, sticky="w", padx=3, pady=3)
         self.discord_token_entry.grid(column=1, row=9, sticky="w", padx=3, pady=3)
         self.discord_get_auth_btn.grid(column=2, row=9, sticky="e", padx=3, pady=3)
-        self.help_btn.grid(column=2, row=10, sticky="e", padx=3, pady=3)
+        self.mastodon_url_lbl.grid(column=0, row=10, sticky="w", padx=3, pady=3)
+        self.mastodon_url_entry.grid(
+            column=1, row=10, columnspan=2, sticky="w", padx=3, pady=3
+        )
+        self.mastodon_cookies_lbl.grid(column=0, row=11, sticky="w", padx=3, pady=3)
+        self.mastodon_cookies_entry.grid(column=1, row=11, sticky="w", padx=3, pady=3)
+        self.mastodon_get_auth_btn.grid(column=2, row=11, sticky="w", padx=3, pady=3)
+        self.misskey_url_lbl.grid(column=0, row=12, sticky="w", padx=3, pady=3)
+        self.misskey_url_entry.grid(
+            column=1, row=12, columnspan=2, sticky="w", padx=3, pady=3
+        )
+        self.misskey_token_lbl.grid(column=0, row=13, sticky="w", padx=3, pady=3)
+        self.misskey_token_entry.grid(column=1, row=13, sticky="w", padx=3, pady=3)
+        self.misskey_get_auth_btn.grid(column=2, row=13, sticky="w", padx=3, pady=3)
+        self.help_btn.grid(column=2, row=14, sticky="e", padx=3, pady=3)
 
     def cb_cred_help(self, *_: Any) -> None:
         faq_site = "https://github.com/laggykiller/sticker-convert#faq"
@@ -200,6 +258,16 @@ class CredFrame(LabelFrame):
 
         DiscordGetAuthWindow(self.gui)
 
+    def cb_mastodon_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.mastodon_get_auth_window import MastodonGetAuthWindow
+
+        MastodonGetAuthWindow(self.gui)
+
+    def cb_misskey_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.misskey_get_auth_window import MisskeyGetAuthWindow
+
+        MisskeyGetAuthWindow(self.gui)
+
     def set_states(self, state: str) -> None:
         self.signal_uuid_entry.config(state=state)
         self.signal_password_entry.config(state=state)
@@ -212,3 +280,9 @@ class CredFrame(LabelFrame):
         self.viber_get_auth_btn.config(state=state)
         self.discord_token_entry.config(state=state)
         self.discord_get_auth_btn.config(state=state)
+        self.mastodon_cookies_entry.config(state=state)
+        self.mastodon_get_auth_btn.config(state=state)
+        self.mastodon_url_entry.config(state=state)
+        self.misskey_token_entry.config(state=state)
+        self.misskey_get_auth_btn.config(state=state)
+        self.misskey_url_entry.config(state=state)

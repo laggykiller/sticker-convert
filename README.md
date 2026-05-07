@@ -41,17 +41,19 @@
 - [DISCLAIMER](#disclaimer)
 
 ## Compatibility
-| Application                           | ⬇️ Download                         | ⬆️ Upload                                                |
-| ------------------------------------- | ------------------------------------| --------------------------------------------------------- |
+| Application                                  | ⬇️ Download                         | ⬆️ Upload                                                |
+| -------------------------------------------- | ------------------------------------ | -------------------------------------------------------- |
 | [Signal](/docs/en_US/guide_signal.md)        | ✅                                  | ✅ (Require `uuid` & `password` or manually)             |
 | [Telegram](/docs/en_US/guide_telegram.md)    | ✅ (Require `token` or telethon)    | ✅ (Require `token` & `user_id` or telethon or manually) |
 | [WhatsApp](/docs/en_US/guide_whatsapp.md)    | ⭕ (By Android or WhatsApp Web)     | ⭕ (Create `.wastickers`, import by Sticker Maker)       |
 | [Line](/docs/en_US/guide_line.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
 | [Kakao](/docs/en_US/guide_kakao.md)          | ✅ (Need 'auth_token' for animated) | 🚫 (Need to submit for manual approval)                  |
 | [Band](/docs/en_US/guide_band.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
-| [OGQ](/docs/en_US/guide_ogq.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
+| [OGQ](/docs/en_US/guide_ogq.md)              | ✅                                  | 🚫 (Need to submit for manual approval)                  |
 | [Viber](/docs/en_US/guide_viber.md)          | ✅                                  | ✅ (Require `viber_auth`)                                |
 | [Discord](/docs/en_US/guide_discord.md)      | ✅ (Require `token`)                | 🚫                                                       |
+| [Mastodon](/docs/en_US/guide_mastodon.md)    | ✅ (Require `token`)                | ✅ (Require `mastodon_cookies`)                          |
+| [Misskey](/docs/en_US/guide_misskey.md)      | ✅ (Require `token`)                | ✅ (Require `misskey_token`)                             |
 | [iMessage](/docs/en_US/guide_imessage.md)    | 🚫                                  | ⭕ (Create Xcode stickerpack project for sideload)       |
 
 ✅ = Supported ⭕ = Partially supported 🚫 = Not supported
@@ -88,6 +90,12 @@
 - Discord
     - Download: Supported (e.g. `https://discord.com/channels/169256939211980800/@home` OR `169256939211980800`), but require user token.
     - Upload: Not supported.
+- Mastodon
+    - Download: Supported (e.g. `https://mastodon.social/`)
+    - Upload: Supported. Upload to Mastodon if auth available, or compress a .tar.gz file for upload to Mastodon using toolctl.
+- Misskey
+    - Download: Supported (e.g. `https://misskey.io/`)
+    - Upload: Supported. Compress a .zip file and upload to Misskey if auth available.
 - iMessage
     - Download: Not supported.
     - Upload: The program can create Xcode project for iMessage sticker pack, which could then be compiled and sideloaded using Xcode.
@@ -108,29 +116,27 @@
 To run in CLI mode, pass on any arguments
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
-                          [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
-                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--lang {en_US,ja_JP,zh_CN,zh_TW}]
+                          [--input-dir INPUT_DIR]
+                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI | --download-mastodon DOWNLOAD_MASTODON | --download-misskey DOWNLOAD_MISSKEY]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
-                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage]
+                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage | --export-mastodon | --export-misskey]
                           [--no-compress]
-                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                          [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
-                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
-                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT]
-                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
-                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
-                          [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
-                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN]
-                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth]
+                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER]
+                          [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
+                          [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
+                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
+                          [--color-power COLOR_POWER] [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--duration-spoof]
+                          [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid] [--scale-filter SCALE_FILTER]
+                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH]
+                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
+                          [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth]
                           [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
-                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
-                          [--save-cred]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--mastodon-get-auth]
+                          [--mastodon-url MASTODON_URL] [--mastodon-cookies MASTODON_COOKIES] [--misskey-get-auth] [--misskey-url MISSKEY_URL]
+                          [--misskey-token MISSKEY_TOKEN] [--save-cred]
 
 CLI for sticker-convert
 
@@ -170,7 +176,7 @@ Input options:
   --download-kakao DOWNLOAD_KAKAO
                         Download kakao stickers from a URL / ID as input
                         (Example: https://e.kakao.com/t/xxxxx 
-                        OR https://emoticon.kakao.com/items/xxxxx OR 4404400)
+                        OR https://emoticon.kakao.com/items/xxxxx)
   --download-band DOWNLOAD_BAND
                         Download Naver Band stickers from a URL / ID as input
                         (Example: https://www.band.us/sticker/xxxx OR 2535)
@@ -189,6 +195,12 @@ Input options:
                         Download discord emojis from a channel URL / ID as input
                         (Example: https://discord.com/channels/169256939211980800/@home
                         OR 169256939211980800)
+  --download-mastodon DOWNLOAD_MASTODON
+                        Download Mastodon emojis from a URL as input
+                        (Example: https://mastodon.social/)
+  --download-misskey DOWNLOAD_MISSKEY
+                        Download Misskey emojis from a URL as input
+                        (Example: https://misskey.io/)
 
 Output options:
   --output-dir OUTPUT_DIR
@@ -206,10 +218,12 @@ Output options:
   --export-viber        Upload to Viber
   --export-whatsapp     Create a .wastickers file for uploading to WhatsApp
   --export-imessage     Create Xcode project for importing to iMessage
+  --export-mastodon     Upload to Mastodon if auth available, or compress a .tar.gz file for upload to Mastodon using toolctl
+  --export-misskey      Compress a .zip file and upload to Misskey if auth available
 
 Compression options:
   --no-compress         Do not compress files. Useful for only downloading stickers.
-  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}
                         Apply preset for compression.
   --steps STEPS         Set number of divisions between min and max settings.
                         Steps higher = Slower but yields file more closer to the specified file size limit.
@@ -325,6 +339,16 @@ Credentials options:
   --discord-get-auth    Get Discord token.
   --discord-token DISCORD_TOKEN
                         Set Discord token. Required for downloading Discord stickers and emojis.
+  --mastodon-get-auth   Get Mastodon cookies from browser, which is required to upload custom emojis.
+  --mastodon-url MASTODON_URL
+                        Set Mastodon URL, which is required to upload custom emojis.
+  --mastodon-cookies MASTODON_COOKIES
+                        Set Mastodon cookies, which is required to upload custom emojis.
+  --misskey-get-auth    Get Misskey cookies from browser, which is required to upload custom emojis.
+  --misskey-url MISSKEY_URL
+                        Set Misskey URL, which is required to upload custom emojis.
+  --misskey-token MISSKEY_TOKEN
+                        Set Misskey token, which is required to upload custom emojis.
   --save-cred           Save credentials.
 ```
 

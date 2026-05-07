@@ -14,6 +14,7 @@ from PIL import Image, UnidentifiedImageError
 from rlottie_python.rlottie_wrapper import LottieAnimation
 
 from sticker_convert.definitions import SVG_DEFAULT_HEIGHT, SVG_DEFAULT_WIDTH, SVG_SAMPLE_FPS
+from sticker_convert.utils.media.format_detect import format_detect
 
 
 def lcm(a: int, b: int) -> int:
@@ -443,7 +444,10 @@ class CodecInfo:
 
     @staticmethod
     def get_file_ext(file: Path) -> str:
-        return Path(file).suffix.lower()
+        ext = Path(file).suffix.lower()
+        if ext != ".unknown_ext":
+            return ext
+        return format_detect(file)
 
     @staticmethod
     def is_anim(file: Union[Path, bytes]) -> bool:

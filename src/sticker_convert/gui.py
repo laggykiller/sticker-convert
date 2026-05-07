@@ -204,6 +204,10 @@ class GUI(Window):
         self.viber_auth_var = StringVar(self)
         self.viber_bin_path_var = StringVar(self)
         self.discord_token_var = StringVar(self)
+        self.mastodon_cookies_var = StringVar(self)
+        self.mastodon_url_var = StringVar(self)
+        self.misskey_token_var = StringVar(self)
+        self.misskey_url_var = StringVar(self)
 
         # Config
         self.settings_save_cred_var = BooleanVar()
@@ -420,6 +424,10 @@ class GUI(Window):
         )
         self.line_cookies_var.set(self.creds.get("line", {}).get("cookies", ""))
         self.viber_auth_var.set(self.creds.get("viber", {}).get("auth", ""))
+        self.mastodon_url_var.set(self.creds.get("mastodon", {}).get("url", ""))
+        self.mastodon_cookies_var.set(self.creds.get("mastodon", {}).get("cookies", ""))
+        self.misskey_url_var.set(self.creds.get("misskey", {}).get("url", ""))
+        self.misskey_token_var.set(self.creds.get("misskey", {}).get("token", ""))
         self.discord_token_var.set(self.creds.get("discord", {}).get("token", ""))
 
     def get_input_name(self) -> str:
@@ -578,6 +586,10 @@ class GUI(Window):
             line_cookies=self.line_cookies_var.get(),
             viber_auth=self.viber_auth_var.get(),
             discord_token=self.discord_token_var.get(),
+            mastodon_cookies=self.mastodon_cookies_var.get(),
+            mastodon_url=self.mastodon_url_var.get(),
+            misskey_token=self.misskey_token_var.get(),
+            misskey_url=self.misskey_url_var.get(),
         )
 
     def start_process(self) -> None:
@@ -662,6 +674,7 @@ class GUI(Window):
                     in ("kakao", "band", "line", "discord", "discord_emoji")
                     and url.isnumeric()
                 )
+                and input_option not in ("mastodon", "misskey")
             ):
                 self.input_frame.address_entry.config(bootstyle="danger")  # type: ignore
                 self.input_frame.address_tip.config(

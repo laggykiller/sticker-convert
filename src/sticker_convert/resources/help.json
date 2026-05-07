@@ -74,6 +74,12 @@
         "viber_bin_path": "Specify location of Viber Desktop application.\nUseful for portable installation.",
         "discord_get_auth": "Get Discord token.",
         "discord_token": "Set Discord token. Required for downloading Discord stickers and emojis.",
+        "mastodon_get_auth": "Get Mastodon cookies from browser, which is required to upload custom emojis.",
+        "mastodon_url": "Set Mastodon URL, which is required to upload custom emojis.",
+        "mastodon_cookies": "Set Mastodon cookies, which is required to upload custom emojis.",
+        "misskey_get_auth": "Get Misskey cookies from browser, which is required to upload custom emojis.",
+        "misskey_url": "Set Misskey URL, which is required to upload custom emojis.",
+        "misskey_token": "Set Misskey token, which is required to upload custom emojis.",
         "save_cred": "Save credentials."
     }
 }

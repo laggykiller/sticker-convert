@@ -234,6 +234,10 @@ class CredOption(BaseOption):
     line_cookies: str = ""
     viber_auth: str = ""
     discord_token: str = ""
+    mastodon_cookies: str = ""
+    mastodon_url: str = ""
+    misskey_token: str = ""
+    misskey_url: str = ""
 
     def to_dict(self) -> Dict[Any, Any]:
         return {
@@ -246,4 +250,6 @@ class CredOption(BaseOption):
             "line": {"cookies": self.line_cookies},
             "viber": {"auth": self.viber_auth},
             "discord": {"token": self.discord_token},
+            "mastodon": {"url": self.mastodon_url, "cookies": self.mastodon_cookies},
+            "misskey": {"url": self.misskey_url, "token": self.misskey_token},
         }

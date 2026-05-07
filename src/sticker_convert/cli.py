@@ -187,6 +187,8 @@ class CLI:
             "kakao_get_auth_android_login",
             "line_get_auth",
             "discord_get_auth",
+            "mastodon_get_auth",
+            "misskey_get_auth",
             "save_cred",
         )
         for k, v in self.help["cred"].items():
@@ -504,6 +506,18 @@ class CLI:
             discord_token=args.discord_token
             if args.discord_token
             else creds.get("discord", {}).get("token"),
+            mastodon_cookies=args.mastodon_cookies
+            if args.mastodon_cookies
+            else creds.get("mastodon", {}).get("cookies"),
+            mastodon_url=args.mastodon_url
+            if args.mastodon_url
+            else creds.get("mastodon", {}).get("url"),
+            misskey_token=args.misskey_token
+            if args.misskey_token
+            else creds.get("misskey", {}).get("token"),
+            misskey_url=args.misskey_url
+            if args.misskey_url
+            else creds.get("misskey", {}).get("url"),
         )
 
         if args.signal_get_auth:
@@ -568,6 +582,28 @@ class CLI:
 
             if discord_token:
                 opt_cred.discord_token = discord_token
+
+            self.cb.put(msg)
+
+        if args.mastodon_get_auth:
+            from sticker_convert.auth.auth_mastodon import AuthMastodon
+
+            mastodon_auth = AuthMastodon(opt_cred, self.cb)
+            mastodon_cookies, msg = mastodon_auth.get_cred()
+
+            if mastodon_cookies:
+                opt_cred.mastodon_cookies = mastodon_cookies
+
+            self.cb.put(msg)
+
+        if args.misskey_get_auth:
+            from sticker_convert.auth.auth_misskey import AuthMisskey
+
+            misskey_auth = AuthMisskey(opt_cred, self.cb)
+            misskey_token, msg = misskey_auth.get_cred()
+
+            if misskey_token:
+                opt_cred.misskey_token = misskey_token
 
             self.cb.put(msg)
 

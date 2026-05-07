@@ -63,6 +63,22 @@
             "author": true
         }
     },
+    "mastodon": {
+        "full_name": "Upload to Mastodon",
+        "help": "Upload to Mastodon if auth available, or compress a .tar.gz file for upload to Mastodon using toolctl",
+        "metadata_requirements": {
+            "title": false,
+            "author": false
+        }
+    },
+    "misskey": {
+        "full_name": "Upload to Misskey",
+        "help": "Compress a .zip file and upload to Misskey if auth available",
+        "metadata_requirements": {
+            "title": false,
+            "author": false
+        }
+    },
     "local": {
         "full_name": "Save to local directory only",
         "help": "Save to local directory only",

@@ -74,6 +74,12 @@
         "viber_bin_path": "Viberデスクトップアプリケーションの場所を指定します。これはポータブルインストールに便利です。",
         "discord_get_auth": "Discordトークンを取得します。",
         "discord_token": "Discordトークンを設定します。Discordスタンプと絵文字のダウンロードに必要です。",
+        "mastodon_get_auth": "ブラウザからMastodon Cookieを取得します。これはカスタム絵文字のアップロードに必要です。",
+        "mastodon_url": "Mastodon URLを設定します。これはカスタム絵文字のアップロードに必要です。",
+        "mastodon_cookies": "Mastodon Cookieを設定します。これはカスタム絵文字のアップロードに必要です。",
+        "misskey_get_auth": "ブラウザからMastodon Cookieを取得します。これはカスタム絵文字のアップロードに必要です。",
+        "misskey_url": "Misskey URLを設定します。これはカスタム絵文字のアップロードに必要です。",
+        "misskey_token": "Misskey tokenを設定します。これはカスタム絵文字のアップロードに必要です。",
         "save_cred": "認証情報を保存します。"
     }
 }

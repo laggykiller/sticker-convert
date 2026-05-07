@@ -31,6 +31,14 @@
         "full_name": "创建Xcode专案 (iMessage)",
         "help": "创建Xcode专案以供输入至iMessage"
     },
+    "mastodon": {
+        "full_name": "上载至Mastodon",
+        "help": "有认证资料时上载至Mastodon, 或压缩.tar.gz档案以使用toolctl上载到Mastodon"
+    },
+    "misskey": {
+        "full_name": "上载至Misskey",
+        "help": "压缩.zip档案并在有认证资料时上载至Misskey"
+    },
     "local": {
         "full_name": "只储存至本机路径",
         "help": "只储存至本机路径"

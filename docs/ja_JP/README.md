@@ -41,18 +41,20 @@
 - [免責事項](#免責事項)
 
 ## 適合性
-| アプリ                                   | ⬇️ ダウンロード                               | ⬆️ アップロード                                        |
-| ---------------------------------------- | ----------------------------------------------| ---------------------------------------------------- |
-| [Signal](/docs/ja_JP/guide_signal.md)        | ✅                                           | ✅ (`uuid`と`password`が必要；又は自分で)              |
-| [Telegram](/docs/ja_JP/guide_telegram.md)    | ✅ (`token`又はtelethonが必要)                | ✅ (`token`と`user_id`又はtelethonが必要；又は自分で)  |
-| [WhatsApp](/docs/ja_JP/guide_whatsapp.md)    | ⭕ (AndroidまたはWhatsApp Webで)              | ⭕ (`.wastickers`を創建、Sticker Makerで入力)         |
-| [Line](/docs/ja_JP/guide_line.md)            | ✅                                           | 🚫 (人工審査が必要)                                   |
+| アプリ                                        | ⬇️ ダウンロード                      | ⬆️ アップロード                                       |
+| -------------------------------------------- | ------------------------------------ | ---------------------------------------------------- |
+| [Signal](/docs/ja_JP/guide_signal.md)        | ✅                                  | ✅ (`uuid`と`password`が必要；又は自分で)              |
+| [Telegram](/docs/ja_JP/guide_telegram.md)    | ✅ (`token`又はtelethonが必要)       | ✅ (`token`と`user_id`又はtelethonが必要；又は自分で)  |
+| [WhatsApp](/docs/ja_JP/guide_whatsapp.md)    | ⭕ (AndroidまたはWhatsApp Webで)     | ⭕ (`.wastickers`を創建、Sticker Makerで入力)         |
+| [Line](/docs/ja_JP/guide_line.md)            | ✅                                  | 🚫 (人工審査が必要)                                   |
 | [Kakao](/docs/ja_JP/guide_kakao.md)          | ✅ (動画スタンプは'auth_token'が必要) | 🚫 (人工審査が必要)                                   |
-| [Band](/docs/ja_JP/guide_band.md)            | ✅                                           | 🚫 (人工審査が必要)                                   |
-| [OGQ](/docs/ja_JP/guide_ogq.md)              | ✅                                           | 🚫 (人工審査が必要)                                   |
-| [Viber](/docs/ja_JP/guide_viber.md)          | ✅                                           | ✅ (`viber_auth`が必要)                              |
-| [Discord](/docs/ja_JP/guide_discord.md)      | ✅ (`token`が必要)                            | 🚫                                                  |
-| [iMessage](/docs/ja_JP/guide_imessage.md)    | 🚫                                           | ⭕ (サイドロードのためにXcodeスタンププロジェクトを創建) |
+| [Band](/docs/ja_JP/guide_band.md)            | ✅                                  | 🚫 (人工審査が必要)                                   |
+| [OGQ](/docs/ja_JP/guide_ogq.md)              | ✅                                  | 🚫 (人工審査が必要)                                   |
+| [Viber](/docs/ja_JP/guide_viber.md)          | ✅                                  | ✅ (`viber_auth`が必要)                              |
+| [Discord](/docs/ja_JP/guide_discord.md)      | ✅ (`token`が必要)                  | 🚫                                                   |
+| [Mastodon](/docs/ja_JP/guide_mastodon.md)    | ✅ (`token`が必要)                  | ✅ (`mastodon_cookies`が必要)                        |
+| [Misskey](/docs/ja_JP/guide_misskey.md)      | ✅ (`token`が必要)                  | ✅ (`misskey_token`が必要)                           |
+| [iMessage](/docs/ja_JP/guide_imessage.md)    | 🚫                                 | ⭕ (サイドロードのためにXcodeスタンププロジェクトを創建) |
 
 ✅ = 対応 ⭕ = 部分的に対応 🚫 = 非対応
 
@@ -88,6 +90,12 @@
 - Discord
     - ダウンロード：対応（例：https://discord.com/channels/169256939211980800/@home または 169256939211980800）ですが、ユーザートークンが必要です。
     - アップロード: 非対応。
+- Mastodon
+    - ダウンロード：対応 (例：`https://mastodon.social/`)
+    - アップロード: 対応。認証した場合はMastodonにアップロードする、又は.tar.gzファイルを圧縮してtoolctlからMastodonにアップロードしてください。
+- Misskey
+    - ダウンロード：対応 (例：`https://misskey.io/`)
+    - アップロード: 対応。.zipファイルを圧縮する、そしてMisskey認証した場合はアップロードする。
 - iMessage
     - ダウンロード: 非対応。
     - アップロード: このプログラムはiMessageスタンプパック用のXcodeプロジェクトを作成でき、Xcodeを使用してコンパイルおよびサイドロードできます。
@@ -108,29 +116,18 @@
 CLIモードで実行するには、引数を渡します
 
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
-                          [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
-                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
+                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI | --download-mastodon DOWNLOAD_MASTODON | --download-misskey DOWNLOAD_MISSKEY]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
-                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage]
-                          [--no-compress]
-                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
-                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
-                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
-                          [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
-                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
-                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT]
-                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
-                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
-                          [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
-                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN]
-                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth]
-                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
-                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
-                          [--save-cred]
+                          [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage | --export-mastodon | --export-misskey]
+                          [--no-compress] [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}] [--steps STEPS] [--processes PROCESSES]
+                          [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
+                          [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
+                          [--no-fake-vid] [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
+                          [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth] [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--mastodon-get-auth] [--mastodon-url MASTODON_URL] [--mastodon-cookies MASTODON_COOKIES] [--misskey-get-auth] [--misskey-url MISSKEY_URL]
+                          [--misskey-token MISSKEY_TOKEN] [--save-cred]
 
 sticker-convertのCLI
 
@@ -170,7 +167,7 @@ options:
   --download-kakao DOWNLOAD_KAKAO
                         入力としてURL/IDからKakaoスタンプをダウンロードする
                         (例: https://e.kakao.com/t/xxxxx 
-                        OR https://emoticon.kakao.com/items/xxxxx OR 4404400)
+                        OR https://emoticon.kakao.com/items/xxxxx)
   --download-band DOWNLOAD_BAND
                         入力としてURL/IDからNaver Bandスタンプをダウンロードする
                         (例: https://www.band.us/sticker/xxxx OR 2535)
@@ -189,6 +186,12 @@ options:
                         入力としてURL/IDからDiscord顔文字をダウンロードする
                         (例: https://discord.com/channels/169256939211980800/@home
                         OR 169256939211980800)
+  --download-mastodon DOWNLOAD_MASTODON
+                        入力としてURLからMastodon顔文字をダウンロードする
+                        (例子: https://mastodon.social/)
+  --download-misskey DOWNLOAD_MISSKEY
+                        入力としてURLからMisskey顔文字をダウンロードする
+                        (例子: https://misskey.io/)
 
 輸出オプション:
   --output-dir OUTPUT_DIR
@@ -206,10 +209,12 @@ options:
   --export-viber        Viberにアップロードする
   --export-whatsapp     .wastickersファイルに圧縮する、そしてWhatsAppにアップロードする
   --export-imessage     iMessageにインポートするためのXcodeプロジェクトを作成する
+  --export-mastodon     認証した場合はMastodonにアップロードする、又は.tar.gzファイルを圧縮してtoolctlからMastodonにアップロードしてください
+  --export-misskey      .zipファイルを圧縮する、そしてMisskey認証した場合はアップロードする
 
 圧縮オプション:
   --no-compress         ファイルを圧縮しません。スタンプのダウンロードのみに便利です。
-  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,custom}
+  --preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}
                         圧縮プリセットを適用します。
   --steps STEPS         最小設定と最大設定の間の分割数を設定します。ステップ数が多いほど圧縮速度は遅くなりますが、指定されたファイルサイズ制限に近づきます。
   --processes PROCESSES
@@ -318,6 +323,16 @@ options:
   --discord-get-auth    Discordトークンを取得します。
   --discord-token DISCORD_TOKEN
                         Discordトークンを設定します。Discordスタンプと絵文字のダウンロードに必要です。
+  --mastodon-get-auth   ブラウザからMastodon Cookieを取得します。これはカスタム絵文字のアップロードに必要です。
+  --mastodon-url MASTODON_URL
+                        Mastodon URLを設定します。これはカスタム絵文字のアップロードに必要です。
+  --mastodon-cookies MASTODON_COOKIES
+                        Mastodon Cookieを設定します。これはカスタム絵文字のアップロードに必要です。
+  --misskey-get-auth    ブラウザからMastodon Cookieを取得します。これはカスタム絵文字のアップロードに必要です。
+  --misskey-url MISSKEY_URL
+                        Misskey URLを設定します。これはカスタム絵文字のアップロードに必要です。
+  --misskey-token MISSKEY_TOKEN
+                        Misskey tokenを設定します。これはカスタム絵文字のアップロードに必要です。
   --save-cred           認証情報を保存します。
 ```
 

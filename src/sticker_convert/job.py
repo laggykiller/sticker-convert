@@ -623,6 +623,16 @@ class Job:
 
             downloaders.append(DownloadDiscord.start)
 
+        if self.opt_input.option == "mastodon":
+            from sticker_convert.downloaders.download_mastodon import DownloadMastodon
+
+            downloaders.append(DownloadMastodon.start)
+
+        if self.opt_input.option == "misskey":
+            from sticker_convert.downloaders.download_misskey import DownloadMisskey
+
+            downloaders.append(DownloadMisskey.start)
+
         if len(downloaders) > 0:
             self.executor.cb(I("Downloading..."))
         else:
@@ -790,6 +800,16 @@ class Job:
             from sticker_convert.uploaders.upload_viber import UploadViber
 
             exporters.append(UploadViber.start)
+
+        if self.opt_output.option == "mastodon":
+            from sticker_convert.uploaders.upload_mastodon import UploadMastodon
+
+            exporters.append(UploadMastodon.start)
+
+        if self.opt_output.option == "misskey":
+            from sticker_convert.uploaders.upload_misskey import UploadMisskey
+
+            exporters.append(UploadMisskey.start)
 
         self.executor.start_workers(processes=1)
 

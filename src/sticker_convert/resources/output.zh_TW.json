@@ -31,6 +31,14 @@
         "full_name": "創建Xcode專案 (iMessage)",
         "help": "創建Xcode專案以供輸入至iMessage"
     },
+    "mastodon": {
+        "full_name": "上載至Mastodon",
+        "help": "有認證資料時上載至Mastodon, 或壓縮.tar.gz檔案以使用toolctl上載到Mastodon"
+    },
+    "misskey": {
+        "full_name": "上載至Misskey",
+        "help": "壓縮.zip檔案並在有認證資料時上載至Misskey"
+    },
     "local": {
         "full_name": "只儲存至本機路徑",
         "help": "只儲存至本機路徑"

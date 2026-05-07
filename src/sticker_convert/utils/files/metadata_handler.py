@@ -33,12 +33,22 @@ RELATED_NAME = (
     "author.txt",
     "emoji.txt",
     "export-result.txt",
+    "misskey_meta.json",
     ".DS_Store",
     "._.DS_Store",
 )
 
-BLACKLIST_PREFIX = ("cover",)
-BLACKLIST_SUFFIX = (".txt", ".m4a", ".wastickers", ".zip", ".DS_Store", "._.DS_Store")
+BLACKLIST_PREFIX = ("cover", "misskey_meta.json")
+BLACKLIST_SUFFIX = (
+    ".txt",
+    ".m4a",
+    ".wastickers",
+    ".zip",
+    ".tar",
+    ".gz",
+    ".DS_Store",
+    "._.DS_Store",
+)
 
 XCODE_IMESSAGE_ICONSET = {
     "App-Store-1024x1024pt.png": (1024, 1024),

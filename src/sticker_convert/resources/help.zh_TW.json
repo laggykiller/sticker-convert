@@ -74,6 +74,12 @@
         "viber_bin_path": "指明Viber桌面版程式路徑。\n可用於免安裝版。",
         "discord_get_auth": "取得Discord token。",
         "discord_token": "設定Discord token。用於下載Discord貼圖和表情。",
+        "mastodon_get_auth": "從瀏覽器取得Mastodon cookies, 用於上載自訂表情。",
+        "mastodon_url": "設定Mastodon URL, 用於上載自訂表情。",
+        "mastodon_cookies": "設定Mastodon cookies, 用於上載自訂表情。",
+        "misskey_get_auth": "從瀏覽器取得Misskey cookies, 用於上載自訂表情。",
+        "misskey_url": "設定Misskey URL, 用於上載自訂表情。",
+        "misskey_token": "設定Misskey token, 用於上載自訂表情。",
         "save_cred": "儲存身份驗證數據。"
     }
 }

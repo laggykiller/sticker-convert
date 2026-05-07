@@ -31,6 +31,14 @@
         "full_name": "Xcodeプロジェクトを作成する (iMessage)",
         "help": "iMessageにインポートするためのXcodeプロジェクトを作成する"
     },
+    "mastodon": {
+        "full_name": "Mastodonにアップロードする",
+        "help": "認証した場合はMastodonにアップロードする、又は.tar.gzファイルを圧縮してtoolctlからMastodonにアップロードしてください"
+    },
+    "misskey": {
+        "full_name": "Misskeyにアップロードする",
+        "help": ".zipファイルを圧縮する、そしてMisskey認証した場合はアップロードする"
+    },
     "local": {
         "full_name": "ローカルディレクトリのみに保存",
         "help": "ローカルディレクトリのみに保存"

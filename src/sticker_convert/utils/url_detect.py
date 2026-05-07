@@ -37,4 +37,10 @@ class UrlDetect:
         if domain == "discord.com":
             return "discord"
 
+        if "mastodon" in domain:
+            return "mastodon"
+
+        if "misskey" in domain:
+            return "misskey"
+
         return None
