@@ -80,16 +80,20 @@ class AuthDiscord(AuthBase):
         chrome_path = self.get_discord_bin_path()
         if chrome_path is not None:
             using_discord_app = True
+            crd_args = []
         else:
             chrome_path = CRD.get_chromium_path()
+            crd_args = [
+                f"--user-data-dir={CONFIG_DIR}/chromium-user-data",
+                "https://discord.com/channels/@me",
+            ]
         if chrome_path is None:
             self.cb.put(("msg_dynamic", (None,), None))
+
             return (
                 None,
                 I("Please install Discord Desktop or Chrome/Chromium and try again"),
             )
-
-        token = None
 
         if find_pid_by_name(Path(chrome_path).name):
             response = self.cb.put(
@@ -108,38 +112,45 @@ class AuthDiscord(AuthBase):
             else:
                 return None, self.FAIL_MSG
 
-        crd = CRD(chrome_path)
-        while True:
-            crd.connect()
-            if using_discord_app is False:
-                crd.navigate("https://discord.com/channels/@me")
-                break
-            else:
+        crd = CRD(chrome_path, args=crd_args)
+        crd.connect()
+        token = None
+        if using_discord_app is True:
+            while True:
                 curr_url = crd.get_curr_url()
                 netloc = urlparse(curr_url).netloc
                 if netloc in ("discordapp.com", "discord.com"):
                     break
                 time.sleep(1)
-
-        while True:
-            try:
-                if using_discord_app:
+            while True:
+                try:
                     r = crd.exec_js(
                         "(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken();"
                     )
-                else:
-                    r = crd.exec_js(
-                        "const iframe=document.createElement('iframe');JSON.parse(document.body.appendChild(iframe).contentWindow.localStorage.token);"
-                    )
-            except RuntimeError:
-                break
-            if (
-                json.loads(r).get("result", {}).get("result", {}).get("type", "")
-                == "string"
-            ):
-                token = json.loads(r)["result"]["result"]["value"]
-                break
-            time.sleep(1)
+                    if (
+                        json.loads(r)
+                        .get("result", {})
+                        .get("result", {})
+                        .get("type", "")
+                        != "string"
+                    ):
+                        continue
+                    token = json.loads(r)["result"]["result"]["value"]
+                    break
+                except RuntimeError:
+                    break
+        else:
+            crd.network_enable()
+            crd.reload()
+            while True:
+                r = crd.ws.recv()
+                data = json.loads(r)
+                if data.get("method") != "Network.requestWillBeSent":
+                    continue
+                token = data["params"]["request"]["headers"].get("Authorization")
+                if token is not None:
+                    break
+            crd.network_disable()
         crd.close()
 
         self.cb.put(("msg_dynamic", (None,), None))

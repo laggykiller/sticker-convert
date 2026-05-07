@@ -12,15 +12,16 @@
 
 1. 登入 Discord：https://discord.com/login
 2. 按 `F12` 開啟開發者工具 (Developer tools)
-3. 在開發者工具中開啟控制台 (Console)
-4. 若要複製貼上指令，請先輸入 `allow pasteing` 並按下回車鍵
-5. Token 是執行下列指令的結果：
+3. 在開發者工具中開啟`Network`，然後按 `F5` 重新整理頁面
+4. 搜尋`credentials`
+5. 點選名為`credentials`的網路請求
+6. `Authorization`的值即為token
 
 ```javascript
 (webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()
 ```
 
-Token 看起來像`mfa.ABcd1e2Fgh3i-jKlmnoPQRstu4VWx4yz5A6b7cDEFGhiJk8LmNOPqR_sSTUV9XyzabcdeF0Xd`
+Token 看起來像`ABcd1e2Fgh3i-jKlmnoPQRstu4VWx4yz5A6b7cDEFGh`
 
 # 導入 SVG
 請注意，導入 SVG 需要安裝 Chromium / Chrome 瀏覽器。

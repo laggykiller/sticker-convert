@@ -10,14 +10,12 @@ Note that you need to install Discord Desktop or Chrome browser.
 ![/imgs/discord-token.png](/imgs/discord-token.png)
 1. Login to discord on https://discord.com/login
 2. Open DevTool by pressing `F12`
-3. Open Console in DevTool
-4. If you want to copy-paste commands, type `allow pasting` and press enter first
-5. Token is the result of running the following command:
-```javascript
-(webpackChunkdiscord_app.push([[''],{},e=>{m=[];for(let c in e.c)m.push(e.c[c])}]),m).find(m=>m?.exports?.default?.getToken!==void 0).exports.default.getToken()
-```
+3. Open `Network` in DevTool, then refresh by pressing `F5`
+4. Search for `credentials`
+5. Click on network request named `credentials`
+6. The value of `Authorization` is the token
 
-Token looks something like `mfa.ABcd1e2Fgh3i-jKlmnoPQRstu4VWx4yz5A6b7cDEFGhiJk8LmNOPqR_sSTUV9XyzabcdeF0Xd`
+Token looks something like `ABcd1e2Fgh3i-jKlmnoPQRstu4VWx4yz5A6b7cDEFGh`
 
 # Importing SVG
 Note that importing SVG requires chromium / chrome installed
