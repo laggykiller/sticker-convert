@@ -243,15 +243,15 @@ class GUI(Window):
 
     def pack_frames(self) -> None:
         self.input_frame.grid(column=0, row=0, sticky="w", padx=5, pady=5)
-        self.comp_frame.grid(column=1, row=0, sticky="news", padx=5, pady=5)
-        self.output_frame.grid(column=0, row=1, sticky="w", padx=5, pady=5)
-        self.cred_frame.grid(column=1, row=1, rowspan=2, sticky="w", padx=5, pady=5)
-        self.settings_frame.grid(column=0, row=2, sticky="news", padx=5, pady=5)
+        self.comp_frame.grid(column=0, row=1, sticky="news", padx=5, pady=5)
+        self.output_frame.grid(column=0, row=2, sticky="w", padx=5, pady=5)
+        self.cred_frame.grid(column=1, row=0, rowspan=3, sticky="w", padx=5, pady=5)
+        self.settings_frame.grid(column=0, row=3, columnspan=2, sticky="news", padx=5, pady=5)
         self.progress_frame.grid(
-            column=0, row=3, columnspan=2, sticky="news", padx=5, pady=5
+            column=0, row=4, columnspan=2, sticky="news", padx=5, pady=5
         )
         self.control_frame.grid(
-            column=0, row=4, columnspan=2, sticky="news", padx=5, pady=5
+            column=0, row=5, columnspan=2, sticky="news", padx=5, pady=5
         )
 
     def author_info(self) -> None:
