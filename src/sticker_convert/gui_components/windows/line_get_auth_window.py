@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-import webbrowser
 from threading import Thread
 from typing import Any
 
@@ -8,6 +7,7 @@ from ttkbootstrap import Button, Frame, Label  # type: ignore
 from sticker_convert.auth.auth_line import AuthLine
 from sticker_convert.gui_components.gui_utils import GUIUtils
 from sticker_convert.gui_components.windows.base_window import BaseWindow
+from sticker_convert.utils.chrome_remotedebug import CRD
 from sticker_convert.utils.translate import I
 
 
@@ -32,13 +32,7 @@ class LineGetAuthWindow(BaseWindow):
         )
         self.explanation2_lbl = Label(
             self.frame_info,
-            text=I("Please open web browser and login to Line"),
-            justify="left",
-            anchor="w",
-        )
-        self.explanation3_lbl = Label(
-            self.frame_info,
-            text=I('After that, press "Get cookies"'),
+            text=I("Close all browsers, press 'Get cookies' and login to Line"),
             justify="left",
             anchor="w",
         )
@@ -48,9 +42,6 @@ class LineGetAuthWindow(BaseWindow):
         )
         self.explanation2_lbl.grid(
             column=0, row=1, columnspan=3, sticky="w", padx=3, pady=3
-        )
-        self.explanation3_lbl.grid(
-            column=0, row=2, columnspan=3, sticky="w", padx=3, pady=3
         )
 
         # Buttons frame
@@ -67,13 +58,11 @@ class LineGetAuthWindow(BaseWindow):
         GUIUtils.finalize_window(self)
 
     def cb_open_browser(self) -> None:
-        line_login_site = "https://store.line.me/login"
-        success = webbrowser.open(line_login_site)
-        if not success:
-            self.gui.cb.ask_str(
-                I("Cannot open web browser for you. Install web browser and open:"),
-                initialvalue=line_login_site,
-            )
+        chrome_bin = CRD.get_chromium_path()
+        if chrome_bin is None:
+            self.gui.cb.msg_block(I("Chrome/Chromium-based browser not installed"))
+            return
+        CRD.launch_chromium(chrome_bin, ["https://store.line.me/login"])
 
     def cb_get_cookies(self) -> None:
         Thread(target=self.cb_get_cookies_thread, daemon=True).start()

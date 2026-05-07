@@ -71,6 +71,8 @@ class CRD:
             chrome_bin,
             f"--remote-debugging-port={port}",
             f"--remote-allow-origins=http://127.0.0.1:{port}",
+            "--no-first-run",
+            "--no-default-browser-check",
         ]
         if args:
             launch_cmd += args
@@ -87,6 +89,22 @@ class CRD:
         self.chrome_proc = subprocess.Popen(launch_cmd)
 
     @staticmethod
+    def launch_chromium(
+        chrome_bin: str, extra_args: Optional[List[str]] = None
+    ) -> bool:
+        launch_cmd: List[str] = [chrome_bin]
+        if (
+            platform.system() != "Windows"
+            and "geteuid" in dir(os)
+            and os.geteuid() == 0
+        ) or os.path.isfile("/.dockerenv"):
+            launch_cmd.append("--no-sandbox")
+        if extra_args is not None:
+            launch_cmd.extend(extra_args)
+        subprocess.Popen(launch_cmd)
+        return True
+
+    @staticmethod
     def get_chromium_path() -> Optional[str]:
         if platform.system() == "Windows":
             from sticker_convert.utils.chromiums.windows import get_chromium_path
@@ -96,7 +114,7 @@ class CRD:
             from sticker_convert.utils.chromiums.linux import get_chromium_path
         return get_chromium_path()
 
-    def connect(self, target_id: int = 0) -> None:
+    def connect(self, target_id: Optional[int] = None) -> None:
         self.cmd_id = 1
         r = None
         targets: List[Any] = []
@@ -107,7 +125,13 @@ class CRD:
                 if len(targets) == 0:
                     time.sleep(1)
                     continue
-                break
+                if target_id is None:
+                    for idx, i in enumerate(targets):
+                        if i["type"] == "page":
+                            target_id = idx
+                            break
+                else:
+                    break
             except requests.exceptions.ConnectionError:
                 time.sleep(1)
 
@@ -117,9 +141,13 @@ class CRD:
         if len(targets) == 0:
             raise RuntimeError(I("Cannot create websocket connection with debugger"))
 
+        assert target_id is not None
         self.ws = websocket.create_connection(  # type: ignore
             targets[target_id]["webSocketDebuggerUrl"]
         )
+
+    def disconnect(self) -> None:
+        self.ws.close()
 
     def send_cmd(self, command: Dict[Any, Any]) -> Union[str, bytes]:
         if command.get("id") is None:
@@ -144,6 +172,23 @@ class CRD:
         if context_id is not None:
             command["params"]["contextId"] = context_id
         return self.send_cmd(command)
+
+    def get_storage(self, key: str) -> Optional[str]:
+        self.exec_js("window.dispatchEvent(new Event('localStorageUpdate'))")
+        r = self.exec_js(f"localStorage.getItem('{key}')")
+        return cast(
+            Optional[str],
+            json.loads(r).get("result", {}).get("result", {}).get("value"),
+        )
+
+    def get_cookie(self, sites: List[str]) -> List[Dict[str, Any]]:
+        command: Dict[str, Any] = {
+            "id": self.cmd_id,
+            "method": "Network.getCookies",
+            "params": {"urls": sites},
+        }
+        result = self.send_cmd(command)
+        return json.loads(result)["result"]["cookies"]
 
     def set_transparent_bg(self) -> Union[str, bytes]:
         command: Dict[str, Any] = {
@@ -205,6 +250,18 @@ class CRD:
     def runtime_disable(self) -> None:
         command = {
             "method": "Runtime.disable",
+        }
+        self.send_cmd(command)
+
+    def network_enable(self) -> None:
+        command = {
+            "method": "Network.enable",
+        }
+        self.send_cmd(command)
+
+    def network_disable(self) -> None:
+        command = {
+            "method": "Network.disable",
         }
         self.send_cmd(command)
 

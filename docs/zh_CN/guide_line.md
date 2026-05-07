@@ -10,15 +10,11 @@
 此功能需要 Line cookies。
 
 ## 方法一：自动转换
-1. 登入store.line.me
-2. 在貼图转换介面点选`生成`按钮
-3. 在弹出的视窗中点选`取得 cookies`按钮（格式：`key_1=value_1;key_2=value_2`）
-4. 输入您的自定义贴图 URL，开始转换
-5. 下载貼图时会弹出提示讯息，请编辑 line-sticker-text.txt 文件，然后继续
-
-注意：
-- 由于 Chrome 浏覽器最近的更新，此方法可能无法正常运作！在这种情况下，您需要使用手动转换方法。
-- 为了获得最佳成功率，建议使用 Firefox 浏覽器。
+1. 安装Chrome浏览器
+2. 在贴图转换介面点选`生成`按钮
+3. 在弹出的视窗中点选`取得 cookies`按钮并登入Line（格式：`key_1=value_1;key_2=value_2`）
+4. 输入您的随你填贴图 URL，开始转换
+5. 下载贴图时会弹出提示讯息，请编辑 line-sticker-text.txt 文件，然后继续
 
 ## 方法二：手动
 1. 在浏覽器中安装 `Get cookies.txt LOCALLY` 扩充功能
