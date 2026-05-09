@@ -128,11 +128,11 @@ class CompressWastickers(UploadBase):
                             cover_data = f.read()
 
                 assert isinstance(cover_data, bytes)
-                zipf.writestr("tray.png", cover_data)
+                zipf.writestr("cover.png", cover_data)
                 zipf.write(Path(self.opt_output.dir, "author.txt"), "author.txt")
                 zipf.write(Path(self.opt_output.dir, "title.txt"), "title.txt")
 
-                for num, src in enumerate(stickers):
+                for src in stickers:
                     self.cb.put(
                         I("Verifying {} for compressing into .wastickers").format(src)
                     )
@@ -167,7 +167,7 @@ class CompressWastickers(UploadBase):
                             image_data = f.read()
 
                     # Originally the Sticker Maker application name the files with int(time.time())
-                    zipf.writestr(f"sticker_{num + 1}{ext}", image_data)
+                    zipf.writestr(f"{src.stem}{ext}", image_data)
 
             self.cb.put((out_f))
             urls.append(out_f)
