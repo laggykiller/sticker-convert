@@ -414,17 +414,17 @@ sticker-convert --no-confirm --preset whatsapp --export-whatsapp
 # 選択 1: Dockerhubから
 ## 完全版
 docker pull laggykiller/sticker-convert:latest
-## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Chromiumなし
 docker pull laggykiller/sticker-convert:latest-min-gui
-## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし；CLIだけ
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Chromiumなし；CLIだけ
 docker pull laggykiller/sticker-convert:latest-min-cli
 
 # 選択 2: ghcrから
 ## 完全版
 docker pull ghcr.io/laggykiller/sticker-convert:latest
-## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Chromiumなし
 docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui
-## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Kakaoデスクトップ版、Chromiumなし；CLIだけ
+## 翻訳、Signalデスクトップ版、Viberデスクトップ版、Chromiumなし；CLIだけ
 docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli
 ```
 

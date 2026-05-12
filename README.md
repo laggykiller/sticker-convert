@@ -421,17 +421,17 @@ Downloading
 # Option 1: From Dockerhub
 ## Full version
 docker pull laggykiller/sticker-convert:latest
-## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium
+## No translation, Signal Desktop, Viber Desktop, Chromium
 docker pull laggykiller/sticker-convert:latest-min-gui
-## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium; Only CLI
+## No translation, Signal Desktop, Viber Desktop, Chromium; Only CLI
 docker pull laggykiller/sticker-convert:latest-min-cli
 
 # Option 2: From ghcr
 ## Full version
 docker pull ghcr.io/laggykiller/sticker-convert:latest
-## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium
+## No translation, Signal Desktop, Viber Desktop, Chromium
 docker pull ghcr.io/laggykiller/sticker-convert:latest-min-gui
-## No translation, Signal Desktop, Viber Desktop, Kakao Desktop, Chromium; Only CLI
+## No translation, Signal Desktop, Viber Desktop, Chromium; Only CLI
 docker pull ghcr.io/laggykiller/sticker-convert:latest-min-cli
 ```
 
