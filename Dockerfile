@@ -35,7 +35,7 @@ USER app
 VOLUME ["/app/sticker_convert/stickers_input", "/app/sticker_convert/stickers_output"]
 ENTRYPOINT ["/home/app/.pyenv/shims/python", "/app/sticker-convert.py"]
 
-FROM jlesage/baseimage-gui:debian-12-v4 AS base-gui
+FROM jlesage/baseimage-gui:debian-12-v4.11 AS base-gui
 
 WORKDIR /app
 
