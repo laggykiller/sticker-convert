@@ -4,7 +4,7 @@ description = "Convert (animated) stickers between Signal, Telegram, WhatsApp, L
 readme = "README.md"
 requires-python = ">=3.8"
 license = {file = "LICENSE"}
-keywords = ["telegram", "line", "tgs", "whatsapp", "kakao", "signal", "imessage", "wastickers", "viber", "discord"]
+keywords = ["telegram", "line", "tgs", "whatsapp", "kakao", "signal", "imessage", "wastickers", "viber", "discord", "mastodon", "misskey"]
 authors = [
   {name = "laggykiller", email = "chaudominic2@gmail.com" } # Optional
 ]
