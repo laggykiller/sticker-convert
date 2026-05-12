@@ -12,8 +12,8 @@ RUN useradd --create-home app && \
     libssl-dev lzma lzma-dev uuid-dev xvfb zlib1g-dev && \
     update-ca-certificates && \
     curl -fsSL https://pyenv.run | bash && \
-    pyenv install 3.12 && \
-    pyenv global 3.12 && \
+    pyenv install 3.13 && \
+    pyenv global 3.13 && \
     pyenv rehash && \
     apt purge -y build-essential curl git gdb lcov libbz2-dev libffi-dev libgdbm-dev \
     liblzma-dev libncurses5-dev libreadline6-dev libsqlite3-dev \
@@ -61,8 +61,8 @@ RUN mkdir -p '/home/app' && \
     locale-gen && \
     # Build python
     curl -fsSL https://pyenv.run | bash && \
-    pyenv install 3.12 && \
-    pyenv global 3.12 && \
+    pyenv install 3.13 && \
+    pyenv global 3.13 && \
     pyenv rehash && \
     # Cleanup python build requirements
     apt purge -y build-essential git gdb lcov libbz2-dev libffi-dev libgdbm-dev \

@@ -19,5 +19,5 @@ docker run \
     cd /opt/_internal &&
     tar xf static-libs-for-embedding-only.tar.xz &&
     cd /sticker-convert &&
-    python3.12 ./compile.py
+    python3.13 ./compile.py
     "'

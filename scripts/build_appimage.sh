@@ -19,7 +19,7 @@ chmod +x ./appimagetool
 ./appimage-builder --skip-appimage --recipe AppImageBuilder.yml
 
 # Fix .desktop
-sed -i 's/Comment=/Comment=Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, Viber, Discord, iMessage/g' ./AppDir/*.desktop
+sed -i 's/Comment=/Comment=Convert (animated) stickers between Signal, Telegram, WhatsApp, Line, Kakao, Naver Band, OGQ, Viber, Discord, iMessage, Mastodon, Misskey/g' ./AppDir/*.desktop
 sed -i "s/X-AppImage-Arch=<MISSING>/X-AppImage-Arch=${SC_COMPILE_ARCH}/g" ./AppDir/*.desktop
 
 # Add appdata.xml

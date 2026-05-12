@@ -1,6 +1,6 @@
 [project]
 name = "sticker-convert"
-description = "Convert (animated) stickers between WhatsApp, Telegram, Signal, Line, Kakao, Naver Band, OGQ, Viber, Discord, iMessage. Written in Python."
+description = "Convert (animated) stickers between Signal, Telegram, WhatsApp, Line, Kakao, Naver Band, OGQ, Viber, Discord, iMessage, Mastodon, Misskey. Written in Python."
 readme = "README.md"
 requires-python = ">=3.8"
 license = {file = "LICENSE"}
@@ -22,6 +22,7 @@ classifiers = [
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3 :: Only",
 ]
 dynamic = ["version", "dependencies"]
