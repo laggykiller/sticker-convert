@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+import os
 import zipfile
 from pathlib import Path
 from typing import Any, Optional, Tuple
-import os
 
 from sticker_convert.auth.auth_whatsapp import SWB
 from sticker_convert.definitions import CONFIG_DIR
@@ -32,7 +32,9 @@ class DownloadWhatsapp(DownloadBase):
         ]
 
         self.cb.put(("msg_dynamic", (I("Logging in WhatsApp, please wait..."),), None))
-        prompt = I("Please send stickers to WhatsApp group 'sticker-whatsapp-bridge'; When done, press OK")
+        prompt = I(
+            "Please send stickers to WhatsApp group 'sticker-whatsapp-bridge'; When done, press OK"
+        )
 
         logged_in = False
         prompt_showing = False
@@ -60,7 +62,13 @@ class DownloadWhatsapp(DownloadBase):
                             info = zip_f.getinfo(i)
                             info.filename = out_f_stem + ext
                             zip_f.extract(i, path=self.out_dir)
-                            self.cb.put(("msg", (I("Downloaded {}").format(info.filename),), None))
+                            self.cb.put(
+                                (
+                                    "msg",
+                                    (I("Downloaded {}").format(info.filename),),
+                                    None,
+                                )
+                            )
                     os.remove(zip_path)
 
                     if (self.out_dir / "title.txt").exists():
@@ -74,7 +82,9 @@ class DownloadWhatsapp(DownloadBase):
                         f.write(r["publisher"])
 
                 elif r["type"] == "sticker":
-                    out_f_path = (self.out_dir / str(count).zfill(3)).with_suffix(r["ext"])
+                    out_f_path = (self.out_dir / str(count).zfill(3)).with_suffix(
+                        r["ext"]
+                    )
                     out_f_path_orig = self.out_dir / r["fname"]
                     os.rename(out_f_path_orig, out_f_path)
                     self.cb.put(("msg", (I("Downloaded {}").format(r["fname"]),), None))

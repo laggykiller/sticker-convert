@@ -310,7 +310,10 @@ class Job:
         if self.opt_input.option == "auto":
             error_msg += I("\n[X] Unrecognized URL input source\n")
 
-        if self.opt_input.option not in ("local", "whatsapp") and not self.opt_input.url:
+        if (
+            self.opt_input.option not in ("local", "whatsapp")
+            and not self.opt_input.url
+        ):
             error_msg += I(
                 "\n"
                 "[X] URL address cannot be empty.\n"

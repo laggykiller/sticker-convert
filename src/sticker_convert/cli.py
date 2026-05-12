@@ -419,7 +419,7 @@ class CLI:
             else args.res_power,
             res_snap_pow2=self.compression_presets[preset]["res"]["snap_pow2"]
             if args.res_snap_pow2 is None and args.no_res_snap_pow2 is None
-            else args.res_snap_pow2,
+            else args.res_snap_pow2 is not None,
             quality_min=self.compression_presets[preset]["quality"]["min"]
             if args.quality_min is None
             else args.quality_min,

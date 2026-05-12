@@ -49,7 +49,6 @@ class DownloadMisskey(DownloadBase):
 
         targets: List[Tuple[str, Path]] = []
         for info in metadata["emojis"]:
-            info: Dict[str, Any]
             category = cast(str, info.get("category", "")).replace("-", "_")
             name = sanitize_filename(cast(str, info.get("name", "")).replace("-", "_"))
             if category != "":
@@ -65,7 +64,6 @@ class DownloadMisskey(DownloadBase):
         ext: Optional[str] = None
         emojis_new: List[Dict[str, Any]] = []
         for info in metadata["emojis"]:
-            info: Dict[str, Any]
             fpath = Path(self.out_dir, info["fileName"])
             if fpath.suffix == ".unknown_ext":
                 ext = format_detect(fpath, [".png", ".gif"])

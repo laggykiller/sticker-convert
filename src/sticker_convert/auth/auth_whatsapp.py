@@ -2,13 +2,13 @@
 import json
 import os
 import platform
+import stat
 import subprocess
 import time
 from collections.abc import Generator
 from io import StringIO
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, cast
-import stat
 
 import qrcode
 import requests
@@ -50,7 +50,7 @@ class SWB:
         r = requests.get(
             "https://api.github.com/repos/laggykiller/sticker-whatsapp-bridge/tags"
         )
-        if r.ok == False:
+        if r.ok is False:
             return None
         try:
             tags_lst = json.loads(r.text)
@@ -84,7 +84,7 @@ class SWB:
             return False, I("Error: {} is not supported").format(platform.system())
 
         arch = self.get_swb_arch()
-        if arch == None:
+        if arch is None:
             return False, I("Error: {} is not supported").format(platform.machine())
         fname = f"swb-{tag}-{plat}-{arch}{suffix}"
 

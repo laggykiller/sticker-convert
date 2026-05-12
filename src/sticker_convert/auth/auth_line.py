@@ -72,8 +72,7 @@ class AuthLine(AuthBase):
             crd.close()
             self.cb.put(("msg_dynamic", (None,), None))
             cookies_list = ["%s=%s" % (i["name"], i["value"]) for i in cookies_dict]
-            cookies = ";".join(cookies_list)
-            return cookies, self.OK_MSG
+            return ";".join(cookies_list), self.OK_MSG
 
     @staticmethod
     def validate_cookies(cookies: Union[CookieJar, Dict[str, str]]) -> bool:

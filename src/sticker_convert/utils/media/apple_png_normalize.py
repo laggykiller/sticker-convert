@@ -57,30 +57,30 @@ class ApplePngNormalize:
                 assert width
                 assert height
                 buf_size = width * height * 4 + height
-                chunk_data = zlib.decompress(chunk_d, -8, buf_size)
+                chunk_bytes = zlib.decompress(chunk_d, -8, buf_size)
 
                 # Swapping red & blue bytes for each pixel
-                chunk_data = bytearray(chunk_data)
+                chunk_arr = bytearray(chunk_bytes)
                 offset = 1
                 for _ in range(height):
                     for x in range(width):
-                        chunk_data[offset + 4 * x], chunk_data[offset + 4 * x + 2] = (
-                            chunk_data[offset + 4 * x + 2],
-                            chunk_data[offset + 4 * x],
+                        chunk_arr[offset + 4 * x], chunk_arr[offset + 4 * x + 2] = (
+                            chunk_arr[offset + 4 * x + 2],
+                            chunk_arr[offset + 4 * x],
                         )
                     offset += 1 + 4 * width
 
                 # Compressing the image chunk
-                # chunk_data = newdata
-                chunk_data = zlib.compress(chunk_data)
-                chunk_length = len(chunk_data)
+                # chunk_arr = newdata
+                chunk_comp = zlib.compress(chunk_arr)
+                chunk_length = len(chunk_comp)
                 chunk_crc_idat = zlib.crc32(b"IDAT")
-                chunk_crc_data = zlib.crc32(chunk_data, chunk_crc_idat)
+                chunk_crc_data = zlib.crc32(chunk_comp, chunk_crc_idat)
                 chunk_crc_mod = (chunk_crc_data + 0x100000000) % 0x100000000
 
                 new_png += struct.pack(">L", chunk_length)
                 new_png += b"IDAT"
-                new_png += chunk_data
+                new_png += chunk_comp
                 new_png += struct.pack(">L", chunk_crc_mod)
 
                 chunk_crc_type = zlib.crc32(chunk_type)
