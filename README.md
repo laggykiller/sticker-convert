@@ -117,6 +117,7 @@ To run in CLI mode, pass on any arguments
 
 <details>
 <summary><b>CLI help</b></summary>
+
 ```
 usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
                           [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]

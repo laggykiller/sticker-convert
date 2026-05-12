@@ -117,6 +117,7 @@ CLIモードで実行するには、引数を渡します
 
 <details>
 <summary><b>CLI ヘルプ</b></summary>
+
 ```
 usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
                           [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
