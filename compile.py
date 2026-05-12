@@ -4,6 +4,7 @@ import platform
 import shutil
 import subprocess
 import sys
+from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Optional
 
@@ -32,6 +33,7 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         f"--product-version={__version__}",
         f"--file-version={__version__}",
         "--copyright=GPL-2.0",
+        f"--jobs={max(int(cpu_count() / 2), 1)}",
     ]
 
     if platform.system() == "Windows":
