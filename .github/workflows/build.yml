@@ -87,6 +87,9 @@ jobs:
           - os: windows-2022
             TARGET: windows7-x86_64
             PYVER: "3.8"
+          - os: windows-11-arm
+            TARGET: windows-arm
+            PYVER: "3.13"
     steps:
     - uses: actions/checkout@v4
       with:

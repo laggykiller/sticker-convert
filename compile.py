@@ -11,6 +11,8 @@ from typing import Optional
 sys.path.append("./src")
 from sticker_convert import __version__
 
+CRYPTOGRAPHY_WIN_ARM_WHL = "cryptography @ https://github.com/khmyznikov/PyEnv-WoA-State/releases/download/cryptography-47.0.0-arm64/cryptography-47.0.0.dev1-cp311-abi3-win_arm64.whl"
+
 
 def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
     cmd_list = [
@@ -92,6 +94,20 @@ def compile() -> None:
     else:
         python_bin = os.path.abspath("venv/bin/python")
 
+    if platform.system() == "Windows" and platform.machine().lower() in (
+        "arm64",
+        "aarch64",
+    ):
+        if shutil.which("cargo") is None:
+            raise RuntimeError("cargo required for building on Windows arm")
+        with open("requirements.txt") as f:
+            req = f.read()
+        with open("requirements.txt", "w+") as f:
+            for line in req.split("\n"):
+                if "cryptography" not in line:
+                    f.write(line + "\n")
+                else:
+                    f.write(CRYPTOGRAPHY_WIN_ARM_WHL + "\n")
     subprocess.run([python_bin, "-m", "pip", "install", "--prefer-binary", ".[build]"])
 
     nuitka(python_bin, arch)
