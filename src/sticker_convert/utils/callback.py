@@ -149,7 +149,7 @@ class CallbackCli(CallbackProtocol):
         if not self.no_confirm:
             input("Press Enter to continue...")
 
-    def cb_msg_dynamic(self, *args: Any) -> bool:
+    def cb_msg_dynamic(self, *args: Any, **kwargs: Any) -> bool:
         message = args[0]
 
         if message is None:
@@ -335,7 +335,7 @@ class CallbackGui(CallbackProtocol):
         self,
         message: Optional[str] = None,
         parent: Optional["Toplevel"] = None,
-        **_kwargs: Any,
+        **kwargs: Any,
     ) -> bool:
         from ttkbootstrap import Label, Progressbar  # type: ignore
 
@@ -351,6 +351,7 @@ class CallbackGui(CallbackProtocol):
                 self.msg_dynamic_label = Label(
                     self.msg_dynamic_window.scrollable_frame,
                     textvariable=self.message_var,
+                    font="TkFixedFont" if kwargs.get("monospace") else "TkDefaultFont",
                 )
                 self.msg_dynamic_bar = Progressbar(
                     self.msg_dynamic_window.scrollable_frame,

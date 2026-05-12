@@ -39,6 +39,16 @@
             "author": false
         }
     },
+    "whatsapp": {
+        "full_name": "Download from WhatsApp",
+        "help": "Download WhatsApp stickers",
+        "example": "Follow instructions after start",
+        "address_lbls": "URL address (N/A)",
+        "metadata_provides": {
+            "title": false,
+            "author": false
+        }
+    },
     "line": {
         "full_name": "Download from Line",
         "help": "Download line stickers from a URL / ID as input",

@@ -24,8 +24,8 @@
         "help": "上載至Viber"
     },
     "whatsapp": {
-        "full_name": "壓縮至 .wastickers (WhatsApp)",
-        "help": "創建 .wastickers檔案以供上載至WhatsApp"
+        "full_name": "上載至WhatsApp",
+        "help": "創建.wastickers檔案並在有認證資料時上載至WhatsApp"
     },
     "imessage": {
         "full_name": "創建Xcode專案 (iMessage)",

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-13 03:14+0800\n"
+"POT-Creation-Date: 2026-05-12 14:31+0800\n"
 "PO-Revision-Date: 2026-02-13 03:14+0800\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/sticker_convert/converter.py:128
+#: src/sticker_convert/converter.py:130
 #, python-brace-format
 msgid "[I] Start compressing {} -> {}"
 msgstr "[I] Start compressing {} -> {}"
 
-#: src/sticker_convert/converter.py:130
+#: src/sticker_convert/converter.py:132
 #, python-brace-format
 msgid "[S] Compatible file found, skip compress and just copy {} -> {}"
 msgstr "[S] Compatible file found, skip compress and just copy {} -> {}"
 
-#: src/sticker_convert/converter.py:133
+#: src/sticker_convert/converter.py:135
 #, python-brace-format
 msgid ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
@@ -36,17 +36,17 @@ msgstr ""
 "[C] Compressing {} -> {} res={}x{}, quality={}, fps={}, color={} (step {}-{}-"
 "{})"
 
-#: src/sticker_convert/converter.py:136
+#: src/sticker_convert/converter.py:138
 #, python-brace-format
 msgid "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 msgstr "[{}] Compressed {} -> {} but size {} {} limit {}, recompressing"
 
-#: src/sticker_convert/converter.py:138
+#: src/sticker_convert/converter.py:140
 #, python-brace-format
 msgid "[S] Successful compression {} -> {} size {} (step {})"
 msgstr "[S] Successful compression {} -> {} size {} (step {})"
 
-#: src/sticker_convert/converter.py:140
+#: src/sticker_convert/converter.py:142
 #, python-brace-format
 msgid ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
@@ -55,25 +55,25 @@ msgstr ""
 "[F] Failed Compression {} -> {}, cannot get below limit {} with lowest "
 "quality under current settings (Best size: {})"
 
-#: src/sticker_convert/converter.py:144
+#: src/sticker_convert/converter.py:146
 #, python-brace-format
 msgid "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 msgstr "[W] {} does not support RGBA, defaulted to fastoctree quantization"
 
-#: src/sticker_convert/converter.py:146
+#: src/sticker_convert/converter.py:148
 msgid "[W] Importing SVG takes long time"
 msgstr "[W] Importing SVG takes long time"
 
-#: src/sticker_convert/converter.py:496
+#: src/sticker_convert/converter.py:547
 msgid "[F] Chrome/Chromium required for importing animated svg"
 msgstr "[F] Chrome/Chromium required for importing animated svg"
 
-#: src/sticker_convert/converter.py:966
+#: src/sticker_convert/converter.py:1028
 #, python-brace-format
 msgid "Invalid format {}"
 msgstr "Invalid format {}"
 
-#: src/sticker_convert/cli.py:28 src/sticker_convert/gui.py:41
+#: src/sticker_convert/cli.py:28 src/sticker_convert/gui.py:40
 #, python-brace-format
 msgid ""
 "sticker-convert is Free and Opensource software by laggykiller\n"
@@ -99,7 +99,7 @@ msgstr "Input options"
 msgid "Output options"
 msgstr "Output options"
 
-#: src/sticker_convert/cli.py:104 src/sticker_convert/gui.py:232
+#: src/sticker_convert/cli.py:104 src/sticker_convert/gui.py:229
 msgid "Compression options"
 msgstr "Compression options"
 
@@ -107,43 +107,43 @@ msgstr "Compression options"
 msgid "Credentials options"
 msgstr "Credentials options"
 
-#: src/sticker_convert/cli.py:214
+#: src/sticker_convert/cli.py:217
 #, python-brace-format
 msgid "Error: Cannot load custom presets from {}"
 msgstr "Error: Cannot load custom presets from {}"
 
-#: src/sticker_convert/cli.py:262
+#: src/sticker_convert/cli.py:266
 #, python-brace-format
 msgid "Detected URL input source: {}"
 msgstr "Detected URL input source: {}"
 
-#: src/sticker_convert/cli.py:265
+#: src/sticker_convert/cli.py:269
 #, python-brace-format
 msgid "Error: Unrecognied URL input source for url: {}"
 msgstr "Error: Unrecognied URL input source for url: {}"
 
-#: src/sticker_convert/cli.py:343
+#: src/sticker_convert/cli.py:347
 #, python-brace-format
 msgid "Auto compression option set to {}"
 msgstr "Auto compression option set to {}"
 
-#: src/sticker_convert/cli.py:352
+#: src/sticker_convert/cli.py:356
 msgid " Reason: Export to local directory only"
 msgstr " Reason: Export to local directory only"
 
-#: src/sticker_convert/cli.py:475 src/sticker_convert/gui.py:299
+#: src/sticker_convert/cli.py:479 src/sticker_convert/gui.py:298
 msgid "Warning: creds.json content is corrupted"
 msgstr "Warning: creds.json content is corrupted"
 
-#: src/sticker_convert/cli.py:481
+#: src/sticker_convert/cli.py:485
 msgid "Loaded credentials from creds.json"
 msgstr "Loaded credentials from creds.json"
 
-#: src/sticker_convert/cli.py:628
+#: src/sticker_convert/cli.py:623
 msgid "Saved credentials to creds.json"
 msgstr "Saved credentials to creds.json"
 
-#: src/sticker_convert/gui.py:49
+#: src/sticker_convert/gui.py:48
 #, python-brace-format
 msgid ""
 "NOTICE: If buttons are not responsive, try to press\n"
@@ -156,52 +156,52 @@ msgstr ""
 "(This is a bug in tkinter specific to macOS 14 python <=3.11.6)\n"
 "({mac14_tk_bug_url})"
 
-#: src/sticker_convert/gui.py:100
+#: src/sticker_convert/gui.py:99
 msgid "Job is running, really quit?"
 msgstr "Job is running, really quit?"
 
-#: src/sticker_convert/gui.py:105
+#: src/sticker_convert/gui.py:104
 msgid "Quitting, please wait..."
 msgstr "Quitting, please wait..."
 
-#: src/sticker_convert/gui.py:229
+#: src/sticker_convert/gui.py:226
 msgid "Input"
 msgstr "Input"
 
-#: src/sticker_convert/gui.py:235
+#: src/sticker_convert/gui.py:232
 msgid "Output"
 msgstr "Output"
 
-#: src/sticker_convert/gui.py:238
+#: src/sticker_convert/gui.py:235
 msgid "Credentials"
 msgstr "Credentials"
 
-#: src/sticker_convert/gui.py:241
+#: src/sticker_convert/gui.py:238
 msgid "Config"
 msgstr "Config"
 
-#: src/sticker_convert/gui.py:244
+#: src/sticker_convert/gui.py:241
 msgid "Progress"
 msgstr "Progress"
 
-#: src/sticker_convert/gui.py:289
+#: src/sticker_convert/gui.py:288
 msgid "Warning: config.json content is corrupted"
 msgstr "Warning: config.json content is corrupted"
 
-#: src/sticker_convert/gui.py:496
+#: src/sticker_convert/gui.py:487
 msgid "Cancel"
 msgstr "Cancel"
 
-#: src/sticker_convert/gui.py:618
+#: src/sticker_convert/gui.py:608
 #: src/sticker_convert/gui_components/frames/control_frame.py:19
 msgid "Start"
 msgstr "Start"
 
-#: src/sticker_convert/gui.py:694
+#: src/sticker_convert/gui.py:685
 msgid "Invalid URL: "
 msgstr "Invalid URL: "
 
-#: src/sticker_convert/gui.py:700
+#: src/sticker_convert/gui.py:691
 msgid "Detected URL: "
 msgstr "Detected URL: "
 
@@ -232,10 +232,12 @@ msgstr "Signal password"
 
 #: src/sticker_convert/gui_components/frames/cred_frame.py:47
 #: src/sticker_convert/gui_components/frames/cred_frame.py:81
-#: src/sticker_convert/gui_components/frames/cred_frame.py:95
-#: src/sticker_convert/gui_components/frames/cred_frame.py:109
-#: src/sticker_convert/gui_components/frames/cred_frame.py:123
-#: src/sticker_convert/gui_components/frames/cred_frame.py:137
+#: src/sticker_convert/gui_components/frames/cred_frame.py:91
+#: src/sticker_convert/gui_components/frames/cred_frame.py:105
+#: src/sticker_convert/gui_components/frames/cred_frame.py:119
+#: src/sticker_convert/gui_components/frames/cred_frame.py:133
+#: src/sticker_convert/gui_components/frames/cred_frame.py:155
+#: src/sticker_convert/gui_components/frames/cred_frame.py:177
 msgid "Generate"
 msgstr "Generate"
 
@@ -252,26 +254,42 @@ msgid "Telethon authorization"
 msgstr "Telethon authorization"
 
 #: src/sticker_convert/gui_components/frames/cred_frame.py:87
-msgid "Kakao auth_token"
-msgstr "Kakao auth_token"
+msgid "WhatsApp login"
+msgstr "WhatsApp login"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:101
+#: src/sticker_convert/gui_components/frames/cred_frame.py:97
 msgid "Line cookies"
 msgstr "Line cookies"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:115
+#: src/sticker_convert/gui_components/frames/cred_frame.py:111
 msgid "Viber auth"
 msgstr "Viber auth"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:129
+#: src/sticker_convert/gui_components/frames/cred_frame.py:125
 msgid "Discord token"
 msgstr "Discord token"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:144
+#: src/sticker_convert/gui_components/frames/cred_frame.py:139
+msgid "Mastodon URL"
+msgstr "Mastodon URL"
+
+#: src/sticker_convert/gui_components/frames/cred_frame.py:147
+msgid "Mastodon cookies"
+msgstr "Mastodon cookies"
+
+#: src/sticker_convert/gui_components/frames/cred_frame.py:161
+msgid "Misskey URL"
+msgstr "Misskey URL"
+
+#: src/sticker_convert/gui_components/frames/cred_frame.py:169
+msgid "Misskey token"
+msgstr "Misskey token"
+
+#: src/sticker_convert/gui_components/frames/cred_frame.py:184
 msgid "Get help"
 msgstr "Get help"
 
-#: src/sticker_convert/gui_components/frames/cred_frame.py:186
+#: src/sticker_convert/gui_components/frames/cred_frame.py:239
 msgid "You can get help from:"
 msgstr "You can get help from:"
 
@@ -393,6 +411,7 @@ msgid "Token will be automatically fetched"
 msgstr "Token will be automatically fetched"
 
 #: src/sticker_convert/gui_components/windows/discord_get_auth_window.py:57
+#: src/sticker_convert/gui_components/windows/misskey_get_auth_window.py:48
 msgid "Get token"
 msgstr "Get token"
 
@@ -539,6 +558,43 @@ msgstr "Category"
 msgid "Search"
 msgstr "Search"
 
+#: src/sticker_convert/gui_components/windows/mastodon_get_auth_window.py:17
+#, fuzzy
+#| msgid "Get Line cookie"
+msgid "Get Mastodon cookie"
+msgstr "Get Line cookie"
+
+#: src/sticker_convert/gui_components/windows/mastodon_get_auth_window.py:28
+#, fuzzy
+#| msgid "Line cookies are required to create custom message stickers"
+msgid "Mastodon cookies are required to upload custom emoji"
+msgstr "Line cookies are required to create custom message stickers"
+
+#: src/sticker_convert/gui_components/windows/mastodon_get_auth_window.py:34
+msgid "Close all browsers, press 'Get cookies' and login to Mastodon"
+msgstr "Close all browsers, press 'Get cookies' and login to Mastodon"
+
+#: src/sticker_convert/gui_components/windows/mastodon_get_auth_window.py:48
+#: src/sticker_convert/gui_components/windows/line_get_auth_window.py:52
+msgid "Get cookies"
+msgstr "Get cookies"
+
+#: src/sticker_convert/gui_components/windows/misskey_get_auth_window.py:17
+#, fuzzy
+#| msgid "Get Discord token"
+msgid "Get Misskey token"
+msgstr "Get Discord token"
+
+#: src/sticker_convert/gui_components/windows/misskey_get_auth_window.py:28
+#, fuzzy
+#| msgid "Line cookies are required to create custom message stickers"
+msgid "Misskey token are required to upload custom emoji"
+msgstr "Line cookies are required to create custom message stickers"
+
+#: src/sticker_convert/gui_components/windows/misskey_get_auth_window.py:34
+msgid "Close all browsers, press 'Get token' and login to Misskey"
+msgstr "Close all browsers, press 'Get token' and login to Misskey"
+
 #: src/sticker_convert/gui_components/windows/line_get_auth_window.py:18
 msgid "Get Line cookie"
 msgstr "Get Line cookie"
@@ -548,24 +604,32 @@ msgid "Line cookies are required to create custom message stickers"
 msgstr "Line cookies are required to create custom message stickers"
 
 #: src/sticker_convert/gui_components/windows/line_get_auth_window.py:35
-msgid "Please open web browser and login to Line"
+#, fuzzy
+#| msgid "Please open web browser and login to Line"
+msgid "Close all browsers, press 'Get cookies' and login to Line"
 msgstr "Please open web browser and login to Line"
 
-#: src/sticker_convert/gui_components/windows/line_get_auth_window.py:41
-msgid "After that, press \"Get cookies\""
-msgstr "After that, press \"Get cookies\""
-
-#: src/sticker_convert/gui_components/windows/line_get_auth_window.py:58
+#: src/sticker_convert/gui_components/windows/line_get_auth_window.py:49
 msgid "Open browser"
 msgstr "Open browser"
 
-#: src/sticker_convert/gui_components/windows/line_get_auth_window.py:61
-msgid "Get cookies"
-msgstr "Get cookies"
+#: src/sticker_convert/gui_components/windows/line_get_auth_window.py:63
+msgid "Chrome/Chromium-based browser not installed"
+msgstr "Chrome/Chromium-based browser not installed"
 
-#: src/sticker_convert/gui_components/windows/line_get_auth_window.py:74
-msgid "Cannot open web browser for you. Install web browser and open:"
-msgstr "Cannot open web browser for you. Install web browser and open:"
+#: src/sticker_convert/gui_components/windows/whatsapp_get_auth_window.py:28
+msgid "This wizard will guide you through logging in WhatsApp Web"
+msgstr "This wizard will guide you through logging in WhatsApp Web"
+
+#: src/sticker_convert/gui_components/windows/whatsapp_get_auth_window.py:47
+#, fuzzy
+#| msgid "Phone number"
+msgid "Phone number (Optional)"
+msgstr "Phone number"
+
+#: src/sticker_convert/gui_components/windows/whatsapp_get_auth_window.py:72
+msgid "Login"
+msgstr "Login"
 
 #: src/sticker_convert/gui_components/windows/signal_get_auth_window.py:28
 msgid "Please install Signal Desktop"
@@ -582,109 +646,6 @@ msgstr "uuid and password will be automatically fetched"
 #: src/sticker_convert/gui_components/windows/signal_get_auth_window.py:58
 msgid "Get uuid and password"
 msgstr "Get uuid and password"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:21
-msgid "Get Kakao auth_token"
-msgstr "Get Kakao auth_token"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:24
-msgid "Method 1: KakaoTalk Desktop memdump"
-msgstr "Method 1: KakaoTalk Desktop memdump"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:27
-msgid "Method 2: Simulate Desktop login"
-msgstr "Method 2: Simulate Desktop login"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:30
-msgid "Method 3: Simulate Android login"
-msgstr "Method 3: Simulate Android login"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:41
-msgid "This will get Kakao auth_token from Kakao Desktop"
-msgstr "This will get Kakao auth_token from Kakao Desktop"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:47
-msgid "Download Kakao Desktop, login and press 'Get auth_token'"
-msgstr "Download Kakao Desktop, login and press 'Get auth_token'"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:53
-msgid "This can take about a minute."
-msgstr "This can take about a minute."
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:61
-msgid "Note: This will download ProcDump and read memory of KakaoTalk Desktop"
-msgstr "Note: This will download ProcDump and read memory of KakaoTalk Desktop"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:69
-msgid "Note: This will read memory of KakaoTalk Desktop"
-msgstr "Note: This will read memory of KakaoTalk Desktop"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:75
-msgid "Kakao app path (Optional):"
-msgstr "Kakao app path (Optional):"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:86
-msgid "Launch Desktop app"
-msgstr "Launch Desktop app"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:93
-msgid "Get auth_token"
-msgstr "Get auth_token"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:118
-msgid "This will simulate login to Desktop Kakao app"
-msgstr "This will simulate login to Desktop Kakao app"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:124
-msgid "You may receive verification code from Kakao app on phone"
-msgstr "You may receive verification code from Kakao app on phone"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:130
-msgid "It is not necessary to download Desktop Kakao app"
-msgstr "It is not necessary to download Desktop Kakao app"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:153
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:294
-msgid "Username"
-msgstr "Username"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:183
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:324
-msgid "Password"
-msgstr "Password"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:212
-msgid "Device UUID (Optional)"
-msgstr "Device UUID (Optional)"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:225
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:395
-msgid "Login and get auth_token"
-msgstr "Login and get auth_token"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:259
-msgid "This will simulate login to Android Kakao app"
-msgstr "This will simulate login to Android Kakao app"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:265
-msgid "You will send / receive verification code via SMS"
-msgstr "You will send / receive verification code via SMS"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:271
-msgid "You will be logged out of existing device"
-msgstr "You will be logged out of existing device"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:353
-msgid "Country code"
-msgstr "Country code"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:382
-msgid "Phone number"
-msgstr "Phone number"
-
-#: src/sticker_convert/gui_components/windows/kakao_get_auth_window.py:483
-msgid "Error: Cannot launch Kakao Desktop. Is it installed?"
-msgstr "Error: Cannot launch Kakao Desktop. Is it installed?"
 
 #: src/sticker_convert/gui_components/windows/viber_get_auth_window.py:21
 msgid "Get Viber auth data"
@@ -726,6 +687,115 @@ msgstr "Get auth data"
 msgid "Choose"
 msgstr "Choose"
 
+#: src/sticker_convert/uploaders/upload_mastodon.py:21
+msgid "Error: Cannot get authenticity_token, upload to Mastodon failed"
+msgstr "Error: Cannot get authenticity_token, upload to Mastodon failed"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:43
+#, fuzzy
+#| msgid "password required for uploading to Signal"
+msgid "Note: mastodon_cookies required for uploading to Mastodon"
+msgstr "password required for uploading to Signal"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:46
+#, fuzzy
+#| msgid "password required for uploading to Signal"
+msgid "Note: mastodon_url required for uploading to Mastodon"
+msgstr "password required for uploading to Signal"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:59
+msgid "Note: Invalid mastodon_cookies, upload to Mastodon failed"
+msgstr "Note: Invalid mastodon_cookies, upload to Mastodon failed"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:93
+#, python-brace-format
+msgid "Failed to upload {} to Mastodon as not png or gif"
+msgstr "Failed to upload {} to Mastodon as not png or gif"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:115
+#, python-brace-format
+msgid "{} name invalid"
+msgstr "{} name invalid"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:118
+#, python-brace-format
+msgid "{} already uploaded"
+msgstr "{} already uploaded"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:122
+#, fuzzy, python-brace-format
+#| msgid "Failed to upload pack {}. Reason: {}"
+msgid "Failed to upload {} to Mastodon: {}"
+msgstr "Failed to upload pack {}. Reason: {}"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:146
+#, python-brace-format
+msgid "Failed to assign category {} to {}: Cannot search for emoji"
+msgstr "Failed to assign category {} to {}: Cannot search for emoji"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:155
+#, python-brace-format
+msgid "Failed to assign category {} to {}: Cannot find row"
+msgstr "Failed to assign category {} to {}: Cannot find row"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:167
+#, python-brace-format
+msgid "Failed to assign category {} to {}: Cannot find input"
+msgstr "Failed to assign category {} to {}: Cannot find input"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:176
+#, python-brace-format
+msgid "Failed to assign category {} to {}: Cannot find custom_emoji_id"
+msgstr "Failed to assign category {} to {}: Cannot find custom_emoji_id"
+
+#: src/sticker_convert/uploaders/upload_mastodon.py:199
+#, python-brace-format
+msgid "Assigned category {} to {}"
+msgstr "Assigned category {} to {}"
+
+#: src/sticker_convert/uploaders/upload_misskey.py:81
+#, fuzzy
+#| msgid "Viber auth required for uploading to viber"
+msgid "Note: misskey_token required for uploading to Misskey"
+msgstr "Viber auth required for uploading to viber"
+
+#: src/sticker_convert/uploaders/upload_misskey.py:84
+#, fuzzy
+#| msgid "Viber auth required for uploading to viber"
+msgid "Note: misskey_url required for uploading to Misskey"
+msgstr "Viber auth required for uploading to viber"
+
+#: src/sticker_convert/uploaders/upload_misskey.py:115
+#: src/sticker_convert/uploaders/upload_misskey.py:131
+#, fuzzy, python-brace-format
+#| msgid "Failed to upload {}: {} {}"
+msgid "Failed to bulk upload to misskey: {}"
+msgstr "Failed to upload {}: {} {}"
+
+#: src/sticker_convert/uploaders/upload_misskey.py:150
+#, fuzzy, python-brace-format
+#| msgid "Failed to upload pack {}. Reason: {}"
+msgid "Failed to upload {} to Misskey as not png or gif"
+msgstr "Failed to upload pack {}. Reason: {}"
+
+#: src/sticker_convert/uploaders/upload_misskey.py:178
+#, fuzzy, python-brace-format
+#| msgid "Failed to upload {}: {} {}"
+msgid "Failed to upload {} to misskey: {}"
+msgstr "Failed to upload {}: {} {}"
+
+#: src/sticker_convert/uploaders/upload_misskey.py:206
+#: src/sticker_convert/uploaders/upload_viber.py:148
+#, python-brace-format
+msgid "Uploaded {}"
+msgstr "Uploaded {}"
+
+#: src/sticker_convert/uploaders/upload_misskey.py:210
+#, fuzzy, python-brace-format
+#| msgid "Failed to upload {}: {} {}"
+msgid "Failed to upload {} to misskey: {} {}"
+msgstr "Failed to upload {}: {} {}"
+
 #: src/sticker_convert/uploaders/xcode_imessage.py:47
 msgid "author is required for creating Xcode iMessage sticker pack"
 msgstr "author is required for creating Xcode iMessage sticker pack"
@@ -756,36 +826,6 @@ msgstr ""
 "emoji.txt generated for you in {}\n"
 "Default emoji is set to {}.\n"
 "Please edit emoji.txt now, then continue"
-
-#: src/sticker_convert/uploaders/compress_wastickers.py:57
-msgid "Title is required for compressing .wastickers"
-msgstr "Title is required for compressing .wastickers"
-
-#: src/sticker_convert/uploaders/compress_wastickers.py:60
-msgid "Author is required for compressing .wastickers"
-msgstr "Author is required for compressing .wastickers"
-
-#: src/sticker_convert/uploaders/compress_wastickers.py:93
-#, python-brace-format
-msgid "Creating cover using {}"
-msgstr "Creating cover using {}"
-
-#: src/sticker_convert/uploaders/compress_wastickers.py:104
-#: src/sticker_convert/uploaders/compress_wastickers.py:122
-#, python-brace-format
-msgid "Warning: Cannot compress cover {}, unable to create .wastickers"
-msgstr "Warning: Cannot compress cover {}, unable to create .wastickers"
-
-#: src/sticker_convert/uploaders/compress_wastickers.py:137
-#, python-brace-format
-msgid "Verifying {} for compressing into .wastickers"
-msgstr "Verifying {} for compressing into .wastickers"
-
-#: src/sticker_convert/uploaders/compress_wastickers.py:161
-#: src/sticker_convert/uploaders/upload_viber.py:117
-#, python-brace-format
-msgid "Warning: Cannot compress file {}, skip this file..."
-msgstr "Warning: Cannot compress file {}, skip this file..."
 
 #: src/sticker_convert/uploaders/upload_signal.py:53
 #, python-brace-format
@@ -860,16 +900,66 @@ msgstr "Invalid Viber auth: Missing m_ts"
 msgid "Verifying {} for uploading to Viber"
 msgstr "Verifying {} for uploading to Viber"
 
-#: src/sticker_convert/uploaders/upload_viber.py:148
+#: src/sticker_convert/uploaders/upload_viber.py:117
+#: src/sticker_convert/uploaders/upload_whatsapp.py:165
 #, python-brace-format
-msgid "Uploaded {}"
-msgstr "Uploaded {}"
+msgid "Warning: Cannot compress file {}, skip this file..."
+msgstr "Warning: Cannot compress file {}, skip this file..."
 
 #: src/sticker_convert/uploaders/upload_viber.py:152
 #: src/sticker_convert/uploaders/upload_viber.py:162
 #, python-brace-format
 msgid "Failed to upload {}: {} {}"
 msgstr "Failed to upload {}: {} {}"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:59
+msgid "Title is required for compressing .wastickers"
+msgstr "Title is required for compressing .wastickers"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:62
+msgid "Author is required for compressing .wastickers"
+msgstr "Author is required for compressing .wastickers"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:97
+#, python-brace-format
+msgid "Creating cover using {}"
+msgstr "Creating cover using {}"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:108
+#: src/sticker_convert/uploaders/upload_whatsapp.py:126
+#, python-brace-format
+msgid "Warning: Cannot compress cover {}, unable to create .wastickers"
+msgstr "Warning: Cannot compress cover {}, unable to create .wastickers"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:141
+#, python-brace-format
+msgid "Verifying {} for compressing into .wastickers"
+msgstr "Verifying {} for compressing into .wastickers"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:176
+#, fuzzy, python-brace-format
+#| msgid "Uploading pack {}"
+msgid "Uploading {}..."
+msgstr "Uploading pack {}"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:193
+#, python-brace-format
+msgid "Uploaded {} to WhatsApp group 'sticker-whatsapp-bridge'"
+msgstr "Uploaded {} to WhatsApp group 'sticker-whatsapp-bridge'"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:198
+#: src/sticker_convert/auth/auth_whatsapp.py:177
+msgid "Login WhatsApp success"
+msgstr "Login WhatsApp success"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:201
+#, python-brace-format
+msgid "Failed to upload {}: {}"
+msgstr "Failed to upload {}: {}"
+
+#: src/sticker_convert/uploaders/upload_whatsapp.py:205
+msgid "Note: WhatsApp not setup yet for uploading"
+msgstr "Note: WhatsApp not setup yet for uploading"
 
 #: src/sticker_convert/uploaders/upload_telegram.py:24
 #, python-brace-format
@@ -918,6 +1008,13 @@ msgstr ""
 msgid "Finish uploading {}"
 msgstr "Finish uploading {}"
 
+#: src/sticker_convert/downloaders/download_misskey.py:43
+#: src/sticker_convert/downloaders/download_mastodon.py:39
+#: src/sticker_convert/downloaders/download_line.py:444
+#: src/sticker_convert/downloaders/download_band.py:82
+msgid "Download failed: Failed to get metadata"
+msgstr "Download failed: Failed to get metadata"
+
 #: src/sticker_convert/downloaders/download_discord.py:27
 msgid "Error: Downloading from Discord requires token"
 msgstr "Error: Downloading from Discord requires token"
@@ -926,33 +1023,35 @@ msgstr "Error: Downloading from Discord requires token"
 msgid "Error: Invalid url"
 msgstr "Error: Invalid url"
 
-#: src/sticker_convert/downloaders/download_base.py:94
-#: src/sticker_convert/downloaders/download_base.py:138
+#: src/sticker_convert/downloaders/download_base.py:97
+#: src/sticker_convert/downloaders/download_base.py:141
 #, python-brace-format
 msgid "Downloading {}"
 msgstr "Downloading {}"
 
-#: src/sticker_convert/downloaders/download_base.py:105
-#: src/sticker_convert/downloaders/download_base.py:169
-#: src/sticker_convert/downloaders/download_line.py:447
+#: src/sticker_convert/downloaders/download_base.py:108
+#: src/sticker_convert/downloaders/download_base.py:172
+#: src/sticker_convert/downloaders/download_line.py:453
 #: src/sticker_convert/downloaders/download_band.py:91
+#: src/sticker_convert/downloaders/download_whatsapp.py:63
+#: src/sticker_convert/downloaders/download_whatsapp.py:80
 #: src/sticker_convert/auth/telegram_api.py:339
 #: src/sticker_convert/auth/telegram_api.py:675
 #, python-brace-format
 msgid "Downloaded {}"
 msgstr "Downloaded {}"
 
-#: src/sticker_convert/downloaders/download_base.py:108
+#: src/sticker_convert/downloaders/download_base.py:111
 #, python-brace-format
 msgid "Error {}: {} (tried {}/{} times)"
 msgstr "Error {}: {} (tried {}/{} times)"
 
-#: src/sticker_convert/downloaders/download_base.py:159
+#: src/sticker_convert/downloaders/download_base.py:162
 #, python-brace-format
 msgid "Cannot download {} (tried {}/{} times): {}"
 msgstr "Cannot download {} (tried {}/{} times): {}"
 
-#: src/sticker_convert/downloaders/download_line.py:167
+#: src/sticker_convert/downloaders/download_line.py:173
 msgid ""
 "The Line sticker pack you are downloading can have customized text.\n"
 "line-sticker-text.txt has been created in input directory.\n"
@@ -962,8 +1061,8 @@ msgstr ""
 "line-sticker-text.txt has been created in input directory.\n"
 "Please edit line-sticker-text.txt, then continue."
 
-#: src/sticker_convert/downloaders/download_line.py:198
-#: src/sticker_convert/downloaders/download_line.py:205
+#: src/sticker_convert/downloaders/download_line.py:204
+#: src/sticker_convert/downloaders/download_line.py:211
 msgid ""
 "Warning: Line cookies invalid, you will not be able to add text to \"Custom "
 "stickers\""
@@ -971,56 +1070,41 @@ msgstr ""
 "Warning: Line cookies invalid, you will not be able to add text to \"Custom "
 "stickers\""
 
-#: src/sticker_convert/downloaders/download_line.py:247
+#: src/sticker_convert/downloaders/download_line.py:253
 #: src/sticker_convert/downloaders/download_viber.py:82
 #, python-brace-format
 msgid "Read {}"
 msgstr "Read {}"
 
-#: src/sticker_convert/downloaders/download_line.py:255
-#: src/sticker_convert/downloaders/download_line.py:276
+#: src/sticker_convert/downloaders/download_line.py:261
+#: src/sticker_convert/downloaders/download_line.py:282
 #: src/sticker_convert/downloaders/download_viber.py:62
 #: src/sticker_convert/downloaders/download_band.py:26
 msgid "Unzipping..."
 msgstr "Unzipping..."
 
-#: src/sticker_convert/downloaders/download_line.py:380
+#: src/sticker_convert/downloaders/download_line.py:386
 #, python-brace-format
 msgid "Failed to generate customized text {} due to: {}"
 msgstr "Failed to generate customized text {} due to: {}"
 
-#: src/sticker_convert/downloaders/download_line.py:412
+#: src/sticker_convert/downloaders/download_line.py:418
 #, python-brace-format
 msgid "Combined {}"
 msgstr "Combined {}"
 
-#: src/sticker_convert/downloaders/download_line.py:420
+#: src/sticker_convert/downloaders/download_line.py:426
 #: src/sticker_convert/downloaders/download_band.py:71
 msgid "Download failed: Unsupported URL format"
 msgstr "Download failed: Unsupported URL format"
 
-#: src/sticker_convert/downloaders/download_line.py:438
-#: src/sticker_convert/downloaders/download_band.py:82
-msgid "Download failed: Failed to get metadata"
-msgstr "Download failed: Failed to get metadata"
-
-#: src/sticker_convert/downloaders/download_line.py:449
+#: src/sticker_convert/downloaders/download_line.py:455
 #: src/sticker_convert/downloaders/download_band.py:93
 #, python-brace-format
 msgid "Cannot download {}"
 msgstr "Cannot download {}"
 
-#: src/sticker_convert/downloaders/download_kakao.py:155
-msgid ""
-"Warning: Cannot get item code.\n"
-"Is auth_token invalid / expired? Try to regenerate it.\n"
-"Continue to download static stickers instead?"
-msgstr ""
-"Warning: Cannot get item code.\n"
-"Is auth_token invalid / expired? Try to regenerate it.\n"
-"Continue to download static stickers instead?"
-
-#: src/sticker_convert/downloaders/download_kakao.py:161
+#: src/sticker_convert/downloaders/download_kakao.py:37
 msgid ""
 "Warning: Cannot get item code.\n"
 "Please use share link instead.\n"
@@ -1030,65 +1114,13 @@ msgstr ""
 "Please use share link instead.\n"
 "Continue to download static stickers instead?"
 
-#: src/sticker_convert/downloaders/download_kakao.py:190
-#: src/sticker_convert/downloaders/download_kakao.py:238
-msgid "Download failed: Cannot download metadata for sticker pack"
-msgstr "Download failed: Cannot download metadata for sticker pack"
-
-#: src/sticker_convert/downloaders/download_kakao.py:200
-msgid "Warning: Downloading animated sticker requires auth_token"
-msgstr "Warning: Downloading animated sticker requires auth_token"
-
-#: src/sticker_convert/downloaders/download_kakao.py:205
-msgid "Warning: auth_token invalid, cannot download animated sticker"
-msgstr "Warning: auth_token invalid, cannot download animated sticker"
-
-#: src/sticker_convert/downloaders/download_kakao.py:208
-msgid "Downloading static stickers..."
-msgstr "Downloading static stickers..."
-
-#: src/sticker_convert/downloaders/download_kakao.py:222
-msgid "Warning: Cannot get pack_title with auth_token."
-msgstr "Warning: Cannot get pack_title with auth_token."
-
-#: src/sticker_convert/downloaders/download_kakao.py:224
-msgid "Is auth_token invalid / expired? Try to regenerate it."
-msgstr "Is auth_token invalid / expired? Try to regenerate it."
-
-#: src/sticker_convert/downloaders/download_kakao.py:226
-msgid "Continuing without getting pack_title"
-msgstr "Continuing without getting pack_title"
-
-#: src/sticker_convert/downloaders/download_kakao.py:255
-msgid ""
-"Cannot get item code, trying to search by author name, this may take long "
-"time..."
-msgstr ""
-"Cannot get item code, trying to search by author name, this may take long "
-"time..."
-
-#: src/sticker_convert/downloaders/download_kakao.py:259
-msgid "Hint: Use share link instead to download more reliably"
-msgstr "Hint: Use share link instead to download more reliably"
-
-#: src/sticker_convert/downloaders/download_kakao.py:283
+#: src/sticker_convert/downloaders/download_kakao.py:54
 msgid "Download failed: Unrecognized URL"
 msgstr "Download failed: Unrecognized URL"
 
-#: src/sticker_convert/downloaders/download_kakao.py:352
-#, python-brace-format
-msgid "Failed to determine extension of {}"
-msgstr "Failed to determine extension of {}"
-
-#: src/sticker_convert/downloaders/download_kakao.py:401
-#, python-brace-format
-msgid "Decrypted {}"
-msgstr "Decrypted {}"
-
-#: src/sticker_convert/downloaders/download_kakao.py:405
-#, python-brace-format
-msgid "Finished getting {}"
-msgstr "Finished getting {}"
+#: src/sticker_convert/downloaders/download_kakao.py:61
+msgid "Download failed: Cannot download metadata for sticker pack"
+msgstr "Download failed: Cannot download metadata for sticker pack"
 
 #: src/sticker_convert/downloaders/download_signal.py:52
 #, python-brace-format
@@ -1124,11 +1156,34 @@ msgstr "Invalid url: {}"
 msgid "Download failed: Cannot get pack info"
 msgstr "Download failed: Cannot get pack info"
 
+#: src/sticker_convert/downloaders/download_whatsapp.py:34
+#, fuzzy
+#| msgid "Quitting, please wait..."
+msgid "Logging in WhatsApp, please wait..."
+msgstr "Quitting, please wait..."
+
+#: src/sticker_convert/downloaders/download_whatsapp.py:35
+#, fuzzy
+#| msgid ""
+#| "Please send stickers to WhatsApp group 'sticker-whatsapp-bridge'; When "
+#| "done, close this window"
+msgid ""
+"Please send stickers to WhatsApp group 'sticker-whatsapp-bridge'; When done, "
+"press OK"
+msgstr ""
+"Please send stickers to WhatsApp group 'sticker-whatsapp-bridge'; When done, "
+"close this window"
+
+#: src/sticker_convert/downloaders/download_whatsapp.py:89
+#, python-brace-format
+msgid "Failed to download: {}"
+msgstr "Failed to download: {}"
+
 #: src/sticker_convert/downloaders/download_telegram.py:35
 msgid "Download failed: No credentials"
 msgstr "Download failed: No credentials"
 
-#: src/sticker_convert/job.py:120
+#: src/sticker_convert/job.py:119
 #, python-brace-format
 msgid ""
 "##### EXCEPTION #####\n"
@@ -1143,16 +1198,16 @@ msgstr ""
 "{tb}\n"
 "#####################"
 
-#: src/sticker_convert/job.py:175
+#: src/sticker_convert/job.py:174
 #, python-brace-format
 msgid "Warning: A process exited with error (code {})"
 msgstr "Warning: A process exited with error (code {})"
 
-#: src/sticker_convert/job.py:248
+#: src/sticker_convert/job.py:247
 msgid "An error occured during this run."
 msgstr "An error occured during this run."
 
-#: src/sticker_convert/job.py:251
+#: src/sticker_convert/job.py:250
 msgid ""
 "##########\n"
 "Summary:\n"
@@ -1162,15 +1217,15 @@ msgstr ""
 "Summary:\n"
 "##########\n"
 
-#: src/sticker_convert/job.py:258
+#: src/sticker_convert/job.py:257
 msgid "Export results:\n"
 msgstr "Export results:\n"
 
-#: src/sticker_convert/job.py:261
+#: src/sticker_convert/job.py:260
 msgid "Export result: None"
 msgstr "Export result: None"
 
-#: src/sticker_convert/job.py:279
+#: src/sticker_convert/job.py:278
 msgid ""
 "\n"
 "    If you want to upload the results by yourself,\n"
@@ -1180,7 +1235,7 @@ msgstr ""
 "    If you want to upload the results by yourself,\n"
 "    select \"Save to local directory only\" for output\n"
 
-#: src/sticker_convert/job.py:286
+#: src/sticker_convert/job.py:285
 msgid ""
 "\n"
 "Not officially supported by telegram, sticker may become broken / removed in "
@@ -1190,7 +1245,7 @@ msgstr ""
 "Not officially supported by telegram, sticker may become broken / removed in "
 "the future.\n"
 
-#: src/sticker_convert/job.py:289
+#: src/sticker_convert/job.py:288
 msgid ""
 "\n"
 "Hint: duration spoof is enabled."
@@ -1198,7 +1253,7 @@ msgstr ""
 "\n"
 "Hint: duration spoof is enabled."
 
-#: src/sticker_convert/job.py:291
+#: src/sticker_convert/job.py:290
 msgid ""
 "\n"
 "Hint: duration spoof is disabled."
@@ -1206,7 +1261,7 @@ msgstr ""
 "\n"
 "Hint: duration spoof is disabled."
 
-#: src/sticker_convert/job.py:293
+#: src/sticker_convert/job.py:292
 msgid ""
 "\n"
 "If duration exceeds limit, playback speed will be adjusted such that "
@@ -1216,7 +1271,7 @@ msgstr ""
 "If duration exceeds limit, playback speed will be adjusted such that "
 "duration is within limit."
 
-#: src/sticker_convert/job.py:296
+#: src/sticker_convert/job.py:295
 msgid ""
 "\n"
 "You may enable duration spoof to pretend duration is within limit without "
@@ -1226,7 +1281,7 @@ msgstr ""
 "You may enable duration spoof to pretend duration is within limit without "
 "changing playback speed."
 
-#: src/sticker_convert/job.py:304
+#: src/sticker_convert/job.py:303
 msgid ""
 "\n"
 "Hint: duration spoof is enabled, but video format does not support this."
@@ -1234,7 +1289,7 @@ msgstr ""
 "\n"
 "Hint: duration spoof is enabled, but video format does not support this."
 
-#: src/sticker_convert/job.py:306
+#: src/sticker_convert/job.py:305
 msgid ""
 "\n"
 "Only mkv/webm video format support this option.\n"
@@ -1242,7 +1297,7 @@ msgstr ""
 "\n"
 "Only mkv/webm video format support this option.\n"
 
-#: src/sticker_convert/job.py:309
+#: src/sticker_convert/job.py:308
 msgid ""
 "\n"
 "[X] Input and output directories cannot be the same\n"
@@ -1250,7 +1305,7 @@ msgstr ""
 "\n"
 "[X] Input and output directories cannot be the same\n"
 
-#: src/sticker_convert/job.py:312
+#: src/sticker_convert/job.py:311
 msgid ""
 "\n"
 "[X] Unrecognized URL input source\n"
@@ -1258,7 +1313,7 @@ msgstr ""
 "\n"
 "[X] Unrecognized URL input source\n"
 
-#: src/sticker_convert/job.py:316
+#: src/sticker_convert/job.py:315
 msgid ""
 "\n"
 "[X] URL address cannot be empty.\n"
@@ -1272,15 +1327,15 @@ msgstr ""
 "    choose \"Save to local directory only\"\n"
 "    in \"Input source\"\n"
 
-#: src/sticker_convert/job.py:327
+#: src/sticker_convert/job.py:326
 msgid "[X] Downloading from and uploading to telegram requires bot token.\n"
 msgstr "[X] Downloading from and uploading to telegram requires bot token.\n"
 
-#: src/sticker_convert/job.py:335
+#: src/sticker_convert/job.py:334
 msgid "[X] Downloading from Discord requires token.\n"
 msgstr "[X] Downloading from Discord requires token.\n"
 
-#: src/sticker_convert/job.py:339
+#: src/sticker_convert/job.py:338
 msgid ""
 "[X] Uploading to telegram requires user_id \n"
 "    (From real account, not bot account).\n"
@@ -1288,25 +1343,25 @@ msgstr ""
 "[X] Uploading to telegram requires user_id \n"
 "    (From real account, not bot account).\n"
 
-#: src/sticker_convert/job.py:347
+#: src/sticker_convert/job.py:346
 msgid "[X] Uploading to signal requires uuid and password.\n"
 msgstr "[X] Uploading to signal requires uuid and password.\n"
 
-#: src/sticker_convert/job.py:351
+#: src/sticker_convert/job.py:350
 msgid "[X] Uploading to Viber requires auth data.\n"
 msgstr "[X] Uploading to Viber requires auth data.\n"
 
-#: src/sticker_convert/job.py:366
+#: src/sticker_convert/job.py:365
 #, python-brace-format
 msgid "[X] {output_option} requires {metadata}\n"
 msgstr "[X] {output_option} requires {metadata}\n"
 
-#: src/sticker_convert/job.py:372
+#: src/sticker_convert/job.py:371
 #, python-brace-format
 msgid "    {metadata} was not supplied and {metadata}.txt is absent\n"
 msgstr "    {metadata} was not supplied and {metadata}.txt is absent\n"
 
-#: src/sticker_convert/job.py:376
+#: src/sticker_convert/job.py:375
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied and input source will not provide "
@@ -1315,7 +1370,7 @@ msgstr ""
 "    {metadata} was not supplied and input source will not provide "
 "{metadata}\n"
 
-#: src/sticker_convert/job.py:379
+#: src/sticker_convert/job.py:378
 #, python-brace-format
 msgid ""
 "    Supply the {metadata} by filling in the option, or\n"
@@ -1324,12 +1379,12 @@ msgstr ""
 "    Supply the {metadata} by filling in the option, or\n"
 "    Create {metadata}.txt with the {metadata} name\n"
 
-#: src/sticker_convert/job.py:383
+#: src/sticker_convert/job.py:382
 #, python-brace-format
 msgid "[!] {output_option} requires {metadata}\n"
 msgstr "[!] {output_option} requires {metadata}\n"
 
-#: src/sticker_convert/job.py:389
+#: src/sticker_convert/job.py:388
 #, python-brace-format
 msgid ""
 "    {metadata} was not supplied but {metadata}.txt is present\n"
@@ -1338,7 +1393,7 @@ msgstr ""
 "    {metadata} was not supplied but {metadata}.txt is present\n"
 "    Using {metadata} name in {metadata}.txt\n"
 
-#: src/sticker_convert/job.py:419
+#: src/sticker_convert/job.py:418
 msgid ""
 "Compression preset does not match export option\n"
 "You may continue, but the files will need to be compressed again before "
@@ -1352,7 +1407,7 @@ msgstr ""
 "You are recommended to choose the matching option for compression and "
 "output. Continue?"
 
-#: src/sticker_convert/job.py:438
+#: src/sticker_convert/job.py:437
 #, python-brace-format
 msgid ""
 "\n"
@@ -1361,7 +1416,7 @@ msgstr ""
 "\n"
 "[X] {param} should be between -1 and positive infinity. {value} was given."
 
-#: src/sticker_convert/job.py:451
+#: src/sticker_convert/job.py:450
 #, python-brace-format
 msgid ""
 "\n"
@@ -1372,7 +1427,7 @@ msgstr ""
 "[X] scale_filter {scale_filter} is not valid option\n"
 "    Valid options: nearest, box, bilinear, hamming, bicubic, lanczos"
 
-#: src/sticker_convert/job.py:464
+#: src/sticker_convert/job.py:463
 #, python-brace-format
 msgid ""
 "\n"
@@ -1383,7 +1438,7 @@ msgstr ""
 "[X] quantize_method {quantize_method} is not valid option\n"
 "    Valid options: imagequant, fastoctree, maxcoverage, mediancut, none"
 
-#: src/sticker_convert/job.py:474
+#: src/sticker_convert/job.py:473
 #, python-brace-format
 msgid ""
 "\n"
@@ -1392,23 +1447,7 @@ msgstr ""
 "\n"
 "[X] bg_color {bg_color} is not valid color hex"
 
-#: src/sticker_convert/job.py:484
-msgid ""
-"To download ANIMATED stickers from e.kakao.com,\n"
-"you need to generate auth_token.\n"
-"Alternatively, you can generate share link (emoticon.kakao.com/items/xxxxx)\n"
-"from Kakao app on phone.\n"
-"You are adviced to read documentations.\n"
-"If you continue, you will only download static stickers. Continue?"
-msgstr ""
-"To download ANIMATED stickers from e.kakao.com,\n"
-"you need to generate auth_token.\n"
-"Alternatively, you can generate share link (emoticon.kakao.com/items/xxxxx)\n"
-"from Kakao app on phone.\n"
-"You are adviced to read documentations.\n"
-"If you continue, you will only download static stickers. Continue?"
-
-#: src/sticker_convert/job.py:521
+#: src/sticker_convert/job.py:499
 #, python-brace-format
 msgid ""
 "WARNING: {path_type} directory is set to {path}.\n"
@@ -1425,15 +1464,15 @@ msgstr ""
 "maybe MOVED to \"archive_*\".\n"
 "THIS MAY CAUSE DAMAGE TO YOUR DATA. Continue?"
 
-#: src/sticker_convert/job.py:565
+#: src/sticker_convert/job.py:543
 msgid "Skip moving old files in input directory as input source is local"
 msgstr "Skip moving old files in input directory as input source is local"
 
-#: src/sticker_convert/job.py:569
+#: src/sticker_convert/job.py:547
 msgid "Skip moving old files in input directory as input source is empty"
 msgstr "Skip moving old files in input directory as input source is empty"
 
-#: src/sticker_convert/job.py:575
+#: src/sticker_convert/job.py:553
 #, python-brace-format
 msgid ""
 "Moving old files in input directory to {archive_dir} as input source is not "
@@ -1442,68 +1481,68 @@ msgstr ""
 "Moving old files in input directory to {archive_dir} as input source is not "
 "local"
 
-#: src/sticker_convert/job.py:585
+#: src/sticker_convert/job.py:563
 msgid "Skip moving old files in output directory as no_compress is True"
 msgstr "Skip moving old files in output directory as no_compress is True"
 
-#: src/sticker_convert/job.py:589
+#: src/sticker_convert/job.py:567
 msgid "Skip moving old files in output directory as output source is empty"
 msgstr "Skip moving old files in output directory as output source is empty"
 
-#: src/sticker_convert/job.py:594
+#: src/sticker_convert/job.py:572
 #, python-brace-format
 msgid "Moving old files in output directory to {archive_dir}"
 msgstr "Moving old files in output directory to {archive_dir}"
 
-#: src/sticker_convert/job.py:649
+#: src/sticker_convert/job.py:642
 msgid "Downloading..."
 msgstr "Downloading..."
 
-#: src/sticker_convert/job.py:651
+#: src/sticker_convert/job.py:644
 msgid "Skipped download (No files to download)"
 msgstr "Skipped download (No files to download)"
 
-#: src/sticker_convert/job.py:652
+#: src/sticker_convert/job.py:645
 msgid "Download: Skipped (No files to download)"
 msgstr "Download: Skipped (No files to download)"
 
-#: src/sticker_convert/job.py:685
+#: src/sticker_convert/job.py:678
 msgid "Skipped compression (no_compress is set to True)"
 msgstr "Skipped compression (no_compress is set to True)"
 
-#: src/sticker_convert/job.py:698
+#: src/sticker_convert/job.py:691
 msgid "Input directory is empty, nothing to copy to output directory"
 msgstr "Input directory is empty, nothing to copy to output directory"
 
-#: src/sticker_convert/job.py:703
+#: src/sticker_convert/job.py:696
 msgid "Output directory is not empty, not copying files from input directory"
 msgstr "Output directory is not empty, not copying files from input directory"
 
-#: src/sticker_convert/job.py:708
+#: src/sticker_convert/job.py:701
 msgid "Output directory is empty, copying files from input directory"
 msgstr "Output directory is empty, copying files from input directory"
 
-#: src/sticker_convert/job.py:741
+#: src/sticker_convert/job.py:734
 msgid "Skipped compression (No files to compress)"
 msgstr "Skipped compression (No files to compress)"
 
-#: src/sticker_convert/job.py:784
+#: src/sticker_convert/job.py:777
 msgid "Skipped export (Saving to local directory only)"
 msgstr "Skipped export (Saving to local directory only)"
 
-#: src/sticker_convert/job.py:785
+#: src/sticker_convert/job.py:778
 msgid "Export: Skipped (Saving to local directory only)"
 msgstr "Export: Skipped (Saving to local directory only)"
 
-#: src/sticker_convert/job.py:787
+#: src/sticker_convert/job.py:780
 msgid "Exporting..."
 msgstr "Exporting..."
 
-#: src/sticker_convert/job.py:839
+#: src/sticker_convert/job.py:842
 msgid "An error occured while exporting stickers"
 msgstr "An error occured while exporting stickers"
 
-#: src/sticker_convert/job.py:841 src/sticker_convert/job.py:845
+#: src/sticker_convert/job.py:844 src/sticker_convert/job.py:848
 #, python-brace-format
 msgid "Export: {stickers_ok}/{stickers_total} stickers success"
 msgstr "Export: {stickers_ok}/{stickers_total} stickers success"
@@ -1625,52 +1664,6 @@ msgstr "Cannot upload any sticker to {} due to invalid sticker format {}"
 msgid "Failed to download cover{}: {}"
 msgstr "Failed to download cover{}: {}"
 
-#: src/sticker_convert/auth/auth_kakao_android_login.py:17
-#, python-brace-format
-msgid ""
-"Got auth_token successfully:\n"
-"auth_token={}\n"
-msgstr ""
-"Got auth_token successfully:\n"
-"auth_token={}\n"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:65
-msgid "Getting Kakao authorization token by Android login: Logging in"
-msgstr "Getting Kakao authorization token by Android login: Logging in"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:103
-msgid ""
-"Getting Kakao authorization token by Android login: Submitting phone number"
-msgstr ""
-"Getting Kakao authorization token by Android login: Submitting phone number"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:147
-#, python-brace-format
-msgid "Send this SMS message to number {} then press enter:"
-msgstr "Send this SMS message to number {} then press enter:"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:179
-msgid "Enter passcode received from SMS:"
-msgstr "Enter passcode received from SMS:"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:204
-msgid ""
-"Getting Kakao authorization token by Android login: Confirm device change"
-msgstr ""
-"Getting Kakao authorization token by Android login: Confirm device change"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:249
-msgid "Getting Kakao authorization token by Android login: Passcode callback"
-msgstr "Getting Kakao authorization token by Android login: Passcode callback"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:266
-msgid "Getting Kakao authorization token by Android login: Skip restoration"
-msgstr "Getting Kakao authorization token by Android login: Skip restoration"
-
-#: src/sticker_convert/auth/auth_kakao_android_login.py:287
-msgid "Getting Kakao authorization token by Android login: Get profile"
-msgstr "Getting Kakao authorization token by Android login: Get profile"
-
 #: src/sticker_convert/auth/auth_signal.py:20
 msgid ""
 "Signal Desktop not detected.\n"
@@ -1700,19 +1693,44 @@ msgstr ""
 "uuid={}\n"
 "password={}"
 
-#: src/sticker_convert/auth/auth_line.py:16
+#: src/sticker_convert/auth/auth_line.py:19
 msgid "Got Line cookies successfully"
 msgstr "Got Line cookies successfully"
 
-#: src/sticker_convert/auth/auth_line.py:18
-msgid "Failed to get Line cookies. Have you logged in the web browser?"
-msgstr "Failed to get Line cookies. Have you logged in the web browser?"
+#: src/sticker_convert/auth/auth_line.py:20
+#, fuzzy
+#| msgid "Failed to get token"
+msgid "Failed to get Line cookies"
+msgstr "Failed to get token"
 
-#: src/sticker_convert/auth/auth_line.py:24
+#: src/sticker_convert/auth/auth_line.py:25
 msgid "Getting Line cookies"
 msgstr "Getting Line cookies"
 
-#: src/sticker_convert/auth/auth_viber.py:19
+#: src/sticker_convert/auth/auth_line.py:28
+#: src/sticker_convert/auth/auth_mastodon.py:26
+#, fuzzy
+#| msgid "Getting Line cookies"
+msgid "Getting Mastodon cookies"
+msgstr "Getting Line cookies"
+
+#: src/sticker_convert/auth/auth_line.py:36
+#: src/sticker_convert/auth/auth_mastodon.py:42
+#: src/sticker_convert/auth/auth_misskey.py:43
+#, fuzzy
+#| msgid "Please install Discord Desktop or Chrome/Chromium and try again"
+msgid "Please install Chrome/Chromium and try again"
+msgstr "Please install Discord Desktop or Chrome/Chromium and try again"
+
+#: src/sticker_convert/auth/auth_line.py:48
+#: src/sticker_convert/auth/auth_mastodon.py:50
+#: src/sticker_convert/auth/auth_discord.py:103
+#: src/sticker_convert/auth/auth_misskey.py:51
+#, python-brace-format
+msgid "All {} will be closed. Continue?"
+msgstr "All {} will be closed. Continue?"
+
+#: src/sticker_convert/auth/auth_viber.py:18
 msgid ""
 "Viber Desktop not detected.\n"
 "Download and install Viber Desktop,\n"
@@ -1722,7 +1740,7 @@ msgstr ""
 "Download and install Viber Desktop,\n"
 "then login to Viber Desktop and try again."
 
-#: src/sticker_convert/auth/auth_viber.py:24
+#: src/sticker_convert/auth/auth_viber.py:23
 msgid ""
 "Viber Desktop installed,\n"
 "but viber_auth not found.\n"
@@ -1732,8 +1750,7 @@ msgstr ""
 "but viber_auth not found.\n"
 "Please login to Viber Desktop and try again."
 
-#: src/sticker_convert/auth/auth_viber.py:29
-#: src/sticker_convert/auth/auth_kakao_desktop_memdump.py:28
+#: src/sticker_convert/auth/auth_viber.py:28
 msgid ""
 "You need to disable SIP:\n"
 "1. Restart computer in Recovery mode\n"
@@ -1747,30 +1764,46 @@ msgstr ""
 "3. Run the command `csrutil disable`\n"
 "4. Restart your computer"
 
-#: src/sticker_convert/auth/auth_viber.py:35
+#: src/sticker_convert/auth/auth_viber.py:34
 msgid "Failed to launch Viber"
 msgstr "Failed to launch Viber"
 
-#: src/sticker_convert/auth/auth_viber.py:36
+#: src/sticker_convert/auth/auth_viber.py:35
 msgid "Failed to read Viber process memory"
 msgstr "Failed to read Viber process memory"
 
-#: src/sticker_convert/auth/auth_viber.py:106
-#: src/sticker_convert/auth/auth_viber.py:171
+#: src/sticker_convert/auth/auth_viber.py:105
+#: src/sticker_convert/auth/auth_viber.py:170
 msgid "Got viber_auth successfully:\n"
 msgstr "Got viber_auth successfully:\n"
 
-#: src/sticker_convert/auth/auth_viber.py:148
+#: src/sticker_convert/auth/auth_viber.py:147
 msgid "Failed to dump memory"
 msgstr "Failed to dump memory"
 
-#: src/sticker_convert/auth/auth_viber.py:204
+#: src/sticker_convert/auth/auth_viber.py:203
 msgid ""
 "Getting Viber credentials...\n"
 "(This may take a minute)"
 msgstr ""
 "Getting Viber credentials...\n"
 "(This may take a minute)"
+
+#: src/sticker_convert/auth/auth_mastodon.py:19
+#, fuzzy
+#| msgid "Got Line cookies successfully"
+msgid "Got Mastodon cookies successfully"
+msgstr "Got Line cookies successfully"
+
+#: src/sticker_convert/auth/auth_mastodon.py:20
+#, fuzzy
+#| msgid "Failed to get token"
+msgid "Failed to get Mastodon cookies"
+msgstr "Failed to get token"
+
+#: src/sticker_convert/auth/auth_mastodon.py:21
+msgid "Error: mastodon_url required"
+msgstr "Error: mastodon_url required"
 
 #: src/sticker_convert/auth/auth_discord.py:20
 #, python-brace-format
@@ -1789,14 +1822,80 @@ msgstr "Failed to get token"
 msgid "Getting Discord authorization token..."
 msgstr "Getting Discord authorization token..."
 
-#: src/sticker_convert/auth/auth_discord.py:89
+#: src/sticker_convert/auth/auth_discord.py:95
 msgid "Please install Discord Desktop or Chrome/Chromium and try again"
 msgstr "Please install Discord Desktop or Chrome/Chromium and try again"
 
-#: src/sticker_convert/auth/auth_discord.py:99
+#: src/sticker_convert/auth/auth_misskey.py:20
+#, fuzzy
+#| msgid "Got Line cookies successfully"
+msgid "Got Misskey storage successfully"
+msgstr "Got Line cookies successfully"
+
+#: src/sticker_convert/auth/auth_misskey.py:21
+#, fuzzy
+#| msgid "Failed to get token"
+msgid "Failed to get Misskey token"
+msgstr "Failed to get token"
+
+#: src/sticker_convert/auth/auth_misskey.py:22
+msgid "Error: misskey_url required"
+msgstr "Error: misskey_url required"
+
+#: src/sticker_convert/auth/auth_misskey.py:27
+msgid "Getting Misskey storage"
+msgstr "Getting Misskey cookies"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:39
+msgid "Error: Failed to get latest tag of sticker-whatsapp-bridge"
+msgstr "Error: Failed to get latest tag of sticker-whatsapp-bridge"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:46
 #, python-brace-format
-msgid "All {} will be closed. Continue?"
-msgstr "All {} will be closed. Continue?"
+msgid "Found sticker-whatsapp-bridge at {}"
+msgstr "Found sticker-whatsapp-bridge at {}"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:83
+#: src/sticker_convert/auth/auth_whatsapp.py:87
+#, python-brace-format
+msgid "Error: {} is not supported"
+msgstr "Error: {} is not supported"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:95
+#, fuzzy, python-brace-format
+#| msgid "Failed to download pack. Reason: {}"
+msgid "Failed to download sticker-whatsapp-bridge {}"
+msgstr "Failed to download pack. Reason: {}"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:101
+#, python-brace-format
+msgid "Downloaded sticker-whatsapp-bridge {}"
+msgstr "Downloaded sticker-whatsapp-bridge {}"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:142
+#, fuzzy
+#| msgid "Downloaded sticker-whatsapp-bridge {}"
+msgid "Downloading sticker-whatsapp-bridge..."
+msgstr "Downloaded sticker-whatsapp-bridge {}"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:154
+msgid "Failed to login: whatsapp-sticker-bridge returned nothing"
+msgstr "Failed to login: whatsapp-sticker-bridge returned nothing"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:160
+#, python-brace-format
+msgid "Please enter {} on WhatsApp mobile"
+msgstr "Please enter {} on WhatsApp mobile"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:171
+msgid "Please scan WhatsApp Web login QR code"
+msgstr "Please scan WhatsApp Web login QR code"
+
+#: src/sticker_convert/auth/auth_whatsapp.py:179
+#, fuzzy, python-brace-format
+#| msgid "Failed to download {}: {}"
+msgid "Failed to login: {}"
+msgstr "Failed to download {}: {}"
 
 #: src/sticker_convert/auth/auth_telethon.py:16
 #, python-brace-format
@@ -1862,19 +1961,31 @@ msgstr "Auto"
 msgid "{} cannot be found"
 msgstr "{} cannot be found"
 
-#: src/sticker_convert/utils/chrome_remotedebug.py:115
+#: src/sticker_convert/utils/chrome_remotedebug.py:139
 msgid "Cannot connect to chrome debugging port"
 msgstr "Cannot connect to chrome debugging port"
 
-#: src/sticker_convert/utils/chrome_remotedebug.py:118
+#: src/sticker_convert/utils/chrome_remotedebug.py:142
 msgid "Cannot create websocket connection with debugger"
 msgstr "Cannot create websocket connection with debugger"
 
-#: src/sticker_convert/utils/chrome_remotedebug.py:136
+#: src/sticker_convert/utils/chrome_remotedebug.py:164
 msgid "Websocket keep disconnecting"
 msgstr "Websocket keep disconnecting"
 
-#: src/sticker_convert/utils/chrome_remotedebug.py:188
+#: src/sticker_convert/utils/chrome_remotedebug.py:233
 #, python-brace-format
 msgid "Cannot navigate to about:blank ({})"
 msgstr "Cannot navigate to about:blank ({})"
+
+#, python-brace-format
+#~ msgid "Extracted {}"
+#~ msgstr "Extracted {}"
+
+#~ msgid "When done, close this window"
+#~ msgstr "When done, close this window"
+
+#, fuzzy
+#~| msgid "Getting Signal credentials..."
+#~ msgid "Getting WhatsApp credentials..."
+#~ msgstr "Getting Signal credentials..."

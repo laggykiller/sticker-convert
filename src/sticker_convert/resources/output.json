@@ -48,8 +48,8 @@
         }
     },
     "whatsapp": {
-        "full_name": "Compress to .wastickers (WhatsApp)",
-        "help": "Create a .wastickers file for uploading to WhatsApp",
+        "full_name": "Upload to WhatsApp",
+        "help": "Create a .wastickers file and upload to WhatsApp if logged in",
         "metadata_requirements": {
             "title": true,
             "author": true

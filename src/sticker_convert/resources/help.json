@@ -67,6 +67,8 @@
         "telegram_token": "Set Telegram token. Required for uploading and downloading Telegram stickers.",
         "telegram_userid": "Set Telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.",
         "telethon_setup": "Setup Telethon",
+        "whatsapp_setup": "Setup WhatsApp",
+        "whatsapp_phone_number": "Phone number without plus sign or bracket\nFor login using pairing code\nExample: +1 (234) 567-8901 -> 12345678901\n(If not supplied, will login using QR code)",
         "line_get_auth": "Get Line cookies from browser, which is required to create custom message stickers.",
         "line_cookies": "Set Line cookies, which is required to create custom message stickers.",
         "viber_auth": "Set Viber authentication data.\nRequired for uploading Viber stickers.",

@@ -67,6 +67,8 @@
         "telegram_token": "設定Telegram token。需用於上載和下載Telegram貼圖。",
         "telegram_userid": "設定Telegram user_id (從真實賬戶，而非機械人帳戶)n。需用於上載和下載Telegram貼圖。",
         "telethon_setup": "設定Telethon",
+        "whatsapp_setup": "設定WhatsApp",
+        "whatsapp_phone_number": "不包含括號和加號的電話號碼\n以驗證碼方式登入時使用\n例: +1 (234) 567-8901 -> 12345678901\n(如留空，將以QR code登入)",
         "line_get_auth": "從瀏覽器取得Line cookies, 以用於製作訊息貼圖。",
         "line_cookies": "設定Line cookies, 以用於製作訊息貼圖。",
         "viber_auth": "設定Viber身份驗證數據。\n用於上載Viber貼圖。",

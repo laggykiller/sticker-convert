@@ -231,6 +231,7 @@ class CredOption(BaseOption):
     telegram_userid: str = ""
     telethon_api_id: int = 0
     telethon_api_hash: str = ""
+    whatsapp_phone_number: str = ""
     line_cookies: str = ""
     viber_auth: str = ""
     discord_token: str = ""

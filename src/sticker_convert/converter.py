@@ -34,6 +34,8 @@ YUV_RGB_MATRIX = np.array(
     ]
 )
 
+LOTTIE_EXT = (".lottie", ".lot", ".tgs", ".json", ".was")
+
 
 def get_step_value(
     max_step: Optional[int],
@@ -224,6 +226,11 @@ class StickerConvert:
         result = self.check_if_compatible()
         if result:
             return self.compress_done(result)
+        if (
+            self.codec_info_orig.file_ext in LOTTIE_EXT
+            and self.out_f.suffix in LOTTIE_EXT
+        ):
+            return self.lot2lot()
 
         self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
 
@@ -436,13 +443,57 @@ class StickerConvert:
 
         return True, self.in_f_path, out_f, self.result_size
 
+    def lot2lot(self) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
+        out_f: Union[None, bytes, Path]
+        if isinstance(self.in_f, Path):
+            suffix = self.in_f.suffix
+        else:
+            suffix = Path(self.in_f_name).suffix
+
+        in_f: Union[Path, BytesIO]
+        if isinstance(self.in_f, Path):
+            in_f = self.in_f
+        else:
+            in_f = BytesIO(self.in_f)
+
+        if suffix == ".was":
+            import zipfile
+
+            with zipfile.ZipFile(in_f, "r") as zip_f:
+                data = zip_f.read("animation/animation.json")
+        elif suffix == ".tgs":
+            import gzip
+
+            with gzip.open(in_f) as f:
+                data = f.read()
+        else:
+            if isinstance(self.in_f, Path):
+                with open(self.in_f, "rb") as f:
+                    data = f.read()
+            else:
+                data = self.in_f
+
+        if self.out_f.stem == "none":
+            out_f = None
+        elif self.out_f.stem == "bytes":
+            out_f = data
+        else:
+            out_f = self.out_f
+            with open(self.out_f, "wb+") as f:
+                f.write(data)
+
+        msg = self.MSG_DONE_COMP.format(self.in_f_name, self.out_f_name, len(data), 0)
+        self.cb.put(msg)
+
+        return True, self.in_f_path, out_f, len(data)
+
     def frames_import(self) -> None:
         if isinstance(self.in_f, Path):
             suffix = self.in_f.suffix
         else:
             suffix = Path(self.in_f_name).suffix
 
-        if suffix in (".tgs", ".lottie", ".json"):
+        if suffix in LOTTIE_EXT:
             self._frames_import_lottie()
         elif suffix in (".webp", ".apng", ".png", ".gif"):
             # ffmpeg do not support webp decoding (yet)
@@ -672,7 +723,18 @@ class StickerConvert:
         else:
             suffix = Path(self.in_f_name).suffix
 
-        if suffix == ".tgs":
+        if suffix == ".was":
+            import zipfile
+
+            in_f: Union[Path, BytesIO]
+            if isinstance(self.in_f, Path):
+                in_f = self.in_f
+            else:
+                in_f = BytesIO(self.in_f)
+            with zipfile.ZipFile(in_f, "r") as zip_f:
+                anim_json = zip_f.read("animation/animation.json").decode("utf-8")
+            anim = LottieAnimation.from_data(anim_json)
+        elif suffix == ".tgs":
             if isinstance(self.in_f, Path):
                 anim = LottieAnimation.from_tgs(self.in_f.as_posix())
             else:

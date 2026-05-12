@@ -23,6 +23,12 @@
         "example": "例: https://telegram.me/addstickers/xxxxx\n OR https://telegram.me/addemoji/xxxxx",
         "address_lbls": "URLアドレス"
     },
+    "whatsapp": {
+        "full_name": "WhatsAppからダウンロード",
+        "help": "WhatsAppからダウンロード",
+        "example": "開始後は指示に従ってください",
+        "address_lbls": "URLアドレス (N/A)"
+    },
     "line": {
         "full_name": "Lineからダウンロード",
         "help": "入力としてURL/IDからLineスタンプをダウンロードする",

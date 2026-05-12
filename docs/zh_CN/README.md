@@ -6,7 +6,7 @@
 
 - 一个用于建立、下载、转换+压缩并上传即时通讯应用程式的貼图的 Python 脚本。
 - 提供图形使用者介面 (GUI) 和命令列介面 (CLI)，可在 Windows、macOS 和 Linux 系统上运作。
-- 目前支援 Signal、Telegram、WhatsApp（建立 .wastickers 档案）、Line（仅下载）、Kakao（仅下载）、Naver Band（仅下载）、OGQ（仅下载）、Viber、Discord（仅下载）和 iMessage（建立 Xcode 貼纸包专案）。
+- 目前支援 Signal、Telegram、WhatsApp、Line（仅下载）、Kakao（仅下载）、Naver Band（仅下载）、OGQ（仅下载）、Viber、Discord（仅下载）和 iMessage（建立 Xcode 貼纸包专案）。
 - 支援静态和动态貼纸，并支援透明度。
 
 ## 下载
@@ -45,7 +45,7 @@
 | ----------------------------------------- | -------------------------------- | --------------------------------------------- |
 | [Signal](/docs/zh_CN/guide_signal.md)     | ✅                              | ✅ (需要`uuid`&`password`或手动上传)           |
 | [Telegram](/docs/zh_CN/guide_telegram.md) | ✅ (需要`token`或telethon)      | ✅ (需要`token`&`user_id`或telethon或手动上传) |
-| [WhatsApp](/docs/zh_CN/guide_whatsapp.md) | ⭕ (以安卓或网页版)              | ⭕ (创建`.wastickers`, 以Sticker Maker输入)   |
+| [WhatsApp](/docs/zh_CN/guide_whatsapp.md) | ✅ (需要登入)                   | ✅ (需要登入或以Sticker Maker上传)             |
 | [Line](/docs/zh_CN/guide_line.md)         | ✅                              | 🚫 (需要人工审核)                             |
 | [Kakao](/docs/zh_CN/guide_kakao.md)       | ✅ (需要'auth_token'下载动态貼图) | 🚫 (需要人工审核)                            |
 | [Band](/docs/zh_CN/guide_band.md)         | ✅                              | 🚫 (需要人工审核)                             |
@@ -67,14 +67,14 @@
     - 下载: 支援貼图和自订表情符号 (例：`https://telegram.me/addstickers/xxxxx`)，但需要bot token或使用Telethon
     - 上载: 支援貼图和自订表情符号，但需要bot token和user_id或使用Telethon。你亦可以手动上载此程式制作出来的貼图档。
 - WhatsApp
-    - 下载：您需要手动寻找贴图包/从手机或 WhatsApp 网页版提取。请参阅 [/docs/zh_TW/guide_whatsapp.md](/docs/zh_TW/guide_whatsapp.md)。
-    - 上传：程式可以建立 .wastickers 文件，然后可以透过第三方应用程式「Sticker Maker」将其汇入 WhatsApp（本仓库作者与 Sticker Maker 无任何关联）。请参阅常见问题。
+    - 下载：可在sticker-convert登入WhatsApp，以帮助下载贴图；或手动寻找贴图包/从手机或 WhatsApp 网页版提取。请参阅 [/docs/zh_CN/guide_whatsapp.md](/docs/zh_CN/guide_whatsapp.md)。 
+    - 上载：可在sticker-convert登入WhatsApp，以帮助下载贴图；或透过第三方应用程式「Sticker Maker」将.wastickers文件汇入 WhatsApp（本仓库作者与 Sticker Maker 无任何关联）。请参阅常见问题。
 - Line
     - 下载: 支援 (例：`https://store.line.me/stickershop/product/1234/en`或`line://shop/detail/1234`或`1234`)
         - 官方网站搜寻：https://store.line.me/stickershop
         - 在非官方网站上搜寻（包括区域锁定和过期的套件）：http://www.line-stickers.com/
         - 欲了解更多资讯：https://github.com/doubleplusc/Line-sticker-downloader
-    - 上传：不支援。您需要手动提交贴纸包以获得批准才能在应用程式中使用。
+    - 上载：不支援。您需要手动提交贴纸包以获得批准才能在应用程式中使用。
 - Kakao
     - 下载: 支援 (例：`https://e.kakao.com/t/xxxxx`或`https://emoticon.kakao.com/items/xxxxx`或`4404400`). 有点复杂，请参照[/docs/zh_CN/guide_kakao.md](/docs/zh_CN/guide_kakao.md)
     - 上载: 不支援。你需要手动上传貼图包作检核以在程式裏使用。
@@ -109,19 +109,34 @@
 ## 使用説明 (CLI)
 如要使用CLI模式，请输入任何参数
 
+<details>
+<summary><b>CLI 帮助</b></summary>
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
-                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI | --download-mastodon DOWNLOAD_MASTODON | --download-misskey DOWNLOAD_MISSKEY]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
+                          [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
+                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-whatsapp DOWNLOAD_WHATSAPP | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI | --download-mastodon DOWNLOAD_MASTODON | --download-misskey DOWNLOAD_MISSKEY]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage | --export-mastodon | --export-misskey]
-                          [--no-compress] [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}] [--steps STEPS] [--processes PROCESSES]
-                          [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX] [--res-power RES_POWER]
-                          [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN] [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
-                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX] [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid]
-                          [--no-fake-vid] [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD]
-                          [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth] [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
-                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--mastodon-get-auth] [--mastodon-url MASTODON_URL] [--mastodon-cookies MASTODON_COOKIES] [--misskey-get-auth] [--misskey-url MISSKEY_URL]
-                          [--misskey-token MISSKEY_TOKEN] [--save-cred]
+                          [--no-compress]
+                          [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
+                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
+                          [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
+                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
+                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT]
+                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
+                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
+                          [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
+                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN]
+                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--whatsapp-setup]
+                          [--whatsapp-phone-number WHATSAPP_PHONE_NUMBER] [--line-get-auth]
+                          [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
+                          [--mastodon-get-auth] [--mastodon-url MASTODON_URL] [--mastodon-cookies MASTODON_COOKIES]
+                          [--misskey-get-auth] [--misskey-url MISSKEY_URL] [--misskey-token MISSKEY_TOKEN] [--save-cred]
 
 sticker-convert的CLI
 
@@ -154,6 +169,9 @@ options:
                         从URL以Telethon下载Telegram贴图
                         (例子: https://telegram.me/addstickers/xxxxx
                          OR https://telegram.me/addemoji/xxxxx)
+  --download-whatsapp DOWNLOAD_WHATSAPP
+                        从WhatsApp下载贴图
+                        (开始后请跟随指示)
   --download-line DOWNLOAD_LINE
                         从URL/ID下载Line贴图
                         (例子: https://store.line.me/stickershop/product/1234/en
@@ -201,7 +219,7 @@ options:
   --export-telegram-emoji-telethon
                         以Telethon上载至Telegram (自订表情符号) *不建议，但可使连结结尾不含_by_xxxbot*
   --export-viber        上载至Viber
-  --export-whatsapp     创建 .wastickers档案以供上载至WhatsApp
+  --export-whatsapp     创建.wastickers档案并在有认证资料时上载至WhatsApp
   --export-imessage     创建Xcode专案以供输入至iMessage
   --export-mastodon     有认证资料时上载至Mastodon, 或压缩.tar.gz档案以使用toolctl上载到Mastodon
   --export-misskey      压缩.zip档案并在有认证资料时上载至Misskey
@@ -308,6 +326,12 @@ options:
   --telegram-userid TELEGRAM_USERID
                         设定Telegram user_id (从真实账户，而非机械人帐户)n。需用于上载和下载Telegram貼图。
   --telethon-setup      设定Telethon
+  --whatsapp-setup      设定WhatsApp
+  --whatsapp-phone-number WHATSAPP_PHONE_NUMBER
+                        不包含括号和加号的电话号码
+                        以验证码方式登入时使用
+                        例: +1 (234) 567-8901 -> 12345678901
+                        (如留空，将以QR code登入)
   --line-get-auth       从浏覽器取得Line cookies, 以用于制作讯息貼图。
   --line-cookies LINE_COOKIES
                         设定Line cookies, 以用于制作讯息貼图。
@@ -334,6 +358,7 @@ options:
                         设定Misskey token, 用于上载自订表情。
   --save-cred           储存身份验证数据。
 ```
+</details>
 
 如要直接执行Python 脚本，请执行`src/sticker-convert.py`
 

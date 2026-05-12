@@ -200,6 +200,7 @@ class GUI(Window):
         self.telegram_userid_var = StringVar(self)
         self.telethon_api_id_var = IntVar(self)
         self.telethon_api_hash_var = StringVar(self)
+        self.whatsapp_phone_number_var = StringVar(self)
         self.line_cookies_var = StringVar(self)
         self.viber_auth_var = StringVar(self)
         self.viber_bin_path_var = StringVar(self)
@@ -216,7 +217,7 @@ class GUI(Window):
         self.lang_display_var = StringVar(self)
         self.lang_true_var = StringVar(self)
         self.response_event = Event()
-        self.response = None
+        self.response: Optional[Any] = None
         self.action: Optional[Callable[..., Any]] = None
         self.job: Optional[Job] = None
 
@@ -246,7 +247,9 @@ class GUI(Window):
         self.comp_frame.grid(column=0, row=1, sticky="news", padx=5, pady=5)
         self.output_frame.grid(column=0, row=2, sticky="w", padx=5, pady=5)
         self.cred_frame.grid(column=1, row=0, rowspan=3, sticky="w", padx=5, pady=5)
-        self.settings_frame.grid(column=0, row=3, columnspan=2, sticky="news", padx=5, pady=5)
+        self.settings_frame.grid(
+            column=0, row=3, columnspan=2, sticky="news", padx=5, pady=5
+        )
         self.progress_frame.grid(
             column=0, row=4, columnspan=2, sticky="news", padx=5, pady=5
         )
@@ -583,6 +586,7 @@ class GUI(Window):
             telegram_userid=self.telegram_userid_var.get(),
             telethon_api_id=self.telethon_api_id_var.get(),
             telethon_api_hash=self.telethon_api_hash_var.get(),
+            whatsapp_phone_number=self.whatsapp_phone_number_var.get(),
             line_cookies=self.line_cookies_var.get(),
             viber_auth=self.viber_auth_var.get(),
             discord_token=self.discord_token_var.get(),
@@ -650,7 +654,7 @@ class GUI(Window):
         )
         self.input_frame.address_entry.config(bootstyle="default")  # type: ignore
 
-        if input_option == "local":
+        if input_option in ("local", "whatsapp"):
             self.input_frame.address_entry.config(state="disabled")
             self.input_frame.address_tip.config(
                 text=self.input_presets[input_option_display]["example"]

@@ -83,6 +83,16 @@ class CredFrame(LabelFrame):
             bootstyle="secondary",  # type: ignore
         )
 
+        self.whatsapp_auth_lbl = Label(
+            self, text=I("WhatsApp login"), justify="left", anchor="w"
+        )
+        self.whatsapp_auth_btn = Button(
+            self,
+            text=I("Generate"),
+            command=self.cb_whatsapp_get_auth,
+            bootstyle="secondary",  # type: ignore
+        )
+
         self.line_cookies_lbl = Label(
             self, text=I("Line cookies"), width=18, justify="left", anchor="w"
         )
@@ -195,6 +205,8 @@ class CredFrame(LabelFrame):
         )
         self.telethon_auth_lbl.grid(column=0, row=5, sticky="w", padx=3, pady=3)
         self.telethon_auth_btn.grid(column=2, row=5, sticky="e", padx=3, pady=3)
+        self.whatsapp_auth_lbl.grid(column=0, row=6, sticky="w", padx=3, pady=3)
+        self.whatsapp_auth_btn.grid(column=2, row=6, sticky="e", padx=3, pady=3)
         self.line_cookies_lbl.grid(column=0, row=7, sticky="w", padx=3, pady=3)
         self.line_cookies_entry.grid(column=1, row=7, sticky="w", padx=3, pady=3)
         self.line_get_auth_btn.grid(column=2, row=7, sticky="e", padx=3, pady=3)
@@ -243,6 +255,11 @@ class CredFrame(LabelFrame):
 
         SignalGetAuthWindow(self.gui)
 
+    def cb_whatsapp_get_auth(self, *_: Any) -> None:
+        from sticker_convert.gui_components.windows.whatsapp_get_auth_window import WhatsappGetAuthWindow
+
+        WhatsappGetAuthWindow(self.gui)
+
     def cb_line_get_auth(self, *_: Any) -> None:
         from sticker_convert.gui_components.windows.line_get_auth_window import LineGetAuthWindow
 
@@ -274,6 +291,8 @@ class CredFrame(LabelFrame):
         self.signal_get_auth_btn.config(state=state)
         self.telegram_token_entry.config(state=state)
         self.telegram_userid_entry.config(state=state)
+        self.telethon_auth_btn.config(state=state)
+        self.whatsapp_auth_btn.config(state=state)
         self.line_cookies_entry.config(state=state)
         self.line_get_auth_btn.config(state=state)
         self.viber_auth_entry.config(state=state)

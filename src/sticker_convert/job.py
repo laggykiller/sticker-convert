@@ -310,7 +310,7 @@ class Job:
         if self.opt_input.option == "auto":
             error_msg += I("\n[X] Unrecognized URL input source\n")
 
-        if self.opt_input.option != "local" and not self.opt_input.url:
+        if self.opt_input.option not in ("local", "whatsapp") and not self.opt_input.url:
             error_msg += I(
                 "\n"
                 "[X] URL address cannot be empty.\n"
@@ -598,6 +598,11 @@ class Job:
 
             downloaders.append(DownloadTelegram.start)
 
+        if self.opt_input.option.startswith("whatsapp"):
+            from sticker_convert.downloaders.download_whatsapp import DownloadWhatsapp
+
+            downloaders.append(DownloadWhatsapp.start)
+
         if self.opt_input.option == "kakao":
             from sticker_convert.downloaders.download_kakao import DownloadKakao
 
@@ -777,9 +782,9 @@ class Job:
         exporters: List[Callable[..., Tuple[int, int, List[str]]]] = []
 
         if self.opt_output.option == "whatsapp":
-            from sticker_convert.uploaders.compress_wastickers import CompressWastickers
+            from sticker_convert.uploaders.upload_whatsapp import UploadWhatsapp
 
-            exporters.append(CompressWastickers.start)
+            exporters.append(UploadWhatsapp.start)
 
         if self.opt_output.option == "signal":
             from sticker_convert.uploaders.upload_signal import UploadSignal

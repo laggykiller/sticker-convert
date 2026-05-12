@@ -53,7 +53,8 @@ type = [
   "types-psutil",
   "types-Pillow",
   "types-requests",
-  "types-tqdm"
+  "types-tqdm",
+  "types-qrcode"
 ]
 
 [build-system]

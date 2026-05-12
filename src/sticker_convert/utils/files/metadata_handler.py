@@ -38,7 +38,7 @@ RELATED_NAME = (
     "._.DS_Store",
 )
 
-BLACKLIST_PREFIX = ("cover", "misskey_meta.json")
+BLACKLIST_PREFIX = ("cover", "misskey_meta")
 BLACKLIST_SUFFIX = (
     ".txt",
     ".m4a",

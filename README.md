@@ -6,7 +6,7 @@
 
 - A python script for creating, downloading, converting+compressing and uploading stickers from multiple instant messaging applications.
 - With GUI and CLI that runs on Windows, MacOS and Linux
-- Currently supports Signal, Telegram, WhatsApp (Create .wastickers), Line (Download only), Kakao (Download only), Naver Band (Download only), OGQ (Download only), Viber, Discord (Download only), iMessage (Create Xcode sticker pack project)
+- Currently supports Signal, Telegram, WhatsApp, Line (Download only), Kakao (Download only), Naver Band (Download only), OGQ (Download only), Viber, Discord (Download only), iMessage (Create Xcode sticker pack project)
 - Supports static and animated stickers, with transparency support
 
 ## Downloads
@@ -45,7 +45,7 @@
 | -------------------------------------------- | ------------------------------------ | -------------------------------------------------------- |
 | [Signal](/docs/en_US/guide_signal.md)        | ✅                                  | ✅ (Require `uuid` & `password` or manually)             |
 | [Telegram](/docs/en_US/guide_telegram.md)    | ✅ (Require `token` or telethon)    | ✅ (Require `token` & `user_id` or telethon or manually) |
-| [WhatsApp](/docs/en_US/guide_whatsapp.md)    | ⭕ (By Android or WhatsApp Web)     | ⭕ (Create `.wastickers`, import by Sticker Maker)       |
+| [WhatsApp](/docs/en_US/guide_whatsapp.md)    | ✅ (Require sign in)                | ✅ (Require login or import by Sticker Maker)            |
 | [Line](/docs/en_US/guide_line.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
 | [Kakao](/docs/en_US/guide_kakao.md)          | ✅ (Need 'auth_token' for animated) | 🚫 (Need to submit for manual approval)                  |
 | [Band](/docs/en_US/guide_band.md)            | ✅                                  | 🚫 (Need to submit for manual approval)                  |
@@ -67,8 +67,8 @@
     - Download: Supported (e.g. `https://telegram.me/addstickers/xxxxx`) for both stickers and custom emoji, but require bot token or setup Telethon
     - Upload: Supported for both stickers and custom emoji, but require bot token and user_id or setup Telethon. Alternatively, you may manually upload and create sticker pack with the output of this program.
 - WhatsApp
-    - Download: You have to manually find sticker packs / extract from your phone or from WhatsApp Web. Learn more from [/docs/en_US/guide_whatsapp.md](/docs/en_US/guide_whatsapp.md)
-    - Upload: The program can create .wastickers file, which could then be imported into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information.
+    - Download: You can sign in WhatsApp in sticker-convert to help you download sticker and sticker packs, or manually find sticker packs / extract from your phone or from WhatsApp Web. Learn more from [/docs/en_US/guide_whatsapp.md](/docs/en_US/guide_whatsapp.md)
+    - Upload: You can sign in WhatsApp in sticker-convert to help you upload sticker pack, or use .wastickers file created to import stickers into WhatsApp via a third-party app named 'Sticker Maker' (The author of this repo is NOT affiliated with Sticker Maker). View FAQ for more information.
 - Line
     - Download: Supported (e.g. `https://store.line.me/stickershop/product/1234/en` OR `line://shop/detail/1234` OR `1234`)
         - Search on official site: https://store.line.me/stickershop
@@ -115,28 +115,34 @@
 ## How to use (CLI)
 To run in CLI mode, pass on any arguments
 
+<details>
+<summary><b>CLI help</b></summary>
 ```
-usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS] [--lang {en_US,ja_JP,zh_CN,zh_TW}]
-                          [--input-dir INPUT_DIR]
-                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI | --download-mastodon DOWNLOAD_MASTODON | --download-misskey DOWNLOAD_MISSKEY]
+usage: sticker-convert.py [-h] [--version] [--no-confirm] [--no-progress] [--custom-presets CUSTOM_PRESETS]
+                          [--lang {en_US,ja_JP,zh_CN,zh_TW}] [--input-dir INPUT_DIR]
+                          [--download-auto DOWNLOAD_AUTO | --download-signal DOWNLOAD_SIGNAL | --download-telegram DOWNLOAD_TELEGRAM | --download-telegram-telethon DOWNLOAD_TELEGRAM_TELETHON | --download-whatsapp DOWNLOAD_WHATSAPP | --download-line DOWNLOAD_LINE | --download-kakao DOWNLOAD_KAKAO | --download-band DOWNLOAD_BAND | --download-ogq DOWNLOAD_OGQ | --download-viber DOWNLOAD_VIBER | --download-discord DOWNLOAD_DISCORD | --download-discord-emoji DOWNLOAD_DISCORD_EMOJI | --download-mastodon DOWNLOAD_MASTODON | --download-misskey DOWNLOAD_MISSKEY]
                           [--output-dir OUTPUT_DIR] [--author AUTHOR] [--title TITLE]
                           [--export-signal | --export-telegram | --export-telegram-emoji | --export-telegram-telethon | --export-telegram-emoji-telethon | --export-viber | --export-whatsapp | --export-imessage | --export-mastodon | --export-misskey]
                           [--no-compress]
                           [--preset {auto,signal,telegram,telegram_emoji,whatsapp,line,kakao,band,ogq,viber,discord,discord_emoji,imessage_small,imessage_medium,imessage_large,mastodon,misskey,custom}]
-                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX] [--fps-power FPS_POWER]
-                          [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN] [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN]
-                          [--res-h-max RES_H_MAX] [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
-                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN] [--color-max COLOR_MAX]
-                          [--color-power COLOR_POWER] [--duration-min DURATION_MIN] [--duration-max DURATION_MAX] [--duration-spoof]
-                          [--padding-percent PADDING_PERCENT] [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
-                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid] [--scale-filter SCALE_FILTER]
-                          [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR] [--chromium-path CHROMIUM_PATH]
-                          [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID] [--signal-password SIGNAL_PASSWORD] [--signal-get-auth]
-                          [--telegram-token TELEGRAM_TOKEN] [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--line-get-auth]
+                          [--steps STEPS] [--processes PROCESSES] [--fps-min FPS_MIN] [--fps-max FPS_MAX]
+                          [--fps-power FPS_POWER] [--res-min RES_MIN] [--res-max RES_MAX] [--res-w-min RES_W_MIN]
+                          [--res-w-max RES_W_MAX] [--res-h-min RES_H_MIN] [--res-h-max RES_H_MAX]
+                          [--res-power RES_POWER] [--res-snap-pow2] [--no-res-snap-pow2] [--quality-min QUALITY_MIN]
+                          [--quality-max QUALITY_MAX] [--quality-power QUALITY_POWER] [--color-min COLOR_MIN]
+                          [--color-max COLOR_MAX] [--color-power COLOR_POWER] [--duration-min DURATION_MIN]
+                          [--duration-max DURATION_MAX] [--duration-spoof] [--padding-percent PADDING_PERCENT]
+                          [--bg-color BG_COLOR] [--vid-size-max VID_SIZE_MAX] [--img-size-max IMG_SIZE_MAX]
+                          [--vid-format VID_FORMAT] [--img-format IMG_FORMAT] [--fake-vid] [--no-fake-vid]
+                          [--scale-filter SCALE_FILTER] [--quantize-method QUANTIZE_METHOD] [--cache-dir CACHE_DIR]
+                          [--chromium-path CHROMIUM_PATH] [--default-emoji DEFAULT_EMOJI] [--signal-uuid SIGNAL_UUID]
+                          [--signal-password SIGNAL_PASSWORD] [--signal-get-auth] [--telegram-token TELEGRAM_TOKEN]
+                          [--telegram-userid TELEGRAM_USERID] [--telethon-setup] [--whatsapp-setup]
+                          [--whatsapp-phone-number WHATSAPP_PHONE_NUMBER] [--line-get-auth]
                           [--line-cookies LINE_COOKIES] [--viber-auth VIBER_AUTH] [--viber-get-auth VIBER_GET_AUTH]
-                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN] [--mastodon-get-auth]
-                          [--mastodon-url MASTODON_URL] [--mastodon-cookies MASTODON_COOKIES] [--misskey-get-auth] [--misskey-url MISSKEY_URL]
-                          [--misskey-token MISSKEY_TOKEN] [--save-cred]
+                          [--viber-bin-path VIBER_BIN_PATH] [--discord-get-auth] [--discord-token DISCORD_TOKEN]
+                          [--mastodon-get-auth] [--mastodon-url MASTODON_URL] [--mastodon-cookies MASTODON_COOKIES]
+                          [--misskey-get-auth] [--misskey-url MISSKEY_URL] [--misskey-token MISSKEY_TOKEN] [--save-cred]
 
 CLI for sticker-convert
 
@@ -169,6 +175,9 @@ Input options:
                         Download telegram stickers from a URL as input with Telethon
                         (Example: https://telegram.me/addstickers/xxxxx
                          OR https://telegram.me/addemoji/xxxxx)
+  --download-whatsapp DOWNLOAD_WHATSAPP
+                        Download WhatsApp stickers
+                        (Follow instructions after start)
   --download-line DOWNLOAD_LINE
                         Download line stickers from a URL / ID as input
                         (Example: https://store.line.me/stickershop/product/1234/en
@@ -216,7 +225,7 @@ Output options:
   --export-telegram-emoji-telethon
                         Upload to Telegram with Telethon (Custom emoji) *Not recommended, but allow link not end with _by_xxxbot*
   --export-viber        Upload to Viber
-  --export-whatsapp     Create a .wastickers file for uploading to WhatsApp
+  --export-whatsapp     Create a .wastickers file and upload to WhatsApp if logged in
   --export-imessage     Create Xcode project for importing to iMessage
   --export-mastodon     Upload to Mastodon if auth available, or compress a .tar.gz file for upload to Mastodon using toolctl
   --export-misskey      Compress a .zip file and upload to Misskey if auth available
@@ -325,6 +334,12 @@ Credentials options:
   --telegram-userid TELEGRAM_USERID
                         Set Telegram user_id (From real account, not bot account). Required for uploading Telegram stickers.
   --telethon-setup      Setup Telethon
+  --whatsapp-setup      Setup WhatsApp
+  --whatsapp-phone-number WHATSAPP_PHONE_NUMBER
+                        Phone number without plus sign or bracket
+                        For login using pairing code
+                        Example: +1 (234) 567-8901 -> 12345678901
+                        (If not supplied, will login using QR code)
   --line-get-auth       Get Line cookies from browser, which is required to create custom message stickers.
   --line-cookies LINE_COOKIES
                         Set Line cookies, which is required to create custom message stickers.
@@ -351,6 +366,7 @@ Credentials options:
                         Set Misskey token, which is required to upload custom emojis.
   --save-cred           Save credentials.
 ```
+</details>
 
 If you are running python script directly, run with `src/sticker-convert.py`
 

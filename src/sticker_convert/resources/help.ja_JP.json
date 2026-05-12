@@ -67,6 +67,8 @@
         "telegram_token": "Telegramトークンを設定します。Telegramスタンプのアップロードとダウンロードに必要です。",
         "telegram_userid": "TelegramユーザーIDを設定します（ボットアカウントではなく、実際のアカウントから）。Telegramスタンプのアップロードに必要です。",
         "telethon_setup": "Telethonをセットアップします。",
+        "whatsapp_setup": "WhatsAppをセットアップします。",
+        "whatsapp_phone_number": "括弧とプラス記号を含まない電話番号\n認証コードでログインする際に使用します\n例：+1 (234) 567-8901 -> 12345678901\n（空欄の場合は、QRコードでログインします）",
         "line_get_auth": "ブラウザからLine Cookieを取得します。これはメッセージスタンプの作成に必要です。",
         "line_cookies": "Line Cookieを設定します。これはメッセージスタンプの作成に必要です。",
         "viber_auth": "Viber認証データを設定します。Viberスタンプのアップロードに必要です。",

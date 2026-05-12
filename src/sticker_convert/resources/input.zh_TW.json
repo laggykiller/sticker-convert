@@ -23,6 +23,12 @@
         "example": "例子: https://telegram.me/addstickers/xxxxx\n OR https://telegram.me/addemoji/xxxxx",
         "address_lbls": "URL 地址"
     },
+    "whatsapp": {
+        "full_name": "從WhatsApp下載",
+        "help": "從WhatsApp下載貼圖",
+        "example": "開始後請跟隨指示",
+        "address_lbls": "URL 地址 (N/A)"
+    },
     "line": {
         "full_name": "從Line下載",
         "help": "從URL/ID下載Line貼圖",

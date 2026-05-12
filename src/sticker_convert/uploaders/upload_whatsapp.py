@@ -4,7 +4,9 @@ import zipfile
 from pathlib import Path
 from typing import Any, List, Tuple
 
+from sticker_convert.auth.auth_whatsapp import SWB
 from sticker_convert.converter import StickerConvert
+from sticker_convert.definitions import CONFIG_DIR
 from sticker_convert.job_option import CompOption, CredOption, OutputOption
 from sticker_convert.uploaders.upload_base import UploadBase
 from sticker_convert.utils.callback import CallbackProtocol, CallbackReturn
@@ -15,7 +17,7 @@ from sticker_convert.utils.media.format_verify import FormatVerify
 from sticker_convert.utils.translate import I
 
 
-class CompressWastickers(UploadBase):
+class UploadWhatsapp(UploadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
         self.base_spec.size_max_img = 100000
@@ -46,7 +48,7 @@ class CompressWastickers(UploadBase):
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
         self.opt_comp_merged.merge(self.base_spec)
 
-    def compress_wastickers(self) -> Tuple[int, int, List[str]]:
+    def upload_whatsapp(self) -> Tuple[int, int, List[str]]:
         urls: List[str] = []
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -66,6 +68,8 @@ class CompressWastickers(UploadBase):
             separate_image_anim=not self.opt_comp.fake_vid,
         )
 
+        swb = SWB()
+        stickers_ok = 0
         stickers_total = 0
         for pack_title, stickers in packs.items():
             stickers_total += len(stickers)
@@ -166,8 +170,39 @@ class CompressWastickers(UploadBase):
                         with open(src, "rb") as f:
                             image_data = f.read()
 
-                    # Originally the Sticker Maker application name the files with int(time.time())
                     zipf.writestr(f"{src.stem}{ext}", image_data)
+
+            if swb.success:
+                msg = I("Uploading {}...").format(out_f)
+                self.cb.put(("msg", (msg,), None))
+                for r in swb.run(
+                    [
+                        "send",
+                        "--json",
+                        "-p",
+                        out_f,
+                        "--auth-info",
+                        str(CONFIG_DIR / "SWB/auth"),
+                    ]
+                ):
+                    if r is None:
+                        continue
+                    if r["event"] == "send":
+                        self.cb.put(
+                            I(
+                                "Uploaded {} to WhatsApp group 'sticker-whatsapp-bridge'"
+                            ).format(out_f)
+                        )
+                        stickers_ok += len(stickers)
+                    elif r["event"] == "login_success":
+                        self.cb.put(I("Login WhatsApp success"))
+                    elif r["event"] == "error":
+                        self.cb.put(
+                            I("Failed to upload {}: {}").format(out_f, r["message"])
+                        )
+                swb.kill()
+            else:
+                self.cb.put(I("Note: WhatsApp not setup yet for uploading"))
 
             self.cb.put((out_f))
             urls.append(out_f)
@@ -182,5 +217,5 @@ class CompressWastickers(UploadBase):
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> Tuple[int, int, List[str]]:
-        exporter = CompressWastickers(opt_output, opt_comp, opt_cred, cb, cb_return)
-        return exporter.compress_wastickers()
+        exporter = UploadWhatsapp(opt_output, opt_comp, opt_cred, cb, cb_return)
+        return exporter.upload_whatsapp()

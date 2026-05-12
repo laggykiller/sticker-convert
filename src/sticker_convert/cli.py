@@ -84,6 +84,7 @@ class CLI:
             parser_input_src.add_argument(
                 f"--download-{k.replace('_', '-')}",
                 dest=f"download_{k}",
+                action="store_true" if k == "whatsapp" else "store",
                 help=f"{v_dict['help']}\n({v_dict['example']})",
             )
 
@@ -182,6 +183,7 @@ class CLI:
         flags_cred_bool = (
             "signal_get_auth",
             "telethon_setup",
+            "whatsapp_setup",
             "kakao_get_auth_desktop_memdump",
             "kakao_get_auth_desktop_login",
             "kakao_get_auth_android_login",
@@ -241,12 +243,15 @@ class CLI:
             "line": args.download_line,
             "telegram": args.download_telegram,
             "telegram_telethon": args.download_telegram_telethon,
+            "whatsapp": args.download_whatsapp,
             "kakao": args.download_kakao,
             "band": args.download_band,
             "ogq": args.download_ogq,
             "viber": args.download_viber,
             "discord": args.download_discord,
             "discord_emoji": args.download_discord_emoji,
+            "mastodon": args.download_mastodon,
+            "misskey": args.download_misskey,
         }
 
         download_option = "local"
@@ -295,6 +300,10 @@ class CLI:
             export_option = "viber"
         elif args.export_imessage:
             export_option = "imessage"
+        elif args.export_mastodon:
+            export_option = "mastodon"
+        elif args.export_misskey:
+            export_option = "misskey"
         else:
             export_option = "local"
 
@@ -497,6 +506,7 @@ class CLI:
             else creds.get("telegram", {}).get("userid"),
             telethon_api_id=creds.get("telethon", {}).get("api_id"),
             telethon_api_hash=creds.get("telethon", {}).get("api_hash"),
+            whatsapp_phone_number=creds.get("whatsapp", {}).get("phone_number"),
             line_cookies=args.line_cookies
             if args.line_cookies
             else creds.get("line", {}).get("cookies"),
@@ -544,6 +554,13 @@ class CLI:
                 opt_cred.telethon_api_id = telethon_api_id
                 opt_cred.telethon_api_hash = telethon_api_hash
 
+            self.cb.put(msg)
+
+        if args.whatsapp_setup:
+            from sticker_convert.auth.auth_whatsapp import AuthWhatsapp
+
+            whatsapp_setup = AuthWhatsapp(opt_cred, self.cb)
+            success, msg = whatsapp_setup.get_cred()
             self.cb.put(msg)
 
         if args.line_get_auth:

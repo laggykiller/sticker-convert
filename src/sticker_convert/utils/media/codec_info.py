@@ -70,6 +70,13 @@ def open_lottie(file: Union[Path, bytes]) -> LottieAnimation:
     if isinstance(file, Path):
         if file.suffix == ".tgs":
             return LottieAnimation.from_tgs(file.as_posix())
+        elif file.suffix == ".was":
+            import zipfile
+
+            with zipfile.ZipFile(file, "r") as zip_f:
+                return LottieAnimation.from_data(
+                    zip_f.read("animation/animation.json").decode("utf-8")
+                )
         else:
             return LottieAnimation.from_file(file.as_posix())
     else:
@@ -78,9 +85,20 @@ def open_lottie(file: Union[Path, bytes]) -> LottieAnimation:
         try:
             with gzip.open(BytesIO(file)) as f:
                 data = f.read().decode(encoding="utf-8")
+                return LottieAnimation.from_data(data)
         except gzip.BadGzipFile:
-            data = json.loads(file.decode())
+            pass
 
+        import zipfile
+
+        try:
+            with zipfile.ZipFile(BytesIO(file), "r") as zip_f:
+                data = zip_f.read("animation/animation.json").decode("utf-8")
+                return LottieAnimation.from_data(data)
+        except zipfile.BadZipFile:
+            pass
+
+        data = json.loads(file.decode())
         return LottieAnimation.from_data(data)
 
 
@@ -116,7 +134,7 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext in (".tgs", ".json", ".lottie"):
+        if file_ext in (".tgs", ".json", ".lottie", ".lot", ".was"):
             fps, frames = CodecInfo._get_file_fps_frames_lottie(file)
             if fps > 0:
                 duration = int(frames / fps * 1000)
@@ -145,7 +163,7 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext in (".tgs", ".json", ".lottie"):
+        if file_ext in (".tgs", ".json", ".was", ".lottie", ".lot"):
             return CodecInfo._get_file_fps_lottie(file)
         elif file_ext == ".webp":
             fps, _, _, _ = CodecInfo._get_file_fps_frames_duration_webp(file)
@@ -174,7 +192,7 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext in (".tgs", ".json", ".lottie"):
+        if file_ext in (".tgs", ".json", ".lottie", ".lot", ".was"):
             return CodecInfo._get_file_frames_lottie(file)
         if file_ext == ".svg":
             _, frames, _, _ = CodecInfo.get_svg_info(file)
@@ -204,7 +222,7 @@ class CodecInfo:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        if file_ext in (".tgs", ".json", ".lottie"):
+        if file_ext in (".tgs", ".json", ".lottie", ".lot", ".was"):
             fps, frames = CodecInfo._get_file_fps_frames_lottie(file)
             if fps > 0:
                 duration = int(frames / fps * 1000)
@@ -377,7 +395,7 @@ class CodecInfo:
 
         codec = None
         animated = False
-        if file_ext in (".tgs", ".lottie", ".json", ".svg"):
+        if file_ext in (".tgs", ".lottie", ".lot", ".was", ".json", ".svg"):
             return file_ext.replace(".", "")
         try:
             with Image.open(file) as im:

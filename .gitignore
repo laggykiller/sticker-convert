@@ -85,3 +85,4 @@ appimage-builder
 appimagetool
 runtime-*
 *.AppImage
+**/SWB/**
