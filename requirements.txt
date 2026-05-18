@@ -4,7 +4,7 @@ apngasm_python~=1.3.2
 av>=12.0.0,!=15.*,!=16.0.*
 beautifulsoup4~=4.14.3
 cryptg>=0.4.0
-cryptography>=47.0.0
+cryptography>=48.0.0
 httpx~=0.28.1
 imagequant~=1.1.4
 memory-tempfile~=2.2.3
