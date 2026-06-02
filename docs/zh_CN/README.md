@@ -469,14 +469,18 @@ docker build --tag sticker-convert:latest-min-gui --target min-gui .
 ## 常见问题
 
 ### 平台特定指南 (例如: 取得凭证)
-- [Signal](/docs/zh_CN/guide_signal.md)
-- [Telegram](/docs/zh_CN/guide_telegram.md)
-- [WhatsApp](/docs/zh_CN/guide_whatsapp.md)
-- [Line](/docs/zh_CN/guide_line.md)
-- [Kakao](/docs/zh_CN/guide_kakao.md)
-- [Viber](/docs/zh_CN/guide_viber.md)
-- [Discord](/docs/zh_CN/guide_discord.md)
-- [iMessage](/docs/zh_CN/guide_imessage.md)
+- [Signal] (/docs/zh_CN/guide_signal.md)
+- [Telegram] (/docs/zh_CN/guide_telegram.md)
+- [Whatsapp] (/docs/zh_CN/guide_whatsapp.md)
+- [Line] (/docs/zh_CN/guide_line.md)
+- [Kakao] (/docs/zh_CN/guide_kakao.md)
+- [Band] (/docs/zh_CN/guide_band.md)
+- [OGQ] (/docs/zh_CN/guide_ogq.md)
+- [Viber] (/docs/zh_CN/guide_viber.md)
+- [Discord] (/docs/zh_CN/guide_discord.md)
+- [Mastodon] (/docs/zh_CN/guide_mastodon.md)
+- [Misskey] (/docs/zh_CN/guide_misskey.md)
+- [iMessage] (/docs/zh_CN/guide_imessage.md)
 
 ### 转换速度慢
 试试以下建议：

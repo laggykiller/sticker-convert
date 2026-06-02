@@ -477,14 +477,18 @@ See [/docs/en_US/COMPILING.md](/docs/en_US/COMPILING.md)
 ## FAQ
 
 ### Platform-specific guides (e.g. Getting credentials)
-- [Signal](/docs/en_US/guide_signal.md)
-- [Telegram](/docs/en_US/guide_telegram.md)
-- [WhatsApp](/docs/en_US/guide_whatsapp.md)
-- [Line](/docs/en_US/guide_line.md)
-- [Kakao](/docs/en_US/guide_kakao.md)
-- [Viber](/docs/en_US/guide_viber.md)
-- [Discord](/docs/en_US/guide_discord.md)
-- [iMessage](/docs/en_US/guide_imessage.md)
+- [Signal] (/docs/en_US/guide_signal.md)
+- [Telegram] (/docs/en_US/guide_telegram.md)
+- [Whatsapp] (/docs/en_US/guide_whatsapp.md)
+- [Line] (/docs/en_US/guide_line.md)
+- [Kakao] (/docs/en_US/guide_kakao.md)
+- [Band] (/docs/en_US/guide_band.md)
+- [OGQ] (/docs/en_US/guide_ogq.md)
+- [Viber] (/docs/en_US/guide_viber.md)
+- [Discord] (/docs/en_US/guide_discord.md)
+- [Mastodon] (/docs/en_US/guide_mastodon.md)
+- [Misskey] (/docs/en_US/guide_misskey.md)
+- [iMessage] (/docs/en_US/guide_imessage.md)
 
 ### Conversion is slow
 Try the following tips:
