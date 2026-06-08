@@ -2,7 +2,7 @@ aiolimiter~=1.2.1
 anyio>=4.5.2
 apngasm_python~=1.3.2
 av>=12.0.0,!=15.*,!=16.0.*
-beautifulsoup4~=4.14.3
+beautifulsoup4~=4.15.0
 cryptg>=0.4.0
 cryptography>=47.0.0
 httpx~=0.28.1
