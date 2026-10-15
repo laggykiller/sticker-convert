@@ -5,6 +5,7 @@ import json
 import mmap
 from decimal import ROUND_HALF_UP, Decimal
 from fractions import Fraction
+from functools import reduce
 from io import BytesIO
 from math import ceil, gcd
 from pathlib import Path
@@ -63,7 +64,7 @@ def durations_gcd(*durations: Union[int, float]) -> Union[float, Fraction]:
         else:
             return min(durations)
     else:
-        return Fraction(gcd(*durations), 1)  # type: ignore
+        return Fraction(reduce(gcd, durations), 1)  # type: ignore
 
 
 def open_lottie(file: Union[Path, bytes]) -> LottieAnimation:
