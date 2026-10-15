@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Optional, Tuple
 from urllib.parse import urlparse
 
 import anyio
@@ -17,14 +18,14 @@ class DownloadTelegram(DownloadBase):
     # def __init__(self, *args: Any, **kwargs: Any) -> None:
     #     super().__init__(*args, **kwargs)
 
-    def download_stickers_telegram(self) -> Tuple[int, int]:
+    def download_stickers_telegram(self) -> tuple[int, int]:
         if not ("telegram.me" in self.url or "t.me" in self.url):
             self.cb.put(I("Download failed: Unrecognized URL format"))
             return 0, 0
 
         return anyio.run(self.save_stickers)
 
-    async def save_stickers(self) -> Tuple[int, int]:
+    async def save_stickers(self) -> tuple[int, int]:
         tg_api: TelegramAPI
         if self.input_option.endswith("telethon"):
             tg_api = TelethonAPI()
@@ -48,9 +49,9 @@ class DownloadTelegram(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadTelegram(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_telegram()

@@ -84,3 +84,4 @@ extend_skip = ["msicreator"]
 
 [tool.ruff]
 exclude = ["msicreator"]
+lint.ignore = ["I001"]

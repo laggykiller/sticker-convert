@@ -1,7 +1,8 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
 import tarfile
 from pathlib import Path
-from typing import Any, List, Tuple, cast
+from typing import Any, cast
 from urllib.parse import urlparse
 
 import requests
@@ -21,7 +22,7 @@ class UploadMastodon(UploadBase):
             "Error: Cannot get authenticity_token, upload to Mastodon failed"
         )
 
-    def upload_mastodon(self) -> Tuple[int, int, List[str]]:
+    def upload_mastodon(self) -> tuple[int, int, list[str]]:
         title, _, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
             title=self.opt_output.title,
@@ -93,24 +94,26 @@ class UploadMastodon(UploadBase):
                     I("Failed to upload {} to Mastodon as not png or gif").format(name)
                 )
                 continue
-            response = requests.post(
-                f"{domain}/admin/custom_emojis",
-                headers={"Referer": f"{domain}/admin/custom_emojis/new"},
-                cookies=cookies,
-                data={
-                    "authenticity_token": authenticity_token,
-                    "custom_emoji[shortcode]": name,
-                    "custom_emoji[category_name]": category,
-                    "button": "",
-                },
-                files={
-                    "custom_emoji[image]": (
-                        emoji.name,
-                        open(str(emoji), "rb"),
-                        content_type,
-                    )
-                },
-            )
+
+            with open(str(emoji), "rb") as f:
+                response = requests.post(
+                    f"{domain}/admin/custom_emojis",
+                    headers={"Referer": f"{domain}/admin/custom_emojis/new"},
+                    cookies=cookies,
+                    data={
+                        "authenticity_token": authenticity_token,
+                        "custom_emoji[shortcode]": name,
+                        "custom_emoji[category_name]": category,
+                        "button": "",
+                    },
+                    files={
+                        "custom_emoji[image]": (
+                            emoji.name,
+                            f,
+                            content_type,
+                        )
+                    },
+                )
             if "is invalid" in response.text:
                 self.cb.put(I("{} name invalid").format(name))
                 continue
@@ -208,6 +211,6 @@ class UploadMastodon(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int, List[str]]:
+    ) -> tuple[int, int, list[str]]:
         exporter = UploadMastodon(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.upload_mastodon()

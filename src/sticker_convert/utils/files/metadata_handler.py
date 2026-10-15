@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
 from sticker_convert.utils.files.json_resources_loader import load_resource_json
 from sticker_convert.utils.media.codec_info import CodecInfo
@@ -80,7 +79,7 @@ class MetadataHandler:
     @staticmethod
     def get_files_related_to_sticker_convert(
         directory: Path, include_archive: bool = True
-    ) -> List[Path]:
+    ) -> list[Path]:
         files = [
             i
             for i in sorted(directory.iterdir())
@@ -94,7 +93,7 @@ class MetadataHandler:
         return files
 
     @staticmethod
-    def get_stickers_present(directory: Path) -> List[Path]:
+    def get_stickers_present(directory: Path) -> list[Path]:
         stickers_present = [
             i
             for i in sorted(directory.iterdir())
@@ -107,7 +106,7 @@ class MetadataHandler:
         return stickers_present
 
     @staticmethod
-    def get_cover(directory: Path) -> Optional[Path]:
+    def get_cover(directory: Path) -> Path | None:
         stickers_present = sorted(directory.iterdir())
         for i in stickers_present:
             if Path(i).stem == "cover":
@@ -118,10 +117,10 @@ class MetadataHandler:
     @staticmethod
     def get_metadata(
         directory: Path,
-        title: Optional[str] = None,
-        author: Optional[str] = None,
-        emoji_dict: Optional[Dict[str, str]] = None,
-    ) -> Tuple[Optional[str], Optional[str], Optional[Dict[str, str]]]:
+        title: str | None = None,
+        author: str | None = None,
+        emoji_dict: dict[str, str] | None = None,
+    ) -> tuple[str | None, str | None, dict[str, str] | None]:
         title_path = Path(directory, "title.txt")
         if not title and title_path.is_file():
             with open(title_path, encoding="utf-8") as f:
@@ -142,9 +141,9 @@ class MetadataHandler:
     @staticmethod
     def set_metadata(
         directory: Path,
-        title: Optional[str] = None,
-        author: Optional[str] = None,
-        emoji_dict: Optional[Dict[str, str]] = None,
+        title: str | None = None,
+        author: str | None = None,
+        emoji_dict: dict[str, str] | None = None,
         newline: bool = False,
     ) -> None:
         title_path = Path(directory, "title.txt")
@@ -227,13 +226,13 @@ class MetadataHandler:
     def split_sticker_packs(
         directory: Path,
         title: str,
-        file_per_pack: Optional[int] = None,
-        file_per_anim_pack: Optional[int] = None,
-        file_per_image_pack: Optional[int] = None,
+        file_per_pack: int | None = None,
+        file_per_anim_pack: int | None = None,
+        file_per_image_pack: int | None = None,
         separate_image_anim: bool = True,
-    ) -> Dict[str, List[Path]]:
+    ) -> dict[str, list[Path]]:
         # {pack_1: [sticker1_path, sticker2_path]}
-        packs: Dict[str, List[Path]] = {}
+        packs: dict[str, list[Path]] = {}
 
         if file_per_pack is None:
             file_per_pack = (
@@ -250,8 +249,8 @@ class MetadataHandler:
         processed = 0
 
         if separate_image_anim is True:
-            image_stickers: List[Path] = []
-            anim_stickers: List[Path] = []
+            image_stickers: list[Path] = []
+            anim_stickers: list[Path] = []
 
             image_pack_count = 0
             anim_pack_count = 0
@@ -290,7 +289,7 @@ class MetadataHandler:
                     image_pack_count += 1
 
         else:
-            stickers: List[Path] = []
+            stickers: list[Path] = []
             pack_count = 0
 
             for processed, file in enumerate(stickers_present):

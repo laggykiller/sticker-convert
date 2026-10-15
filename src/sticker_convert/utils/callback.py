@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 from functools import partial
 from getpass import getpass
 from multiprocessing import Event, Manager
@@ -30,7 +32,7 @@ else:
 
 
 class CallbackReturn:
-    def __init__(self, manager: Optional[SyncManager] = None) -> None:
+    def __init__(self, manager: SyncManager | None = None) -> None:
         self.response_event = Event()
         if manager is None:
             manager = Manager()
@@ -51,25 +53,25 @@ class CallbackReturn:
 
 
 class CallbackProtocol(Protocol):
-    def put(self, i: Union[CbQueueItemType, str]) -> Any: ...
+    def put(self, i: CbQueueItemType | str) -> Any: ...
 
 
 class CallbackCli(CallbackProtocol):
     def __init__(
         self,
-        msg: Optional[Callable[..., None]] = None,
-        bar: Optional[Callable[..., None]] = None,
-        msg_block: Optional[Callable[..., None]] = None,
-        msg_dynamic: Optional[Callable[..., bool]] = None,
-        ask_bool: Optional[Callable[..., bool]] = None,
-        ask_str: Optional[Callable[..., str]] = None,
+        msg: Callable[..., None] | None = None,
+        bar: Callable[..., None] | None = None,
+        msg_block: Callable[..., None] | None = None,
+        msg_dynamic: Callable[..., bool] | None = None,
+        ask_bool: Callable[..., bool] | None = None,
+        ask_str: Callable[..., str] | None = None,
         silent: bool = False,
         no_confirm: bool = False,
         no_progress: bool = False,
     ) -> None:
         from tqdm import tqdm
 
-        self.progress_bar: Optional[tqdm[Any]] = None
+        self.progress_bar: tqdm[Any] | None = None
 
         if msg:
             self.msg = msg
@@ -122,7 +124,7 @@ class CallbackCli(CallbackProtocol):
 
     def cb_bar(
         self,
-        set_progress_mode: Optional[str] = None,
+        set_progress_mode: str | None = None,
         steps: int = 0,
         update_bar: int = 0,
     ) -> None:
@@ -175,14 +177,12 @@ class CallbackCli(CallbackProtocol):
         )
         self.msg()
         result = input("Continue? [y/N] > ")
-        if result.lower() != "y":
-            return False
-        return True
+        return result.lower() == "y"
 
     def cb_ask_str(
         self,
-        question: Optional[str] = None,
-        initialvalue: Optional[str] = None,
+        question: str | None = None,
+        initialvalue: str | None = None,
         cli_show_initialvalue: bool = True,
         password: bool = False,
     ) -> str:
@@ -204,20 +204,20 @@ class CallbackCli(CallbackProtocol):
 
         return response
 
-    def put(self, i: Union[CbQueueItemType, str]) -> Union[str, bool, None]:
+    def put(self, i: CbQueueItemType | str) -> str | bool | None:
         if isinstance(i, tuple):
             action = i[0]
             if len(i) >= 2:
-                args: Tuple[Any, ...] = i[1] if i[1] else tuple()
+                args: tuple[Any, ...] = i[1] if i[1] else ()
             else:
-                args = tuple()
+                args = ()
             if len(i) >= 3:
-                kwargs: Dict[str, Any] = i[2] if i[2] else {}
+                kwargs: dict[str, Any] = i[2] if i[2] else {}
             else:
                 kwargs = {}
         else:
             action = i
-            args = tuple()
+            args = ()
             kwargs = {}
 
         # Fake implementation for Queue.put()
@@ -243,18 +243,18 @@ class CallbackCli(CallbackProtocol):
 
 
 class CallbackGui(CallbackProtocol):
-    def __init__(self, gui: "GUI"):
+    def __init__(self, gui: GUI):
         from ttkbootstrap import Label, Progressbar, StringVar  # type: ignore
 
         from sticker_convert.gui_components.windows.base_window import BaseWindow
         from sticker_convert.job import Job
 
         self.gui = gui
-        self.job: Optional[Job] = None
-        self.msg_dynamic_window: Optional[BaseWindow] = None
+        self.job: Job | None = None
+        self.msg_dynamic_window: BaseWindow | None = None
         self.message_var = StringVar(self.gui)
-        self.msg_dynamic_label: Optional[Label] = None
-        self.msg_dynamic_bar: Optional[Progressbar] = None
+        self.msg_dynamic_label: Label | None = None
+        self.msg_dynamic_bar: Progressbar | None = None
 
         self.ask_str = self.cb_ask_str
         self.ask_bool = self.cb_ask_bool
@@ -266,10 +266,10 @@ class CallbackGui(CallbackProtocol):
     def cb_ask_str(
         self,
         question: str,
-        initialvalue: Optional[str] = None,
+        initialvalue: str | None = None,
         cli_show_initialvalue: bool = True,
         password: bool = False,
-        parent: Optional[object] = None,
+        parent: object | None = None,
     ) -> str:
         from ttkbootstrap import Querybox  # type: ignore
 
@@ -291,7 +291,7 @@ class CallbackGui(CallbackProtocol):
         else:
             raise RuntimeError(f"Invalid response in cb_ask_str: {self.gui.response}")
 
-    def cb_ask_bool(self, question: str, parent: Optional["Toplevel"] = None) -> bool:
+    def cb_ask_bool(self, question: str, parent: Toplevel | None = None) -> bool:
         from ttkbootstrap.dialogs import Messagebox  # type: ignore
 
         self.gui.action = partial(
@@ -304,17 +304,15 @@ class CallbackGui(CallbackProtocol):
         self.gui.response_event.wait()
         self.gui.response_event.clear()
 
-        if self.gui.response == "Yes":
-            return True
-        return False
+        return self.gui.response == "Yes"
 
     def cb_msg(self, *args: Any, **kwargs: Any) -> None:
         self.gui.progress_frame.update_message_box(*args, **kwargs)
 
     def cb_msg_block(
         self,
-        message: Optional[str] = None,
-        parent: Optional[object] = None,
+        message: str | None = None,
+        parent: object | None = None,
         **_kwargs: Any,
     ) -> Any:
         from ttkbootstrap.dialogs import Messagebox  # type: ignore
@@ -333,8 +331,8 @@ class CallbackGui(CallbackProtocol):
 
     def cb_msg_dynamic(
         self,
-        message: Optional[str] = None,
-        parent: Optional["Toplevel"] = None,
+        message: str | None = None,
+        parent: Toplevel | None = None,
         **kwargs: Any,
     ) -> bool:
         from ttkbootstrap import Label, Progressbar  # type: ignore
@@ -398,7 +396,7 @@ class CallbackGui(CallbackProtocol):
 
     def cb_bar(
         self,
-        set_progress_mode: Optional[str] = None,
+        set_progress_mode: str | None = None,
         steps: int = 0,
         update_bar: int = 0,
         *args: Any,
@@ -408,20 +406,20 @@ class CallbackGui(CallbackProtocol):
             set_progress_mode, steps, update_bar, *args, **kwargs
         )
 
-    def put(self, i: Union[CbQueueItemType, str]) -> Union[str, bool, None]:
+    def put(self, i: CbQueueItemType | str) -> str | bool | None:
         if isinstance(i, tuple):
             action = i[0]
             if len(i) >= 2:
-                args: Tuple[Any, ...] = i[1] if i[1] else tuple()
+                args: tuple[Any, ...] = i[1] if i[1] else ()
             else:
-                args = tuple()
+                args = ()
             if len(i) >= 3:
-                kwargs: Dict[str, Any] = i[2] if i[2] else {}
+                kwargs: dict[str, Any] = i[2] if i[2] else {}
             else:
                 kwargs = {}
         else:
             action = i
-            args = tuple()
+            args = ()
             kwargs = {}
 
         # Fake implementation for Queue.put()

@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import os
 import platform
 import shutil
 import time
 import webbrowser
-from typing import Any, Optional, Tuple, cast
+from typing import Any, cast
 
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.definitions import CONFIG_DIR
@@ -37,8 +39,8 @@ class AuthSignal(AuthBase):
 
         self.cb.put(("ask_str", (self.MSG_NO_SIGDESK,), None))
 
-    def get_signal_bin_path(self) -> Optional[str]:
-        signal_paths: Tuple[Optional[str], ...]
+    def get_signal_bin_path(self) -> str | None:
+        signal_paths: tuple[str | None, ...]
         if platform.system() == "Windows":
             signal_paths = (
                 os.path.expandvars("%localappdata%/Programs/signal-desktop/Signal.exe"),
@@ -67,7 +69,7 @@ class AuthSignal(AuthBase):
                 return signal_path
         return None
 
-    def get_cred(self) -> Tuple[Optional[str], Optional[str], str]:
+    def get_cred(self) -> tuple[str | None, str | None, str]:
         msg = I("Getting Signal credentials...")
         self.cb.put(("msg_dynamic", (msg,), None))
         signal_bin_path = self.get_signal_bin_path()

@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 from pathlib import Path
-from typing import List, Optional
 
 
 def is_png(header: bytes, trailer: bytes):
@@ -31,7 +32,7 @@ FORMATS = {
 }
 
 
-def format_detect(path: Path, possible: Optional[List[str]] = None) -> str:
+def format_detect(path: Path, possible: list[str] | None = None) -> str:
     with open(path, "rb") as f:
         header = f.read(16)
         f.seek(-16, 2)

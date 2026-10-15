@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 import platform
 import shutil
 import subprocess
 import time
 from pathlib import Path
-from typing import Any, Callable, List, Optional, Tuple, cast
+from typing import Any, Callable, cast
 
 from sticker_convert.auth.auth_base import AuthBase
 from sticker_convert.utils.process import check_admin, find_pid_by_name, get_mem, killall
@@ -36,7 +38,7 @@ class AuthViber(AuthBase):
 
         super().__init__(*args, **kwargs)
 
-    def relaunch_viber(self, viber_bin_path: str) -> Optional[int]:
+    def relaunch_viber(self, viber_bin_path: str) -> int | None:
         killed = killall("viber")
         if killed:
             time.sleep(5)
@@ -52,7 +54,7 @@ class AuthViber(AuthBase):
 
     def get_auth_by_pme(
         self, viber_bin_path: str, relaunch: bool = True
-    ) -> Tuple[Optional[str], str]:
+    ) -> tuple[str | None, str]:
         from PyMemoryEditor import OpenProcess  # type: ignore
 
         member_id = None
@@ -109,14 +111,14 @@ class AuthViber(AuthBase):
 
     def get_auth_by_dump(
         self, viber_bin_path: str, relaunch: bool = True
-    ) -> Tuple[Optional[str], str]:
+    ) -> tuple[str | None, str]:
         member_id = None
         m_token = None
         m_ts = None
 
         if platform.system() == "Darwin":
             csrutil_status = subprocess.run(
-                ["csrutil", "status"], capture_output=True, text=True
+                ["csrutil", "status"], capture_output=True, text=True, check=False
             ).stdout
 
             if "enabled" in csrutil_status:
@@ -172,7 +174,7 @@ class AuthViber(AuthBase):
 
         return viber_auth, msg
 
-    def get_viber_desktop(self) -> Optional[str]:
+    def get_viber_desktop(self) -> str | None:
         if platform.system() == "Windows":
             viber_bin_path = os.path.expandvars("%localappdata%/Viber/Viber.exe")
         elif platform.system() == "Darwin":
@@ -198,8 +200,8 @@ class AuthViber(AuthBase):
 
     def get_cred(
         self,
-        viber_bin_path: Optional[str] = None,
-    ) -> Tuple[Optional[str], str]:
+        viber_bin_path: str | None = None,
+    ) -> tuple[str | None, str]:
         msg = I("Getting Viber credentials...\n(This may take a minute)")
         self.cb.put(("msg_dynamic", (msg,), None))
         if not viber_bin_path:
@@ -218,7 +220,7 @@ class AuthViber(AuthBase):
         # - Cannot run on macOS
 
         # If admin, prefer get_auth_by_dump() over get_auth_by_pme(), vice versa
-        methods: List[Callable[[str, bool], Tuple[Optional[str], str]]] = []
+        methods: list[Callable[[str, bool], tuple[str | None, str]]] = []
         relaunch = True
         viber_auth = None
         msg = ""

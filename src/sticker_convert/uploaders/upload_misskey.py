@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import zipfile
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
@@ -20,9 +21,9 @@ class UploadMisskey(UploadBase):
         super().__init__(*args, **kwargs)
 
     def generate_meta_json(
-        self, emojis: List[Path], host: Optional[str]
-    ) -> Dict[str, Any]:
-        meta_json: Dict[str, Any] = {
+        self, emojis: list[Path], host: str | None
+    ) -> dict[str, Any]:
+        meta_json: dict[str, Any] = {
             "metaVersion": 2,
             "host": "example.misskey.domain" if host is None else host,
             "exportedAt": datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z",
@@ -30,7 +31,7 @@ class UploadMisskey(UploadBase):
         }
 
         for i in emojis:
-            emoji: Dict[str, Any]
+            emoji: dict[str, Any]
             if "-" in i.name:
                 emoji = {
                     "name": i.stem.split("-", 1)[-1],
@@ -52,7 +53,7 @@ class UploadMisskey(UploadBase):
 
         return meta_json
 
-    def upload_misskey(self) -> Tuple[int, int, List[str]]:
+    def upload_misskey(self) -> tuple[int, int, list[str]]:
         emojis = MetadataHandler.get_stickers_present(self.opt_output.dir)
         self.title, _, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -60,7 +61,7 @@ class UploadMisskey(UploadBase):
             author=self.opt_output.author,
         )
 
-        meta_json: Dict[str, Any]
+        meta_json: dict[str, Any]
         meta_json_path = Path(self.opt_output.dir, "misskey_meta.json")
         if meta_json_path.exists():
             with open(meta_json_path, encoding="utf-8") as f:
@@ -90,23 +91,24 @@ class UploadMisskey(UploadBase):
         domain = f"{scheme}://{netloc}"
 
         # Try bulk upload first
-        response = requests.post(
-            f"{domain}/api/drive/files/create",
-            headers={"Referer": f"{domain}/admin/emojis"},
-            data={
-                "i": self.opt_cred.misskey_token,
-                "force": "true",
-                "name": zipf_name,
-                "isSensitive": "false",
-            },
-            files={
-                "file": (
-                    zipf_name,
-                    open(zipf_path, "rb"),
-                    "application/x-zip-compressed",
-                )
-            },
-        )
+        with open(zipf_path, "rb") as f:
+            response = requests.post(
+                f"{domain}/api/drive/files/create",
+                headers={"Referer": f"{domain}/admin/emojis"},
+                data={
+                    "i": self.opt_cred.misskey_token,
+                    "force": "true",
+                    "name": zipf_name,
+                    "isSensitive": "false",
+                },
+                files={
+                    "file": (
+                        zipf_name,
+                        f,
+                        "application/x-zip-compressed",
+                    )
+                },
+            )
 
         try:
             zip_id = json.loads(response.text).get("id")
@@ -153,23 +155,24 @@ class UploadMisskey(UploadBase):
                 )
                 continue
 
-            response = requests.post(
-                f"{domain}/api/drive/files/create",
-                headers={"Referer": f"{domain}/admin/emojis"},
-                data={
-                    "i": self.opt_cred.misskey_token,
-                    "force": "true",
-                    "name": emoji.name,
-                    "isSensitive": "false",
-                },
-                files={
-                    "file": (
-                        emoji.name,
-                        open(emoji, "rb"),
-                        content_type,
-                    )
-                },
-            )
+            with open(emoji, "rb") as f:
+                response = requests.post(
+                    f"{domain}/api/drive/files/create",
+                    headers={"Referer": f"{domain}/admin/emojis"},
+                    data={
+                        "i": self.opt_cred.misskey_token,
+                        "force": "true",
+                        "name": emoji.name,
+                        "isSensitive": "false",
+                    },
+                    files={
+                        "file": (
+                            emoji.name,
+                            f,
+                            content_type,
+                        )
+                    },
+                )
 
             try:
                 file_id = json.loads(response.text).get("id")
@@ -221,6 +224,6 @@ class UploadMisskey(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int, List[str]]:
+    ) -> tuple[int, int, list[str]]:
         exporter = UploadMisskey(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.upload_misskey()

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import platform
-from typing import TYPE_CHECKING, Optional, Tuple
+from typing import TYPE_CHECKING
 
 from ttkbootstrap import Toplevel  # type: ignore
 
@@ -11,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class BaseWindow(Toplevel):
-    def __init__(self, gui: "GUI", parent: Optional[Toplevel] = None) -> None:
+    def __init__(self, gui: GUI, parent: Toplevel | None = None) -> None:
         super().__init__(alpha=0)  # type: ignore
         self.gui = gui
 
@@ -22,7 +24,7 @@ class BaseWindow(Toplevel):
 
         GUIUtils.set_icon(self)
 
-        self.mousewheel: Tuple[str, ...]
+        self.mousewheel: tuple[str, ...]
         if platform.system() == "Windows":
             self.mousewheel = ("<MouseWheel>",)
             self.delta_divide = 120

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 from threading import Lock
-from typing import TYPE_CHECKING, Any, List, Optional
+from typing import TYPE_CHECKING, Any
 
 from tqdm import tqdm
 from ttkbootstrap import LabelFrame, Progressbar  # type: ignore
@@ -18,7 +20,6 @@ class ProgressFrame(LabelFrame):
     auto_scroll = True
 
     msg_cls = False
-    msg_buffer: List[str] = []
 
     bar_mode_changed = False
     bar_mode = "clear"
@@ -28,9 +29,10 @@ class ProgressFrame(LabelFrame):
     msg_lock = Lock()
     bar_lock = Lock()
 
-    def __init__(self, gui: "GUI", *args: Any, **kwargs: Any) -> None:
+    def __init__(self, gui: GUI, *args: Any, **kwargs: Any) -> None:
         self.gui = gui
         super().__init__(*args, **kwargs)  # type: ignore
+        self.msg_buffer: list[str] = []
 
         self.message_box = ScrolledText(self, height=15, wrap="word")
         self.message_box._text.bind("<Button-3><ButtonRelease-3>", RightClicker)  # type: ignore
@@ -47,7 +49,7 @@ class ProgressFrame(LabelFrame):
 
     def update_progress_bar(
         self,
-        set_progress_mode: Optional[str] = None,
+        set_progress_mode: str | None = None,
         steps: int = 0,
         update_bar: int = 0,
     ) -> None:

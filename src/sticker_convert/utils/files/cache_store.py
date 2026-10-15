@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 import platform
 import shutil
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from typing import Any, ContextManager, Generator, Optional, Union
+from typing import Any, ContextManager, Generator
 from uuid import uuid4
 
 if platform.system() == "Linux":
@@ -32,8 +34,8 @@ def debug_cache_dir(path: str) -> ContextManager[Path]:
 class CacheStore:
     @staticmethod
     def get_cache_store(
-        path: Optional[str] = None,
-    ) -> "Union[ContextManager[Path], TemporaryDirectory[str]]":
+        path: str | None = None,
+    ) -> ContextManager[Path] | TemporaryDirectory[str]:
         if path:
             return debug_cache_dir(path)
         return tempfile.TemporaryDirectory()  # type: ignore

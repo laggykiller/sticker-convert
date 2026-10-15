@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 import zipfile
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any
 
 from sticker_convert.auth.auth_whatsapp import SWB
 from sticker_convert.definitions import CONFIG_DIR
@@ -16,7 +18,7 @@ class DownloadWhatsapp(DownloadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-    def download_stickers_whatsapp(self) -> Tuple[int, int]:
+    def download_stickers_whatsapp(self) -> tuple[int, int]:
         swb = SWB()
         if swb.success is False:
             self.cb.put(("msg_block", (swb.msg,), None))
@@ -105,9 +107,9 @@ class DownloadWhatsapp(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadWhatsapp(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_whatsapp()

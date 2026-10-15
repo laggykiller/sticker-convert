@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 from typing import List, cast
 
 from pyuegc import EGC  # type: ignore
@@ -7,7 +9,7 @@ from sticker_convert.definitions import RUNTIME_STATE
 from sticker_convert.utils.files.json_resources_loader import load_resource_json
 
 
-def get_emoji_list() -> List[str]:
+def get_emoji_list() -> list[str]:
     if RUNTIME_STATE.get("EMOJI_LIST") is not None:
         return cast(List[str], RUNTIME_STATE["EMOJI_LIST"])
     else:
@@ -20,8 +22,8 @@ EMOJI_LIST = get_emoji_list()
 
 
 # https://stackoverflow.com/a/43146653
-def extract_emojis(s: str) -> List[str]:
-    emojis: List[str] = []
+def extract_emojis(s: str) -> list[str]:
+    emojis: list[str] = []
     for c in cast(List[str], EGC(s)):
         if c in EMOJI_LIST and c not in emojis:
             emojis.append(c)

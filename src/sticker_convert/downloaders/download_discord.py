@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, cast
+from typing import cast
 from urllib.parse import urlparse
 
 import requests
@@ -22,12 +24,12 @@ class DownloadDiscord(DownloadBase):
     # def __init__(self, *args: Any, **kwargs: Any) -> None:
     #     super().__init__(*args, **kwargs)
 
-    def download_stickers_discord(self) -> Tuple[int, int]:
+    def download_stickers_discord(self) -> tuple[int, int]:
         if self.opt_cred is None or self.opt_cred.discord_token == "":
             self.cb.put(I("Error: Downloading from Discord requires token"))
             return 0, 0
 
-        gid: Optional[str] = None
+        gid: str | None = None
         if self.url.isnumeric():
             gid = self.url
         else:
@@ -51,8 +53,8 @@ class DownloadDiscord(DownloadBase):
         else:
             stickers = r_json["stickers"]
 
-        targets: List[Tuple[str, Path]] = []
-        emoji_dict: Dict[str, str] = {}
+        targets: list[tuple[str, Path]] = []
+        emoji_dict: dict[str, str] = {}
         for i, sticker in enumerate(stickers):
             f_id = str(i).zfill(3)
             sticker_id = sticker["id"]
@@ -84,9 +86,9 @@ class DownloadDiscord(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadDiscord(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_discord()

@@ -1,11 +1,12 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
 import gettext
 import json
 import locale
 import platform
 import sys
 from multiprocessing import current_process
-from typing import Any, Callable, Dict, cast
+from typing import Any, Callable, cast
 
 from sticker_convert.definitions import CONFIG_DIR, ROOT_DIR, RUNTIME_STATE
 
@@ -52,7 +53,7 @@ def get_lang() -> str:
     if settings_path.is_file():
         try:
             with open(settings_path, encoding="utf-8") as f:
-                settings: Dict[Any, Any] = json.load(f)
+                settings: dict[Any, Any] = json.load(f)
             lang = settings.get("lang")
             if lang:
                 if lang in LANG_DICT:
@@ -95,7 +96,7 @@ def get_translator() -> Callable[[str], str]:
     return trans
 
 
-def I(x: str) -> str:  # noqa: E743
+def I(x: str) -> str:
     return get_translator()(x)
 
 

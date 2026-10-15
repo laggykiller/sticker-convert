@@ -4,7 +4,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, cast
 from urllib.parse import urlparse
 
 import requests
@@ -22,7 +22,7 @@ class DownloadMisskey(DownloadBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-    def get_metadata(self, domain: str) -> Optional[Dict[Any, Any]]:
+    def get_metadata(self, domain: str) -> dict[Any, Any] | None:
         r = requests.get(f"{domain}/api/emojis")
         if r.text:
             metadata = json.loads(r.text)
@@ -31,7 +31,7 @@ class DownloadMisskey(DownloadBase):
 
         return metadata
 
-    def download_stickers_misskey(self) -> Tuple[int, int]:
+    def download_stickers_misskey(self) -> tuple[int, int]:
         parsed = urlparse(self.url)
         if parsed.scheme:
             domain = parsed.scheme + "://" + parsed.netloc
@@ -47,7 +47,7 @@ class DownloadMisskey(DownloadBase):
         self.author = parsed.netloc
         MetadataHandler.set_metadata(self.out_dir, title=self.title, author=self.author)
 
-        targets: List[Tuple[str, Path]] = []
+        targets: list[tuple[str, Path]] = []
         for info in metadata["emojis"]:
             category = cast(str, info.get("category", "")).replace("-", "_")
             name = sanitize_filename(cast(str, info.get("name", "")).replace("-", "_"))
@@ -61,8 +61,8 @@ class DownloadMisskey(DownloadBase):
 
         results = self.download_multiple_files(targets)
 
-        ext: Optional[str] = None
-        emojis_new: List[Dict[str, Any]] = []
+        ext: str | None = None
+        emojis_new: list[dict[str, Any]] = []
         for info in metadata["emojis"]:
             fpath = Path(self.out_dir, info["fileName"])
             if fpath.suffix == ".unknown_ext":
@@ -92,9 +92,9 @@ class DownloadMisskey(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadMisskey(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_misskey()

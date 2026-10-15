@@ -5,7 +5,7 @@ import json
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
@@ -57,7 +57,7 @@ class DownloadBand(DownloadBase):
 
         return len(pack_files)
 
-    def get_metadata(self, pack_no: str) -> Optional[Dict[Any, Any]]:
+    def get_metadata(self, pack_no: str) -> dict[Any, Any] | None:
         r = requests.get(
             f"https://sapi.band.us/v1.0.0/get_sticker_info?pack_no={pack_no}"
         )
@@ -66,7 +66,7 @@ class DownloadBand(DownloadBase):
         else:
             return None
 
-    def download_stickers_band(self) -> Tuple[int, int]:
+    def download_stickers_band(self) -> tuple[int, int]:
         if urlparse(self.url).netloc != "www.band.us" and self.url.isnumeric() is False:
             self.cb.put(I("Download failed: Unsupported URL format"))
             return 0, 0
@@ -103,9 +103,9 @@ class DownloadBand(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadBand(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_band()

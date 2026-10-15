@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import time
 from http.cookiejar import CookieJar
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any
 
 import requests
 
@@ -21,7 +23,7 @@ class AuthLine(AuthBase):
 
         super().__init__(*args, **kwargs)
 
-    def get_cred(self) -> Tuple[Optional[str], str]:
+    def get_cred(self) -> tuple[str | None, str]:
         msg = I("Getting Line cookies")
         self.cb.put(("msg_dynamic", (msg,), None))
 
@@ -71,11 +73,11 @@ class AuthLine(AuthBase):
                 continue
             crd.close()
             self.cb.put(("msg_dynamic", (None,), None))
-            cookies_list = ["%s=%s" % (i["name"], i["value"]) for i in cookies_dict]
+            cookies_list = ["{}={}".format(i["name"], i["value"]) for i in cookies_dict]
             return ";".join(cookies_list), self.OK_MSG
 
     @staticmethod
-    def validate_cookies(cookies: Union[CookieJar, Dict[str, str]]) -> bool:
+    def validate_cookies(cookies: CookieJar | dict[str, str]) -> bool:
         headers = {
             "x-requested-with": "XMLHttpRequest",
         }
@@ -91,6 +93,4 @@ class AuthLine(AuthBase):
 
         response_dict = json.loads(response.text)
 
-        if response_dict["errorMessage"]:
-            return False
-        return True
+        return not response_dict["errorMessage"]

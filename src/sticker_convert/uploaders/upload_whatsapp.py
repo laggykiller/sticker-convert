@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import copy
 import zipfile
 from pathlib import Path
-from typing import Any, List, Tuple
+from typing import Any
 
 from sticker_convert.auth.auth_whatsapp import SWB
 from sticker_convert.converter import StickerConvert
@@ -48,8 +50,8 @@ class UploadWhatsapp(UploadBase):
         self.opt_comp_merged = copy.deepcopy(self.opt_comp)
         self.opt_comp_merged.merge(self.base_spec)
 
-    def upload_whatsapp(self) -> Tuple[int, int, List[str]]:
-        urls: List[str] = []
+    def upload_whatsapp(self) -> tuple[int, int, list[str]]:
+        urls: list[str] = []
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
             title=self.opt_output.title,
@@ -88,12 +90,12 @@ class UploadWhatsapp(UploadBase):
                 cover_path_new = Path("bytes.png")
                 if cover_path_old is None:
                     # First image in the directory, extracting first frame
-                    first_image = [
+                    first_image = next(
                         i
                         for i in sorted(self.opt_output.dir.iterdir())
                         if Path(self.opt_output.dir, i.name).is_file()
                         and i.suffix not in (".txt", ".m4a", ".wastickers")
-                    ][0]
+                    )
                     self.cb.put(I("Creating cover using {}").format(first_image.name))
                     success, _, cover_data, _ = StickerConvert.convert(
                         Path(self.opt_output.dir, first_image),
@@ -204,7 +206,7 @@ class UploadWhatsapp(UploadBase):
             else:
                 self.cb.put(I("Note: WhatsApp not setup yet for uploading"))
 
-            self.cb.put((out_f))
+            self.cb.put(out_f)
             urls.append(out_f)
 
         return stickers_total, stickers_total, urls
@@ -216,6 +218,6 @@ class UploadWhatsapp(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int, List[str]]:
+    ) -> tuple[int, int, list[str]]:
         exporter = UploadWhatsapp(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.upload_whatsapp()

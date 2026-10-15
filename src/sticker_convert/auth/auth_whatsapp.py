@@ -1,4 +1,5 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import os
 import platform
@@ -8,7 +9,7 @@ import time
 from collections.abc import Generator
 from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, cast
+from typing import Any, Dict, cast
 
 import qrcode
 import requests
@@ -20,7 +21,7 @@ from sticker_convert.utils.translate import I
 
 class SWB:
     def __init__(self, try_download: bool = False):
-        self.process: Optional[subprocess.Popen[str]] = None
+        self.process: subprocess.Popen[str] | None = None
         swb_dir = CONFIG_DIR / "SWB"
         swb_fname = "swb.exe" if platform.system() == "Windows" else "swb"
         swb_dir.mkdir(exist_ok=True)
@@ -29,7 +30,7 @@ class SWB:
 
         if self.swb_bin.is_file():
             swb_ver = subprocess.run(
-                [self.swb_bin, "-v"], capture_output=True, text=True
+                [self.swb_bin, "-v"], capture_output=True, text=True, check=False
             ).stdout.strip()
         else:
             swb_ver = None
@@ -43,10 +44,10 @@ class SWB:
         elif (swb_ver is None or swb_ver != latest_tag) and try_download is True:
             self.success, self.msg = self.get_swb(latest_tag, self.swb_bin)
             return
-        self.success = False if swb_ver is None else True
+        self.success = not swb_ver is None
         self.msg = I("Found sticker-whatsapp-bridge at {}").format(self.swb_bin)
 
-    def get_swb_latest_tag(self) -> Optional[str]:
+    def get_swb_latest_tag(self) -> str | None:
         r = requests.get(
             "https://api.github.com/repos/laggykiller/sticker-whatsapp-bridge/tags"
         )
@@ -58,7 +59,7 @@ class SWB:
         except json.JSONDecodeError:
             return None
 
-    def get_swb_arch(self) -> Optional[str]:
+    def get_swb_arch(self) -> str | None:
         archs = {
             "x64": ["amd64", "x86_64", "x64"],
             "arm64": ["arm64", "aarch64", "aarch64_be", "armv8b", "armv8l"],
@@ -69,7 +70,7 @@ class SWB:
                 return k
         return None
 
-    def get_swb(self, tag: str, dest: Path) -> Tuple[bool, str]:
+    def get_swb(self, tag: str, dest: Path) -> tuple[bool, str]:
         if platform.system() == "Windows":
             plat = "windows"
             suffix = ".exe"
@@ -102,7 +103,7 @@ class SWB:
         os.chmod(dest, os.stat(dest).st_mode | stat.S_IXUSR)
         return True, I("Downloaded sticker-whatsapp-bridge {}").format(fname)
 
-    def run(self, cmd: List[str]) -> Generator[Optional[Dict[str, str]], None, int]:
+    def run(self, cmd: list[str]) -> Generator[dict[str, str] | None, None, int]:
         cmds = [str(self.swb_bin)]
         cmds.extend(cmd)
         self.process = subprocess.Popen(
@@ -139,7 +140,7 @@ class AuthWhatsapp(AuthBase):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
 
-    def get_cred(self) -> Tuple[bool, str]:
+    def get_cred(self) -> tuple[bool, str]:
         self.cb.put(
             ("msg_dynamic", (I("Downloading sticker-whatsapp-bridge..."),), None)
         )

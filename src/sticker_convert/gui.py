@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 import platform
 import signal
@@ -8,11 +10,12 @@ from math import ceil
 from multiprocessing import Event, cpu_count
 from pathlib import Path
 from threading import Thread
-from typing import Any, Callable, Dict, Optional
+from typing import Any, Callable
 
 from mergedeep import merge  # type: ignore
 from PIL import ImageFont
 from ttkbootstrap import BooleanVar, DoubleVar, IntVar, StringVar, Window  # type: ignore
+from typing_extensions import Self
 
 from sticker_convert.definitions import CONFIG_DIR, DEFAULT_DIR, ROOT_DIR, RUNTIME_STATE
 from sticker_convert.gui_components.frames.comp_frame import CompFrame
@@ -85,7 +88,7 @@ class GUI(Window):
 
         self.bind("<<exec_in_main>>", self.exec_in_main)  # type: ignore
 
-    def __enter__(self) -> "GUI":
+    def __enter__(self) -> Self:
         return self
 
     def gui(self) -> None:
@@ -217,9 +220,9 @@ class GUI(Window):
         self.lang_display_var = StringVar(self)
         self.lang_true_var = StringVar(self)
         self.response_event = Event()
-        self.response: Optional[Any] = None
-        self.action: Optional[Callable[..., Any]] = None
-        self.job: Optional[Job] = None
+        self.response: Any | None = None
+        self.action: Callable[..., Any] | None = None
+        self.job: Job | None = None
 
     def init_frames(self) -> None:
         self.input_frame = InputFrame(
@@ -264,7 +267,7 @@ class GUI(Window):
         if (
             platform.system() == "Darwin"
             and platform.mac_ver()[0].split(".")[0] == "14"
-            and sys.version_info[0] == 3
+            and sys.version_info[0] == 3  # noqa: YTT201
             and sys.version_info[1] == 11
             and sys.version_info[2] <= 6
         ):
@@ -281,7 +284,7 @@ class GUI(Window):
         self.settings_path = CONFIG_DIR / "config.json"
         if self.settings_path.is_file():
             try:
-                self.settings: Dict[Any, Any] = JsonManager.load_json(
+                self.settings: dict[Any, Any] = JsonManager.load_json(
                     self.settings_path
                 )
             except JSONDecodeError:
@@ -303,7 +306,7 @@ class GUI(Window):
     def save_config(self) -> None:
         # Only update comp_custom if custom preset is selected
         if self.comp_preset_var.get() == "custom":
-            comp_custom: Dict[Any, Any] = merge(  # type: ignore
+            comp_custom: dict[Any, Any] = merge(  # type: ignore
                 self.compression_presets.get("custom"),  # type: ignore
                 self.get_opt_comp().to_dict(),
             )
@@ -371,7 +374,7 @@ class GUI(Window):
         self.no_compress_var.set(
             self.settings.get("comp", {}).get("no_compress", False)
         )
-        default_comp_preset = list(self.compression_presets.keys())[0]
+        default_comp_preset = next(iter(self.compression_presets.keys()))
         self.comp_preset_var.set(
             self.settings.get("comp", {}).get("preset", default_comp_preset)
         )
@@ -413,7 +416,7 @@ class GUI(Window):
         # Language
         self.lang_true_var.set(self.settings.get("lang", "auto"))
         self.lang_display_var.set(
-            [k for k, v in SUPPORTED_LANG.items() if v == self.lang_true_var.get()][0]
+            next(k for k, v in SUPPORTED_LANG.items() if v == self.lang_true_var.get())
         )
 
     def apply_creds(self) -> None:
@@ -434,25 +437,25 @@ class GUI(Window):
         self.discord_token_var.set(self.creds.get("discord", {}).get("token", ""))
 
     def get_input_name(self) -> str:
-        return [
+        return next(
             k
             for k, v in self.input_presets.items()
             if v["full_name"] == self.input_option_true_var.get()
-        ][0]
+        )
 
     def get_input_display_name(self) -> str:
-        return [
+        return next(
             k
             for k, v in self.input_presets.items()
             if v["full_name"] == self.input_option_display_var.get()
-        ][0]
+        )
 
     def get_output_name(self) -> str:
-        return [
+        return next(
             k
             for k, v in self.output_presets.items()
             if v["full_name"] == self.output_option_true_var.get()
-        ][0]
+        )
 
     # def get_output_display_name(self) -> str:
     #     return [

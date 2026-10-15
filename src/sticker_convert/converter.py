@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import os
 from fractions import Fraction
 from io import BytesIO
 from math import ceil, floor, log2
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
 from PIL import Image
@@ -20,7 +22,7 @@ from sticker_convert.utils.media.ebml_duration_spoof import spoof_duration
 from sticker_convert.utils.media.format_verify import FormatVerify
 from sticker_convert.utils.translate import get_translator
 
-I = get_translator()  # noqa: E741
+I = get_translator()
 
 if TYPE_CHECKING:
     from av.video.frame import VideoFrame
@@ -38,14 +40,14 @@ LOTTIE_EXT = (".lottie", ".lot", ".tgs", ".json", ".was")
 
 
 def get_step_value(
-    max_step: Optional[int],
-    min_step: Optional[int],
+    max_step: int | None,
+    min_step: int | None,
     step: int,
     steps: int,
     power: float = 1.0,
     even: bool = False,
     snap_pow2: bool = False,
-) -> Optional[int]:
+) -> int | None:
     # Power should be between -1 and positive infinity
     # Smaller power = More 'importance' of the parameter
     # Power of 1 is linear relationship
@@ -74,17 +76,17 @@ def get_step_value(
 
 
 def useful_array(
-    plane: "VideoPlane", bytes_per_pixel: int = 1, dtype: str = "uint8"
-) -> "np.ndarray[Any, Any]":
+    plane: VideoPlane, bytes_per_pixel: int = 1, dtype: str = "uint8"
+) -> np.ndarray[Any, Any]:
     total_line_size = abs(plane.line_size)
     useful_line_size = plane.width * bytes_per_pixel
-    arr: "np.ndarray[Any, Any]" = np.frombuffer(cast(bytes, plane), np.uint8)
+    arr: np.ndarray[Any, Any] = np.frombuffer(cast(bytes, plane), np.uint8)
     if total_line_size != useful_line_size:
         arr = arr.reshape(-1, total_line_size)[:, 0:useful_line_size].reshape(-1)
     return arr.view(np.dtype(dtype))
 
 
-def yuva_to_rgba(frame: "VideoFrame") -> "np.ndarray[Any, Any]":
+def yuva_to_rgba(frame: VideoFrame) -> np.ndarray[Any, Any]:
     # https://stackoverflow.com/questions/72308308/converting-yuv-to-rgb-in-python-coefficients-work-with-array-dont-work-with-n
 
     width = frame.width
@@ -121,7 +123,7 @@ def yuva_to_rgba(frame: "VideoFrame") -> "np.ndarray[Any, Any]":
 class StickerConvert:
     def __init__(
         self,
-        in_f: Union[Path, Tuple[Path, bytes]],
+        in_f: Path | tuple[Path, bytes],
         out_f: Path,
         opt_comp: CompOption,
         cb: CallbackProtocol,
@@ -147,7 +149,7 @@ class StickerConvert:
         )
         self.MSG_SVG_LONG = I("[W] Importing SVG takes long time")
 
-        self.in_f: Union[bytes, Path]
+        self.in_f: bytes | Path
         if isinstance(in_f, Path):
             self.in_f = in_f
             self.in_f_name = self.in_f.name
@@ -159,7 +161,7 @@ class StickerConvert:
             self.in_f_path = in_f[0]
             self.codec_info_orig = CodecInfo(in_f[1], Path(in_f[0]).suffix)
 
-        valid_formats: List[str] = []
+        valid_formats: list[str] = []
         for i in opt_comp.get_format():
             valid_formats.extend(i)
 
@@ -179,50 +181,50 @@ class StickerConvert:
         self.out_f_name: str = self.out_f.name
 
         self.cb = cb
-        self.frames_raw: "List[np.ndarray[Any, Any]]" = []
-        self.frames_processed: "List[np.ndarray[Any, Any]]" = []
+        self.frames_raw: list[np.ndarray[Any, Any]] = []
+        self.frames_processed: list[np.ndarray[Any, Any]] = []
         self.opt_comp: CompOption = opt_comp
         if not self.opt_comp.steps:
             self.opt_comp.steps = 1
 
         self.size: int = 0
-        self.size_max: Optional[int] = None
-        self.res_w: Optional[int] = None
-        self.res_h: Optional[int] = None
-        self.quality: Optional[int] = None
-        self.fps: Optional[Fraction] = None
-        self.color: Optional[int] = None
+        self.size_max: int | None = None
+        self.res_w: int | None = None
+        self.res_h: int | None = None
+        self.quality: int | None = None
+        self.fps: Fraction | None = None
+        self.color: int | None = None
         self.duration_spoof = (
             self.opt_comp.duration_spoof is True
             and self.out_f.suffix.lower() in (".mkv", ".webm")
         )
 
-        self.bg_color: Optional[Tuple[int, int, int, int]] = None
+        self.bg_color: tuple[int, int, int, int] | None = None
         if self.opt_comp.bg_color:
             r, g, b, a = bytes.fromhex(self.opt_comp.bg_color)
             self.bg_color = (r, g, b, a)
 
         self.tmp_f: BytesIO = BytesIO()
-        self.result: Optional[bytes] = None
+        self.result: bytes | None = None
         self.result_size: int = 0
-        self.result_step: Optional[int] = None
+        self.result_step: int | None = None
 
         self.apngasm = None
 
     @staticmethod
     def convert(
-        in_f: Union[Path, Tuple[Path, bytes]],
+        in_f: Path | tuple[Path, bytes],
         out_f: Path,
         opt_comp: CompOption,
         cb: CallbackProtocol,
         _cb_return: CallbackReturn,
-    ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
+    ) -> tuple[bool, Path, None | bytes | Path, int]:
         sticker = StickerConvert(in_f, out_f, opt_comp, cb)
         result = sticker._convert()
         cb.put("update_bar")
         return result
 
-    def _convert(self) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
+    def _convert(self) -> tuple[bool, Path, None | bytes | Path, int]:
         result = self.check_if_compatible()
         if result:
             return self.compress_done(result)
@@ -232,7 +234,7 @@ class StickerConvert:
         ):
             return self.lot2lot()
 
-        self.cb.put((self.MSG_START_COMP.format(self.in_f_name, self.out_f_name)))
+        self.cb.put(self.MSG_START_COMP.format(self.in_f_name, self.out_f_name))
 
         steps_list = self.generate_steps_list()
 
@@ -313,7 +315,7 @@ class StickerConvert:
             else:
                 return self.compress_fail()
 
-    def check_if_compatible(self) -> Optional[bytes]:
+    def check_if_compatible(self) -> bytes | None:
         f_fmt = self.opt_comp.get_format()
         if (
             # Issue #260: Some webp file not accepted by Whatsapp
@@ -341,7 +343,7 @@ class StickerConvert:
                 file_info=self.codec_info_orig,
             )
         ):
-            self.cb.put((self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name)))
+            self.cb.put(self.MSG_SKIP_COMP.format(self.in_f_name, self.out_f_name))
 
             if isinstance(self.in_f, Path):
                 with open(self.in_f, "rb") as f:
@@ -355,8 +357,8 @@ class StickerConvert:
 
         return None
 
-    def generate_steps_list(self) -> List[Tuple[Optional[int], ...]]:
-        steps_list: List[Tuple[Optional[int], ...]] = []
+    def generate_steps_list(self) -> list[tuple[int | None, ...]]:
+        steps_list: list[tuple[int | None, ...]] = []
         need_even = self.out_f.suffix in (".webm", ".mp4", ".mkv", ".webp")
         for step in range(self.opt_comp.steps, -1, -1):
             steps_list.append(
@@ -413,7 +415,7 @@ class StickerConvert:
 
     def compress_fail(
         self,
-    ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
+    ) -> tuple[bool, Path, None | bytes | Path, int]:
         msg = self.MSG_FAIL_COMP.format(
             self.in_f_name, self.out_f_name, self.size_max, self.size
         )
@@ -422,9 +424,9 @@ class StickerConvert:
         return False, self.in_f_path, self.out_f, self.size
 
     def compress_done(
-        self, data: bytes, result_step: Optional[int] = None
-    ) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
-        out_f: Union[None, bytes, Path]
+        self, data: bytes, result_step: int | None = None
+    ) -> tuple[bool, Path, None | bytes | Path, int]:
+        out_f: None | bytes | Path
 
         if self.out_f.stem == "none":
             out_f = None
@@ -443,14 +445,14 @@ class StickerConvert:
 
         return True, self.in_f_path, out_f, self.result_size
 
-    def lot2lot(self) -> Tuple[bool, Path, Union[None, bytes, Path], int]:
-        out_f: Union[None, bytes, Path]
+    def lot2lot(self) -> tuple[bool, Path, None | bytes | Path, int]:
+        out_f: None | bytes | Path
         if isinstance(self.in_f, Path):
             suffix = self.in_f.suffix
         else:
             suffix = Path(self.in_f_name).suffix
 
-        in_f: Union[Path, BytesIO]
+        in_f: Path | BytesIO
         if isinstance(self.in_f, Path):
             in_f = self.in_f
         else:
@@ -526,7 +528,7 @@ class StickerConvert:
         height = self.codec_info_orig.res[1]
 
         if RUNTIME_STATE.get("crd") is None:
-            chrome_path: Optional[str]
+            chrome_path: str | None
             if self.opt_comp.chromium_path:
                 chrome_path = self.opt_comp.chromium_path
             else:
@@ -604,7 +606,7 @@ class StickerConvert:
                 and self.codec_info_orig.fps != 0.0
             ):
                 # Pillow is not reliable for getting webp frame durations
-                durations: Optional[List[int]]
+                durations: list[int] | None
                 if im.format == "WEBP":
                     _, _, _, durations = CodecInfo._get_file_fps_frames_duration_webp(  # type: ignore
                         self.in_f
@@ -642,11 +644,10 @@ class StickerConvert:
         from av.codec.context import CodecContext
         from av.container.input import InputContainer
         from av.video.codeccontext import VideoCodecContext
-        from av.video.frame import VideoFrame
 
         # Crashes when handling some webm in yuv420p and convert to rgba
         # https://github.com/PyAV-Org/PyAV/issues/1166
-        file: Union[BytesIO, str]
+        file: BytesIO | str
         if isinstance(self.in_f, Path):
             file = self.in_f.as_posix()
         else:
@@ -657,7 +658,7 @@ class StickerConvert:
             if context.name == "vp8":
                 context = CodecContext.create("libvpx", "r")
             elif context.name == "vp9":
-                context = cast(
+                context = cast(  # type: ignore
                     VideoCodecContext, CodecContext.create("libvpx-vp9", "r")
                 )
 
@@ -684,7 +685,7 @@ class StickerConvert:
                         graph.configure()
 
                         graph.push(frame)
-                        frame_resized = cast(VideoFrame, graph.pull())
+                        frame_resized = cast(av.VideoFrame, graph.pull())
                     else:
                         frame_resized = frame
 
@@ -726,7 +727,7 @@ class StickerConvert:
         if suffix == ".was":
             import zipfile
 
-            in_f: Union[Path, BytesIO]
+            in_f: Path | BytesIO
             if isinstance(self.in_f, Path):
                 in_f = self.in_f
             else:
@@ -755,7 +756,7 @@ class StickerConvert:
 
         anim.lottie_animation_destroy()
 
-    def determine_bg_color(self) -> Tuple[int, int, int, int]:
+    def determine_bg_color(self) -> tuple[int, int, int, int]:
         mean_total = 0.0
         # Calculate average color of all frames for selecting background color
         for frame in self.frames_raw:
@@ -777,9 +778,9 @@ class StickerConvert:
             return (0, 0, 0, 0)
 
     def frames_resize(
-        self, frames_in: "List[np.ndarray[Any, Any]]"
-    ) -> "List[np.ndarray[Any, Any]]":
-        frames_out: "List[np.ndarray[Any, Any]]" = []
+        self, frames_in: list[np.ndarray[Any, Any]]
+    ) -> list[np.ndarray[Any, Any]]:
+        frames_out: list[np.ndarray[Any, Any]] = []
 
         resample: Literal[0, 1, 2, 3, 4, 5]
         if self.opt_comp.scale_filter == "nearest":
@@ -817,21 +818,22 @@ class StickerConvert:
                 height_new = int(self.res_h * scaling)
                 width_new = int(width * self.res_h / height * scaling)
 
-            with im.resize((width_new, height_new), resample=resample) as im_resized:
-                with Image.new(
-                    "RGBA", (self.res_w, self.res_h), self.bg_color
-                ) as im_new:
-                    im_new.alpha_composite(
-                        im_resized,
-                        ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2),
-                    )
-                    frames_out.append(np.asarray(im_new))
+            with im.resize(
+                (width_new, height_new), resample=resample
+            ) as im_resized, Image.new(
+                "RGBA", (self.res_w, self.res_h), self.bg_color
+            ) as im_new:
+                im_new.alpha_composite(
+                    im_resized,
+                    ((self.res_w - width_new) // 2, (self.res_h - height_new) // 2),
+                )
+                frames_out.append(np.asarray(im_new))
 
         return frames_out
 
     def frames_drop(
-        self, frames_in: "List[np.ndarray[Any, Any]]"
-    ) -> "List[np.ndarray[Any, Any]]":
+        self, frames_in: list[np.ndarray[Any, Any]]
+    ) -> list[np.ndarray[Any, Any]]:
         if (
             not self.codec_info_orig.is_animated
             or not self.fps
@@ -839,7 +841,7 @@ class StickerConvert:
         ):
             return [frames_in[0]]
 
-        frames_out: "List[np.ndarray[Any, Any]]" = []
+        frames_out: list[np.ndarray[Any, Any]] = []
 
         # fps_ratio: 1 frame in new anim equal to how many frame in old anim
         # speed_ratio: How much to speed up / slow down
@@ -923,8 +925,8 @@ class StickerConvert:
         import av
         from av.video.stream import VideoStream
 
-        options_container: Dict[str, str] = {}
-        options_stream: Dict[str, str] = {}
+        options_container: dict[str, str] = {}
+        options_stream: dict[str, str] = {}
 
         if isinstance(self.quality, int):
             # Seems not actually working
@@ -955,7 +957,7 @@ class StickerConvert:
             options=options_container,
         ) as output:
             out_stream = output.add_stream(codec, rate=self.fps, options=options_stream)  # type: ignore
-            out_stream = cast(VideoStream, out_stream)
+            out_stream = cast(VideoStream, out_stream)  # type: ignore
             assert isinstance(self.res_w, int) and isinstance(self.res_h, int)
             out_stream.width = self.res_w
             out_stream.height = self.res_h
@@ -981,7 +983,7 @@ class StickerConvert:
             self.tmp_f.write(tmp_f_new)
 
     def _frames_export_pil_anim(self) -> None:
-        extra_kwargs: Dict[str, Any] = {}
+        extra_kwargs: dict[str, Any] = {}
 
         # disposal=2 on gif cause flicker in image with transparency
         # Occurs in Pillow == 10.2.0

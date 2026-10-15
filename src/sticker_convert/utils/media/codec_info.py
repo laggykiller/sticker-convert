@@ -9,7 +9,7 @@ from functools import reduce
 from io import BytesIO
 from math import ceil, gcd
 from pathlib import Path
-from typing import BinaryIO, List, Optional, Tuple, Union, cast
+from typing import BinaryIO, cast
 
 from PIL import Image, UnidentifiedImageError
 from rlottie_python.rlottie_wrapper import LottieAnimation
@@ -50,10 +50,10 @@ def get_five_dec_place(value: float) -> str:
 def likely_int(value: float) -> bool:
     if isinstance(value, int):
         return True
-    return True if get_five_dec_place(value) in ("99999", "00000") else False
+    return get_five_dec_place(value) in ("99999", "00000")
 
 
-def durations_gcd(*durations: Union[int, float]) -> Union[float, Fraction]:
+def durations_gcd(*durations: float) -> float | Fraction:
     if any(i for i in durations if isinstance(i, float)):
         if all(i for i in durations if likely_int(i)):
             return Fraction(gcd(*(int(rounding(i)) for i in durations)), 1)
@@ -61,13 +61,12 @@ def durations_gcd(*durations: Union[int, float]) -> Union[float, Fraction]:
         for x in (3, 6, 7, 9, 11, 13):
             if all(likely_int(i * x) for i in durations):
                 return Fraction(gcd(*(int(rounding(i * x)) for i in durations)), x)
-        else:
-            return min(durations)
+        return min(durations)
     else:
         return Fraction(reduce(gcd, durations), 1)  # type: ignore
 
 
-def open_lottie(file: Union[Path, bytes]) -> LottieAnimation:
+def open_lottie(file: Path | bytes) -> LottieAnimation:
     if isinstance(file, Path):
         if file.suffix == ".tgs":
             return LottieAnimation.from_tgs(file.as_posix())
@@ -104,10 +103,8 @@ def open_lottie(file: Union[Path, bytes]) -> LottieAnimation:
 
 
 class CodecInfo:
-    def __init__(
-        self, file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> None:
-        self.file_ext: Optional[str]
+    def __init__(self, file: Path | bytes, file_ext: str | None = None) -> None:
+        self.file_ext: str | None
         if file_ext is None and isinstance(file, Path):
             self.file_ext = CodecInfo.get_file_ext(file)
         else:
@@ -127,8 +124,8 @@ class CodecInfo:
 
     @staticmethod
     def get_file_fps_frames_duration(
-        file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> Tuple[float, int, int]:
+        file: Path | bytes, file_ext: str | None = None
+    ) -> tuple[float, int, int]:
         fps: float
         duration: int
 
@@ -160,7 +157,7 @@ class CodecInfo:
         return fps, frames, duration
 
     @staticmethod
-    def get_file_fps(file: Union[Path, bytes], file_ext: Optional[str] = None) -> float:
+    def get_file_fps(file: Path | bytes, file_ext: str | None = None) -> float:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
@@ -185,8 +182,8 @@ class CodecInfo:
 
     @staticmethod
     def get_file_frames(
-        file: Union[Path, bytes],
-        file_ext: Optional[str] = None,
+        file: Path | bytes,
+        file_ext: str | None = None,
         check_anim: bool = False,
     ) -> int:
         # If check_anim is True, return value > 1 means the file is animated
@@ -214,9 +211,7 @@ class CodecInfo:
         return frames
 
     @staticmethod
-    def get_file_duration(
-        file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> int:
+    def get_file_duration(file: Path | bytes, file_ext: str | None = None) -> int:
         duration: int
 
         # Return duration in miliseconds
@@ -241,21 +236,21 @@ class CodecInfo:
         return duration
 
     @staticmethod
-    def _get_file_fps_lottie(file: Union[Path, bytes]) -> int:
+    def _get_file_fps_lottie(file: Path | bytes) -> int:
         anim = open_lottie(file)
         fps = anim.lottie_animation_get_framerate()
 
         return fps
 
     @staticmethod
-    def _get_file_frames_lottie(file: Union[Path, bytes]) -> int:
+    def _get_file_frames_lottie(file: Path | bytes) -> int:
         anim = open_lottie(file)
         frames = anim.lottie_animation_get_totalframe()
 
         return frames
 
     @staticmethod
-    def _get_file_fps_frames_lottie(file: Union[Path, bytes]) -> Tuple[int, int]:
+    def _get_file_fps_frames_lottie(file: Path | bytes) -> tuple[int, int]:
         anim = open_lottie(file)
         fps = anim.lottie_animation_get_framerate()
         frames = anim.lottie_animation_get_totalframe()
@@ -265,10 +260,10 @@ class CodecInfo:
 
     @staticmethod
     def _get_file_fps_frames_duration_pillow(
-        file: Union[Path, bytes], frames_only: bool = False
-    ) -> Tuple[float, int, int]:
+        file: Path | bytes, frames_only: bool = False
+    ) -> tuple[float, int, int]:
         total_duration = 0
-        durations: List[int] = []
+        durations: list[int] = []
 
         with Image.open(file) as im:
             if "n_frames" in dir(im):
@@ -295,35 +290,34 @@ class CodecInfo:
 
     @staticmethod
     def _get_file_fps_frames_duration_webp(
-        file: Union[Path, bytes],
-    ) -> Tuple[float, int, int, List[int]]:
+        file: Path | bytes,
+    ) -> tuple[float, int, int, list[int]]:
         total_duration = 0
         frames = 0
-        durations: List[int] = []
-        durations_unique: List[int] = []
+        durations: list[int] = []
+        durations_unique: list[int] = []
 
-        def _open_f(file: Union[Path, bytes]) -> BinaryIO:
+        def _open_f(file: Path | bytes) -> BinaryIO:
             if isinstance(file, Path):
                 return open(file, "r+b")
             return BytesIO(file)
 
-        with _open_f(file) as f:
-            with mmap.mmap(f.fileno(), 0) as mm:
-                while True:
-                    anmf_pos = mm.find(b"ANMF")
-                    if anmf_pos == -1:
-                        break
-                    mm.seek(anmf_pos + 20)
-                    frame_duration_32 = mm.read(4)
-                    frame_duration_bytes = frame_duration_32[:-1] + bytes(
-                        int(frame_duration_32[-1]) & 0b11111100
-                    )
-                    frame_duration = int.from_bytes(frame_duration_bytes, "little")
-                    if frame_duration not in durations_unique and frame_duration != 0:
-                        durations_unique.append(frame_duration)
-                    durations.append(frame_duration)
-                    total_duration += frame_duration
-                    frames += 1
+        with _open_f(file) as f, mmap.mmap(f.fileno(), 0) as mm:
+            while True:
+                anmf_pos = mm.find(b"ANMF")
+                if anmf_pos == -1:
+                    break
+                mm.seek(anmf_pos + 20)
+                frame_duration_32 = mm.read(4)
+                frame_duration_bytes = frame_duration_32[:-1] + bytes(
+                    int(frame_duration_32[-1]) & 0b11111100
+                )
+                frame_duration = int.from_bytes(frame_duration_bytes, "little")
+                if frame_duration not in durations_unique and frame_duration != 0:
+                    durations_unique.append(frame_duration)
+                durations.append(frame_duration)
+                total_duration += frame_duration
+                frames += 1
 
         if frames <= 1:
             return 0.0, 1, 0, durations
@@ -339,10 +333,10 @@ class CodecInfo:
 
     @staticmethod
     def _get_file_frames_duration_av(
-        file: Union[Path, bytes],
-        frames_to_iterate: Optional[int] = None,
+        file: Path | bytes,
+        frames_to_iterate: int | None = None,
         frames_only: bool = False,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         import av
         from av.container.input import InputContainer
 
@@ -351,7 +345,7 @@ class CodecInfo:
         # duration could be spoofed
         # https://github.com/sliva0/tgradish/blob/master/src/tgradish/spoofer.py
 
-        file_ref: Union[str, BinaryIO]
+        file_ref: str | BinaryIO
         if isinstance(file, Path):
             file_ref = file.as_posix()
         else:
@@ -384,11 +378,11 @@ class CodecInfo:
             return frame_count, int(rounding(float(duration)))
 
     @staticmethod
-    def get_file_codec(file: Union[Path, bytes], file_ext: Optional[str] = None) -> str:
+    def get_file_codec(file: Path | bytes, file_ext: str | None = None) -> str:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
-        file_ref: Union[str, BinaryIO]
+        file_ref: str | BinaryIO
         if isinstance(file, Path):
             file_ref = file.as_posix()
         else:
@@ -429,8 +423,8 @@ class CodecInfo:
 
     @staticmethod
     def get_file_res(
-        file: Union[Path, bytes], file_ext: Optional[str] = None
-    ) -> Tuple[int, int]:
+        file: Path | bytes, file_ext: str | None = None
+    ) -> tuple[int, int]:
         if not file_ext and isinstance(file, Path):
             file_ext = CodecInfo.get_file_ext(file)
 
@@ -448,7 +442,7 @@ class CodecInfo:
         else:
             import av
 
-            file_ref: Union[str, BinaryIO]
+            file_ref: str | BinaryIO
             if isinstance(file, Path):
                 file_ref = file.as_posix()
             else:
@@ -469,15 +463,13 @@ class CodecInfo:
         return format_detect(file)
 
     @staticmethod
-    def is_anim(file: Union[Path, bytes]) -> bool:
-        if CodecInfo.get_file_frames(file, check_anim=True) > 1:
-            return True
-        return False
+    def is_anim(file: Path | bytes) -> bool:
+        return CodecInfo.get_file_frames(file, check_anim=True) > 1
 
     @staticmethod
     def get_svg_info(
-        file: Union[Path, bytes],
-    ) -> Tuple[float, int, int, Tuple[int, int]]:
+        file: Path | bytes,
+    ) -> tuple[float, int, int, tuple[int, int]]:
         import warnings
 
         from bs4 import BeautifulSoup, XMLParsedAsHTMLWarning

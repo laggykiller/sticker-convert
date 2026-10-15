@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any
 from urllib import parse
 
 import requests
@@ -22,7 +22,7 @@ class DownloadOgq(DownloadBase):
         super().__init__(*args, **kwargs)
         self.headers = {"User-Agent": "Mozilla/5.0"}
 
-    def download_stickers_ogq(self) -> Tuple[int, int]:
+    def download_stickers_ogq(self) -> tuple[int, int]:
         url_parse = parse.urlparse(self.url)
         if (
             url_parse.netloc != "ogqmarket.naver.com"
@@ -41,9 +41,9 @@ class DownloadOgq(DownloadBase):
         title_tag = soup.select_one("div.header div div.title p")  # type: ignore
         title = title_tag.text.strip() if title_tag else artwork_id
 
-        seen: List[str] = []
-        imgs: List[str] = []
-        targets: List[Tuple[str, Path]] = []
+        seen: list[str] = []
+        imgs: list[str] = []
+        targets: list[tuple[str, Path]] = []
         n = 0
         for img in soup.find_all("img", alt="sticker-detail-image-prevew"):
             src = img.get("src")
@@ -72,9 +72,9 @@ class DownloadOgq(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadOgq(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_ogq()

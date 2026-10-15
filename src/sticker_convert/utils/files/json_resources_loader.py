@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 from typing import Any, Dict, cast
 
 from mergedeep import merge  # type: ignore
@@ -7,7 +9,7 @@ from sticker_convert.definitions import CONFIG_DIR, ROOT_DIR, RUNTIME_STATE
 from sticker_convert.utils.files.json_manager import JsonManager
 
 
-def load_resource_json(json_name: str) -> Dict[Any, Any]:
+def load_resource_json(json_name: str) -> dict[Any, Any]:
     if RUNTIME_STATE.get(f"{json_name}_json") is not None:
         return cast(Dict[Any, Any], RUNTIME_STATE[f"{json_name}_json"])
     else:
@@ -24,7 +26,7 @@ def load_resource_json(json_name: str) -> Dict[Any, Any]:
 
         if json_to_merge and json_to_merge.exists():
             custom_preset_json = JsonManager.load_json(json_to_merge)
-            loaded_json: Dict[Any, Any] = merge(  # type: ignore
+            loaded_json: dict[Any, Any] = merge(  # type: ignore
                 loaded_json,  # type: ignore
                 custom_preset_json,
             )

@@ -12,7 +12,7 @@ from sticker_convert.utils.translate import I
 
 class SignalGetAuthWindow(BaseWindow):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(SignalGetAuthWindow, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.title("Get Signal uuid and password")
 

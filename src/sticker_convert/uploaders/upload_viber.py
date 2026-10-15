@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import copy
 import json
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 import requests
 
@@ -35,14 +37,14 @@ class UploadViber(UploadBase):
         self.opt_comp_cover_merged = copy.deepcopy(self.opt_comp)
         self.opt_comp_cover_merged.merge(self.png_cover_spec)
 
-    def upload_stickers_viber(self) -> Tuple[int, int, List[str]]:
-        urls: List[str] = []
+    def upload_stickers_viber(self) -> tuple[int, int, list[str]]:
+        urls: list[str] = []
 
         if not self.opt_cred.viber_auth:
             self.cb.put(I("Viber auth required for uploading to viber"))
             return 0, 0, urls
 
-        upload_data_base: Dict[str, str] = {}
+        upload_data_base: dict[str, str] = {}
         for i in self.opt_cred.viber_auth.split(";"):
             j = i.split(":")
             upload_data_base[j[0]] = j[1]
@@ -173,6 +175,6 @@ class UploadViber(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int, List[str]]:
+    ) -> tuple[int, int, list[str]]:
         exporter = UploadViber(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.upload_stickers_viber()

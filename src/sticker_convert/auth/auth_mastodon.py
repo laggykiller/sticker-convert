@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import time
 from http.cookiejar import CookieJar
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
@@ -22,7 +24,7 @@ class AuthMastodon(AuthBase):
 
         super().__init__(*args, **kwargs)
 
-    def get_cred(self) -> Tuple[Optional[str], str]:
+    def get_cred(self) -> tuple[str | None, str]:
         msg = I("Getting Mastodon cookies")
         self.cb.put(("msg_dynamic", (msg,), None))
 
@@ -89,7 +91,7 @@ class AuthMastodon(AuthBase):
     @staticmethod
     def validate_cookies(
         url: str,
-        cookies: Union[CookieJar, Dict[str, str]],
+        cookies: CookieJar | dict[str, str],
     ) -> bool:
         scheme = urlparse(url).scheme
         if scheme == "":
@@ -99,6 +101,4 @@ class AuthMastodon(AuthBase):
             f"{scheme}://{netloc}",
             cookies=cookies,  # type: ignore
         )
-        if response.cookies.get_dict().get("_mastodon_session"):
-            return False
-        return True
+        return not response.cookies.get_dict().get("_mastodon_session")

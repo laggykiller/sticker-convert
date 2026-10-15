@@ -8,7 +8,7 @@ from datetime import datetime
 from multiprocessing import Manager, Process, Value
 from pathlib import Path
 from threading import Thread
-from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Tuple, Union, cast
+from typing import TYPE_CHECKING, Any, Callable, cast
 
 from sticker_convert.definitions import RUNTIME_STATE
 from sticker_convert.job_option import CompOption, CredOption, InputOption, OutputOption
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
 
 
 class Executor:
-    def __init__(self, cb: Union[CallbackGui, CallbackCli]) -> None:
+    def __init__(self, cb: CallbackGui | CallbackCli) -> None:
         self.cb_msg = cb.cb_msg
         self.cb_msg_block = cb.cb_msg_block
         self.cb_msg_dynamic = cb.cb_msg_dynamic
@@ -34,11 +34,11 @@ class Executor:
         self.cb_queue: CbQueueType = self.manager.Queue()
         self.results_list: ResultsListType = self.manager.list()
         self.cb_return = CallbackReturn(self.manager)
-        self.processes: List[Process] = []
+        self.processes: list[Process] = []
 
         self.is_cancel_job = Value("i", 0)
 
-        self.cb_thread_instance: Optional[Thread] = None
+        self.cb_thread_instance: Thread | None = None
 
     def cb_thread(
         self,
@@ -55,27 +55,27 @@ class Executor:
             if isinstance(i, tuple):
                 action = i[0]
                 if len(i) >= 2:
-                    args: Tuple[str, ...] = i[1] if i[1] else tuple()
+                    args: tuple[str, ...] = i[1] if i[1] else ()
                 else:
-                    args = tuple()
+                    args = ()
                 if len(i) >= 3:
-                    kwargs: Dict[str, str] = i[2] if i[2] else {}
+                    kwargs: dict[str, str] = i[2] if i[2] else {}
                 else:
                     kwargs = {}
             else:
                 action = i
-                args = tuple()
+                args = ()
                 kwargs = {}
             self.cb(action, args, kwargs)
 
     def cb(
         self,
-        action: Optional[str],
-        args: Optional[Tuple[Any, ...]] = None,
-        kwargs: Optional[Dict[str, Any]] = None,
+        action: str | None,
+        args: tuple[Any, ...] | None = None,
+        kwargs: dict[str, Any] | None = None,
     ) -> None:
         if args is None:
-            args = tuple()
+            args = ()
         if kwargs is None:
             kwargs = {}
         if action == "msg":
@@ -108,8 +108,8 @@ class Executor:
             try:
                 results = work_func(*work_args, cb_queue, cb_return)
                 results_list.append(results)
-            except Exception:
-                arg_dump: List[Any] = []
+            except Exception:  # noqa: BLE001
+                arg_dump: list[Any] = []
                 for i in work_args:
                     if isinstance(i, CredOption):
                         arg_dump.append("CredOption(REDACTED)")
@@ -160,7 +160,7 @@ class Executor:
             self.processes.append(process)
 
     def add_work(
-        self, work_func: Callable[..., Any], work_args: Tuple[Any, ...]
+        self, work_func: Callable[..., Any], work_args: tuple[Any, ...]
     ) -> None:
         self.work_queue.put((work_func, work_args))
 
@@ -203,14 +203,14 @@ class Job:
         opt_comp: CompOption,
         opt_output: OutputOption,
         opt_cred: CredOption,
-        cb: Union[CallbackCli, CallbackGui],
+        cb: CallbackCli | CallbackGui,
     ) -> None:
         self.opt_input = opt_input
         self.opt_comp = opt_comp
         self.opt_output = opt_output
         self.opt_cred = opt_cred
 
-        self.out_urls: List[str] = []
+        self.out_urls: list[str] = []
 
         self.executor = Executor(cb)
 
@@ -223,7 +223,7 @@ class Job:
 
         self.executor.cb("msg", kwargs={"cls": True})
 
-        tasks: Tuple[Callable[..., Tuple[bool, Optional[str]]], ...] = (
+        tasks: tuple[Callable[..., tuple[bool, str | None]], ...] = (
             self.verify_input,
             self.cleanup,
             self.download,
@@ -232,7 +232,7 @@ class Job:
         )
 
         code = 0
-        summaries: List[str] = []
+        summaries: list[str] = []
         for task in tasks:
             self.executor.cb("bar", kwargs={"set_progress_mode": "indeterminate"})
             success, summary = task()
@@ -268,7 +268,7 @@ class Job:
     def cancel(self, *_: Any, **_kwargs: Any) -> None:
         self.executor.kill_workers()
 
-    def verify_input(self) -> Tuple[bool, None]:
+    def verify_input(self) -> tuple[bool, None]:
         from sticker_convert.utils.files.metadata_handler import MetadataHandler
 
         info_msg = ""
@@ -524,7 +524,7 @@ class Job:
 
         return True, None
 
-    def cleanup(self) -> Tuple[bool, None]:
+    def cleanup(self) -> tuple[bool, None]:
         from sticker_convert.utils.files.metadata_handler import MetadataHandler
 
         # If input is 'From local directory', then we should keep files in input/output directory as it maybe edited by user
@@ -583,8 +583,8 @@ class Job:
 
         return True, None
 
-    def download(self) -> Tuple[bool, str]:
-        downloaders: List[Callable[..., Tuple[int, int]]] = []
+    def download(self) -> tuple[bool, str]:
+        downloaders: list[Callable[..., tuple[int, int]]] = []
 
         if self.opt_input.option == "signal":
             from sticker_convert.downloaders.download_signal import DownloadSignal
@@ -673,7 +673,7 @@ class Job:
             f"Download: {stickers_ok}/{stickers_total} stickers success",
         )
 
-    def compress(self) -> Tuple[bool, str]:
+    def compress(self) -> tuple[bool, str]:
         from sticker_convert.converter import StickerConvert
         from sticker_convert.utils.media.codec_info import CodecInfo
 
@@ -713,7 +713,7 @@ class Job:
         input_dir = Path(self.opt_input.dir)
         output_dir = Path(self.opt_output.dir)
 
-        in_fs: List[Path] = []
+        in_fs: list[Path] = []
 
         # .txt: emoji.txt, title.txt
         # .m4a: line sticker sound effects
@@ -757,7 +757,7 @@ class Job:
         success = True
         stickers_ok = 0
         stickers_total = 0
-        fails: List[str] = []
+        fails: list[str] = []
         for result in self.executor.results_list:
             stickers_total += 1
             if result[0] is False:
@@ -775,14 +775,14 @@ class Job:
             f"Compress: {stickers_ok}/{stickers_total} stickers success" + msg_append,
         )
 
-    def export(self) -> Tuple[bool, str]:
+    def export(self) -> tuple[bool, str]:
         if self.opt_output.option == "local":
             self.executor.cb(I("Skipped export (Saving to local directory only)"))
             return True, I("Export: Skipped (Saving to local directory only)")
 
         self.executor.cb(I("Exporting..."))
 
-        exporters: List[Callable[..., Tuple[int, int, List[str]]]] = []
+        exporters: list[Callable[..., tuple[int, int, list[str]]]] = []
 
         if self.opt_output.option == "whatsapp":
             from sticker_convert.uploaders.upload_whatsapp import UploadWhatsapp

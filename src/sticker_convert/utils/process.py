@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 import platform
 import shutil
@@ -6,7 +8,7 @@ import subprocess
 import time
 from getpass import getpass
 from io import BytesIO
-from typing import Callable, Optional, Union
+from typing import Callable
 from zipfile import ZipFile
 
 import psutil
@@ -26,7 +28,7 @@ def killall(name: str) -> bool:
     return result
 
 
-def find_pid_by_name(name: str) -> Optional[int]:
+def find_pid_by_name(name: str) -> int | None:
     for proc in psutil.process_iter():  # type: ignore
         if name in proc.name().lower():
             return proc.pid
@@ -49,9 +51,10 @@ if platform.system() == "Windows":
             ["net", "user", username],
             capture_output=True,
             text=True,
+            check=False,
         ).stdout
 
-        return True if "*Administrators" in s else False
+        return "*Administrators" in s
 
 elif platform.system() == "Linux":
 
@@ -63,16 +66,17 @@ elif platform.system() == "Linux":
             ["sudo", "-l"],
             capture_output=True,
             text=True,
+            check=False,
         ).stdout
 
-        return True if "may run the following commands" in s else False
+        return "may run the following commands" in s
 
 
 def _get_mem_win_procdump(
-    pid: Union[str, int],
-    pw_func: Optional[Callable[..., str]] = None,
+    pid: str | int,
+    pw_func: Callable[..., str] | None = None,
     is_wine: bool = False,
-) -> Optional[bytes]:
+) -> bytes | None:
     procdump_dir = CONFIG_DIR / "ProcDump"
     procdump_bin = procdump_dir / "procdump.exe"
     if procdump_bin.is_file() is False:
@@ -93,7 +97,7 @@ def _get_mem_win_procdump(
         dump_fpath = os.path.expandvars(f"%temp%/memdump.{pid}.dmp")
     cmd += [str(procdump_bin), "-accepteula", "-ma", str(pid), dump_fpath]
 
-    subprocess.run(cmd)
+    subprocess.run(cmd, check=True)
 
     with open(dump_fpath, "rb") as f:
         s = f.read()
@@ -103,8 +107,8 @@ def _get_mem_win_procdump(
 
 
 def _get_mem_win_builtin(
-    pid: Union[str, int], pw_func: Optional[Callable[..., str]] = None
-) -> Optional[bytes]:
+    pid: str | int, pw_func: Callable[..., str] | None = None
+) -> bytes | None:
     from pathlib import WindowsPath
 
     memdump_ps_path = str(WindowsPath(ROOT_DIR / "resources/memdump_windows.ps1"))
@@ -120,7 +124,7 @@ def _get_mem_win_builtin(
         f"Start-Process -Verb RunAs powershell -ArgumentList '{arglist}'",
     ]
 
-    subprocess.run(cmd, capture_output=True, text=True)
+    subprocess.run(cmd, capture_output=True, text=True, check=True)
 
     while True:
         try:
@@ -143,8 +147,8 @@ def _get_mem_win_builtin(
 
 
 def _get_mem_darwin(
-    pid: Union[str, int], pw_func: Optional[Callable[..., str]] = None
-) -> Optional[bytes]:
+    pid: str | int, pw_func: Callable[..., str] | None = None
+) -> bytes | None:
     subprocess.run(
         [
             "lldb",
@@ -157,6 +161,7 @@ def _get_mem_darwin(
         ],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
+        check=True,
     )
 
     with open(f"/tmp/memdump.{pid}.dmp", "rb") as f:
@@ -168,8 +173,8 @@ def _get_mem_darwin(
 
 
 def _get_mem_linux(
-    pid: Union[str, int], pw_func: Optional[Callable[..., str]] = None
-) -> Optional[bytes]:
+    pid: str | int, pw_func: Callable[..., str] | None = None
+) -> bytes | None:
     memdump_sh_path = (ROOT_DIR / "resources/memdump_linux.sh").as_posix()
 
     s = subprocess.run(
@@ -178,6 +183,7 @@ def _get_mem_linux(
             str(pid),
         ],
         capture_output=True,
+        check=False,
     ).stdout
 
     if len(s) > 1000:
@@ -190,6 +196,7 @@ def _get_mem_linux(
                 str(pid),
             ],
             capture_output=True,
+            check=False,
         ).stdout
     else:
         prompt = "Enter sudo password: "
@@ -209,16 +216,17 @@ def _get_mem_linux(
             ],
             capture_output=True,
             stdin=sudo_password_pipe.stdout,
+            check=False,
         ).stdout
 
     return s
 
 
 def get_mem(
-    pid: Union[str, int],
-    pw_func: Optional[Callable[..., str]] = None,
+    pid: str | int,
+    pw_func: Callable[..., str] | None = None,
     is_wine: bool = False,
-) -> Optional[bytes]:
+) -> bytes | None:
     if is_wine or platform.system() == "Windows":
         dump = _get_mem_win_procdump(pid, pw_func, is_wine)
         if dump is not None or is_wine:

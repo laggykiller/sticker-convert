@@ -90,11 +90,11 @@ class InputFrame(LabelFrame):
         )
         self.address_tip.grid(column=0, row=3, columnspan=3, sticky="w", padx=3, pady=3)
 
-        preset = [
+        preset = next(
             k
             for k, v in self.gui.input_presets.items()
             if v["full_name"] == self.gui.input_option_display_var.get()
-        ][0]
+        )
         if preset == "local":
             self.address_entry.config(state="disabled")
         else:

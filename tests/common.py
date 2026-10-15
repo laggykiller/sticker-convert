@@ -1,10 +1,12 @@
+from __future__ import annotations
+
 import json
 import os
 import shutil
 import subprocess
 from pathlib import Path
 from subprocess import CompletedProcess
-from typing import Any, List
+from typing import Any
 
 
 def get_python_path() -> str:
@@ -44,7 +46,7 @@ else:
     VIBER_AUTH = os.environ.get("VIBER_AUTH")  # type: ignore
 
 
-def run_cmd(cmd: List[str], **kwargs: Any) -> None:
-    result: CompletedProcess[Any] = subprocess.run(cmd, **kwargs)  # type: ignore
+def run_cmd(cmd: list[str], **kwargs: Any) -> None:
+    result: CompletedProcess[Any] = subprocess.run(cmd, check=False, **kwargs)  # type: ignore
 
     assert result.returncode == 0  # type: ignore

@@ -1,8 +1,8 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
 import configparser
 import os
 import re
-from typing import Optional
 
 # Adopted from https://github.com/roniemartinez/browsers/blob/master/browsers/linux.py
 
@@ -31,7 +31,7 @@ VERSION_PATTERN = re.compile(
 )  # simple pattern assuming all version strings have a dot on them
 
 
-def get_chromium_path() -> Optional[str]:
+def get_chromium_path() -> str | None:
     for _, desktop_entries in LINUX_DESKTOP_ENTRY_LIST:
         for application_dir in XDG_DATA_LOCATIONS:
             for desktop_entry in desktop_entries:

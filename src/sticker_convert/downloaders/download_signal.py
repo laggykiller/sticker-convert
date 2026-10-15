@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 from pathlib import Path
-from typing import Dict, Optional, Tuple
 
 import anyio
 from signalstickers_client.errors import SignalException
@@ -38,7 +39,7 @@ class DownloadSignal(DownloadBase):
             )
         )
 
-        emoji_dict: Dict[str, str] = {}
+        emoji_dict: dict[str, str] = {}
         for sticker in pack.stickers:
             f_id = str(sticker.id).zfill(3)
             f_path = Path(self.out_dir, f_id)
@@ -77,7 +78,7 @@ class DownloadSignal(DownloadBase):
             self.out_dir, title=pack.title, author=pack.author, emoji_dict=emoji_dict
         )
 
-    def download_stickers_signal(self) -> Tuple[int, int]:
+    def download_stickers_signal(self) -> tuple[int, int]:
         if "signal.art" not in self.url and not self.url.startswith(
             "sgnl://addstickers/"
         ):
@@ -100,9 +101,9 @@ class DownloadSignal(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadSignal(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_signal()

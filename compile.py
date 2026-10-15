@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 import platform
 import shutil
@@ -6,7 +8,6 @@ import subprocess
 import sys
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Optional
 
 sys.path.append("./src")
 from sticker_convert import __version__
@@ -14,7 +15,7 @@ from sticker_convert import __version__
 CRYPTOGRAPHY_WIN_ARM_WHL = "cryptography @ https://github.com/khmyznikov/PyEnv-WoA-State/releases/download/cryptography-47.0.0-arm64/cryptography-47.0.0.dev1-cp311-abi3-win_arm64.whl"
 
 
-def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
+def nuitka(python_bin: str, arch: str | None = None) -> None:
     cmd_list = [
         python_bin,
         "-m",
@@ -53,7 +54,7 @@ def nuitka(python_bin: str, arch: Optional[str] = None) -> None:
         cmd_list.append("--linux-icon=src/sticker_convert/resources/appicon.png")
 
     cmd_list.append("src/sticker-convert.py")
-    subprocess.run(cmd_list)
+    subprocess.run(cmd_list, check=True)
 
 
 def win_patch() -> None:
@@ -74,7 +75,9 @@ def osx_patch() -> None:
         f.write("open ./sticker-convert-cli")
     os.chmod(sticker_bin, 0o744)
 
-    subprocess.run(["codesign", "--force", "--deep", "-s", "-", "sticker-convert.app"])
+    subprocess.run(
+        ["codesign", "--force", "--deep", "-s", "-", "sticker-convert.app"], check=True
+    )
 
 
 def compile() -> None:
@@ -88,7 +91,7 @@ def compile() -> None:
     shutil.make_archive(ios_stickers_path, "zip", ios_stickers_path)
 
     shutil.rmtree("venv", ignore_errors=True)
-    subprocess.run([python_bin, "-m", "venv", "venv"])
+    subprocess.run([python_bin, "-m", "venv", "venv"], check=True)
     if platform.system() == "Windows":
         python_bin = os.path.abspath("venv/Scripts/python.exe")
     else:
@@ -108,7 +111,9 @@ def compile() -> None:
                     f.write(line + "\n")
                 else:
                     f.write(CRYPTOGRAPHY_WIN_ARM_WHL + "\n")
-    subprocess.run([python_bin, "-m", "pip", "install", "--prefer-binary", ".[build]"])
+    subprocess.run(
+        [python_bin, "-m", "pip", "install", "--prefer-binary", ".[build]"], check=True
+    )
 
     nuitka(python_bin, arch)
 

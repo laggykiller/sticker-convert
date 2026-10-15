@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import re
 from tkinter import colorchooser
-from typing import Any, List, Tuple
+from typing import Any
 
 from PIL import Image, ImageDraw, ImageTk
 from ttkbootstrap import Button, Canvas, Checkbutton, Entry, Frame, Label, LabelFrame, OptionMenu, Scrollbar, StringVar  # type: ignore
@@ -17,10 +17,10 @@ from sticker_convert.utils.translate import I
 
 class AdvancedCompressionWindow(BaseWindow):
     emoji_visible_rows = 5
-    emoji_btns: List[Tuple[Button, ImageTk.PhotoImage]] = []
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
+        self.emoji_btns: list[tuple[Button, ImageTk.PhotoImage]] = []
         self.categories = list(
             {entry["category"] for entry in load_resource_json("emoji")}
         )

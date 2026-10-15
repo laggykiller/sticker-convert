@@ -1,12 +1,13 @@
+from __future__ import annotations
+
 import json
 from pathlib import Path
-from typing import Dict, Tuple
 
 ROOT_DIR = Path(__file__).parents[1]
 
 
 def main() -> None:
-    xcode_imessage_iconset: Dict[str, Tuple[int, int]] = {}
+    xcode_imessage_iconset: dict[str, tuple[int, int]] = {}
 
     with open(
         ROOT_DIR

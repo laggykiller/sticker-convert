@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import zipfile
 from io import BytesIO
 from pathlib import Path
-from typing import Optional, Tuple, cast
+from typing import cast
 from urllib.parse import urlparse
 
 import requests
@@ -20,7 +22,7 @@ class DownloadViber(DownloadBase):
     # def __init__(self, *args: Any, **kwargs: Any) -> None:
     #     super().__init__(*args, **kwargs)
 
-    def get_pack_info(self, url: str) -> Optional[Tuple[str, str, str, str]]:
+    def get_pack_info(self, url: str) -> tuple[str, str, str, str] | None:
         r = requests.get(url, allow_redirects=True)
         soup = BeautifulSoup(r.text, "html.parser")
 
@@ -55,9 +57,7 @@ class DownloadViber(DownloadBase):
 
         return title, zip_url, cover_url, pack_id
 
-    def decompress(
-        self, zip_file: bytes, exts: Optional[Tuple[str, ...]] = None
-    ) -> int:
+    def decompress(self, zip_file: bytes, exts: tuple[str, ...] | None = None) -> int:
         with zipfile.ZipFile(BytesIO(zip_file)) as zf:
             self.cb.put(I("Unzipping..."))
 
@@ -89,7 +89,7 @@ class DownloadViber(DownloadBase):
 
             return len(zf_files)
 
-    def download_stickers_viber(self) -> Tuple[int, int]:
+    def download_stickers_viber(self) -> tuple[int, int]:
         pack_info = self.get_pack_info(self.url)
         if pack_info is None:
             self.cb.put(I("Download failed: Cannot get pack info"))
@@ -113,9 +113,9 @@ class DownloadViber(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadViber(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_viber()

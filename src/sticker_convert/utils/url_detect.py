@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import string
-from typing import Optional
 from urllib.parse import urlparse
 
 
 class UrlDetect:
     @staticmethod
-    def detect(url: str) -> Optional[str]:
+    def detect(url: str) -> str | None:
         domain = urlparse(url).netloc
 
         if domain == "signal.art" or url.startswith("sgnl://addstickers/"):

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 import ctypes
-from typing import Tuple
+import sys
 
 # Adopted from https://github.com/sliva0/tgradish/blob/master/src/tgradish/spoofer.py
 
@@ -15,7 +17,7 @@ def bytes2bitstr(data: bytes) -> str:
     return format(int.from_bytes(data, "big"), f"0{nbytes * 8}b")
 
 
-def read_vint(data: bytes) -> Tuple[int, int]:
+def read_vint(data: bytes) -> tuple[int, int]:
     """
     Reads Variable-Size Integer from the start of data
     according to RFC 8794 section 4.
@@ -25,20 +27,20 @@ def read_vint(data: bytes) -> Tuple[int, int]:
     return vint_length, vint_value
 
 
-def enter_element(s: int, f: int, data: bytes) -> Tuple[int, int]:
+def enter_element(s: int, f: int, data: bytes) -> tuple[int, int]:
     vint_len, element_len = read_vint(data[s:f])
     s += vint_len
     f = s + element_len
     return s, f
 
 
-def skip_element(s: int, f: int, data: bytes) -> Tuple[int, int]:
+def skip_element(s: int, f: int, data: bytes) -> tuple[int, int]:
     vint_len, element_len = read_vint(data[s:f])
     s += vint_len + element_len
     return s, f
 
 
-def find_duration_tag(data: bytes) -> Tuple[int, int]:
+def find_duration_tag(data: bytes) -> tuple[int, int]:
     # start and finish of the current working byte sequence in data
     s: int = 0
     f: int = len(data)
@@ -55,9 +57,8 @@ def find_duration_tag(data: bytes) -> Tuple[int, int]:
                 return s, f
         else:
             s, f = skip_element(s, f, data)
-    else:
-        print("Duration value was not found")
-        exit(1)
+    print("Duration value was not found")
+    sys.exit(1)
 
 
 def spoof_duration(data: bytes, duration_fake: float) -> bytearray:

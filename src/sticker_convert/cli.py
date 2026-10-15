@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import argparse
 import signal
 import sys
@@ -7,7 +9,7 @@ from json.decoder import JSONDecodeError
 from math import ceil
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 from mergedeep import merge  # type: ignore
 
@@ -154,7 +156,7 @@ class CLI:
             "res_snap_pow2",
             "no_res_snap_pow2",
         )
-        keyword_args: Dict[str, Any]
+        keyword_args: dict[str, Any]
         for k, v in self.help["comp"].items():
             if k in flags_comp_int:
                 keyword_args = {"type": int, "default": None}
@@ -209,7 +211,7 @@ class CLI:
         if args.custom_presets:
             try:
                 custom_presets = JsonManager.load_json(Path(args.custom_presets))
-                self.compression_presets: Dict[Any, Any] = merge(  # type: ignore
+                self.compression_presets: dict[Any, Any] = merge(  # type: ignore
                     self.compression_presets,  # type: ignore
                     custom_presets,
                 )

@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import copy
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union, cast
+from typing import Any, Tuple, cast
 
 import anyio
 from telegram import Sticker
@@ -75,8 +77,8 @@ class UploadTelegram(UploadBase):
         self.opt_comp_cover_merged.merge(self.base_spec)
 
     async def upload_pack(
-        self, pack_title: str, stickers: List[Path], emoji_dict: Dict[str, str]
-    ) -> Tuple[Optional[str], int, int]:
+        self, pack_title: str, stickers: list[Path], emoji_dict: dict[str, str]
+    ) -> tuple[str | None, int, int]:
         tg_api: TelegramAPI
         if self.opt_output.option.endswith("telethon"):
             tg_api = TelethonAPI()
@@ -122,7 +124,7 @@ class UploadTelegram(UploadBase):
         else:
             sticker_type = Sticker.REGULAR
 
-        stickers_list: List[TelegramSticker] = []
+        stickers_list: list[TelegramSticker] = []
         sticker_format = None
         for src in stickers:
             self.cb.put(I("Verifying {} for uploading to telegram").format(src))
@@ -206,8 +208,8 @@ class UploadTelegram(UploadBase):
                 )
 
             if check_file_result:
-                with open(src, "rb") as f:
-                    sticker_bytes = f.read()
+                async with await anyio.open_file(src, "rb") as f:
+                    sticker_bytes = await f.read()
             else:
                 _, _, convert_result, _ = StickerConvert.convert(
                     Path(src),
@@ -232,7 +234,7 @@ class UploadTelegram(UploadBase):
 
         cover_path = MetadataHandler.get_cover(self.opt_output.dir)
         if cover_path:
-            thumbnail_bytes: Union[None, bytes, Path] = None
+            thumbnail_bytes: None | bytes | Path = None
             cover_ext = Path(cover_path).suffix
 
             if cover_ext == ".tgs":
@@ -247,8 +249,8 @@ class UploadTelegram(UploadBase):
                 cover_spec_choice = self.png_cover_spec
 
             if FormatVerify.check_file(cover_path, spec=cover_spec_choice):
-                with open(cover_path, "rb") as f:
-                    thumbnail_bytes = f.read()
+                async with await anyio.open_file(cover_path, "rb") as f:
+                    thumbnail_bytes = await f.read()
             else:
                 _, _, thumbnail_bytes, _ = cast(
                     Tuple[Any, Any, bytes, Any],
@@ -269,8 +271,8 @@ class UploadTelegram(UploadBase):
         await tg_api.exit()
         return await tg_api.get_pack_url(), stickers_total, stickers_ok
 
-    def upload_stickers_telegram(self) -> Tuple[int, int, List[str]]:
-        urls: List[str] = []
+    def upload_stickers_telegram(self) -> tuple[int, int, list[str]]:
+        urls: list[str] = []
 
         title, _, emoji_dict = MetadataHandler.get_metadata(
             self.opt_output.dir,
@@ -328,7 +330,7 @@ class UploadTelegram(UploadBase):
                 self.upload_pack, pack_title, stickers, emoji_dict
             )
             if result:
-                self.cb.put((result))
+                self.cb.put(result)
                 urls.append(result)
             stickers_total += stickers_total_pack
             stickers_ok += stickers_ok_pack
@@ -342,7 +344,7 @@ class UploadTelegram(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int, List[str]]:
+    ) -> tuple[int, int, list[str]]:
         exporter = UploadTelegram(
             opt_output,
             opt_comp,

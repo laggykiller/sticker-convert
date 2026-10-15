@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, List, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
@@ -20,7 +20,7 @@ class MetadataKakao:
     @staticmethod
     def get_pack_info(
         pack_title: str,
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         pack_meta_r = requests.get(f"https://e.kakao.com/api/items/{pack_title}")
 
         if pack_meta_r.status_code == 200:
@@ -40,12 +40,12 @@ class DownloadKakao(DownloadBase):
         )
 
         super().__init__(*args, **kwargs)
-        self.pack_title: Optional[str] = None
-        self.author: Optional[str] = None
+        self.pack_title: str | None = None
+        self.author: str | None = None
 
-        self.pack_info: Optional[dict[str, Any]] = None
+        self.pack_info: dict[str, Any] | None = None
 
-    def download_stickers_kakao(self) -> Tuple[int, int]:
+    def download_stickers_kakao(self) -> tuple[int, int]:
         if urlparse(self.url).netloc == "emoticon.kakao.com":
             # Redirect to e.kakao.com
             self.url = requests.get(self.url).url
@@ -67,7 +67,7 @@ class DownloadKakao(DownloadBase):
             self.out_dir, title=self.pack_title, author=self.author
         )
 
-        targets: List[Tuple[str, Path]] = []
+        targets: list[tuple[str, Path]] = []
         targets.append(
             (self.pack_info["hero"]["imageUrl"], Path(self.out_dir, "cover"))
         )
@@ -86,7 +86,7 @@ class DownloadKakao(DownloadBase):
             semaphore_cnt=2,
         )
 
-        ext: Optional[str] = None
+        ext: str | None = None
         for i in self.out_dir.iterdir():
             if i.suffix == ".unknown_ext":
                 ext = format_detect(i, [".webp", ".gif", ".png"])
@@ -97,9 +97,9 @@ class DownloadKakao(DownloadBase):
     @staticmethod
     def start(
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int]:
+    ) -> tuple[int, int]:
         downloader = DownloadKakao(opt_input, opt_cred, cb, cb_return)
         return downloader.download_stickers_kakao()

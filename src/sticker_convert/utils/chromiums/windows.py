@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
 import os
-from typing import Optional
 
 # Not adopting approach of reading registry like https://github.com/roniemartinez/browsers
 # As trigger antivirus
@@ -37,7 +37,7 @@ WINDOWS_CHROMIUMS_PATHS = (
 )
 
 
-def get_chromium_path() -> Optional[str]:
+def get_chromium_path() -> str | None:
     for path in WINDOWS_CHROMIUMS_PATHS:
         if os.path.exists(path):
             return path

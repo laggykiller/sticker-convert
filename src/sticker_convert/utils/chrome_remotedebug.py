@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import base64
 import io
 import json
@@ -9,7 +11,7 @@ import signal
 import socket
 import subprocess
 import time
-from typing import Any, Dict, List, Optional, Union, cast
+from typing import Any, Optional, cast
 
 import requests
 import websocket
@@ -17,7 +19,7 @@ from PIL import Image
 
 from sticker_convert.utils.translate import get_translator
 
-I = get_translator()  # noqa: E741
+I = get_translator()
 
 # References
 # https://github.com/yeongbin-jo/python-chromedriver-autoinstaller/blob/master/chromedriver_autoinstaller/utils.py
@@ -52,17 +54,17 @@ class CRD:
     def __init__(
         self,
         chrome_bin: str,
-        port: Optional[int] = None,
-        args: Optional[List[str]] = None,
+        port: int | None = None,
+        args: list[str] | None = None,
     ) -> None:
         if port is None:
             port = get_free_port()
         self.port = port
 
-        launch_cmd: List[str] = []
+        launch_cmd: list[str] = []
         if (
             platform.system() == "Linux"
-            and os.environ.get("DISPLAY", False) is False
+            and os.environ.get("DISPLAY", None) is None
             and shutil.which("xvfb-run")
         ):
             launch_cmd += ["xvfb-run", "--server-args='-screen 0, 1024x768x24'"]
@@ -89,10 +91,8 @@ class CRD:
         self.chrome_proc = subprocess.Popen(launch_cmd)
 
     @staticmethod
-    def launch_chromium(
-        chrome_bin: str, extra_args: Optional[List[str]] = None
-    ) -> bool:
-        launch_cmd: List[str] = [chrome_bin]
+    def launch_chromium(chrome_bin: str, extra_args: list[str] | None = None) -> bool:
+        launch_cmd: list[str] = [chrome_bin]
         if (
             platform.system() != "Windows"
             and "geteuid" in dir(os)
@@ -105,7 +105,7 @@ class CRD:
         return True
 
     @staticmethod
-    def get_chromium_path() -> Optional[str]:
+    def get_chromium_path() -> str | None:
         if platform.system() == "Windows":
             from sticker_convert.utils.chromiums.windows import get_chromium_path
         elif platform.system() == "Darwin":
@@ -114,10 +114,10 @@ class CRD:
             from sticker_convert.utils.chromiums.linux import get_chromium_path
         return get_chromium_path()
 
-    def connect(self, target_id: Optional[int] = None) -> None:
+    def connect(self, target_id: int | None = None) -> None:
         self.cmd_id = 1
         r = None
-        targets: List[Any] = []
+        targets: list[Any] = []
         for _ in range(30):
             try:
                 r = requests.get(f"http://127.0.0.1:{self.port}/json")
@@ -149,7 +149,7 @@ class CRD:
     def disconnect(self) -> None:
         self.ws.close()
 
-    def send_cmd(self, command: Dict[Any, Any]) -> Union[str, bytes]:
+    def send_cmd(self, command: dict[Any, Any]) -> str | bytes:
         if command.get("id") is None:
             command["id"] = self.cmd_id
         for _ in range(3):
@@ -163,8 +163,8 @@ class CRD:
 
         raise RuntimeError(I("Websocket keep disconnecting"))
 
-    def exec_js(self, js: str, context_id: Optional[int] = None) -> Union[str, bytes]:
-        command: Dict[str, Any] = {
+    def exec_js(self, js: str, context_id: int | None = None) -> str | bytes:
+        command: dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Runtime.evaluate",
             "params": {"expression": js},
@@ -173,7 +173,7 @@ class CRD:
             command["params"]["contextId"] = context_id
         return self.send_cmd(command)
 
-    def get_storage(self, key: str) -> Optional[str]:
+    def get_storage(self, key: str) -> str | None:
         self.exec_js("window.dispatchEvent(new Event('localStorageUpdate'))")
         r = self.exec_js(f"localStorage.getItem('{key}')")
         return cast(
@@ -181,8 +181,8 @@ class CRD:
             json.loads(r).get("result", {}).get("result", {}).get("value"),
         )
 
-    def get_cookie(self, sites: List[str]) -> List[Dict[str, Any]]:
-        command: Dict[str, Any] = {
+    def get_cookie(self, sites: list[str]) -> list[dict[str, Any]]:
+        command: dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Network.getCookies",
             "params": {"urls": sites},
@@ -190,16 +190,16 @@ class CRD:
         result = self.send_cmd(command)
         return json.loads(result)["result"]["cookies"]
 
-    def set_transparent_bg(self) -> Union[str, bytes]:
-        command: Dict[str, Any] = {
+    def set_transparent_bg(self) -> str | bytes:
+        command: dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Emulation.setDefaultBackgroundColorOverride",
             "params": {"color": {"r": 0, "g": 0, "b": 0, "a": 0}},
         }
         return self.send_cmd(command)
 
-    def screenshot(self, clip: Optional[Dict[str, int]] = None) -> Image.Image:
-        command: Dict[str, Any] = {
+    def screenshot(self, clip: dict[str, int] | None = None) -> Image.Image:
+        command: dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Page.captureScreenshot",
             "params": {"captureBeyondViewport": True, "optimizeForSpeed": True},
@@ -222,7 +222,7 @@ class CRD:
         self.send_cmd(command)
 
     def open_html_str(self, html: str) -> None:
-        command: Dict[str, Any] = {
+        command: dict[str, Any] = {
             "id": self.cmd_id,
             "method": "Page.navigate",
             "params": {"url": "about:blank"},

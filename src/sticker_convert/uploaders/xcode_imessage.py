@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import copy
 import json
 import os
@@ -6,7 +8,7 @@ import plistlib
 import shutil
 import zipfile
 from pathlib import Path
-from typing import Any, Dict, List, Tuple
+from typing import Any
 
 from sticker_convert.converter import StickerConvert
 from sticker_convert.definitions import ROOT_DIR
@@ -35,8 +37,8 @@ class XcodeImessage(UploadBase):
         self.large_spec = copy.deepcopy(self.base_spec)
         self.large_spec.set_res(618)
 
-    def create_imessage_xcode(self) -> Tuple[int, int, List[str]]:
-        urls: List[str] = []
+    def create_imessage_xcode(self) -> tuple[int, int, list[str]]:
+        urls: list[str] = []
         title, author, _ = MetadataHandler.get_metadata(
             self.opt_output.dir,
             title=self.opt_output.title,
@@ -109,11 +111,11 @@ class XcodeImessage(UploadBase):
     def add_metadata(self, author: str, title: str) -> None:
         first_image_path = Path(
             self.opt_output.dir,
-            [
+            next(
                 i
                 for i in sorted(self.opt_output.dir.iterdir())
                 if (self.opt_output.dir / i).is_file() and i.suffix == ".png"
-            ][0],
+            ),
         )
         cover_path = MetadataHandler.get_cover(self.opt_output.dir)
         if cover_path:
@@ -213,7 +215,7 @@ class XcodeImessage(UploadBase):
             if i.suffix == ".sticker":
                 shutil.rmtree(stickers_path / i)
 
-        stickers_lst: List[str] = []
+        stickers_lst: list[str] = []
         for i in sorted(self.opt_output.dir.iterdir()):
             if (
                 CodecInfo.get_file_ext(i) == ".png"
@@ -242,7 +244,7 @@ class XcodeImessage(UploadBase):
 
         # packname StickerPackExtension/Stickers.xcstickers/Sticker Pack.stickerpack/Contents.json
         with open(stickers_path / "Contents.json", encoding="utf-8") as f:
-            stickerpack_json_content: Dict[str, List[Dict[str, str]]] = json.load(f)
+            stickerpack_json_content: dict[str, list[dict[str, str]]] = json.load(f)
 
         stickerpack_json_content["stickers"] = []
         for sticker in stickers_lst:
@@ -261,7 +263,7 @@ class XcodeImessage(UploadBase):
             if Path(iconfile_name).suffix == ".png":
                 os.remove(iconset_path / iconfile_name)
 
-        icons_lst: List[str] = []
+        icons_lst: list[str] = []
         for icon in XCODE_IMESSAGE_ICONSET:
             shutil.copy(self.opt_output.dir / icon, iconset_path / icon)
             icons_lst.append(icon)
@@ -290,6 +292,6 @@ class XcodeImessage(UploadBase):
         opt_cred: CredOption,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
-    ) -> Tuple[int, int, List[str]]:
+    ) -> tuple[int, int, list[str]]:
         exporter = XcodeImessage(opt_output, opt_comp, opt_cred, cb, cb_return)
         return exporter.create_imessage_xcode()

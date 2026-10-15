@@ -12,7 +12,7 @@ from sticker_convert.utils.translate import I
 
 class DiscordGetAuthWindow(BaseWindow):
     def __init__(self, *args: Any, **kwargs: Any) -> None:
-        super(DiscordGetAuthWindow, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self.title(I("Get Discord token"))
 

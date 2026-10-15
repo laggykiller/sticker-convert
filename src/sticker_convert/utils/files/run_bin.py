@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import platform
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Any, Callable, List, Tuple, Union
+from typing import Any, Callable
 
 
 class RunBin:
     @staticmethod
     def get_bin(
         executable: str, silent: bool = False, cb_msg: Callable[..., Any] = print
-    ) -> Union[str, None]:
+    ) -> str | None:
         if Path(executable).is_file():
             return executable
 
@@ -27,8 +29,8 @@ class RunBin:
 
     @staticmethod
     def run_cmd(
-        cmd_list: List[str], silence: bool = False, cb_msg: Callable[..., Any] = print
-    ) -> Tuple[bool, str]:
+        cmd_list: list[str], silence: bool = False, cb_msg: Callable[..., Any] = print
+    ) -> tuple[bool, str]:
         bin_path = RunBin.get_bin(cmd_list[0])
 
         if bin_path:
@@ -44,8 +46,7 @@ class RunBin:
         sp = subprocess.run(
             cmd_list,
             stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            capture_output=True,
             check=False,
         )
 

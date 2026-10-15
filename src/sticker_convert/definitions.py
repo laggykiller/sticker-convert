@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 import platform
 import sys
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any
 
 
 def get_root_dir() -> Path:
@@ -39,7 +41,7 @@ ROOT_DIR_EXE = get_root_dir_exe()
 
 
 def check_root_dir_exe_writable() -> bool:
-    if (
+    return not (
         not os.access(ROOT_DIR_EXE.parent, os.W_OK)
         or Path("/usr/bin/") in ROOT_DIR_EXE.parents
         or Path("/bin") in ROOT_DIR_EXE.parents
@@ -47,9 +49,7 @@ def check_root_dir_exe_writable() -> bool:
         or Path("C:/Program Files") in ROOT_DIR_EXE.parents
         or Path("/Applications/") in ROOT_DIR_EXE.parents
         or "site-packages" in ROOT_DIR_EXE.as_posix()
-    ):
-        return False
-    return True
+    )
 
 
 ROOT_DIR_EXE_WRITABLE = check_root_dir_exe_writable()
@@ -92,4 +92,4 @@ SVG_DEFAULT_WIDTH = 1024
 SVG_DEFAULT_HEIGHT = 1024
 
 # A shared dictionary
-RUNTIME_STATE: Dict[str, Any] = {}
+RUNTIME_STATE: dict[str, Any] = {}

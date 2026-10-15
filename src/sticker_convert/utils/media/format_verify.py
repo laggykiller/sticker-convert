@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import os
 from fractions import Fraction
 from pathlib import Path
-from typing import Optional, Tuple, Union
 
 from sticker_convert.job_option import CompOption
 from sticker_convert.utils.media.codec_info import CodecInfo
@@ -10,7 +11,7 @@ from sticker_convert.utils.media.codec_info import CodecInfo
 
 class FormatVerify:
     @staticmethod
-    def check_file(file: Union[Path, bytes], spec: CompOption) -> bool:
+    def check_file(file: Path | bytes, spec: CompOption) -> bool:
         if FormatVerify.check_presence(file) is False:
             return False
 
@@ -36,18 +37,16 @@ class FormatVerify:
         )
 
     @staticmethod
-    def check_presence(file: Union[Path, bytes]) -> bool:
+    def check_presence(file: Path | bytes) -> bool:
         if isinstance(file, Path):
             return Path(file).is_file()
         return True
 
     @staticmethod
     def check_file_res(
-        file: Union[Path, bytes],
-        res: Tuple[
-            Tuple[Optional[int], Optional[int]], Tuple[Optional[int], Optional[int]]
-        ],
-        file_info: Optional[CodecInfo] = None,
+        file: Path | bytes,
+        res: tuple[tuple[int | None, int | None], tuple[int | None, int | None]],
+        file_info: CodecInfo | None = None,
     ) -> bool:
         if file_info:
             file_width, file_height = file_info.res
@@ -76,22 +75,22 @@ class FormatVerify:
 
         if min_ratio is not None and max_ratio is not None:
             if min_ratio == max_ratio:
-                return True if file_ratio == min_ratio else False
+                return file_ratio == min_ratio
             else:
                 return True
 
         if min_ratio is not None:
-            return True if file_ratio == min_ratio else False
+            return file_ratio == min_ratio
         if max_ratio is not None:
-            return True if file_ratio == max_ratio else False
+            return file_ratio == max_ratio
 
         return True
 
     @staticmethod
     def check_file_fps(
-        file: Union[Path, bytes],
-        fps: Tuple[Optional[int], Optional[int]],
-        file_info: Optional[CodecInfo] = None,
+        file: Path | bytes,
+        fps: tuple[int | None, int | None],
+        file_info: CodecInfo | None = None,
     ) -> bool:
         if file_info:
             file_fps = file_info.fps
@@ -100,16 +99,13 @@ class FormatVerify:
 
         if fps and fps[0] and file_fps < fps[0]:
             return False
-        if fps and fps[1] and file_fps > fps[1]:
-            return False
-
-        return True
+        return not (fps and fps[1] and file_fps > fps[1])
 
     @staticmethod
     def check_file_duration(
-        file: Union[Path, bytes],
-        duration: Tuple[Optional[int], Optional[int]],
-        file_info: Optional[CodecInfo] = None,
+        file: Path | bytes,
+        duration: tuple[int | None, int | None],
+        file_info: CodecInfo | None = None,
     ) -> bool:
         if file_info:
             file_duration = file_info.duration
@@ -120,16 +116,13 @@ class FormatVerify:
             return True
         if duration and duration[0] and file_duration < duration[0]:
             return False
-        if duration and duration[1] and file_duration > duration[1]:
-            return False
-
-        return True
+        return not (duration and duration[1] and file_duration > duration[1])
 
     @staticmethod
     def check_file_size(
-        file: Union[Path, bytes],
-        size: Tuple[Optional[int], Optional[int]],
-        file_info: Optional[CodecInfo] = None,
+        file: Path | bytes,
+        size: tuple[int | None, int | None],
+        file_info: CodecInfo | None = None,
     ) -> bool:
         if isinstance(file, Path):
             file_size = os.path.getsize(file)
@@ -156,25 +149,22 @@ class FormatVerify:
 
     @staticmethod
     def check_animated(
-        file: Union[Path, bytes],
-        animated: Optional[bool] = None,
-        file_info: Optional[CodecInfo] = None,
+        file: Path | bytes,
+        animated: bool | None = None,
+        file_info: CodecInfo | None = None,
     ) -> bool:
         if file_info:
             file_animated = file_info.is_animated
         else:
             file_animated = CodecInfo.is_anim(file)
 
-        if animated is not None and file_animated != animated:
-            return False
-
-        return True
+        return not (animated is not None and file_animated != animated)
 
     @staticmethod
     def check_format(
-        file: Union[Path, bytes],
-        fmt: Tuple[Tuple[str, ...], Tuple[str, ...]],
-        file_info: Optional[CodecInfo] = None,
+        file: Path | bytes,
+        fmt: tuple[tuple[str, ...], tuple[str, ...]],
+        file_info: CodecInfo | None = None,
     ) -> bool:
         if file_info:
             file_animated = file_info.is_animated
@@ -200,6 +190,6 @@ class FormatVerify:
             return True
         if file_ext in jpg_exts and (".jpg" in valid_fmt or ".jpeg" in valid_fmt):
             return True
-        if file_ext in png_exts and (".png" in valid_fmt or ".apng" in valid_fmt):
-            return True
-        return False
+        return bool(
+            file_ext in png_exts and (".png" in valid_fmt or ".apng" in valid_fmt)
+        )

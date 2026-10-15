@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 import anyio
 import httpx
@@ -18,7 +18,7 @@ class DownloadBase:
     def __init__(
         self,
         opt_input: InputOption,
-        opt_cred: Optional[CredOption],
+        opt_cred: CredOption | None,
         cb: CallbackProtocol,
         cb_return: CallbackReturn,
     ) -> None:
@@ -31,13 +31,13 @@ class DownloadBase:
 
     def download_multiple_files(
         self,
-        targets: List[Tuple[str, Path]],
+        targets: list[tuple[str, Path]],
         retries: int = 3,
-        headers: Optional[dict[Any, Any]] = None,
+        headers: dict[Any, Any] | None = None,
         semaphore_cnt: int = 4,
         **kwargs: Any,
-    ) -> Dict[str, bool]:
-        results: Dict[str, bool] = {}
+    ) -> dict[str, bool]:
+        results: dict[str, bool] = {}
         anyio.run(
             partial(
                 self.download_multiple_files_async,
@@ -53,10 +53,10 @@ class DownloadBase:
 
     async def download_multiple_files_async(
         self,
-        targets: List[Tuple[str, Path]],
+        targets: list[tuple[str, Path]],
         retries: int = 3,
-        headers: Optional[dict[Any, Any]] = None,
-        results: Optional[dict[str, bool]] = None,
+        headers: dict[Any, Any] | None = None,
+        results: dict[str, bool] | None = None,
         semaphore_cnt: int = 4,
         **kwargs: Any,
     ) -> None:
@@ -67,20 +67,19 @@ class DownloadBase:
 
         semaphore = anyio.Semaphore(semaphore_cnt)
 
-        async with httpx.AsyncClient() as client:
-            async with anyio.create_task_group() as tg:
-                for url, dest in targets:
-                    tg.start_soon(
-                        self.download_file_async,
-                        semaphore,
-                        client,
-                        url,
-                        dest,
-                        retries,
-                        headers,
-                        results,
-                        **kwargs,
-                    )
+        async with httpx.AsyncClient() as client, anyio.create_task_group() as tg:
+            for url, dest in targets:
+                tg.start_soon(
+                    self.download_file_async,
+                    semaphore,
+                    client,
+                    url,
+                    dest,
+                    retries,
+                    headers,
+                    results,
+                    **kwargs,
+                )
 
     async def download_file_async(
         self,
@@ -89,8 +88,8 @@ class DownloadBase:
         url: str,
         dest: Path,
         retries: int = 3,
-        headers: Optional[dict[Any, Any]] = None,
-        results: Optional[dict[str, bool]] = None,
+        headers: dict[Any, Any] | None = None,
+        results: dict[str, bool] | None = None,
         **kwargs: Any,
     ) -> None:
         async with semaphore:
@@ -121,7 +120,7 @@ class DownloadBase:
     def download_file(
         self,
         url: str,
-        dest: Optional[Path] = None,
+        dest: Path | None = None,
         retries: int = 3,
         show_progress: bool = True,
         **kwargs: Any,

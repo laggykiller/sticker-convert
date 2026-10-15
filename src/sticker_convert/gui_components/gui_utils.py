@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import platform
-from typing import TYPE_CHECKING, Tuple, Union
+from typing import TYPE_CHECKING
 
 from ttkbootstrap import Canvas, Frame, PhotoImage, Scrollbar  # type: ignore
 
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 
 class GUIUtils:
     @staticmethod
-    def set_icon(window: Union["BaseWindow", "GUI"]) -> None:
+    def set_icon(window: BaseWindow | GUI) -> None:
         window.icon = PhotoImage(file=ROOT_DIR / "resources/appicon.png")  # type: ignore
         window.iconphoto(1, window.icon)  # type: ignore
         if platform.system() == "Darwin":
@@ -26,8 +26,8 @@ class GUIUtils:
 
     @staticmethod
     def create_scrollable_frame(
-        window: Union["BaseWindow", "GUI"],
-    ) -> Tuple[Frame, Frame, Canvas, Scrollbar, Scrollbar, Frame]:
+        window: BaseWindow | GUI,
+    ) -> tuple[Frame, Frame, Canvas, Scrollbar, Scrollbar, Frame]:
         main_frame = Frame(window)
         main_frame.pack(fill="both", expand=1)
 
@@ -66,7 +66,7 @@ class GUIUtils:
         )
 
     @staticmethod
-    def finalize_window(window: Union["GUI", "BaseWindow"]) -> None:
+    def finalize_window(window: GUI | BaseWindow) -> None:
         window.attributes("-alpha", 0)  # type: ignore
 
         screen_width = window.winfo_screenwidth()

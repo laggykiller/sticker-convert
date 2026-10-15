@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-from typing import Any, Optional, Tuple
+from __future__ import annotations
+
+from typing import Any
 
 import anyio
 from telethon import TelegramClient  # type: ignore
@@ -33,7 +35,7 @@ class AuthTelethon(AuthBase):
 
     async def signin_async(
         self, try_sign_in: bool = True
-    ) -> Tuple[bool, TelegramClient, int, str, str]:
+    ) -> tuple[bool, TelegramClient, int, str, str]:
         client = TelegramClient(
             CONFIG_DIR / f"telethon-{self.opt_cred.telethon_api_id}.session",
             self.opt_cred.telethon_api_id,
@@ -129,13 +131,11 @@ class AuthTelethon(AuthBase):
                 {"question": msg, "initialvalue": self.opt_cred.telethon_api_hash},
             )
         )
-        if self.opt_cred.telethon_api_hash == "":
-            return False
-        return True
+        return self.opt_cred.telethon_api_hash != ""
 
     async def start_async(
         self, check_auth_only: bool = False
-    ) -> Tuple[bool, Optional[TelegramClient], int, str, str]:
+    ) -> tuple[bool, TelegramClient | None, int, str, str]:
         if self.opt_cred.telethon_api_id != 0 and self.opt_cred.telethon_api_hash != "":
             success, client, api_id, api_hash, msg = await self.signin_async(
                 try_sign_in=False
@@ -157,5 +157,5 @@ class AuthTelethon(AuthBase):
 
     def start(
         self, check_auth_only: bool = False
-    ) -> Tuple[bool, Optional[TelegramClient], int, str, str]:
+    ) -> tuple[bool, TelegramClient | None, int, str, str]:
         return anyio.run(self.start_async, check_auth_only)

@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import re
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import Any, Dict, List, Tuple, Union, cast
+from typing import Any, List, Tuple, cast
 
 import anyio
 from telegram import InputSticker, PhotoSize, Sticker
@@ -59,13 +61,13 @@ class TelegramAPI:
         raise NotImplementedError
 
     async def pack_new(
-        self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]:
+        self, stickers_list: list[TelegramSticker], sticker_type: str
+    ) -> tuple[int, int]:
         raise NotImplementedError
 
     async def pack_add(
-        self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]:
+        self, stickers_list: list[TelegramSticker], sticker_type: str
+    ) -> tuple[int, int]:
         raise NotImplementedError
 
     async def pack_thumbnail(self, thumbnail: TelegramSticker) -> bool:
@@ -76,7 +78,7 @@ class TelegramAPI:
 
     async def pack_dl(
         self, pack_short_name: str, out_dir: Path
-    ) -> Tuple[Dict[str, bool], Dict[str, str]]:
+    ) -> tuple[dict[str, bool], dict[str, str]]:
         raise NotImplementedError
 
 
@@ -152,9 +154,7 @@ class BotAPI(TelegramAPI):
         except TelegramError:
             pass
 
-        if sticker_set is not None:
-            return True
-        return False
+        return sticker_set is not None
 
     async def pack_del(self) -> bool:
         try:
@@ -179,9 +179,9 @@ class BotAPI(TelegramAPI):
         return True
 
     async def pack_new(
-        self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]:
-        init_input_stickers: List[InputSticker] = []
+        self, stickers_list: list[TelegramSticker], sticker_type: str
+    ) -> tuple[int, int]:
+        init_input_stickers: list[InputSticker] = []
         for i in stickers_list[:50]:
             init_input_stickers.append(
                 InputSticker(
@@ -220,8 +220,8 @@ class BotAPI(TelegramAPI):
             return len(stickers_list), 0
 
     async def pack_add(
-        self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]:
+        self, stickers_list: list[TelegramSticker], sticker_type: str
+    ) -> tuple[int, int]:
         stickers_ok = 0
         self.cb.put(
             (
@@ -305,11 +305,11 @@ class BotAPI(TelegramAPI):
 
     async def _download_sticker(
         self,
-        sticker: Union[PhotoSize, Sticker],
+        sticker: PhotoSize | Sticker,
         f_id: str,
         out_dir: Path,
-        results: Dict[str, bool],
-        emoji_dict: Dict[str, str],
+        results: dict[str, bool],
+        emoji_dict: dict[str, str],
     ) -> None:
         try:
             sticker_file = await sticker.get_file(
@@ -343,9 +343,9 @@ class BotAPI(TelegramAPI):
 
     async def pack_dl(
         self, pack_short_name: str, out_dir: Path
-    ) -> Tuple[Dict[str, bool], Dict[str, str]]:
-        results: Dict[str, bool] = {}
-        emoji_dict: Dict[str, str] = {}
+    ) -> tuple[dict[str, bool], dict[str, str]]:
+        results: dict[str, bool] = {}
+        emoji_dict: dict[str, str] = {}
 
         try:
             sticker_set: TGStickerSet = await self.application.bot.get_sticker_set(
@@ -382,7 +382,7 @@ class BotAPI(TelegramAPI):
                 )
 
             if sticker_set.thumbnail is not None:
-                results_thumb: Dict[str, bool] = {}
+                results_thumb: dict[str, bool] = {}
                 tg.start_soon(
                     self._download_sticker,
                     sticker_set.thumbnail,
@@ -446,7 +446,7 @@ class TelethonAPI(TelegramAPI):
 
         return True
 
-    async def _send_and_recv(self, msg: Union[str, Path]) -> str:
+    async def _send_and_recv(self, msg: str | Path) -> str:
         if isinstance(msg, str):
             sent_message = await self.client.send_message("Stickers", msg)
         else:
@@ -458,7 +458,7 @@ class TelethonAPI(TelegramAPI):
         for _ in range(5):
             # https://core.telegram.org/bots/faq#my-bot-is-hitting-limits-how-do-i-avoid-this
             # In a single chat, avoid sending more than one message per second.
-            time.sleep(1)
+            time.sleep(1)  # noqa: ASYNC251
             last_message = cast(
                 List[Message],
                 await self.client.get_messages("Stickers", 1),  # type: ignore
@@ -488,8 +488,8 @@ class TelethonAPI(TelegramAPI):
         return True
 
     async def pack_new(
-        self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]:
+        self, stickers_list: list[TelegramSticker], sticker_type: str
+    ) -> tuple[int, int]:
         stickers_ok = 0
         if self.is_emoji:
             repl = await self._send_and_recv("/newemojipack")
@@ -571,8 +571,8 @@ class TelethonAPI(TelegramAPI):
         return len(stickers_list), stickers_ok
 
     async def pack_add(
-        self, stickers_list: List[TelegramSticker], sticker_type: str
-    ) -> Tuple[int, int]:
+        self, stickers_list: list[TelegramSticker], sticker_type: str
+    ) -> tuple[int, int]:
         stickers_ok = 0
         if self.is_emoji:
             repl = await self._send_and_recv("/addemoji")
@@ -649,9 +649,9 @@ class TelethonAPI(TelegramAPI):
         sticker: TypeDocument,
         f_id: str,
         out_dir: Path,
-        id_to_emoji: Dict[int, str],
-        emoji_dict: Dict[str, str],
-        results: Dict[str, bool],
+        id_to_emoji: dict[int, str],
+        emoji_dict: dict[str, str],
+        results: dict[str, bool],
     ) -> None:
         fpath_attr = [
             attr
@@ -666,7 +666,7 @@ class TelethonAPI(TelegramAPI):
 
         try:
             await self.client.download_media(sticker, file=f_path)  # type: ignore
-        except Exception as e:
+        except Exception as e:  # noqa: BLE001
             self.cb.put(I("Failed to download {}: {}").format(f_id, str(e)))
             results[f_id] = False
             return
@@ -678,10 +678,10 @@ class TelethonAPI(TelegramAPI):
 
     async def pack_dl(
         self, pack_short_name: str, out_dir: Path
-    ) -> Tuple[Dict[str, bool], Dict[str, str]]:
-        results: Dict[str, bool] = {}
-        emoji_dict: Dict[str, str] = {}
-        id_to_emoji: Dict[int, str] = defaultdict(str)
+    ) -> tuple[dict[str, bool], dict[str, str]]:
+        results: dict[str, bool] = {}
+        emoji_dict: dict[str, str] = {}
+        id_to_emoji: dict[int, str] = defaultdict(str)
 
         sticker_set = cast(
             TLStickerSet,
@@ -730,7 +730,7 @@ class TelethonAPI(TelegramAPI):
                     ),
                     f"cover{ext}",
                 )
-            except Exception as e:
+            except Exception as e:  # noqa: BLE001
                 self.cb.put(I("Failed to download cover{}: {}").format(ext, str(e)))
 
         return results, emoji_dict

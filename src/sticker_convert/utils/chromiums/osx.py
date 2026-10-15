@@ -1,9 +1,9 @@
-#!/usr/bin/env python3
+from __future__ import annotations
+
 import glob
 import os
 import plistlib
 import subprocess
-from typing import Optional
 
 # Adopted from https://github.com/roniemartinez/browsers/blob/master/browsers/osx.py
 
@@ -37,7 +37,7 @@ OSX_CHROMIUMS_BUNDLE_LIST = (
 OSX_CHROMIUMS_BUNDLE_DICT = {item[1]: item for item in OSX_CHROMIUMS_BUNDLE_LIST}
 
 
-def get_chromium_path() -> Optional[str]:
+def get_chromium_path() -> str | None:
     for _, bundle_id, _ in OSX_CHROMIUMS_BUNDLE_LIST:
         app_dirs = subprocess.getoutput(
             f'mdfind "kMDItemCFBundleIdentifier == {bundle_id}"'

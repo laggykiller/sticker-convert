@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 import os
 import sys
 from pathlib import Path
-from typing import List, Optional
 
 import pytest
 from _pytest._py.path import LocalPath  # type: ignore
@@ -11,17 +12,15 @@ from tests.common import COMPRESSION_DICT, PYTHON_EXE, SAMPLE_DIR, SIGNAL_PASSWO
 os.chdir(Path(__file__).resolve().parent)
 sys.path.append("../src")
 
-from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore # noqa: E402
+from sticker_convert.utils.media.codec_info import CodecInfo  # type: ignore
 
 TEST_UPLOAD = os.environ.get("TEST_UPLOAD")
 
 
-def _run_sticker_convert(
-    tmp_path: LocalPath, preset: str, export: Optional[str]
-) -> None:
+def _run_sticker_convert(tmp_path: LocalPath, preset: str, export: str | None) -> None:
     preset_dict = COMPRESSION_DICT.get(preset)
 
-    cmd: List[str] = [
+    cmd: list[str] = [
         PYTHON_EXE,
         "sticker-convert.py",
         "--input-dir",

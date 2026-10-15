@@ -6,16 +6,16 @@ from dataclasses import dataclass
 from math import ceil
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any
 
 
-def to_int(i: Union[float, str, None]) -> Optional[int]:
+def to_int(i: float | str | None) -> int | None:
     return int(i) if i is not None else None
 
 
 @dataclass
 class BaseOption:
-    def merge(self, config: "BaseOption") -> None:
+    def merge(self, config: BaseOption) -> None:
         for k, v in vars(config).items():
             if v is not None:
                 setattr(self, k, v)
@@ -23,7 +23,7 @@ class BaseOption:
     def __repr__(self) -> str:
         return json.dumps(self.to_dict(), indent=2)
 
-    def to_dict(self) -> Dict[str, str]:
+    def to_dict(self) -> dict[str, str]:
         return {}
 
 
@@ -33,58 +33,58 @@ class InputOption(BaseOption):
     url: str = ""
     dir: Path = Path()
 
-    def to_dict(self) -> Dict[Any, Any]:
+    def to_dict(self) -> dict[Any, Any]:
         return {"option": self.option, "url": self.url, "dir": self.dir.as_posix()}
 
 
 @dataclass
 class CompOption(BaseOption):
     preset: str = "auto"
-    size_max_img: Optional[int] = None
-    size_max_vid: Optional[int] = None
+    size_max_img: int | None = None
+    size_max_vid: int | None = None
 
-    format_img: Tuple[str, ...] = tuple()
-    format_vid: Tuple[str, ...] = tuple()
+    format_img: tuple[str, ...] = ()
+    format_vid: tuple[str, ...] = ()
 
-    fps_min: Optional[int] = None
-    fps_max: Optional[int] = None
+    fps_min: int | None = None
+    fps_max: int | None = None
     fps_power: float = -0.5
 
-    res_w_min: Optional[int] = None
-    res_w_max: Optional[int] = None
-    res_h_min: Optional[int] = None
-    res_h_max: Optional[int] = None
+    res_w_min: int | None = None
+    res_w_max: int | None = None
+    res_h_min: int | None = None
+    res_h_max: int | None = None
     res_power: float = 3.0
     res_snap_pow2: bool = False
 
-    quality_min: Optional[int] = None
-    quality_max: Optional[int] = None
+    quality_min: int | None = None
+    quality_max: int | None = None
     quality_power: float = 5.0
 
-    color_min: Optional[int] = None
-    color_max: Optional[int] = None
+    color_min: int | None = None
+    color_max: int | None = None
     color_power: float = 3.0
 
-    duration_min: Optional[int] = None
-    duration_max: Optional[int] = None
+    duration_min: int | None = None
+    duration_max: int | None = None
     duration_spoof: bool = False
 
-    bg_color: Optional[str] = None
+    bg_color: str | None = None
 
     padding_percent: int = 0
 
     steps: int = 1
-    fake_vid: Optional[bool] = None
-    quantize_method: Optional[str] = None
-    scale_filter: Optional[str] = None
-    chromium_path: Optional[str] = None
-    cache_dir: Optional[str] = None
+    fake_vid: bool | None = None
+    quantize_method: str | None = None
+    scale_filter: str | None = None
+    chromium_path: str | None = None
+    cache_dir: str | None = None
     default_emoji: str = "😀"
-    no_compress: Optional[bool] = None
+    no_compress: bool | None = None
     processes: int = ceil(cpu_count() / 2)
-    animated: Optional[bool] = None
+    animated: bool | None = None
 
-    def to_dict(self) -> Dict[Any, Any]:
+    def to_dict(self) -> dict[Any, Any]:
         return {
             "preset": self.preset,
             "size_max": {"img": self.size_max_img, "vid": self.size_max_vid},
@@ -125,79 +125,77 @@ class CompOption(BaseOption):
             "animated": self.animated,
         }
 
-    def get_size_max(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_size_max(self) -> tuple[int | None, int | None]:
         return (self.size_max_img, self.size_max_vid)
 
-    def set_size_max(self, value: Optional[int]) -> None:
+    def set_size_max(self, value: int | None) -> None:
         self.size_max_img, self.size_max_vid = to_int(value), to_int(value)
 
-    def get_format(self) -> Tuple[Tuple[str, ...], Tuple[str, ...]]:
+    def get_format(self) -> tuple[tuple[str, ...], tuple[str, ...]]:
         return (self.format_img, self.format_vid)
 
-    def set_format(self, value: Tuple[str, ...]) -> None:
+    def set_format(self, value: tuple[str, ...]) -> None:
         self.format_img, self.format_vid = value, value
 
-    def get_fps(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_fps(self) -> tuple[int | None, int | None]:
         return (self.fps_min, self.fps_max)
 
-    def set_fps(self, value: Optional[int]) -> None:
+    def set_fps(self, value: int | None) -> None:
         self.fps_min, self.fps_max = to_int(value), to_int(value)
 
     def get_res(
         self,
-    ) -> Tuple[
-        Tuple[Optional[int], Optional[int]], Tuple[Optional[int], Optional[int]]
-    ]:
+    ) -> tuple[tuple[int | None, int | None], tuple[int | None, int | None]]:
         return (self.get_res_w(), self.get_res_h())
 
-    def set_res(self, value: Optional[int]) -> None:
+    def set_res(self, value: int | None) -> None:
         self.res_w_min = to_int(value)
         self.res_w_max = to_int(value)
         self.res_h_min = to_int(value)
         self.res_h_max = to_int(value)
 
-    def get_res_max(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_res_max(self) -> tuple[int | None, int | None]:
         return (self.res_w_max, self.res_h_max)
 
-    def set_res_max(self, value: Optional[int]) -> None:
+    def set_res_max(self, value: int | None) -> None:
         self.res_w_max = to_int(value)
         self.res_h_max = to_int(value)
 
-    def get_res_min(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_res_min(self) -> tuple[int | None, int | None]:
         return (self.res_w_min, self.res_h_min)
 
-    def set_res_min(self, value: Optional[int]) -> None:
+    def set_res_min(self, value: int | None) -> None:
         self.res_w_min = to_int(value)
         self.res_h_min = to_int(value)
 
-    def get_res_w(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_res_w(self) -> tuple[int | None, int | None]:
         return (self.res_w_min, self.res_w_max)
 
-    def set_res_w(self, value: Optional[int]) -> None:
+    def set_res_w(self, value: int | None) -> None:
         self.res_w_min, self.res_w_max = to_int(value), to_int(value)
 
-    def get_res_h(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_res_h(self) -> tuple[int | None, int | None]:
         return (self.res_h_min, self.res_h_max)
 
-    def set_res_h(self, value: Optional[int]) -> None:
+    def set_res_h(self, value: int | None) -> None:
         self.res_h_min, self.res_h_max = to_int(value), to_int(value)
 
-    def get_quality(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_quality(self) -> tuple[int | None, int | None]:
         return (self.quality_min, self.quality_max)
 
-    def set_quality(self, value: Optional[int]) -> None:
+    def set_quality(self, value: int | None) -> None:
         self.quality_min, self.quality_max = to_int(value), to_int(value)
 
-    def get_color(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_color(self) -> tuple[int | None, int | None]:
         return (self.color_min, self.color_max)
 
-    def set_color(self, value: Optional[int]) -> None:
+    def set_color(self, value: int | None) -> None:
         self.color_min, self.color_max = to_int(value), to_int(value)
 
-    def get_duration(self) -> Tuple[Optional[int], Optional[int]]:
+    def get_duration(self) -> tuple[int | None, int | None]:
         return (self.duration_min, self.duration_max)
 
-    def set_duration(self, value: Optional[int]) -> None:
+    def set_duration(self, value: int | None) -> None:
         self.duration_min, self.duration_max = to_int(value), to_int(value)
 
     def get_duration_spoof(self) -> bool:
@@ -214,7 +212,7 @@ class OutputOption(BaseOption):
     title: str = ""
     author: str = ""
 
-    def to_dict(self) -> Dict[Any, Any]:
+    def to_dict(self) -> dict[Any, Any]:
         return {
             "option": self.option,
             "dir": self.dir.as_posix(),
@@ -240,7 +238,7 @@ class CredOption(BaseOption):
     misskey_token: str = ""
     misskey_url: str = ""
 
-    def to_dict(self) -> Dict[Any, Any]:
+    def to_dict(self) -> dict[Any, Any]:
         return {
             "signal": {"uuid": self.signal_uuid, "password": self.signal_password},
             "telegram": {"token": self.telegram_token, "userid": self.telegram_userid},

@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import os
 import platform
 import shutil
 import time
 from pathlib import Path
-from typing import Any, Optional, Tuple
+from typing import Any
 from urllib.parse import urlparse
 
 from sticker_convert.auth.auth_base import AuthBase
@@ -25,10 +27,10 @@ class AuthDiscord(AuthBase):
 
         self.chromedriver_download_dir = chromedriver_download_dir
 
-    def get_discord_bin_path(self) -> Optional[str]:
-        discord_bin: Optional[str]
+    def get_discord_bin_path(self) -> str | None:
+        discord_bin: str | None
         if platform.system() == "Windows":
-            discord_win_dirs: Tuple[Tuple[str, str], ...]
+            discord_win_dirs: tuple[tuple[str, str], ...]
             discord_win_dirs = (
                 (
                     os.path.expandvars("%localappdata%/Discord"),
@@ -44,8 +46,8 @@ class AuthDiscord(AuthBase):
                 ),
             )
             for discord_dir, discord_bin in discord_win_dirs:
-                app_dir: Optional[str] = None
-                chrome_path: Optional[str] = None
+                app_dir: str | None = None
+                chrome_path: str | None = None
                 if os.path.isdir(discord_dir) is False:
                     continue
                 for i in [j for j in os.listdir(discord_dir) if j.startswith("app-")]:
@@ -54,7 +56,7 @@ class AuthDiscord(AuthBase):
                     if os.path.isfile(chrome_path):
                         return chrome_path
         else:
-            discord_dirs: Tuple[Optional[str], ...]
+            discord_dirs: tuple[str | None, ...]
             if platform.system() == "Darwin":
                 discord_dirs = (
                     "/Applications/Discord.app/Contents/MacOS/Discord",
@@ -72,7 +74,7 @@ class AuthDiscord(AuthBase):
                     return discord_bin
         return None
 
-    def get_cred(self) -> Tuple[Optional[str], str]:
+    def get_cred(self) -> tuple[str | None, str]:
         msg = I("Getting Discord authorization token...")
         self.cb.put(("msg_dynamic", (msg,), None))
 

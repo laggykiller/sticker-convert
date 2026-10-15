@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import json
 import time
 from http.cookiejar import CookieJar
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any
 from urllib.parse import urlparse
 
 import requests
@@ -23,7 +25,7 @@ class AuthMisskey(AuthBase):
 
         super().__init__(*args, **kwargs)
 
-    def get_cred(self) -> Tuple[Optional[str], str]:
+    def get_cred(self) -> tuple[str | None, str]:
         msg = I("Getting Misskey storage")
         self.cb.put(("msg_dynamic", (msg,), None))
 
@@ -92,7 +94,7 @@ class AuthMisskey(AuthBase):
     @staticmethod
     def validate_token(
         url: str,
-        token: Union[CookieJar, Dict[str, str]],
+        token: CookieJar | dict[str, str],
     ) -> bool:
         scheme = urlparse(url).scheme
         if scheme == "":
@@ -103,6 +105,4 @@ class AuthMisskey(AuthBase):
             headers={"Referer": f"{scheme}://{netloc}/"},
             json={"i": token},
         )
-        if response.ok:
-            return True
-        return False
+        return bool(response.ok)
