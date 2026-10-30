@@ -1,7 +1,7 @@
 # sticker-convert
 ### [ [English](/README.md) | [繁體中文](/docs/zh_TW/README.md) | [简体中文](/docs/zh_CN/README.md) | [日本語](/docs/ja_JP/README.md) ]
 
-![/imgs/banner.png](https://socialify.git.ci/laggykiller/sticker-convert/image?description=1&font=Inter&logo=https%3A%2F%2Fgithub.com%2Flaggykiller%2Fsticker-convert%2Fblob%2Fmaster%2Fsrc%2Fsticker_convert%2Fresources%2Fappicon.png%3Fraw%3Dtrue&name=1&owner=1&theme=Dark)
+![/imgs/banner.png](https://socialify.git.ci/laggykiller/sticker-convert/image?description=1&font=Inter&logo=https%3A%2F%2Fraw.githubusercontent.com%2Flaggykiller%2Fsticker-convert%2Frefs%2Fheads%2Fmaster%2Fsrc%2Fsticker_convert%2Fresources%2Fappicon.png&name=1&owner=1&stargazers=1&theme=Dark)
 ![/imgs/screenshot](/imgs/screenshot.png)
 
 - 複数のインスタントメッセージングアプリケーションからスタンプを作成、ダウンロード、変換+圧縮、アップロードするためのPythonスクリプトです。
