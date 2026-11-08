@@ -30,7 +30,7 @@ jobs:
     - name: Update emoji data
       run: |
         curl -o src/sticker_convert/resources/emoji.json -L https://raw.githubusercontent.com/rhysd/gemoji/refs/heads/unicode-16.0/db/emoji.json
-        curl -o src/sticker_convert/resources/NotoColorEmoji.ttf -L https://github.com/googlefonts/noto-emoji/raw/refs/heads/main/fonts/NotoColorEmoji.ttf
+        curl -o src/sticker_convert/resources/NotoColorEmoji.ttf -L https://raw.githubusercontent.com/googlefonts/noto-emoji/refs/heads/main/2D/fonts/NotoColorEmoji.ttf
     - name: mypy
       run: mypy
     - name: pyright
